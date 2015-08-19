@@ -45,7 +45,8 @@
             }
             else{
               /*redirect page here */
-              alert("Redirect this page (project created)");
+              window.location.href = '{%url 'project:list_of_projects'%}'
+              
             }
           });
           e.preventDefault();
