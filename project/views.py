@@ -1,6 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponse
-from piebase.models import Project,Organization
+from piebase.models import Project
 from forms import CreateProjectForm
 from django.utils import timezone
 from django.template.defaultfilters import slugify
