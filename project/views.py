@@ -1,6 +1,5 @@
 import json, random, string
 from django.shortcuts import render
-from django.http import HttpResponse
 from django.utils import timezone
 from django.template.defaultfilters import slugify
 from django.contrib.auth.decorators import login_required
@@ -12,32 +11,33 @@ from forms import CreateProjectForm, CreateMemberForm
 
 @login_required
 def create_project(request):
-    print 'oooooooooooooooooooooo'
-    template_name = 'create_project.html'
-    if(request.method=="POST"):     
-        print '((((((((((((((((((((((((((((((('
-        organization=request.user.organization
-        form = CreateProjectForm(request.POST,organization=organization)
-        if(form.is_valid()):
-            print 'validdddddddddddddddddddddddddddd'
-            slug = slugify(request.POST['name'])
-            project_obj = Project.objects.create(name=request.POST['name'],slug=slug,description=request.POST['description'],modified_date=timezone.now(),organization=organization)
-            project_id = project_obj.id
-            json_data = {'error':False,'errors':form.errors, 'project_id': project_id}
-            return HttpResponse(json.dumps(json_data), content_type="application/json")
-        else:
-            json_data = {'error':True,'errors':form.errors}
-            return HttpResponse(json.dumps(json_data), content_type="application/json")
-    return render(request,template_name) 
+	template_name = 'create_project.html'
+	if(request.method=="POST"):
+		organization=request.user.organization
+		form = CreateProjectForm(request.POST,organization=organization)
+		if(form.is_valid()):
+			slug = slugify(request.POST['name'])
+			Project.objects.create(name=request.POST['name'],slug=slug,description=request.POST['description'],modified_date=timezone.now(),organization=organization)
+			return HttpResponse(json.dumps({'error':False,'errors':form.errors}), content_type="application/json")
+		else:
+			return HttpResponse(json.dumps({'error':True,'errors':form.errors}), content_type="application/json")
+	return render(request,template_name)
 
 
 @login_required
 def list_of_projects(request):
-    template_name = 'list_of_projects.html'
-    projects_list=Project.objects.all()
-    user_objects=User.objects.all()
-    dict_items={'projects_list':projects_list, 'user_objects':user_objects}
-    return render(request, template_name, dict_items)
+	template_name = 'list_of_projects.html'
+	projects_list=Project.objects.filter(members__email=request.user)
+	dict_items={'projects_list':projects_list}
+	return render(request, template_name, dict_items)
+
+@login_required
+def project_description(request, pk):
+	template_name='project_description.html'
+	project_object=Project.objects.filter(id=pk)
+	project_members=project_object[0].members.all()
+	dict_items={'project_object':project_object[0], 'project_members':project_members}
+	return render(request, template_name, dict_items)
 
 @login_required
 @csrf_exempt
@@ -95,5 +95,3 @@ def create_member(request, project_id):
     else:
         print 'from get'
         return render(request, 'create_member.html')
-
-
