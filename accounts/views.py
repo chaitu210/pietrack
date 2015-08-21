@@ -63,4 +63,3 @@ def forgot_password(request):
             else:
                 json_data = {'error': True, 'error_msg': 'email not registered'}
         return HttpResponse(json.dumps(json_data), content_type = 'application/json')
-

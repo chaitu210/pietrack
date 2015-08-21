@@ -45,7 +45,9 @@
             }
             else{
               /*redirect page here */
-              alert("Redirect this page (project created)");
+              var project_id = response['project_id']
+              var create_member_url = ('/project/create_member/' + project_id)
+              window.location.replace(create_member_url) //{%  url 'project:create_member' project_id %}")
             }
           });
           e.preventDefault();
