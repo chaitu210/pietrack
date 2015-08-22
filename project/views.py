@@ -4,6 +4,7 @@ from django.utils import timezone
 from django.template.defaultfilters import slugify
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
+from django.core.mail import send_mail
 from piebase.models import User, Project, Organization, Role
 from forms import CreateProjectForm, CreateMemberForm
 
@@ -61,12 +62,13 @@ def create_member(request, project_id):
                 description = post_dict['description']
                 organization_obj = request.user.organization
                 if User.objects.filter(email = email).exists():
-                    #send_mail('Subject here', 'Here is the message.', 'dineshmcmf@gmail.com', [email])
+                    send_mail('invitaition for project', 'time to code', 'dineshmcmf@gmail.com', [email])
                     pass
                 else:
                     random_password = ''.join(random.choice(string.digits) for _ in xrange(8))
-                    User.objects.create(email = email, username = email, password = random_password, organization = organization_obj, pietrack_role = 'user')
-                    #send_mail('Subject here', 'Here is the message.', 'dineshmcmf@gmail.com', [email])
+                    new_user_obj = User.objects.create(email = email, username = email, password = random_password, organization = organization_obj, pietrack_role = 'user')
+                    change_password_link = '127.0.0.1:8000/accounts/change_password/' + str(new_user_obj.id) + '/'
+                    send_mail('Invitation for project', 'time to code, before that change your password: ' + change_password_link, 'dineshmcmf@gmail.com', [email])
                 project_obj = Project.objects.get(id = project_id)
                 user_obj = User.objects.get(email = email)
                 project_obj.members.add(user_obj)
