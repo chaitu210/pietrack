@@ -397,6 +397,61 @@ header{
 	width: 100%;
 	background: #fff;
 	height: 42px;
+	.logo{
+		i{
+			padding: 11px 30px;
+			background: #000;
+			color: @green;
+			position: relative;
+			font-size: 28px;
+			text-align: center;
+			cursor: pointer;
+		}
+	}
+	.pg_mt{
+		margin-left: -4px;
+		cursor: pointer;
+		transition:0.3s;
+		clear: both;
+		line-height: 14px;
+		margin-right: -3px;
+		i{
+			padding: 12.5px 15px;
+			background: @green;
+			color: #fff;
+			font-size: 20px;
+		}
+	}
+	.dashboard{
+		.pg_mt;
+		i{
+			background: @blue!important;
+		}
+	}
+	.search_bar{
+		position: relative;
+		top: -7px;
+		width: 250px;
+		display: inline-block;
+		input{
+			padding: 5px 10px;
+			margin-left: 14px;
+			background: @menu_bg_three;
+			color: #fff;
+			font-weight: 500;
+			width: 100%;
+			height: 28px;
+			display: inline-block;
+		}
+		i{
+			color: @menu_bg_one;
+			position: absolute;
+			right: -14px;
+			top: 0px;
+			padding: 7.5px;
+			background: @menu_bg_three;
+		}
+	}
 	.left_header{
 		display: inline-block;
 		.right_header .menu;
@@ -406,7 +461,7 @@ header{
 					.logo{
 						i{
 							padding: 11px 30px;
-							background: #FFF;
+							background: #fff;
 							color: @aqua;
 							position: relative;
 							font-size: 28px;
@@ -457,8 +512,8 @@ header{
 					&:first-child{
 						.each_wrap{
 							border-left: 0px;
-						}
-					}
+							}
+							}
 					/*&:last-child{
 						margin-left: 1px;
 						&:hover{
@@ -488,7 +543,7 @@ header{
 							background: #666;
 							line-height: 0px;
 							padding-top: 7px;
-							color: #fff;
+							color:#fff;
 						}
 						.name{
 							display: none;
@@ -507,7 +562,7 @@ header{
 						}
 						&:hover{
 							background: @aqua;
-							color: #fff;
+							color:#fff;
 							padding: 8.5px 16px!important;
 							.name{
 								display: inline-block;
@@ -568,13 +623,13 @@ header{
 								/*	width: 155px;*/
 								}
 							}
-							/*.extras_one{
+							.extras_one{
 								i{
 									background: #fff;
 									color: @extras_one;
 								}
 								transition:0.5s;
-								color:@extras_one;
+								color: @extras_one;
 								border:1px solid @extras_one;
 								&:hover{
 									background: @extras_one;
@@ -593,7 +648,7 @@ header{
 									background: @extras_two;
 									color: #fff;
 								}
-							}*/
+							}
 						}
 						&:before{
 							content:'';
@@ -706,6 +761,7 @@ header{
 							color: @menu_bg_one!important;
 						}
 					}
+					
 					.child_one{
 						background: @menu_bg_one;
 						color: #fff;
@@ -818,14 +874,14 @@ header{
 }
 .active_li_drop{
 	.each_wrap{
-		background: @aqua!important;
-		color: #fff!important;
-		.name{
-			display: inline-block!important;
-		}
-		.count{
-			display: none;
-		}
+	background: @aqua !important;
+	color: #fff !important;
+	.name{
+		display: inline-block!important;
+	}
+	.count{
+		display: none;
+	}
 	}
 }
 #vertical_menu{
@@ -1170,6 +1226,7 @@ header{
 					}
 				}
 			}
+					
 		}
 		.profile-pic-count{
 			margin-bottom:20px;
@@ -1440,11 +1497,13 @@ header{
 								font-size:13px;
 								dipslay:block;
 								margin:6px 0px;
-							}
-						}
+							}							
+						}	
 					}
+					
 				}
 			}
+			
 			.content-panel-extra{
 				width:100%;
 				.member-box{
@@ -1532,7 +1591,8 @@ header{
 			}
 		}
 	/* right container ends here */
-}
+	
+}	
 /* modal styles starts here */
 .modal{
 	border:none;
@@ -1597,9 +1657,10 @@ header{
 	}
 }
 /* modal styles ends here */
+		
 
 /* box-content ends here */
-/* contacts div height */
+	/* contacts div height */
 .height_wrap{
 	height: 400px;
 }

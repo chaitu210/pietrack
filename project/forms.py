@@ -1,5 +1,5 @@
 from django import forms
-from piebase.models import Project,Organization
+from piebase.models import Project,Organization, User
 
 
 class CreateProjectForm(forms.ModelForm):
@@ -17,3 +17,8 @@ class CreateProjectForm(forms.ModelForm):
 		if(Project.objects.filter(name=name,organization=self.organization)):
 			raise forms.ValidationError('Project with this name already exists.')
 		return name 
+
+class CreateMemberForm(forms.Form):
+    email = forms.EmailField()
+    designation = forms.CharField()
+    description = forms.Textarea()

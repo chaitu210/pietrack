@@ -54,6 +54,7 @@ def register(request):
                 json_data = {'error': False}
                 new_user = User.objects.create_user(username=username, email=email, password=password,
                                                     first_name=first_name)
+
             else:
                 json_data = {'error': True, 'error_password': 'password mismatch'}
             return HttpResponse(json.dumps(json_data), content_type='application/json')
@@ -175,24 +176,3 @@ def userProfile(request):
 
     context = {'form': form}
     return render(request, 'user-profile.html', context)
-
-
-    # def userProfile(request):
-    #     user = User.objects.get(username='vidyasagar')
-    #     context = {'user' : user}
-    #     return render(request, 'user-profile.html', context)
-
-    #
-    # def userProfile(request):
-    #     if request.method == 'POST':
-    #         email = request.POST['email']
-    #         print email
-    #         user = User.objects.get(username='vidyasagar')
-    #         print(user)
-    #         form = EditUserModelForm(request.POST, instance=user)
-    #         print form.is_valid()
-    #         print form
-    #         if form.is_valid():
-    #             form.save()
-    #             return HttpResponseRedirect(reverse('userPofile'))
-    #         return render(request, 'user-profile.html', {'form': form, 'user': user})
