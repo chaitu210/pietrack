@@ -10,7 +10,9 @@ from django.core import validators
 from .helper import Memail
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.generic import GenericForeignKey
+from django.core.mail import send_mail
 
+import os
 
 MILESTONE_STATUS = (
     ('planned', 'Planned'),
@@ -36,6 +38,10 @@ class Organization(models.Model):
     slug = models.SlugField(max_length=250, unique=True, null=False, blank=True, verbose_name=_("slug"))
 
 
+def profile_path(instance, filename):
+    return os.path.join('profile/', str(instance.username), str(instance.username)+'.jpg')
+
+
 class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=30, unique=True)
     first_name = models.CharField(_('first name'), max_length=30, blank=True)
@@ -47,10 +53,15 @@ class User(AbstractBaseUser, PermissionsMixin):
     email_verified = models.BooleanField(default=False)
     organization = models.ForeignKey(Organization)
     pietrack_role = models.CharField(_('pietrack_role'), max_length=30, choices=PIETRACK_ROLES)
+    profile_pic = models.ImageField(upload_to=profile_path, null=True, blank=True)
+    biography = models.TextField(_('biography'), default=False)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
     objects = UserManager()
+
+    def __str__(self):
+        return "%s's profile" % self.username
 
     def get_full_name(self):
         full_name = '%s %s' % (self.first_name, self.last_name)

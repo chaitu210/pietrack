@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block content %}
+<section id='base_content' class='create_project'>
+      <div class="content_box">
+        <div class="title">
+          <h4>User Profile</h4>
+          <div class="tag">Compellingly reintermediate premier materials for client-centered markets.for client-centered markets.</div>
+        </div>
+        <div class="panel_box">
+            <form class="" action="" method="post" id="post-form" enctype="multipart/form-data">
+                {% csrf_token %}
+              <div class="user-pic-block">
+                 <span class="user-picture">
+                    <img src="{{ user.profile_pic.url }}" alt="{{ user.profile_pic.url }}" width="100px" height="100px"/>
+                     <!--<img src="{% static 'img/user-pic.jpg' %}" alt="user-profile-picture" />-->
+                 </span>
+                  <div class="">
+
+                      <label for="id_profile_pic">Profile pic:</label>
+                      Currently:
+                      <span class="user-picture">
+                            <a href="{{ user.profile_pic.url }}">{{ user.profile_pic }}</a>
+                      </span>
+                      <input id="profile_pic-clear_id" name="profile_pic-clear" type="checkbox" />
+                      <label for="profile_pic-clear_id">Clear</label>
+                      <span name="profile_pic"></span>
+                      <br />
+                      Change: <input id="id_profile_pic" name="profile_pic" type="file" />
+
+
+
+                      <!--<label for="id_profile_pic">Profile pic:</label>-->
+                      <!--Currently:-->
+                      <!--<span class="user-picture">-->
+                          <!--<img src="{{ user.profile_pic.url }}" alt="{{ user.profile_pic.url }}" width="100px" height="100px"/>-->
+                      <!--</span>-->
+                      <!--<input id="profile_pic-clear_id" name="profile_pic-clear" type="checkbox" />-->
+                      <!--<label for="profile_pic-clear_id">Clear</label>-->
+                      <!--Change: <input id="id_profile_pic" name="profile_pic" type="file" />-->
+
+
+                  </div>
+                 <span class="pic-size">The image will be scaled to 80x80px.</span>
+                 <span class="pic-btn"> <button>Change Picture</button></span>
+              </div>
+              <div class="form_group">
+                <label for="id_username">User Name</label>
+                <input id="id_username" name="username" type="text" class='input' value={{user.username}}>
+                  <span name="username"></span>
+                <div class="help">Type your username here</div>
+
+              </div>
+              <div class="form_group">
+                <label for="id_email">Email Address</label>
+                <input type="text" class='input' id="id_email" name="email" value={{user.email}}>
+                  <span name="email"></span>
+                <div class="help">Type your email address here</div>
+
+              </div>
+              <div class="form_group">
+                <label for="id_first_name">Full Name</label>
+                <input type="text" class='input' id="id_first_name" name="first_name" value={{user.first_name}}>
+                  <span name="first_name"></span>
+                <div class="help">Type your Full name here</div>
+
+              </div>
+               <div class="form_group">
+                <label for="id_biography">Bio (Max 300 letters)</label>
+                <textarea class="form-control textarea" id="id_biography" name="biography">{{user.biography}}</textarea>
+                   <span name="biography"></span>
+                <div class="help">Type your bio-graphy here</div>
+
+              </div>
+              <button type="submit">Save</button>
+            </form>
+        </div>
+      </div>
+    </section>
+{% endblock %}
+{% block jscript %}
+    <script src="http://malsup.github.com/jquery.form.js"></script>
+        <script type="text/javascript" >
+        $(document).ready(function(){
+
+        function display_error(errors){
+            if(errors){
+                return errors;
+            }
+            else{
+                return '';
+            }
+        };
+        function create_post(){
+
+            console.log("Create post is working!")
+            $.post("{% url 'accounts:userProfile' %}",$('form').serialize(), function(result){
+
+
+                if(result['error']){
+                    $("span[name='profile_pic']").text(display_error(result['errors'].profile_pic));
+                    $("span[name='username']").text(display_error(result['errors'].username));
+                    $("span[name='email']").text(display_error(result['errors'].email));
+                    $("span[name='first_name']").text(display_error(result['errors'].first_name));
+                    $("span[name='last_name']").text(display_error(result['errors'].last_name));
+                    $("span[name='biography']").text(display_error(result['errors'].biography));
+                }
+
+                else{
+                    alert(result['errors']);
+                    console.log('Updated');
+                }
+            });
+        }
+        $('#post-form').ajaxForm(function(){
+
+            console.log("form submitted!");
+            create_post();
+        });
+
+    });
+    </script>
+
+{% endblock %}

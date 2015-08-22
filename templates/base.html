@@ -1,5 +1,5 @@
-{% load compress %}
 <!DOCTYPE html>
+{% load compress %}
 <html>
   <head>
     <title>pieT</title>
@@ -80,18 +80,20 @@
               </span>
               <ul class="sub_list_extras">
                 <li>
-                  <span class='extras_drop_child extras_one'>
-                  <i class='fa fa-user'></i>
-                  <span class='name'>Profile</span>
-                  </span>
-                  </span>
+                  <a href="{% url 'accounts:userProfile' %}">
+                      <span class='extras_drop_child extras_one'>
+                      <i class='fa fa-user'></i>
+                      <span class='name'>Profile</span>
+                      </span>
+                  </a>
                 </li>
                 <li>
-                  <span class='extras_drop_child extras_two'>
-                  <i class='fa fa-expeditedssl'></i>
-                  <span class='name'>Change Password</span>
-                  </span>
-                  </span>
+                    <a href="{% url 'accounts:changePassword' %}">
+                      <span class='extras_drop_child extras_two'>
+                      <i class='fa fa-expeditedssl'></i>
+                      <span class='name'>Change Password</span>
+                      </span>
+                    </a>
                 </li>
               </ul>
             </li>
@@ -101,9 +103,10 @@
               <span class='name'>Notifications</span>
               <span class='number count'>25</span>
               </span>
-              <div class='scroll'>
+
                 <ul class='sub_list'>
-                  <li>
+                  <div class='scroll'>
+                      <li>
                     <span class='ticket'>
                     <img src='http://i.stack.imgur.com/8sNfT.jpg'>
                     <span class='description'>
@@ -113,119 +116,119 @@
                     <span class='time'>12 min ago</span>
                     </span>
                     </span>
-                  </li>
-                  <li>
-                    <span class='ticket'>
-                    <img src='http://i.stack.imgur.com/8sNfT.jpg'>
-                    <span class='description'>
-                    <span class='name'>Nazneen</span>
-                    added you to project
-                    <span class='project'>Pie Track</span>
-                    <span class='time'>12 min ago</span>
-                    </span>
-                    </span>
-                  </li>
-                  <li>
-                    <span class='ticket'>
-                    <img src='http://i.stack.imgur.com/8sNfT.jpg'>
-                    <span class='description'>
-                    <span class='name'>Nazneen</span>
-                    added you to project
-                    <span class='project'>Pie Track</span>
-                    <span class='time'>12 min ago</span>
-                    </span>
-                    </span>
-                  </li>
-                  <li>
-                    <span class='ticket'>
-                    <img src='http://i.stack.imgur.com/8sNfT.jpg'>
-                    <span class='description'>
-                    <span class='name'>Nazneen</span>
-                    added you to project
-                    <span class='project'>Pie Track</span>
-                    <span class='time'>12 min ago</span>
-                    </span>
-                    </span>
-                  </li>
-                  <li>
-                    <span class='ticket'>
-                    <img src='http://i.stack.imgur.com/8sNfT.jpg'>
-                    <span class='description'>
-                    <span class='name'>Nazneen</span>
-                    added you to project
-                    <span class='project'>Pie Track</span>
-                    <span class='time'>12 min ago</span>
-                    </span>
-                    </span>
-                  </li>
-                  <li>
-                    <span class='ticket'>
-                    <img src='http://i.stack.imgur.com/8sNfT.jpg'>
-                    <span class='description'>
-                    <span class='name'>Nazneen</span>
-                    added you to project
-                    <span class='project'>Pie Track</span>
-                    <span class='time'>12 min ago</span>
-                    </span>
-                    </span>
-                  </li>
-                  <li>
-                    <span class='ticket'>
-                    <img src='http://i.stack.imgur.com/8sNfT.jpg'>
-                    <span class='description'>
-                    <span class='name'>Nazneen</span>
-                    added you to project
-                    <span class='project'>Pie Track</span>
-                    <span class='time'>12 min ago</span>
-                    </span>
-                    </span>
-                  </li>
-                  <li>
-                    <span class='ticket'>
-                    <img src='http://i.stack.imgur.com/8sNfT.jpg'>
-                    <span class='description'>
-                    <span class='name'>Nazneen</span>
-                    added you to project
-                    <span class='project'>Pie Track</span>
-                    <span class='time'>12 min ago</span>
-                    </span>
-                    </span>
-                  </li>
-                  <li>
-                    <span class='ticket'>
-                    <img src='http://i.stack.imgur.com/8sNfT.jpg'>
-                    <span class='description'>
-                    <span class='name'>Nazneen</span>
-                    added you to project
-                    <span class='project'>Pie Track</span>
-                    <span class='time'>12 min ago</span>
-                    </span>
-                    </span>
-                  </li>
-                  <li>
-                    <span class='ticket'>
-                    <img src='http://i.stack.imgur.com/8sNfT.jpg'>
-                    <span class='description'>
-                    <span class='name'>Nazneen</span>
-                    added you to project
-                    <span class='project'>Pie Track</span>
-                    <span class='time'>12 min ago</span>
-                    </span>
-                    </span>
-                  </li>
-                  <li>
-                    <span class='ticket'>
-                    <img src='http://i.stack.imgur.com/8sNfT.jpg'>
-                    <span class='description'>
-                    <span class='name'>Nazneen</span>
-                    added you to project
-                    <span class='project'>Pie Track</span>
-                    <span class='time'>12 min ago</span>
-                    </span>
-                    </span>
-                  </li>
+                      </li>
+                      <li>
+                        <span class='ticket'>
+                        <img src='http://i.stack.imgur.com/8sNfT.jpg'>
+                        <span class='description'>
+                        <span class='name'>Nazneen</span>
+                        added you to project
+                        <span class='project'>Pie Track</span>
+                        <span class='time'>12 min ago</span>
+                        </span>
+                        </span>
+                      </li>
+                      <li>
+                        <span class='ticket'>
+                        <img src='http://i.stack.imgur.com/8sNfT.jpg'>
+                        <span class='description'>
+                        <span class='name'>Nazneen</span>
+                        added you to project
+                        <span class='project'>Pie Track</span>
+                        <span class='time'>12 min ago</span>
+                        </span>
+                        </span>
+                      </li>
+                      <li>
+                        <span class='ticket'>
+                        <img src='http://i.stack.imgur.com/8sNfT.jpg'>
+                        <span class='description'>
+                        <span class='name'>Nazneen</span>
+                        added you to project
+                        <span class='project'>Pie Track</span>
+                        <span class='time'>12 min ago</span>
+                        </span>
+                        </span>
+                      </li>
+                      <li>
+                        <span class='ticket'>
+                        <img src='http://i.stack.imgur.com/8sNfT.jpg'>
+                        <span class='description'>
+                        <span class='name'>Nazneen</span>
+                        added you to project
+                        <span class='project'>Pie Track</span>
+                        <span class='time'>12 min ago</span>
+                        </span>
+                        </span>
+                      </li>
+                      <li>
+                        <span class='ticket'>
+                        <img src='http://i.stack.imgur.com/8sNfT.jpg'>
+                        <span class='description'>
+                        <span class='name'>Nazneen</span>
+                        added you to project
+                        <span class='project'>Pie Track</span>
+                        <span class='time'>12 min ago</span>
+                        </span>
+                        </span>
+                      </li>
+                      <li>
+                        <span class='ticket'>
+                        <img src='http://i.stack.imgur.com/8sNfT.jpg'>
+                        <span class='description'>
+                        <span class='name'>Nazneen</span>
+                        added you to project
+                        <span class='project'>Pie Track</span>
+                        <span class='time'>12 min ago</span>
+                        </span>
+                        </span>
+                      </li>
+                      <li>
+                        <span class='ticket'>
+                        <img src='http://i.stack.imgur.com/8sNfT.jpg'>
+                        <span class='description'>
+                        <span class='name'>Nazneen</span>
+                        added you to project
+                        <span class='project'>Pie Track</span>
+                        <span class='time'>12 min ago</span>
+                        </span>
+                        </span>
+                      </li>
+                      <li>
+                        <span class='ticket'>
+                        <img src='http://i.stack.imgur.com/8sNfT.jpg'>
+                        <span class='description'>
+                        <span class='name'>Nazneen</span>
+                        added you to project
+                        <span class='project'>Pie Track</span>
+                        <span class='time'>12 min ago</span>
+                        </span>
+                        </span>
+                      </li>
+                      <li>
+                        <span class='ticket'>
+                        <img src='http://i.stack.imgur.com/8sNfT.jpg'>
+                        <span class='description'>
+                        <span class='name'>Nazneen</span>
+                        added you to project
+                        <span class='project'>Pie Track</span>
+                        <span class='time'>12 min ago</span>
+                        </span>
+                        </span>
+                      </li>
+                      <li>
+                        <span class='ticket'>
+                        <img src='http://i.stack.imgur.com/8sNfT.jpg'>
+                        <span class='description'>
+                        <span class='name'>Nazneen</span>
+                        added you to project
+                        <span class='project'>Pie Track</span>
+                        <span class='time'>12 min ago</span>
+                        </span>
+                        </span>
+                      </li>
+                  </div>
                 </ul>
-              </div>
             </li>
             <li>
               <span class='each_wrap logout'>
@@ -235,14 +238,14 @@
             </li>
           </ul>
         </div>
-        <span class="name_img_wrap">
-        <span class='name'>
-        Hello, <span>Nazneen Shaik</span>
-        </span>
-        <img src='http://epicwpp.com/wp-content/uploads/Smiling-minions-Frank-and-Dave-holding-a-Seastar_www.EpicWpp.com_.jpg'>
+      <span class="name_img_wrap">
+          <span class='name'>
+              Hello, <span>{{user.username}}</span>
+          </span>
+          <img src='{{ user.profile_pic.url }}' alt="{{ user.profile_pic.url }}">
+      </span>
       </div>
-      </div>
-      <!--/ right header -->
+
     </header>
     {%block content%}
 	{%endblock content%}
@@ -253,7 +256,7 @@
       $(function(){
         $('.scroll').slimscroll({
           alwaysVisible: false,
-          height: 400
+          height: 380
         });
       });
       $('.sub_list,.sub_list_extras').mouseenter(function(event) {
@@ -267,5 +270,7 @@
       {%endblock create_project_js%}
 
     </script>
+  {% block jscript %}
+  {% endblock %}
   </body>
 </html>

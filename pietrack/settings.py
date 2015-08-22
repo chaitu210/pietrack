@@ -28,6 +28,9 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
+MEDIA_ROOT = os.path.join(BASE_DIR+'/media/')
+MEDIA_URL = '/media/'
+
 # Application definition
 
 INSTALLED_APPS = (
@@ -85,7 +88,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'pietrack',
         'USER': 'root',
-        'PASSWORD': 'root',
+        'PASSWORD': 'vidyasagar',
         'HOST': '127.0.0.1',
         'PORT': '3306',
     }

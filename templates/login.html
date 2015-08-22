@@ -243,7 +243,8 @@
                         $('#login_error_id').text(result.error_msg)
                     }
                     else{
-                        alert('logged_in') 
+                        alert('You are successfully logged in !');
+                        window.location.href='userProfile';
                     }
                 });
         });
@@ -276,6 +277,7 @@
                     }
                     else{
                         alert('user_created')
+                        window.url
                     }
                 });
         });
