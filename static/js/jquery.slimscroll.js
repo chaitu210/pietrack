@@ -13,7 +13,7 @@
       var defaults = {
 
         // width in pixels of the visible scroll area
-        width : '300',
+        width : 'auto',
 
         // height in pixels of the visible scroll area
         height : '250px',
@@ -157,12 +157,8 @@
         var wrapper = $(divS)
           .addClass(o.wrapperClass)
           .css({
-            position: 'absolute',
-            /*overflow: 'hidden',*/
-            right: '-75%',
-            top: '46px',
-            zIndex: '30',
-            boxShadow:'0px 0px 20px rgba(0,0,0,0.3)',
+            position: 'relative',
+            overflow: 'hidden',
             width: o.width,
             height: o.height
           });
