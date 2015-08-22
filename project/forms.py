@@ -1,5 +1,6 @@
 from django import forms
 from piebase.models import Project,Organization
+from django.template.defaultfilters import slugify
 
 
 class CreateProjectForm(forms.ModelForm):
@@ -14,6 +15,8 @@ class CreateProjectForm(forms.ModelForm):
 
 	def clean_name(self):
 		name = self.cleaned_data['name']
-		if(Project.objects.filter(name=name,organization=self.organization)):
+		slug = slugify(name)
+		print slug
+		if(Project.objects.filter(organization=self.organization, slug=slug)):
 			raise forms.ValidationError('Project with this name already exists.')
 		return name 

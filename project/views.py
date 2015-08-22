@@ -30,3 +30,22 @@ def list_of_projects(request):
 	user_objects=User.objects.all()
 	dict_items={'projects_list':projects_list, 'user_objects':user_objects}
 	return render(request, template_name, dict_items)
+
+def project_details(request,slug):
+	# print slug
+	project = Project.objects.get(slug=slug)
+	dictionary = {'project':project}
+	template_name = 'Project-Project_Details.html'
+
+	if(request.method=='POST'):
+		organization=request.user.organization
+		form = CreateProjectForm(request.POST,organization=organization)
+		if(form.is_valid()):
+			slug = slugify(request.POST['name'])
+			project = Project(name=request.POST['name'],slug=slug,description=request.POST['description'],modified_date=timezone.now(),organization=organization)
+			project.save()
+			return HttpResponse(json.dumps({'error':False}), content_type="application/json")
+		else:
+			return HttpResponse(json.dumps({'error':True,'errors':form.errors}), content_type="application/json")
+
+	return render(request, template_name, dictionary)
