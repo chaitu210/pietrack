@@ -2,19 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="fe8834ca-bc8e-4049-a8a2-f2ad22dceea8" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/templates/create_member.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/templates/create_project.html" afterPath="$PROJECT_DIR$/templates/create_project.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/project/forms.py" afterPath="$PROJECT_DIR$/project/forms.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/static/js/jquery.slimscroll.js" afterPath="$PROJECT_DIR$/static/js/jquery.slimscroll.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/static/less/main.css" afterPath="$PROJECT_DIR$/static/less/main.css" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/static/less/main.less" afterPath="$PROJECT_DIR$/static/less/main.less" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/static/less/ref.css" afterPath="$PROJECT_DIR$/static/less/ref.css" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/static/less/ref.less" afterPath="$PROJECT_DIR$/static/less/ref.less" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/accounts/urls.py" afterPath="$PROJECT_DIR$/accounts/urls.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pietrack/urls.py" afterPath="$PROJECT_DIR$/pietrack/urls.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/project/urls.py" afterPath="$PROJECT_DIR$/project/urls.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/accounts/views.py" afterPath="$PROJECT_DIR$/accounts/views.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/project/views.py" afterPath="$PROJECT_DIR$/project/views.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="pietrack.iws" />
@@ -339,7 +326,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="27" width="1366" height="711" extended-state="0" />
-    <editor active="true" />
+    <editor active="false" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2441349" sideWeight="0.490099" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
