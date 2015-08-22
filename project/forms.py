@@ -19,4 +19,5 @@ class CreateProjectForm(forms.ModelForm):
 		print slug
 		if(Project.objects.filter(organization=self.organization, slug=slug)):
 			raise forms.ValidationError('Project with this name already exists.')
-		return name 
+		return name
+
