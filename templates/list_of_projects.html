@@ -6,14 +6,14 @@
       <div class="center">
         <span>Enthusiastically empower front-end web-readiness vis-a-vis frictionless schemas. Globally architect.</span>
         <div class="left">my projects</div>
-        <div class="right"><button>create Project</button></div>
+        <div class="right"><a href="{% url 'project:create_project' %}"><button>create Project</button></div></a>
       </div>
     </div>
     <div class="table_div">
       <table class='table table-hover'>
         <tbody>
           {% for project in projects_list %}
-          <tr>
+          <tr data-href="{% url 'project:project_description' project.id %}">
             <td><img src='http://www.freelargeimages.com/wp-content/uploads/2014/12/Happy_birthday_minions-4.jpg'></td>
             <td>
               <h2>{{project.name}}</h2>
@@ -21,7 +21,7 @@
             </td>
             <td width="15%">
               <p>{{project.created_date}}</p>
-              <p>{{user_objects.0.username}}</p>
+              <p>{{request.user.username}}</p>
             </td>
           </tr>
           {% endfor %}
@@ -31,3 +31,11 @@
   </div>
 </section>
 {%endblock content%}
+
+{%block create_project_js%}
+
+$('tr[data-href]').on("click", function() {
+    document.location = $(this).data('href');
+});
+
+{%endblock create_project_js%}

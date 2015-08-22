@@ -157,6 +157,10 @@
               <input id = 'username_id' name = 'username' type="text" class="form-control"><span id = 'error_username_id'></span>
             </div>
             <div class="form-group">
+              <label>organization</label>
+              <input id = 'organization_id' name = 'organization' type="text" class="form-control"><span id = 'error_organization_id'></span>
+            </div>
+            <div class="form-group">
                 <button id = 'create_account_button_id' type = 'submit' class='button'>Sign up for free</button>
             </div>
             <!--<div class="form-group">
@@ -265,6 +269,7 @@
                         $('#error_username_id').text(disp_error(result['form_errors'].username))
                         $('#error_password_id').text(disp_error(result['form_errors'].password))
                         $('#error_confirm_password_id').text(disp_error(result['form_errors'].confirm_password))
+                        $('#error_organization_id').text(disp_error(result['form_errors'].organization))
                     }
                     else if(result['error_password']){
                             $('#error_confirm_password_id').text(result['error_password'])
@@ -282,7 +287,6 @@
                 $.post("{% url 'accounts:forgot_password' %}", $('#form_forgot_password_id').serialize(), function(result){
                     if(result['error']){
                         $('#error_fp_email_id').text(disp_error(result['error_msg']))
-                        $('#error_fp_email_id').text(disp_error(result['form_errors'].email))
                     }
                     else{
                         alert('forgot password done')
