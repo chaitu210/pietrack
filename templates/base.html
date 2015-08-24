@@ -242,7 +242,11 @@
           <span class='name'>
               Hello, <span>{{user.username}}</span>
           </span>
-          <img src='{{ user.profile_pic.url }}' alt="{{ user.profile_pic.url }}">
+          {% if user.profile_pic %}
+            <img src='{{ user.profile_pic.url }}' alt="{{ user.profile_pic.url }}">
+          {% else %}
+            <img src="media/user-pic.jpg" alt="">
+          {% endif %}
       </span>
       </div>
 

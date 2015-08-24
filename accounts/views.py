@@ -78,13 +78,6 @@ def forgot_password(request):
         return HttpResponse(json.dumps(json_data), content_type='application/json')
 
 
-def createAccount(request):
-    return render(request, 'create_account.html')
-
-
-def createProject(request):
-    return render(request, 'create_project.html')
-
 # main change password code with views and forms validation  of new passwords matching
 # def changePassword(request):
 #     # user = User.objects.get(username=request.user.username)
@@ -136,16 +129,6 @@ def changePassword(request):
     context = {'form': form, 'user': user}
 
     return render(request, 'change_password.html', context)
-#
-
-
-
-def listOfProjects(request):
-    return render(request, 'list_of_projects.html')
-
-
-def projectDescription(request):
-    return render(request, 'project_description.html')
 
 
 def userProfile(request):
@@ -164,7 +147,6 @@ def userProfile(request):
                     os.remove(settings.MEDIA_ROOT+'profile/'+user.username+'/'+user.username+'.jpg')
                 except:
                     pass
-            
 
             form.save()
             response_data = {'error': False, "errors": 'Successfully updated'}
