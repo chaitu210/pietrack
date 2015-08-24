@@ -3,4 +3,5 @@ piebase/migrations/*
 *.pyc
 *~
 .idea
-/media/vidyasagar
+/media/profile
+
