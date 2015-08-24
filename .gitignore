@@ -2,4 +2,4 @@
 piebase/migrations/*
 *.pyc
 *~
-
+.idea

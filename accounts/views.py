@@ -164,6 +164,7 @@ def userProfile(request):
                     os.remove(settings.MEDIA_ROOT+'profile/'+user.username+'/'+user.username+'.jpg')
                 except:
                     pass
+            
 
             form.save()
             response_data = {'error': False, "errors": 'Successfully updated'}
