@@ -12,35 +12,6 @@ class EditUserModelForm(forms.ModelForm):
         fields = ['profile_pic', 'username', 'email', 'first_name', 'last_name', 'biography']
 
 
-        # def clean_profile_pic(self):
-        #     profile_pic = self.cleaned_data['profile_pic']
-        #
-        #     try:
-        #         w, h = get_image_dimensions(profile_pic)
-        #
-        #         # validate dimensions
-        #         max_width = max_height = 80
-        #         if w > max_width or h > max_height:
-        #             raise forms.ValidationError(
-        #                 'Please use an image that is %s x %s pixels or smaller.' % (max_width, max_height))
-        #
-        #         # validate content type
-        #         main, sub = profile_pic.content_type.split('/')
-        #         if not (main == 'image' and sub in ['jpeg', 'pjpeg', 'gif', 'png']):
-        #             raise forms.ValidationError('Please use a JPEG, GIF or PNG image.')
-        #
-        #         # validate file size
-        #         if len(profile_pic) > (20 * 1024):
-        #             raise forms.ValidationError('Avatar file size may not exceed 20k.')
-        #
-        #     except AttributeError:
-        #         """
-        #         Handles case when we are updating the user profile
-        #         and do not supply a new avatar
-        #         """
-        #         pass
-
-
 class ChangePasswordForm(forms.Form):
     password = forms.CharField(label=_("Old Password"), widget=forms.PasswordInput)
     password1 = forms.CharField(label=_("Password"), widget=forms.PasswordInput)

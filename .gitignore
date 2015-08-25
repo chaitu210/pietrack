@@ -3,5 +3,5 @@ piebase/migrations/*
 *.pyc
 *~
 .idea/
-/media/profile
-
+media/profile
+local_settings.py

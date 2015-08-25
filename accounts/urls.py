@@ -10,6 +10,4 @@ urlpatterns = [
     url(r'^forgot_password/$', 'accounts.views.forgot_password', name='forgot_password'),
     url(r'^userProfile/$', 'accounts.views.userProfile', name='userProfile'),
     url(r'^changePassword/$', 'accounts.views.changePassword', name='changePassword'),
-
-    url(r'^testHtml/$', 'accounts.views.testHtml', name='testHtml'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

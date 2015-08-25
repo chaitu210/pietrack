@@ -16,13 +16,6 @@ from django.conf import settings
 
 # Create your views here.
 
-# for base html
-def testHtml(request):
-    user = User.objects.get(username=request.user)
-    context = {'user': user}
-    return render(request, 'base.html', context)
-
-
 def index(request):
     if request.method == 'POST':
         email = request.POST.get('email')
