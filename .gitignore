@@ -5,3 +5,4 @@ piebase/migrations/*
 .idea/
 media/profile
 pietrack/local_settings.py
+.coverage
