@@ -303,46 +303,58 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
+                  {%for priority in priority_list%}
+                    <tr id="row{{priority.id}}">
                       <td scope="row">
                       <div class="input-group colorpicker-component demo demo-auto">
-                          <input type="text" value="#666666" class="form-control"/>
+                          <input type="text" value="{{priority.color}}" class="form-control"/>
                           <span class="input-group-addon"><i></i></span>
                       </div>
                      </td>
-                      <td>Low</td>
-                      <td class="actions"><a href="#" class="edit"><i class="fa fa-edit"></i></a>
-                      <a href="#" class="delete"><i class="fa fa-trash"></i></a></td>
+                      <td>{{priority.name}}</td>
+                      <td class="actions"><a href="#" class="edit" onclick="edit_priority('{{priority.color}}','{{priority.name}}','row{{priority.id}}')"><i class="fa fa-edit"></i></a>
+                      <a href="#" class="delete" onclick="delete_priority('{{priority.color}}','{{priority.name}}','row{{priority.id}}')"><i class="fa fa-trash"></i></a></td>
                     </tr>
-                    <tr>
-                      <td scope="row">
-                      <div class="input-group colorpicker-component demo demo-auto">
-                          <input type="text" value="#669933" class="form-control"/>
-                          <span class="input-group-addon"><i></i></span>
-                      </div>
-                     </td>
-                      <td>Normal</td>
-                      <td class="actions"><a href="#" class="edit"><i class="fa fa-edit"></i></a>
-                      <a href="#" class="delete"><i class="fa fa-trash"></i></a></td>
-                    </tr>
-                    <tr>
-                      <td scope="row">
-                      <div class="input-group colorpicker-component demo demo-auto">
-                          <input type="text" value="#cc0000" class="form-control"/>
-                          <span class="input-group-addon"><i></i></span>
-                      </div>
-                     </td>
-                      <td>High</td>
-                      <td class="actions"><a href="#" class="edit"><i class="fa fa-edit"></i></a>
-                      <a href="#" class="delete"><i class="fa fa-trash"></i></a></td>
-                    </tr>
-
-                    
-                    
-                    
-                   
+                  {%endfor%}
                   </tbody>
                 </table>
+
+                <!-- form start -->
+                <form action="" method="post" style="display:none;" id="id_issue_prio_form">
+	                {% csrf_token %}
+	                <input id="old_id" name="old_id" value="none" style="display:none;">
+	                <table class="table table-striped">
+	                  <thead>
+	                    <tr>
+	                      <th width="40%"></th>
+	                      <th></th>
+	                      <th></th>
+	                    </tr>
+	                  </thead>
+	                  <tbody>
+	                    <tr>
+	                      <td scope="row">
+	                      <div class="input-group colorpicker-component demo demo-auto">
+	                          <input name="color" type="text" value="#666666" class="form-control"/>
+	                          <span class="input-group-addon"><i></i></span>
+	                      </div>
+	                     </td>
+	                      <td>
+		                      <input name="name" value="" type="text" style="width: 100px; padding: 2px; border:1px solid #929292;" placeholder="Name"/>
+		                  </td>
+		                  <td class="actions">
+		                      <button type="submit" class="edit" id="add_form"><i class="fa fa-plus"></i></button>
+		                      <a class="delete" id="id_reset"><span class="glyphicon glyphicon-remove"></span></a>
+                              
+	                      </td>
+	                    </tr>
+	                    <tr>
+	                    	<td colspan="3"><span name="error"></span></td>
+	                    </tr>
+	                  </tbody>
+	                </table>
+	            </form>
+	            <!-- form ends here -->
                 </div>
                <!-- status table ends here -->     
               <!-- content box starts here -->
@@ -376,24 +388,134 @@
       	$(this).closest('.parent_list').removeClass('active_li_drop')
       });
 
+
       /* backend code*/
+      
 
-      $('#id_new_pri').on('click',function(){
-      	console.log('redy to add row');
-      	var tableData ='<tr><td scope="row"><div class="input-group colorpicker-component demo demo-auto"><input type="text" value="#457b49" class="form-control"/><span class="input-group-addon"><i></i></span></div></td><td><input type="text" style="width: 100px; padding: 2px; border:1px solid #929292;" placeholder="Name"/></td><td class="actions"><input type="submit"  value="Add"  style="width: 100px; padding: 2px; border:1px solid #929292;" /><input type="submit"  value="remove"  style="width: 100px; padding: 2px; border:1px solid #929292;" /></td></tr>'
+      var row1="rr";
+      function hexToRgb(hex) {
+	    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	    return result ? {
+	        r: parseInt(result[1], 16),
+	        g: parseInt(result[2], 16),
+	        b: parseInt(result[3], 16)
+	    } : null;
+	}
+	
 
-               // alert(table_Data);
+      function create_issue_priority(form_id){
+      	$('#'+form_id).serialize()
+      	alert(form_id);
+      	alert($('#'+form_id).serialize())
+
+      }
+      function clear_form(){
+      	var form = $('#id_issue_prio_form');
+      	form.css('display','none');
+      	form.find('input[name="name"]').val(''); 
+      	$('#id_issue_prio_form span[name="error"]').text('')
+      	// $('#id_issue_prio_form').find("input[name='old_new']").val("new")
+      	$("#old_id").val("none")
+      }
+      function edit_priority(color,name,row_id){
+      	rowId = row_id.substring(3,row_id.length)
+      	var r = hexToRgb(color).r
+      	var g = hexToRgb(color).g
+      	var b = hexToRgb(color).b
+      	// console.log(r)
+      	// console.log(g)
+      	// console.log(b)
+      	// var old_id = 
+      	$("#old_id").val(rowId)
+      	var color_box = '<i style="background-color: rgb('+r+','+ g+','+ b+');"></i>'
+      	$('#id_issue_prio_form').css('display','block');
+      	$('#id_issue_prio_form').find("input[name='color']").val(color)
+      	$('#id_issue_prio_form').find("input[name='name']").val(name)
       	
-      	$('.table tbody').append(tableData);
-		$('.demo').colorpicker();
-
+      	$('#id_issue_prio_form span').html(color_box)
+      	$('.demo').colorpicker();
+      	row1=row_id;
+      	// alert($("#old_id").val())
+      }
+      function delete_priority(color,name,row){
+      	data_send = 'name='+name+'&color='+color+'&csrfmiddlewaretoken='+'{{csrf_token}}';
+      	$.post('{%url "project:issues_priorities_delete" slug %}',data_send,function(response){
+      		if(!response.error){
+      			$('#'+row).remove();
+      		}
+      	});
+      	// 
+      }
+      var count=0;
+      $('#id_new_pri').on('click',function(){
+      	clear_form()
+		$('#id_issue_prio_form').css('display','block');
+      	$('#id_issue_prio_form').find("input[name='old_new']").val("new")
 
       });
 
+      $('#id_reset').on('click',function(){
+      	clear_form();
+
+      });
+     
+      /* adding new priority */
+
+      $('#add_form').on('click',function(e){
+        var create_data = $("#old_id").val()//$('#id_issue_prio_form').find('input[name="old_id"]').val()
+        var rowCount = $('#priority tbody tr').length;
+      	e.preventDefault();
+      	if(create_data=="none"){
+      		$.post('',$('#id_issue_prio_form').serialize(),function(response){
+      			if(response.error){
+      				if(response.errors['name']){
+      					$("span[name='error']").text(response.errors['name']);
+      				}
+      			}
+      			else{
+      				
+      				name = response['name'];
+      				color = response['color'];
+      				row_id = response['proj_id']
+
+      				//rowCount+=1
+      				data_row = "<tr id=\"row"+row_id+"\"><td scope=\"row\"><div class=\"input-group colorpicker-component demo demo-auto\"><input type=\"text\" value=\""+color+"\" class=\"form-control\"/><span class=\"input-group-addon\"><i></i></span></div></td><td>"+name+"</td><td class=\"actions\"><a href=\"#\" class=\"edit\" onclick=\"edit_priority('"+color+"','"+name+"','row"+row_id+"')\"><i class=\"fa fa-edit\"></i></a>&nbsp;<a href=\"#\" class=\"delete\" onclick=\"delete_priority('"+color+"','"+name+"','row"+row_id+"')\"><i class=\"fa fa-trash\"></i></a></td></tr>"
+      				$('#priority tbody').append(data_row);
+      				$('.demo').colorpicker();
+      				clear_form();
+      				rowCount+=1;
+      			}
+
+      	    });
+      	}
+        else{
+        	var data = $('#id_issue_prio_form').serialize();
+        	console.log(data)
+        	$.post('{%url "project:issues_priorities_edit" slug %}',data,function(response){
+        		
+        		if(response.error){
+      				if(response.errors['name']){
+      					$("span[name='error']").text(response.errors['name']);
+      				}
+      			}
+      			else{
+      				var name = response['name'];
+					var color = response['color'];
+					var id = response['id'];
+					var row_edit = $('#row'+id)
+		        	var data_row = "<td scope=\"row\"><div class=\"input-group colorpicker-component demo demo-auto\"><input type=\"text\" value=\""+color+"\" class=\"form-control\"/><span class=\"input-group-addon\"><i></i></span></div></td><td>"+name+"</td><td class=\"actions\"><a href=\"#\" class=\"edit\" onclick=\"edit_priority('"+color+"','"+name+"','row"+id+"')\"><i class=\"fa fa-edit\"></i></a>&nbsp;<a href=\"#\" class=\"delete\" onclick=\"delete_priority('"+color+"','"+name+"','row"+id+"')\"><i class=\"fa fa-trash\"></i></a></td>"
+        	
+					row_edit.html(data_row);
+      				$('.demo').colorpicker();
+      				clear_form();
+      			}
+        	});
+        }
+      	
+      });
+      /* new priority ends here */
+
       /*ends */
-
-
-
     </script>
 </body>
 </html>

@@ -1,6 +1,6 @@
 from django.shortcuts import render,redirect
-from piebase.models import Project
-from forms import CreateProjectForm
+from piebase.models import Project,Priority
+from forms import CreateProjectForm,PriorityIssueForm,PriorityIssueFormEdit
 from django.utils import timezone
 from django.template.defaultfilters import slugify
 from django.contrib.auth.decorators import login_required
@@ -72,6 +72,32 @@ def delete_project(request,id):
 	return redirect("project:list_of_projects")
 
 
-def issues_priorities(request):
+def issues_priorities(request,slug):
 	template_name = 'issues-proities.html'
-	return render(request,template_name)
+	if(request.method=='POST'):
+		form = PriorityIssueForm(request.POST,project=slug)
+		if(form.is_valid()):
+			project = Priority.objects.create(name=request.POST['name'],color=request.POST['color'],project=Project.objects.get(slug=slug));
+			return HttpResponse(json.dumps({'error':False,'color':request.POST['color'],'name':request.POST['name'],'proj_id':project.id}),content_type="application/json")
+		else:
+			return HttpResponse(json.dumps({'error':True,'errors':form.errors}),content_type="application/json");
+	priority_list=Priority.objects.filter(project=Project.objects.get(slug=slug))
+	return render(request,template_name,{'slug':slug,'priority_list':priority_list})
+def issues_priorities_edit(request,slug):
+	if(request.method=='POST'):
+		form = PriorityIssueFormEdit(request.POST)
+		if(form.is_valid()):
+			print request.POST
+			priority = Priority.objects.get(id=request.POST['old_id'],project=Project.objects.get(slug=slug));
+			print  priority.color,priority.name
+			priority.color = request.POST['color']
+			priority.name = request.POST['name']
+			priority.save()
+			print  priority.color,priority.name
+			return HttpResponse(json.dumps({'error':False,'color':request.POST['color'],'name':request.POST['name'],'id':request.POST['old_id']}),content_type="application/json")
+		else:
+			return HttpResponse(json.dumps({'error':True,'errors':form.errors}),content_type="application/json");	
+
+def issues_priorities_delete(request,slug):
+	Priority.objects.get(name=request.POST['name'],color=request.POST['color'],project=Project.objects.get(slug=slug)).delete();
+	return HttpResponse(json.dumps({'error':False}),content_type="application/json");
