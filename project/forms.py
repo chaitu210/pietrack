@@ -3,24 +3,21 @@ from piebase.models import Project,Priority,Severity,Organization,User,TicketSta
 from django.template.defaultfilters import slugify
 
 
-
 class CreateProjectForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        self.organization = kwargs.pop('organization', None)
+        super(CreateProjectForm, self).__init__(*args, **kwargs)
 
-	def __init__(self, *args, **kwargs):
-		self.organization = kwargs.pop('organization', None)
-		super(CreateProjectForm, self).__init__(*args, **kwargs)
+    class Meta:
+        model = Project
+        fields = ['name', 'description']
 
-	class Meta:
-		model = Project
-		fields = ['name','description']
+    def clean_name(self):
+        name = self.cleaned_data['name']
+        if (Project.objects.filter(name=name, organization=self.organization)):
+            raise forms.ValidationError('Project with this name already exists.')
+        return name
 
-	def clean_name(self):
-		name = self.cleaned_data['name']
-		slug = slugify(name)
-		print slug
-		if(Project.objects.filter(organization=self.organization, slug=slug)):
-			raise forms.ValidationError('Project with this name already exists.')
-		return name
 
 class PriorityIssueForm(forms.ModelForm):
 	def __init__(self, *args, **kwargs):

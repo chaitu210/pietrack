@@ -2,4 +2,6 @@
 piebase/migrations/*
 *.pyc
 *~
-
+.idea/
+media/profile
+pietrack/local_settings.py

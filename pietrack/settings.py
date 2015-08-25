@@ -28,6 +28,9 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
+MEDIA_ROOT = os.path.join(BASE_DIR+'/media/')
+MEDIA_URL = '/media/'
+
 # Application definition
 
 INSTALLED_APPS = (
@@ -148,3 +151,8 @@ COMPRESS_OFFLINE_CONTEXT = {
 
 COMPRESS_CSS_FILTERS = ['compressor.filters.css_default.CssAbsoluteFilter', 'compressor.filters.cssmin.CSSMinFilter']
 COMPRESS_JS_FILTERS = ['compressor.filters.jsmin.JSMinFilter']
+
+try:
+    from local_settings import *
+except ImportError :
+    pass
