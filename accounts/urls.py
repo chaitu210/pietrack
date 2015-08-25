@@ -5,7 +5,7 @@ from django.conf import settings
 
 urlpatterns = [
     url(r'^$', 'accounts.views.index', name='index'),
-    url(r'login/$', 'accounts.views.login', name='login'),
+    url(r'^login/$', 'accounts.views.index', name='login'),
     url(r'^register/$', 'accounts.views.register', name='register'),
     url(r'^forgot_password/$', 'accounts.views.forgot_password', name='forgot_password'),
     url(r'^user_profile/$', 'accounts.views.user_profile', name='user_profile'),
