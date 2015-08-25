@@ -1,38 +1,24 @@
+from __future__ import unicode_literals
+
+from collections import OrderedDict
+
 from django import forms
-from django.contrib.auth import get_user_model
+from django.contrib.auth import authenticate, get_user_model
+from django.contrib.auth.hashers import (
+    UNUSABLE_PASSWORD_PREFIX, identify_hasher,
+)
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import EmailMultiAlternatives
+#from django.forms.utils import flatatt
 from django.template import loader
 from django.utils.encoding import force_bytes
+#from django.utils.html import format_html, format_html_join
 from django.utils.http import urlsafe_base64_encode
+from django.utils.safestring import mark_safe
+from django.utils.text import capfirst
 from django.utils.translation import ugettext, ugettext_lazy as _
-
-from piebase.models import Project,Organization, User
-from .tasks import celery_send_mail
-
-
-class CreateProjectForm(forms.ModelForm):
-
-	def __init__(self, *args, **kwargs):
-		self.organization = kwargs.pop('organization', None)
-		super(CreateProjectForm, self).__init__(*args, **kwargs)
-
-	class Meta:
-		model = Project
-		fields = ['name','description']
-
-	def clean_name(self):
-		name = self.cleaned_data['name']
-		if(Project.objects.filter(name=name,organization=self.organization)):
-			raise forms.ValidationError('Project with this name already exists.')
-		return name 
-
-class CreateMemberForm(forms.Form):
-    email = forms.EmailField()
-    designation = forms.CharField()
-    description = forms.Textarea()
 
 
 class PasswordResetForm(forms.Form):
@@ -44,6 +30,7 @@ class PasswordResetForm(forms.Form):
         Sends a django.core.mail.EmailMultiAlternatives to `to_email`.
         """
         subject = loader.render_to_string(subject_template_name, context)
+        # Email subject *must not* contain newlines
         subject = ''.join(subject.splitlines())
         body = loader.render_to_string(email_template_name, context)
 
@@ -93,6 +80,6 @@ class PasswordResetForm(forms.Form):
                 'protocol': 'https' if use_https else 'http',
             }
 
-            celery_send_mail.delay(subject_template_name, email_template_name,
+            self.send_mail(subject_template_name, email_template_name,
                            context, from_email, user.email,
                            html_email_template_name=html_email_template_name)

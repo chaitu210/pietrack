@@ -12,6 +12,18 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+from datetime import timedelta
+import djcelery
+
+djcelery.setup_loader()
+BROKER_URL = 'django://'
+#CELERYBEAT_SCHEDULE = {
+#    'every_minute': {
+#        'task': 'app.tasks.add',
+#        'schedule': timedelta(seconds = 5),
+#        'args': (),
+#    },
+#}
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -43,6 +55,8 @@ INSTALLED_APPS = (
     'piebase',
     'project',
     'reports',
+    'djcelery',
+    'kombu.transport.django',
 )
 
 MIDDLEWARE_CLASSES = (

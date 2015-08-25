@@ -1,16 +1,16 @@
-import json, random, string, time
+import json, random, string
 from django.shortcuts import render
 from django.utils import timezone
 from django.template.defaultfilters import slugify
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, HttpResponseRedirect
-from django.core.mail import send_mail
+from django.http import HttpResponse 
 from django.contrib.auth.tokens import default_token_generator
-from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.views import password_reset_confirm
 from django.core.urlresolvers import reverse
 from piebase.models import User, Project, Organization, Role
-from forms import CreateProjectForm, CreateMemberForm
+from forms import CreateProjectForm, CreateMemberForm, PasswordResetForm
+from .tasks import send_mail_old_user
+
 
 
 @login_required
@@ -45,19 +45,14 @@ def project_description(request, pk):
     dict_items={'project_object':project_object[0], 'project_members':project_members}
     return render(request, template_name, dict_items)
 
-def password_reset(request):  
+def password_reset(request, to_email):  
     from_email = 'dineshmcmf@gmail.com'
-    dup = request.POST.copy()
-    del dup['email'], dup['designation'], dup['description']
-    dup['email'] = 'druuu.mail@gmail.com'
-    to_email = 'druuu.mail@gmail.com'
     to_email_dict = {'email': to_email}
     token_generator = default_token_generator
     email_template_name = 'reset_email.html'
     subject_template_name = 'reset_subject.txt'
     form = PasswordResetForm(to_email_dict)
     if form.is_valid():
-        print 'hiiiiiiiiiiiiii'
         opts = {
             'use_https': request.is_secure(),
             'from_email': from_email,
@@ -65,7 +60,6 @@ def password_reset(request):
             'subject_template_name': subject_template_name,
             'request': request}
         form.save(**opts)
-        print 'yeeeep'
 
 
 @login_required
@@ -89,13 +83,12 @@ def create_member(request, project_id):
                 description = post_dict['description']
                 organization_obj = request.user.organization
                 if User.objects.filter(email = email).exists():
-                    send_mail('invitaition for project', 'time to code', 'dineshmcmf@gmail.com', [email])
+                    send_mail_old_user.delay(email) 
                     pass
                 else:
                     random_password = ''.join(random.choice(string.digits) for _ in xrange(8))
-                    new_user_obj = User.objects.create(email = email, username = email, password = random_password, organization = organization_obj, pietrack_role = 'user')
-                    password_reset(request)
-                    print '$$$$$$$$$$$$$$$$$$$$$$$$$'
+                    new_user_obj = User.objects.create_user(email = email, username = email, password = random_password, organization = organization_obj, pietrack_role = 'user')
+                    password_reset(request, email_iter)
                 project_obj = Project.objects.get(id = project_id)
                 user_obj = User.objects.get(email = email)
                 project_obj.members.add(user_obj)
@@ -120,4 +113,4 @@ def create_member(request, project_id):
 
 
 def reset_confirm(request, uidb64=None, token=None):
-    return password_reset_confirm(request, template_name = 'reset_confirm.html', uidb64=uidb64, token=token, post_reset_redirect = reverse('project:create_project'))
+    return password_reset_confirm(request, template_name = 'reset_confirm.html', uidb64=uidb64, token=token, post_reset_redirect = reverse('accounts:login'))
