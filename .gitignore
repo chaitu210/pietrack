@@ -2,6 +2,6 @@
 piebase/migrations/*
 *.pyc
 *~
-.idea
+.idea/
 /media/profile
 

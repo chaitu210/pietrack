@@ -12,37 +12,22 @@
                 {% csrf_token %}
               <div class="user-pic-block">
                  <span class="user-picture">
+                     {% if user.profile_pic %}
                     <img src="{{ user.profile_pic.url }}" alt="{{ user.profile_pic.url }}" width="100px" height="100px"/>
-                     <!--<img src="{% static 'img/user-pic.jpg' %}" alt="user-profile-picture" />-->
+                     {% else %}
+                     <img src="{% static 'img/user-pic.jpg' %}" alt="user-profile-picture" />
+                     {% endif %}
                  </span>
-                  <div class="">
-
-                      <label for="id_profile_pic">Profile pic:</label>
-                      Currently:
-                      <span class="user-picture">
-                            <a href="{{ user.profile_pic.url }}">{{ user.profile_pic }}</a>
-                      </span>
-                      <input id="profile_pic-clear_id" name="profile_pic-clear" type="checkbox" />
-                      <label for="profile_pic-clear_id">Clear</label>
-                      <span name="profile_pic"></span>
-                      <br />
-                      Change: <input id="id_profile_pic" name="profile_pic" type="file" />
-
-
-
-                      <!--<label for="id_profile_pic">Profile pic:</label>-->
-                      <!--Currently:-->
-                      <!--<span class="user-picture">-->
-                          <!--<img src="{{ user.profile_pic.url }}" alt="{{ user.profile_pic.url }}" width="100px" height="100px"/>-->
-                      <!--</span>-->
+                  <!--<div class="">-->
                       <!--<input id="profile_pic-clear_id" name="profile_pic-clear" type="checkbox" />-->
                       <!--<label for="profile_pic-clear_id">Clear</label>-->
-                      <!--Change: <input id="id_profile_pic" name="profile_pic" type="file" />-->
-
-
-                  </div>
+                  <!--</div>-->
                  <span class="pic-size">The image will be scaled to 80x80px.</span>
-                 <span class="pic-btn"> <button>Change Picture</button></span>
+                 <span class="pic-btn">
+                     <button id="change_picture_button">Change Picture</button>
+                    <input id="id_profile_pic" name="profile_pic" type="file" style='display:none;'/>
+                 </span>
+
               </div>
               <div class="form_group">
                 <label for="id_username">User Name</label>
@@ -72,7 +57,7 @@
                 <div class="help">Type your bio-graphy here</div>
 
               </div>
-              <button type="submit">Save</button>
+              <button >Save</button>
             </form>
         </div>
       </div>
@@ -82,6 +67,11 @@
     <script src="http://malsup.github.com/jquery.form.js"></script>
         <script type="text/javascript" >
 
+        $("#change_picture_button").click(function(e){
+        e.preventDefault();
+        $("#id_profile_pic").click()
+        });
+
         function display_error(errors){
             if(errors){
                 return errors;
@@ -90,12 +80,12 @@
                 return '';
             }
         };
-        function create_post(){
 
-            console.log("Create post is working!")
+        $('#post-form').ajaxForm(function(){
+
+            console.log("form submitted!");
+
             $.post("{% url 'accounts:userProfile' %}",$('form').serialize(), function(result){
-
-
                 if(result['error']){
                     $("span[name='profile_pic']").text(display_error(result['errors'].profile_pic));
                     $("span[name='username']").text(display_error(result['errors'].username));
@@ -110,11 +100,6 @@
                     console.log('Updated');
                 }
             });
-        }
-        $('#post-form').ajaxForm(function(){
-
-            console.log("form submitted!");
-            create_post();
         });
 
     </script>

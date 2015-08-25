@@ -16,11 +16,8 @@
         width : 'auto',
 
         // height in pixels of the visible scroll area
-<<<<<<< HEAD
-        height : '100%',
-=======
         height : '250px',
->>>>>>> 3e7703d3dec9692499c3d8e2252347a577aa4842
+
 
         // width in pixels of the scrollbar and rail
         size : '7px',

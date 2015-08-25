@@ -88,7 +88,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'pietrack',
         'USER': 'root',
-        'PASSWORD': 'vidyasagar',
+        'PASSWORD': 'root',
         'HOST': '127.0.0.1',
         'PORT': '3306',
     }
@@ -151,3 +151,8 @@ COMPRESS_OFFLINE_CONTEXT = {
 
 COMPRESS_CSS_FILTERS = ['compressor.filters.css_default.CssAbsoluteFilter', 'compressor.filters.cssmin.CSSMinFilter']
 COMPRESS_JS_FILTERS = ['compressor.filters.jsmin.JSMinFilter']
+
+try:
+    from local_settings import *
+except ImportError :
+    pass

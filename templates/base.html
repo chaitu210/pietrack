@@ -245,7 +245,7 @@
           {% if user.profile_pic %}
             <img src='{{ user.profile_pic.url }}' alt="{{ user.profile_pic.url }}">
           {% else %}
-            <img src="media/user-pic.jpg" alt="">
+            <img src="{% static 'img/user-pic.jpg' %}" alt="No profile pic :(">
           {% endif %}
       </span>
       </div>
