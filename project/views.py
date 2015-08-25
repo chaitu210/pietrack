@@ -1,5 +1,7 @@
+from django.shortcuts import render,redirect
+from piebase.models import Project,Priority,Severity,TicketStatus
+from forms import CreateProjectForm,PriorityIssueForm,PriorityIssueFormEdit,SeverityIssueForm,SeverityIssueFormEdit,TicketStatusForm,TicketStatusFormEdit
 import json, random, string
-from django.shortcuts import render
 from django.utils import timezone
 from django.template.defaultfilters import slugify
 from django.contrib.auth.decorators import login_required
@@ -29,7 +31,6 @@ def create_project(request):
             return HttpResponse(json.dumps({'error':True,'errors':form.errors}), content_type="application/json")
     return render(request,template_name)
 
-
 @login_required
 def list_of_projects(request):
     template_name = 'list_of_projects.html'
@@ -39,11 +40,135 @@ def list_of_projects(request):
 
 @login_required
 def project_description(request, pk):
-    template_name='project_description.html'
-    project_object=Project.objects.filter(id=pk)
-    project_members=project_object[0].members.all()
-    dict_items={'project_object':project_object[0], 'project_members':project_members}
-    return render(request, template_name, dict_items)
+	template_name='project_description.html'
+	project_object=Project.objects.filter(id=pk)
+	project_members=project_object[0].members.all()
+	dict_items={'project_object':project_object[0], 'project_members':project_members}
+	return render(request, template_name, dict_items)
+
+def project_details(request,slug):
+	# print slug
+	project = Project.objects.get(slug=slug)
+	dictionary = {'project':project}
+	template_name = 'Project-Project_Details.html'
+
+	if(request.method=='POST'):
+		print request.POST['oldname']
+		organization=request.user.organization
+		form = CreateProjectForm(request.POST,organization=organization)
+
+		if(form.is_valid()):
+			slug = slugify(request.POST['name'])
+			project = Project.objects.get(slug=request.POST['oldname'],organization=organization)
+			project.name=request.POST['name']
+			project.slug = slug
+			project.modified_date = timezone.now()
+			project.save()
+			return HttpResponse(json.dumps({'error':False,'slug':slug}), content_type="application/json")
+		else:
+			return HttpResponse(json.dumps({'error':True,'errors':form.errors}), content_type="application/json")
+
+	return render(request, template_name, dictionary)
+
+
+def delete_project(request,id):
+	Project.objects.get(id=id).delete()
+	return redirect("project:list_of_projects")
+
+
+def issues_priorities(request,slug):
+	template_name = 'issues-proities.html'
+	if(request.method=='POST'):
+		form = PriorityIssueForm(request.POST,project=slug)
+		if(form.is_valid()):
+			project = Priority.objects.create(name=request.POST['name'],color=request.POST['color'],project=Project.objects.get(slug=slug));
+			return HttpResponse(json.dumps({'error':False,'color':request.POST['color'],'name':request.POST['name'],'proj_id':project.id}),content_type="application/json")
+		else:
+			return HttpResponse(json.dumps({'error':True,'errors':form.errors}),content_type="application/json");
+	priority_list=Priority.objects.filter(project=Project.objects.get(slug=slug))
+	return render(request,template_name,{'slug':slug,'priority_list':priority_list})
+
+def issues_priorities_edit(request,slug):
+	if(request.method=='POST'):
+		form = PriorityIssueFormEdit(request.POST)
+		if(form.is_valid()):
+			priority = Priority.objects.get(id=request.POST['old_id'],project=Project.objects.get(slug=slug));
+			priority.color = request.POST['color']
+			priority.name = request.POST['name']
+			priority.save()
+			return HttpResponse(json.dumps({'error':False,'color':request.POST['color'],'name':request.POST['name'],'id':request.POST['old_id']}),content_type="application/json")
+		else:
+			return HttpResponse(json.dumps({'error':True,'errors':form.errors}),content_type="application/json");	
+
+def issues_priorities_delete(request,slug):
+	Priority.objects.get(name=request.POST['name'],color=request.POST['color'],project=Project.objects.get(slug=slug)).delete();
+	return HttpResponse(json.dumps({'error':False}),content_type="application/json");
+
+def issues_severities(request,slug):
+    template_name = 'severities.html'
+    if(request.method=='POST'):
+        form = SeverityIssueForm(request.POST,project=slug)
+        if(form.is_valid()):
+            project = Severity.objects.create(name=request.POST['name'],color=request.POST['color'],project=Project.objects.get(slug=slug));
+            return HttpResponse(json.dumps({'error':False,'color':request.POST['color'],'name':request.POST['name'],'proj_id':project.id}),content_type="application/json")
+        else:
+            return HttpResponse(json.dumps({'error':True,'errors':form.errors}),content_type="application/json");
+    priority_list=Severity.objects.filter(project=Project.objects.get(slug=slug))
+    return render(request,template_name,{'slug':slug,'priority_list':priority_list})
+
+def issues_severities_edit(request,slug):
+    if(request.method=='POST'):
+        form = SeverityIssueFormEdit(request.POST)
+        if(form.is_valid()):
+            priority = Severity.objects.get(id=request.POST['old_id'],project=Project.objects.get(slug=slug));
+            priority.color = request.POST['color']
+            priority.name = request.POST['name']
+            priority.save()
+            return HttpResponse(json.dumps({'error':False,'color':request.POST['color'],'name':request.POST['name'],'id':request.POST['old_id']}),content_type="application/json")
+        else:
+            return HttpResponse(json.dumps({'error':True,'errors':form.errors}),content_type="application/json");   
+
+def issues_severities_delete(request,slug):
+    Severity.objects.get(name=request.POST['name'],color=request.POST['color'],project=Project.objects.get(slug=slug)).delete();
+    return HttpResponse(json.dumps({'error':False}),content_type="application/json");
+
+def ticket_status(request,slug):
+    template_name = 'Attributes_Status.html'
+    if(request.method=='POST'):
+        print "before form" 
+        form = TicketStatusForm(request.POST,project=slug)
+        print "after form" 
+        print form
+        if(form.is_valid()):
+            print "no error"
+            tslug = slugify(request.POST['name'])
+            project = TicketStatus.objects.create(name=request.POST['name'],slug=tslug,color=request.POST['color'],project=Project.objects.get(slug=slug));
+            return HttpResponse(json.dumps({'error':False,'color':request.POST['color'],'name':request.POST['name'],'proj_id':project.id}),content_type="application/json")
+        else:
+            print "errors"
+            return HttpResponse(json.dumps({'error':True,'errors':form.errors}),content_type="application/json");
+    priority_list=TicketStatus.objects.filter(project=Project.objects.get(slug=slug))
+    return render(request,template_name,{'slug':slug,'priority_list':priority_list})
+
+def ticket_status_edit(request,slug):
+    if(request.method=='POST'):
+        form = TicketStatusFormEdit(request.POST)
+        if(form.is_valid()):
+            priority = TicketStatus.objects.get(id=request.POST['old_id'],project=Project.objects.get(slug=slug));
+            priority.color = request.POST['color']
+            priority.name = request.POST['name']
+            priority.slug = slugify(request.POST['name']) 
+            priority.save()
+            return HttpResponse(json.dumps({'error':False,'color':request.POST['color'],'name':request.POST['name'],'id':request.POST['old_id']}),content_type="application/json")
+        else:
+            return HttpResponse(json.dumps({'error':True,'errors':form.errors}),content_type="application/json");   
+
+def ticket_status_delete(request,slug):
+    TicketStatus.objects.get(name=request.POST['name'],color=request.POST['color'],project=Project.objects.get(slug=slug)).delete();
+    return HttpResponse(json.dumps({'error':False}),content_type="application/json");
+
+
+
 
 def password_reset(request, to_email):  
     from_email = 'dineshmcmf@gmail.com'
