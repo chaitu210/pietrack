@@ -3,8 +3,10 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import render, HttpResponse, HttpResponseRedirect
 from django.contrib import auth
 from django.core.mail import send_mail
-from accounts.forms import RegisterForm
+from django.contrib.auth.views import password_reset, password_reset_confirm
+from accounts.forms import RegisterForm, ChangePasswordForm
 from piebase.models import User, Organization
+from django.views.decorators.csrf import csrf_exempt
 
 
 def register(request):

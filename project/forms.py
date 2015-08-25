@@ -22,3 +22,4 @@ class CreateMemberForm(forms.Form):
     email = forms.EmailField()
     designation = forms.CharField()
     description = forms.Textarea()
+

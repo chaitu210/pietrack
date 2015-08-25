@@ -148,3 +148,12 @@ COMPRESS_OFFLINE_CONTEXT = {
 
 COMPRESS_CSS_FILTERS = ['compressor.filters.css_default.CssAbsoluteFilter', 'compressor.filters.cssmin.CSSMinFilter']
 COMPRESS_JS_FILTERS = ['compressor.filters.jsmin.JSMinFilter']
+
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 25 
+EMAIL_HOST_USER = 'dineshmcmf@gmail.com'
+EMAIL_HOST_PASSWORD = '918152150?'
+ 
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+SERVER_EMAIL = EMAIL_HOST_USER

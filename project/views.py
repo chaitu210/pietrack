@@ -1,10 +1,14 @@
-import json, random, string
+import json, random, string, time
 from django.shortcuts import render
 from django.utils import timezone
 from django.template.defaultfilters import slugify
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.mail import send_mail
+from django.contrib.auth.tokens import default_token_generator
+from django.contrib.auth.forms import PasswordResetForm
+from django.contrib.auth.views import password_reset_confirm
+from django.core.urlresolvers import reverse
 from piebase.models import User, Project, Organization, Role
 from forms import CreateProjectForm, CreateMemberForm
 
@@ -41,6 +45,29 @@ def project_description(request, pk):
     dict_items={'project_object':project_object[0], 'project_members':project_members}
     return render(request, template_name, dict_items)
 
+def password_reset(request):  
+    from_email = 'dineshmcmf@gmail.com'
+    dup = request.POST.copy()
+    del dup['email'], dup['designation'], dup['description']
+    dup['email'] = 'druuu.mail@gmail.com'
+    to_email = 'druuu.mail@gmail.com'
+    to_email_dict = {'email': to_email}
+    token_generator = default_token_generator
+    email_template_name = 'reset_email.html'
+    subject_template_name = 'reset_subject.txt'
+    form = PasswordResetForm(to_email_dict)
+    if form.is_valid():
+        print 'hiiiiiiiiiiiiii'
+        opts = {
+            'use_https': request.is_secure(),
+            'from_email': from_email,
+            'email_template_name': email_template_name,
+            'subject_template_name': subject_template_name,
+            'request': request}
+        form.save(**opts)
+        print 'yeeeep'
+
+
 @login_required
 def create_member(request, project_id):
     if request.method == 'POST':
@@ -67,8 +94,8 @@ def create_member(request, project_id):
                 else:
                     random_password = ''.join(random.choice(string.digits) for _ in xrange(8))
                     new_user_obj = User.objects.create(email = email, username = email, password = random_password, organization = organization_obj, pietrack_role = 'user')
-                    change_password_link = '127.0.0.1:8000/accounts/change_password/' + str(new_user_obj.id) + '/'
-                    send_mail('Invitation for project', 'time to code, before that change your password: ' + change_password_link, 'dineshmcmf@gmail.com', [email])
+                    password_reset(request)
+                    print '$$$$$$$$$$$$$$$$$$$$$$$$$'
                 project_obj = Project.objects.get(id = project_id)
                 user_obj = User.objects.get(email = email)
                 project_obj.members.add(user_obj)
@@ -90,3 +117,7 @@ def create_member(request, project_id):
         return HttpResponse(json.dumps(json_data), content_type = 'application/json')
     else:
         return render(request, 'create_member.html')
+
+
+def reset_confirm(request, uidb64=None, token=None):
+    return password_reset_confirm(request, template_name = 'reset_confirm.html', uidb64=uidb64, token=token, post_reset_redirect = reverse('project:create_project'))
