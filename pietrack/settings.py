@@ -12,6 +12,18 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+from datetime import timedelta
+import djcelery
+
+djcelery.setup_loader()
+BROKER_URL = 'django://'
+#CELERYBEAT_SCHEDULE = {
+#    'every_minute': {
+#        'task': 'app.tasks.add',
+#        'schedule': timedelta(seconds = 5),
+#        'args': (),
+#    },
+#}
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -46,6 +58,8 @@ INSTALLED_APPS = (
     'piebase',
     'project',
     'reports',
+    'djcelery',
+    'kombu.transport.django',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -151,6 +165,15 @@ COMPRESS_OFFLINE_CONTEXT = {
 
 COMPRESS_CSS_FILTERS = ['compressor.filters.css_default.CssAbsoluteFilter', 'compressor.filters.cssmin.CSSMinFilter']
 COMPRESS_JS_FILTERS = ['compressor.filters.jsmin.JSMinFilter']
+
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 25 
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''
+ 
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+SERVER_EMAIL = EMAIL_HOST_USER
 
 try:
     from local_settings import *

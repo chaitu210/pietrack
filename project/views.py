@@ -5,10 +5,14 @@ import json, random, string
 from django.utils import timezone
 from django.template.defaultfilters import slugify
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, HttpResponseRedirect
-from django.core.mail import send_mail
+from django.http import HttpResponse 
+from django.contrib.auth.tokens import default_token_generator
+from django.contrib.auth.views import password_reset_confirm
+from django.core.urlresolvers import reverse
 from piebase.models import User, Project, Organization, Role
-from forms import CreateProjectForm, CreateMemberForm
+from forms import CreateProjectForm, CreateMemberForm, PasswordResetForm
+from .tasks import send_mail_old_user
+
 
 
 @login_required
@@ -43,13 +47,11 @@ def project_description(request, pk):
 	return render(request, template_name, dict_items)
 
 def project_details(request,slug):
-	# print slug
 	project = Project.objects.get(slug=slug)
 	dictionary = {'project':project}
 	template_name = 'Project-Project_Details.html'
 
 	if(request.method=='POST'):
-		print request.POST['oldname']
 		organization=request.user.organization
 		form = CreateProjectForm(request.POST,organization=organization)
 
@@ -131,17 +133,12 @@ def issues_severities_delete(request,slug):
 def ticket_status(request,slug):
     template_name = 'Attributes_Status.html'
     if(request.method=='POST'):
-        print "before form" 
         form = TicketStatusForm(request.POST,project=slug)
-        print "after form" 
-        print form
         if(form.is_valid()):
-            print "no error"
             tslug = slugify(request.POST['name'])
             project = TicketStatus.objects.create(name=request.POST['name'],slug=tslug,color=request.POST['color'],project=Project.objects.get(slug=slug));
             return HttpResponse(json.dumps({'error':False,'color':request.POST['color'],'name':request.POST['name'],'proj_id':project.id}),content_type="application/json")
         else:
-            print "errors"
             return HttpResponse(json.dumps({'error':True,'errors':form.errors}),content_type="application/json");
     priority_list=TicketStatus.objects.filter(project=Project.objects.get(slug=slug))
     return render(request,template_name,{'slug':slug,'priority_list':priority_list})
@@ -166,6 +163,23 @@ def ticket_status_delete(request,slug):
 
 
 
+def password_reset(request, to_email):  
+    from_email = 'dineshmcmf@gmail.com'
+    to_email_dict = {'email': to_email}
+    token_generator = default_token_generator
+    email_template_name = 'reset_email.html'
+    subject_template_name = 'reset_subject.txt'
+    form = PasswordResetForm(to_email_dict)
+    if form.is_valid():
+        opts = {
+            'use_https': request.is_secure(),
+            'from_email': from_email,
+            'email_template_name': email_template_name,
+            'subject_template_name': subject_template_name,
+            'request': request}
+        form.save(**opts)
+
+
 @login_required
 def create_member(request, project_id):
     if request.method == 'POST':
@@ -187,13 +201,12 @@ def create_member(request, project_id):
                 description = post_dict['description']
                 organization_obj = request.user.organization
                 if User.objects.filter(email = email).exists():
-                    send_mail('invitaition for project', 'time to code', 'dineshmcmf@gmail.com', [email])
+                    send_mail_old_user.delay(email) 
                     pass
                 else:
                     random_password = ''.join(random.choice(string.digits) for _ in xrange(8))
-                    new_user_obj = User.objects.create(email = email, username = email, password = random_password, organization = organization_obj, pietrack_role = 'user')
-                    change_password_link = '127.0.0.1:8000/accounts/change_password/' + str(new_user_obj.id) + '/'
-                    send_mail('Invitation for project', 'time to code, before that change your password: ' + change_password_link, 'dineshmcmf@gmail.com', [email])
+                    new_user_obj = User.objects.create_user(email = email, username = email, password = random_password, organization = organization_obj, pietrack_role = 'user')
+                    password_reset(request, email_iter)
                 project_obj = Project.objects.get(id = project_id)
                 user_obj = User.objects.get(email = email)
                 project_obj.members.add(user_obj)
@@ -215,3 +228,7 @@ def create_member(request, project_id):
         return HttpResponse(json.dumps(json_data), content_type = 'application/json')
     else:
         return render(request, 'create_member.html')
+
+
+def reset_confirm(request, uidb64=None, token=None):
+    return password_reset_confirm(request, template_name = 'reset_confirm.html', uidb64=uidb64, token=token, post_reset_redirect = reverse('accounts:login'))
