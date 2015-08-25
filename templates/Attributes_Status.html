@@ -23,7 +23,7 @@
                     <li class="init-arrow-down"> <a href="javascript:void(0)"> <span class="gw-menu-text"> <i class="fa fa-sort-amount-asc"></i> Attributes</span> <b class="gw-arrow"></b> </a>
                       <ul class="gw-submenu">
                         <li> <a href="javascript:void(0)">Status</a> </li>
-                        <li> <a href="javascript:void(0)">Priorities</a> </li>
+                        <li> <a href="javascript:void(0)">severities</a> </li>
                         <li> <a href="javascript:void(0)">Severities</a> </li>
                       </ul>
                     </li>
@@ -42,9 +42,9 @@
         	<!-- content box starts here -->
         	<div class="content_box">
                 <div class="title">
-                  <h4>SAMPL1 STATUS - <span class="status">Issues Priorities</span></h4>
+                  <h4>SAMPL1 STATUS - <span class="status"> TICKET STATUS</span></h4>
                   <div class="tag">Specify the statuses your user stories, tasks and issues will go through</div>
-                  <span class="new"><a href="#" id="id_new_pri">Add New Priority</a></span>
+                  <span class="new"><a href="#" id="id_new_pri">Add New Status</a></span>
                 </div>
 				<!-- status table starts here -->
 				<div class="table-responsive color-box">
@@ -172,7 +172,7 @@
       
       function delete_priority(color,name,row){
       	data_send = 'name='+name+'&color='+color+'&csrfmiddlewaretoken='+'{{csrf_token}}';
-      	$.post('{%url "project:issues_priorities_delete" slug %}',data_send,function(response){
+      	$.post('{%url "project:ticket_status_delete" slug %}',data_send,function(response){
       		if(!response.error){
       			$('#'+row).remove();
       		}
@@ -219,7 +219,7 @@
         else{
         	var data = $('#id_issue_prio_form').serialize();
         	console.log(data)
-        	$.post('{%url "project:issues_priorities_edit" slug %}',data,function(response){
+        	$.post('{%url "project:ticket_status_edit" slug %}',data,function(response){
         		
         		if(response.error){
       				if(response.errors['name']){

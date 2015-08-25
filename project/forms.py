@@ -1,5 +1,5 @@
 from django import forms
-from piebase.models import Project,Priority,Organization,User
+from piebase.models import Project,Priority,Severity,Organization,User,TicketStatus
 from django.template.defaultfilters import slugify
 
 
@@ -37,12 +37,56 @@ class PriorityIssueForm(forms.ModelForm):
 		if(Priority.objects.filter(name=name,project=project)):
 			raise forms.ValidationError('Priority with this name already exists')
 		return name
-		
+
 class PriorityIssueFormEdit(forms.ModelForm):
 
 	class Meta:
 		model = Priority
 		fields = ['name','color']
+
+class SeverityIssueForm(forms.ModelForm):
+	def __init__(self, *args, **kwargs):
+		self.project = kwargs.pop('project', None)
+		super(SeverityIssueForm, self).__init__(*args, **kwargs)
+	
+	class Meta:
+		model = Severity
+		fields = ['name','color']
+
+	def clean_name(self):
+		name = self.cleaned_data['name']
+		project = Project.objects.get(slug=self.project);
+		if(Priority.objects.filter(name=name,project=project)):
+			raise forms.ValidationError('Severity with this name already exists')
+		return name
+
+class SeverityIssueFormEdit(forms.ModelForm):
+
+	class Meta:
+		model = Severity
+		fields = ['name','color']
+
+class TicketStatusForm(forms.ModelForm):
+	def __init__(self, *args, **kwargs):
+		self.project = kwargs.pop('project', None)
+		super(TicketStatusForm, self).__init__(*args, **kwargs)
+	
+	class Meta:
+		model = TicketStatus
+		fields = ['name','color']
+
+	def clean_name(self):
+		name = self.cleaned_data['name']
+		project = Project.objects.get(slug=self.project);
+		if(Priority.objects.filter(name=name,project=project)):
+			raise forms.ValidationError('Severity with this name already exists')
+		return name
+
+class TicketStatusFormEdit(forms.ModelForm):
+
+	class Meta:
+		model = TicketStatus
+		fields = ['name','color']		
 
 class CreateMemberForm(forms.Form):
     email = forms.EmailField()
