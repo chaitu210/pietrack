@@ -56,7 +56,7 @@ def register(request):
             json_data = {'error': True, 'error_password': 'password mismatch'}
         return HttpResponse(json.dumps(json_data), content_type = 'application/json')
     else:
-        json_data = {'error': True, 'form_errors': register_form.errors}
+        json_data = {'error': True, 'response': register_form.errors}
         return HttpResponse(json.dumps(json_data), content_type = 'application/json')
 
 
@@ -74,7 +74,7 @@ def forgot_password(request):
         return HttpResponse(json.dumps(json_data), content_type='application/json')
 
 
-def changePassword(request):
+def change_password(request):
     # user = User.objects.get(username=request.user.username)
     user = request.user
 
@@ -86,23 +86,20 @@ def changePassword(request):
             user.set_password(request.POST['password1'])
             user.save()
 
-            response_data = {'error': False, "errors": 'Your password is updated !'}
+            response_data = {'error': False, "response": 'Your password is updated !'}
             return HttpResponse(json.dumps(response_data), content_type='application/json')
         else:
-            response_data = {'error': True, 'errors': form.errors}
+            response_data = {'error': True, 'response': form.errors}
             return HttpResponse(json.dumps(response_data), content_type="application/json")
 
-    form = ChangePasswordForm()
-    context = {'form': form, 'user': user}
-
-    return render(request, 'change_password.html', context)
+    return render(request, 'change_password.html')
 
 
-def userProfile(request):
+def user_profile(request):
     user = request.user
 
     if request.method == 'POST':
-        user = request.user
+
         form = EditUserModelForm(request.POST, request.FILES, instance=user)
 
         if form.is_valid():
@@ -115,10 +112,10 @@ def userProfile(request):
                     pass
 
             form.save()
-            response_data = {'error': False, "errors": 'Successfully updated'}
+            response_data = {'error': False, "response": 'Successfully updated'}
             return HttpResponse(json.dumps(response_data), content_type='application/json')
         else:
-            response_data = {'error': True, 'errors': form.errors}
+            response_data = {'error': True, 'response': form.errors}
 
             return HttpResponse(json.dumps(response_data), content_type="application/json")
     form = EditUserModelForm(instance=user)

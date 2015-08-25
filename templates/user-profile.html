@@ -13,15 +13,11 @@
               <div class="user-pic-block">
                  <span class="user-picture">
                      {% if user.profile_pic %}
-                    <img src="{{ user.profile_pic.url }}" alt="{{ user.profile_pic.url }}" width="100px" height="100px"/>
+                    <img src="{{ user.profile_pic.url }}" width="100px" height="100px"/>
                      {% else %}
-                     <img src="{% static 'img/user-pic.jpg' %}" alt="user-profile-picture" />
+                     <img src="{% static 'img/user-pic.jpg' %}" />
                      {% endif %}
                  </span>
-                  <!--<div class="">-->
-                      <!--<input id="profile_pic-clear_id" name="profile_pic-clear" type="checkbox" />-->
-                      <!--<label for="profile_pic-clear_id">Clear</label>-->
-                  <!--</div>-->
                  <span class="pic-size">The image will be scaled to 80x80px.</span>
                  <span class="pic-btn">
                      <button id="change_picture_button">Change Picture</button>
@@ -31,28 +27,28 @@
               </div>
               <div class="form_group">
                 <label for="id_username">User Name</label>
-                <input id="id_username" name="username" type="text" class='input' value={{user.username}}>
+                <input id="id_username" name="username" type="text" class='input' value="{{ user.username }}">
                   <span name="username"></span>
                 <div class="help">Type your username here</div>
 
               </div>
               <div class="form_group">
                 <label for="id_email">Email Address</label>
-                <input type="text" class='input' id="id_email" name="email" value={{user.email}}>
+                <input type="text" class='input' id="id_email" name="email" value="{{ user.email }}">
                   <span name="email"></span>
                 <div class="help">Type your email address here</div>
 
               </div>
               <div class="form_group">
                 <label for="id_first_name">Full Name</label>
-                <input type="text" class='input' id="id_first_name" name="first_name" value={{user.first_name}}>
+                <input type="text" class='input' id="id_first_name" name="first_name" value="{{ user.first_name }}">
                   <span name="first_name"></span>
                 <div class="help">Type your Full name here</div>
 
               </div>
                <div class="form_group">
                 <label for="id_biography">Bio (Max 300 letters)</label>
-                <textarea class="form-control textarea" id="id_biography" name="biography">{{user.biography}}</textarea>
+                <textarea class="form-control textarea" id="id_biography" name="biography">{{ user.biography }}</textarea>
                    <span name="biography"></span>
                 <div class="help">Type your bio-graphy here</div>
 
@@ -72,9 +68,9 @@
         $("#id_profile_pic").click()
         });
 
-        function display_error(errors){
-            if(errors){
-                return errors;
+        function display_error(response){
+            if(response){
+                return response;
             }
             else{
                 return '';
@@ -83,21 +79,18 @@
 
         $('#post-form').ajaxForm(function(){
 
-            console.log("form submitted!");
-
-            $.post("{% url 'accounts:userProfile' %}",$('form').serialize(), function(result){
+            $.post("{% url 'accounts:user_profile' %}",$('form').serialize(), function(result){
                 if(result['error']){
-                    $("span[name='profile_pic']").text(display_error(result['errors'].profile_pic));
-                    $("span[name='username']").text(display_error(result['errors'].username));
-                    $("span[name='email']").text(display_error(result['errors'].email));
-                    $("span[name='first_name']").text(display_error(result['errors'].first_name));
-                    $("span[name='last_name']").text(display_error(result['errors'].last_name));
-                    $("span[name='biography']").text(display_error(result['errors'].biography));
+                    $("span[name='profile_pic']").text(display_error(result['response'].profile_pic));
+                    $("span[name='username']").text(display_error(result['response'].username));
+                    $("span[name='email']").text(display_error(result['response'].email));
+                    $("span[name='first_name']").text(display_error(result['response'].first_name));
+                    $("span[name='last_name']").text(display_error(result['response'].last_name));
+                    $("span[name='biography']").text(display_error(result['response'].biography));
                 }
 
                 else{
-                    alert(result['errors']);
-                    console.log('Updated');
+                    alert(result['response']);
                 }
             });
         });
