@@ -11,7 +11,7 @@ from piebase.models import User, Project, Organization, Role
 from forms import CreateProjectForm, CreateMemberForm
 
 
-# @login_required
+@login_required
 def create_project(request):
     template_name = 'create_project.html'
     if(request.method=="POST"):
