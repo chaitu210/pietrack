@@ -59,8 +59,7 @@ def forgot_password(request):
         else:
             if User.objects.filter(email = email).exists():
                 json_data = {'error': False}
-                #send_mail('Subject here', 'Here is the message.', 'dineshmcmf@gmail.com', [email])
+                send_mail('Subject here', 'Here is the message.', 'dineshmcmf@gmail.com', [email])
             else:
                 json_data = {'error': True, 'error_msg': 'email not registered'}
         return HttpResponse(json.dumps(json_data), content_type = 'application/json')
-

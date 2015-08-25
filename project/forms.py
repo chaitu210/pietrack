@@ -1,6 +1,7 @@
 from django import forms
-from piebase.models import Project,Priority,Organization
+from piebase.models import Project,Priority,Organization,User
 from django.template.defaultfilters import slugify
+
 
 
 class CreateProjectForm(forms.ModelForm):
@@ -36,8 +37,14 @@ class PriorityIssueForm(forms.ModelForm):
 		if(Priority.objects.filter(name=name,project=project)):
 			raise forms.ValidationError('Priority with this name already exists')
 		return name
+		
 class PriorityIssueFormEdit(forms.ModelForm):
 
 	class Meta:
 		model = Priority
 		fields = ['name','color']
+
+class CreateMemberForm(forms.Form):
+    email = forms.EmailField()
+    designation = forms.CharField()
+    description = forms.Textarea()
