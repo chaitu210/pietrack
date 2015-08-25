@@ -8,27 +8,38 @@
     <link href='http://fonts.googleapis.com/css?family=Raleway:400,100,200,500,300,600,700,800,900' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+    
     {% compress css %}
     <link rel="stylesheet" type="text/less" href="{% static 'less/slim_scroll.less' %}">
     <link rel="stylesheet" type="text/less" href="{% static 'less/main.less' %}">
+    {%block extra_css_links%}
+    {%endblock%}
     {% endcompress %}
+    
   </head>
   <body>
     <header id='header_base'>
-      <!-- logo -->
-      <span class="logo">
-      <i class='fa fa-pie-chart'></i>
-      </span>
-      <!--/ logo -->
-      <!-- project mgmt -->
-      <span class='pg_mt'>
-      <i class='fa fa-bookmark-o'></i>
-      </span>
-      <!--/ project mgmt -->
+
       <!-- left menu -->
       <div class='left_header'>
         <div class="menu">
           <ul>
+
+      <li>
+         <span class='each_wrap child_one'>
+            <i class='fa fa-pie-chart'></i>
+            <span class='name'>Pie Track</span>
+         </span>
+      </li>
+
+
+      <li>
+         <span class='each_wrap child_one'>
+            <i class='fa fa-bookmark-o'></i>
+            <span class='name'>Bookmark</span>
+         </span>
+      </li>
+
               <li>
          <span class='each_wrap child_one'>
             <i class='fa fa-clock-o'></i>
@@ -116,6 +127,7 @@
                     <span class='time'>12 min ago</span>
                     </span>
                     </span>
+
                       </li>
                       <li>
                         <span class='ticket'>
@@ -256,6 +268,9 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="{% static 'js/jquery.slimscroll.js' %}"></script>
+    {%block extra_js_links %}
+    {%endblock extra_js_links %}
+
     <script type="text/javascript">
       $(function(){
         $('.scroll').slimscroll({
