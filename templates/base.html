@@ -12,26 +12,34 @@
     {% compress css %}
     <link rel="stylesheet" type="text/less" href="{% static 'less/slim_scroll.less' %}">
     <link rel="stylesheet" type="text/less" href="{% static 'less/main.less' %}">
-    {% endcompress %}
     {%block extra_css_links%}
     {%endblock%}
+    {% endcompress %}
+    
   </head>
   <body>
     <header id='header_base'>
-      <!-- logo -->
-      <span class="logo">
-      <i class='fa fa-pie-chart'></i>
-      </span>
-      <!--/ logo -->
-      <!-- project mgmt -->
-      <span class='pg_mt'>
-      <i class='fa fa-bookmark-o'></i>
-      </span>
-      <!--/ project mgmt -->
+
       <!-- left menu -->
       <div class='left_header'>
         <div class="menu">
           <ul>
+
+      <li>
+         <span class='each_wrap child_one'>
+            <i class='fa fa-pie-chart'></i>
+            <span class='name'>Pie Track</span>
+         </span>
+      </li>
+
+
+      <li>
+         <span class='each_wrap child_one'>
+            <i class='fa fa-bookmark-o'></i>
+            <span class='name'>Bookmark</span>
+         </span>
+      </li>
+
               <li>
          <span class='each_wrap child_one'>
             <i class='fa fa-clock-o'></i>

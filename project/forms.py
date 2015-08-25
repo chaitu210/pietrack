@@ -53,7 +53,7 @@ class SeverityIssueForm(forms.ModelForm):
 	def clean_name(self):
 		name = self.cleaned_data['name']
 		project = Project.objects.get(slug=self.project);
-		if(Priority.objects.filter(name=name,project=project)):
+		if(Severity.objects.filter(name=name,project=project)):
 			raise forms.ValidationError('Severity with this name already exists')
 		return name
 
@@ -74,9 +74,12 @@ class TicketStatusForm(forms.ModelForm):
 
 	def clean_name(self):
 		name = self.cleaned_data['name']
+		slug =slugify(name)
+		print slug
+		print "in forms.py"
 		project = Project.objects.get(slug=self.project);
-		if(Priority.objects.filter(name=name,project=project)):
-			raise forms.ValidationError('Severity with this name already exists')
+		if(TicketStatus.objects.filter(name=name,slug=slug,project=project)):
+			raise forms.ValidationError('Status with this name already exists')
 		return name
 
 class TicketStatusFormEdit(forms.ModelForm):
