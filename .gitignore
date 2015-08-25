@@ -4,4 +4,4 @@ piebase/migrations/*
 *~
 .idea/
 media/profile
-local_settings.py
+pietrack/local_settings.py
