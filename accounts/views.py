@@ -1,5 +1,4 @@
 from django.shortcuts import render
-from django.contrib.auth import *
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib import auth
