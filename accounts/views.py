@@ -1,10 +1,39 @@
-import json
+from django.shortcuts import render
 from django.core.urlresolvers import reverse
 from django.shortcuts import render, HttpResponse
 from django.contrib import auth
 from django.core.mail import send_mail
 from accounts.forms import RegisterForm, ChangePasswordForm
+from django.http import HttpResponseRedirect, HttpResponse
+
 from piebase.models import User, Organization
+from .forms import EditUserModelForm, RegisterForm, ChangePasswordForm
+import json
+
+
+# for renaming the profile pic
+import os
+from django.conf import settings
+
+
+# Create your views here.
+
+def index(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        user = auth.authenticate(username=email, password=password)
+        if user:
+            if user.is_active:
+                auth.login(request, user)
+                json_data = {'error': False}
+            else:
+                json_data = {'error': True, 'error_msg': 'User account is disabled'}
+        else:
+            json_data = {'error': True, 'error_msg': 'Authenticating user failed, wrong email or password'}
+        return HttpResponse(json.dumps(json_data), content_type='application/json')
+    else:
+        return render(request, 'login.html')
 
 
 def register(request):
@@ -29,37 +58,69 @@ def register(request):
             json_data = {'error': True, 'error_password': 'password mismatch'}
         return HttpResponse(json.dumps(json_data), content_type = 'application/json')
     else:
-        json_data = {'error': True, 'form_errors': register_form.errors}
+        json_data = {'error': True, 'response': register_form.errors}
         return HttpResponse(json.dumps(json_data), content_type = 'application/json')
 
-
-def login(request):
-    if request.method == 'POST':
-        email = request.POST.get('email')
-        password = request.POST.get('password')
-        user = auth.authenticate(username = email, password = password)
-        if user:
-            if user.is_active:
-                auth.login(request, user)
-                json_data = {'error': False}
-            else:
-                json_data = {'error': True, 'error_msg': 'User account is disabled'}
-        else:
-            json_data = {'error': True, 'error_msg': 'Authenticating user failed, wrong email or password'}
-        return HttpResponse(json.dumps(json_data), content_type = 'application/json')
-    else:
-        return render(request, 'login.html')
-        
 
 def forgot_password(request):
     if request.method == 'POST':
-        email= str(request.POST.get('email'))
+        email = str(request.POST.get('email'))
         if not email:
             json_data = {'error': True, 'error_msg': 'This field is required'}
         else:
-            if User.objects.filter(email = email).exists():
+            if User.objects.filter(email=email).exists():
                 json_data = {'error': False}
-                send_mail('Subject here', 'Here is the message.', 'dineshmcmf@gmail.com', [email])
+                # send_mail('Subject here', 'Here is the message.', 'dineshmcmf@gmail.com', [email])
             else:
                 json_data = {'error': True, 'error_msg': 'email not registered'}
-        return HttpResponse(json.dumps(json_data), content_type = 'application/json')
+        return HttpResponse(json.dumps(json_data), content_type='application/json')
+
+
+def change_password(request):
+    # user = User.objects.get(username=request.user.username)
+    user = request.user
+
+    if request.method == 'POST':
+        form = ChangePasswordForm(request.POST, request=request)
+
+        if form.is_valid():
+
+            user.set_password(request.POST['password1'])
+            user.save()
+
+            response_data = {'error': False, "response": 'Your password is updated !'}
+            return HttpResponse(json.dumps(response_data), content_type='application/json')
+        else:
+            response_data = {'error': True, 'response': form.errors}
+            return HttpResponse(json.dumps(response_data), content_type="application/json")
+
+    return render(request, 'change_password.html')
+
+
+def user_profile(request):
+    user = request.user
+
+    if request.method == 'POST':
+
+        form = EditUserModelForm(request.POST, request.FILES, instance=user)
+
+        if form.is_valid():
+            if 'profile_pic' in request.FILES:
+
+                user.profile_pic = request.FILES['profile_pic']
+                try:
+                    os.remove(settings.MEDIA_ROOT+'profile/'+user.username+'/'+user.username+'.jpg')
+                except:
+                    pass
+
+            form.save()
+            response_data = {'error': False, "response": 'Successfully updated'}
+            return HttpResponse(json.dumps(response_data), content_type='application/json')
+        else:
+            response_data = {'error': True, 'response': form.errors}
+
+            return HttpResponse(json.dumps(response_data), content_type="application/json")
+    form = EditUserModelForm(instance=user)
+
+    context = {'form': form}
+    return render(request, 'user-profile.html', context)

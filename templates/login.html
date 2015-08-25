@@ -1,5 +1,4 @@
 {% load compress %}
-<!DOCTYPE html>
 <html>
   <head>
     {% load staticfiles %}
@@ -243,7 +242,8 @@
                         $('#login_error_id').text(result.error_msg)
                     }
                     else{
-                        alert('logged_in') 
+                        alert('You are successfully logged in !');
+                        window.location.href='user_profile';
                     }
                 });
         });
@@ -264,18 +264,19 @@
         $('#create_account_button_id').click(function(event){
                 event.preventDefault();
                 $.post("{% url 'accounts:register' %}", $('#form_create_account_id').serialize(), function(result){
-                    if(result['form_errors']){
-                        $('#error_email_id').text(disp_error(result['form_errors'].email))
-                        $('#error_username_id').text(disp_error(result['form_errors'].username))
-                        $('#error_password_id').text(disp_error(result['form_errors'].password))
-                        $('#error_confirm_password_id').text(disp_error(result['form_errors'].confirm_password))
-                        $('#error_organization_id').text(disp_error(result['form_errors'].organization))
+                    if(result['response']){
+                        $('#error_email_id').text(disp_error(result['response'].email))
+                        $('#error_username_id').text(disp_error(result['response'].username))
+                        $('#error_password_id').text(disp_error(result['response'].password))
+                        $('#error_confirm_password_id').text(disp_error(result['response'].confirm_password))
+                        $('#error_organization_id').text(disp_error(result['response'].organization))
                     }
                     else if(result['error_password']){
                             $('#error_confirm_password_id').text(result['error_password'])
                     }
                     else{
                         alert('user_created')
+                        window.url
                     }
                 });
         });
@@ -291,7 +292,7 @@
                     else{
                         alert('forgot password done')
                     }
-                });
+                },'json');
         });
     </script>
   </body>

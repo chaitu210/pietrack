@@ -13,17 +13,22 @@ Including another URLconf
     1. Add an import:  from blog import urls as blog_urls
     2. Add a URL to urlpatterns:  url(r'^blog/', include(blog_urls))
 """
-from django.conf.urls import include, url
+import os
+from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
 from project import views as project_views
-from accounts import views as accounts_views
+from .settings import MEDIA_ROOT, MEDIA_URL
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'project/create_member/(\d*)/$', project_views.create_member),
     url(r'^project/', include('project.urls', namespace='project')),
     url(r'^accounts/', include('accounts.urls', namespace='accounts')),
-]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+] + static(MEDIA_URL, document_root=MEDIA_ROOT)
 
+urlpatterns += patterns('',
+                        (r'^media/(.*)$', 'django.views.static.serve',
+                         {'document_root': os.path.join(os.path.abspath(os.path.dirname(__file__)), 'media')}),
+                        )

@@ -40,6 +40,9 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
+MEDIA_ROOT = os.path.join(BASE_DIR+'/media/')
+MEDIA_URL = '/media/'
+
 # Application definition
 
 INSTALLED_APPS = (
@@ -171,3 +174,8 @@ EMAIL_HOST_PASSWORD = '918152150?'
  
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 SERVER_EMAIL = EMAIL_HOST_USER
+
+try:
+    from local_settings import *
+except ImportError :
+    pass
