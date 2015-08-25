@@ -1,19 +1,12 @@
-from django.shortcuts import render
+import os, json
 from django.core.urlresolvers import reverse
-from django.shortcuts import render, HttpResponse
+from django.shortcuts import render
 from django.contrib import auth
 from django.core.mail import send_mail
-from accounts.forms import RegisterForm, ChangePasswordForm
 from django.http import HttpResponseRedirect, HttpResponse
-
-from piebase.models import User, Organization
-from .forms import EditUserModelForm, RegisterForm, ChangePasswordForm
-import json
-
-
-# for renaming the profile pic
-import os
 from django.conf import settings
+from piebase.models import User, Organization
+from accounts.forms import EditUserModelForm, RegisterForm
 
 
 # Create your views here.
