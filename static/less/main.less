@@ -7,7 +7,9 @@ body{
 	background: @bg_base;
 	color: @heading_color;
 }
-
+btn,button,a{
+	outline:none;
+}
 .login_container{
 	background: url(../img/hexagon-pattern.png) @bg_login;
 }
@@ -25,7 +27,7 @@ header{
 		display: inline-block;
 		span{
 			display: inline-block;
-			background-color: @green;
+			background-color: @aqua;
 			display: inline-block;
 			padding: 20px;
 			padding-top: 30px;
@@ -459,8 +461,8 @@ header{
 					.logo{
 						i{
 							padding: 11px 30px;
-							background: #000;
-							color: @green;
+							background: #fff;
+							color: @aqua;
 							position: relative;
 							font-size: 28px;
 							text-align: center;
@@ -496,6 +498,9 @@ header{
 					position: relative;
 					top: 0px;
 					margin-left: 0px;
+					.extras{
+						border-left:1px solid @aqua!important;
+					}
 					&:hover{
 						.slimScrollDiv{
 							display: block;
@@ -504,6 +509,11 @@ header{
 							display: block;
 						}
 					}
+					&:first-child{
+						.each_wrap{
+							border-left: 0px;
+							}
+							}
 					/*&:last-child{
 						margin-left: 1px;
 						&:hover{
@@ -516,6 +526,10 @@ header{
 						height: 100%;
 						padding: 9px 16px;
 						cursor: pointer;
+						background: #fff;
+						border: 1px solid @aqua;
+						color: @aqua;
+						border-left:0px;
 						.count{
 							font-size: 8px;
 							width: 14px;
@@ -526,9 +540,10 @@ header{
 							top: 4px;
 							right: 14px;
 							border-radius: 50%;
-							background: @orange;
+							background: #666;
 							line-height: 0px;
 							padding-top: 7px;
+							color:#fff;
 						}
 						.name{
 							display: none;
@@ -546,7 +561,8 @@ header{
 							font-size: 20px;
 						}
 						&:hover{
-							background: #fff;
+							background: @aqua;
+							color:#fff;
 							padding: 8.5px 16px!important;
 							.name{
 								display: inline-block;
@@ -566,7 +582,7 @@ header{
 						z-index: 100000;
 						position: absolute;
 						display: none;
-						top: 46px;
+						top: 42px;
 						z-index: 1000;
 						right: -20%;
 						width: 200px;
@@ -582,12 +598,21 @@ header{
 								cursor: pointer;
 								width: 100%;
 								display: block;
+								transition:0.5s;
+								color:@aqua;
+								border:1px solid @aqua;
+								&:hover{
+									background: @aqua;
+									color: #fff;
+								}
 								i{
 									width: 40px;
 									height: 40px;
 									text-align: center;
 									font-size: 18px;
 									padding-top: 9px;
+									background: #fff;
+									color: @aqua;
 								}
 								.name{
 									text-transform: uppercase;
@@ -600,8 +625,8 @@ header{
 							}
 							.extras_one{
 								i{
-									background: @extras_one;
-									color: #fff;
+									background: #fff;
+									color: @extras_one;
 								}
 								transition:0.5s;
 								color: @extras_one;
@@ -635,7 +660,7 @@ header{
 							left: 57%;
 							border-left: 7px solid transparent;
 							border-right: 7px solid transparent;
-							border-bottom: 8px solid @menu_right_three;
+							border-bottom: 8px solid #fff;
 						}
 					}
 					.sub_list{
@@ -720,15 +745,15 @@ header{
 							width: 0;
 							height: 0;
 							position: absolute;
-							top: -10px;
+							top: -8px;
 							z-index: 30;
 							left: 38%;
 							border-left: 7px solid transparent;
 							border-right: 7px solid transparent;
-							border-bottom: 8px solid @menu_right_two;
+							border-bottom: 8px solid #fff;
 						}
 					}
-					.child_logo{
+					/*.child_logo{
 						background: #000;
 						color: #00c1a4;
 						border:1px solid @menu_bg_one;
@@ -824,7 +849,7 @@ header{
 						&:hover{
 							color: @menu_bg_six!important;
 						}
-					}
+					}*/
 				}
 			}
 		}
@@ -848,12 +873,15 @@ header{
 	}
 }
 .active_li_drop{
-	background: #fff!important;
+	.each_wrap{
+	background: @aqua !important;
+	color: #fff !important;
 	.name{
 		display: inline-block!important;
 	}
 	.count{
 		display: none;
+	}
 	}
 }
 #vertical_menu{
@@ -929,6 +957,7 @@ header{
 				font-size:13px;
 				color: @heading_tag_create;
 			}
+			
 		}
 		.panel_box{
 			width: 43%;
@@ -1123,6 +1152,81 @@ header{
 				background: #000;
 				padding: 14px 28px;
 			}
+			.header_button_wrap{
+				float: right;
+				background: none;
+				padding: 0px;
+				padding-right: 15px;
+				.header_button{
+					cursor: pointer;
+					color: #fff;
+					background: @green;
+					padding: 10px 28px;
+					font-size: 11px;
+				}
+			}
+		}
+		.mile_stone_wrap{
+			.mile_stone_each{
+				padding-left: 0px;
+				.milestone_container{
+					display: block;
+					padding: 10px;
+					background: #fff;
+					border:1px solid @stroke_color;
+					cursor: pointer;
+					&:hover{
+						box-shadow: @panel_shadow;
+					}
+					.title{
+						display: block;
+						color: @orange;
+						font-weight: 600;
+						text-transform: capitalize;
+						text-align: right;
+						padding-bottom: 10px;
+						border-bottom:1px dashed @stroke_color;
+						margin-bottom: 15px;
+					}
+					.start_date{
+						.end_date;
+					}
+					.stories{
+						.end_date;
+					}
+					.end_date{
+						display: block;
+						padding-bottom: 5px;
+						i{
+							padding-right: 3px;
+							/*color: @blue;*/
+							color: #ddd;
+						}
+						/*.yellow{
+							color: @menu_bg_one;
+						}
+						.green{
+							color: @menu_bg_four;
+						}*/
+						.label{
+							font-weight: 600;
+							color: #666;
+							font-size: 12px;
+							text-align: left;
+							padding-left: 0px;
+							&:after{
+								content:':';
+								padding-right: 8px;
+								padding-left: 5px;
+							}
+						}
+					}
+					.created_by{
+						.end_date;
+					}
+				}
+			}
+					
 		}
 		.profile-pic-count{
 			margin-bottom:20px;
@@ -1160,6 +1264,7 @@ header{
 						font-size:13px;
 						line-height:22px;
 						margin-top:15px;
+						text-align: justify;
 					}
 			}
 		}
@@ -1302,10 +1407,8 @@ header{
 								}
 							}
 					}
-			
 				/*color box ends here */
-			
-				width:50%;
+				width:100%;
 				border-radius:0px;
 				border:none;
 				margin:0px auto;
@@ -1400,10 +1503,165 @@ header{
 					
 				}
 			}
+			
+			.content-panel-extra{
+				width:100%;
+				.member-box{
+					.user-assign{
+						  background: #999999;
+  						  color: #fff;
+						  display: inline-block;
+						  padding: 4px 7px;
+						  font-size: 13px;
+						  i{
+						  	display:inline-block;
+							margin:0px 5px;
+						  }
+					}
+					.img-text{
+						display:table-row;
+						.user-pic{
+							display:table-cell;
+							width:45px;
+							vertical-align:middle;
+							img{
+								width:30px;
+								height:30px;
+								border:1px solid #eee;
+							}
+						}
+						.title-email{
+							display:table-cell;
+							vertical-align:middle;
+							span{
+								display:block;
+								text-align:left;
+							}
+							.title{
+								color:#999999;
+								font-weight:600;
+								font-size:13px;
+								margin-bottom:5px;
+							}
+							.email{
+								color:#333;
+								font-weight:400;
+								font-size:13px;
+							}
+						}
+					}
+					.actions{
+						.edit{
+							background:#669900;
+							border-radius:3px;
+							color:#fff;
+							display:inline-block;
+							padding:2px 4px;
+						}
+						.delete{
+							  background: #ff8a84;
+							  border-radius: 3px;
+							  color: #fff;
+							  display: inline-block;
+							  padding: 2px 4px;
+						}
+					}
+					.status{
+						display:inline-block;
+						padding:4px 7px;
+						font-size:13px;
+						i{
+							display:inline-block;
+							margin-left:5px;
+						}
+					}
+					.active-1{
+						background:#ff9900;
+						color:#fff;
+					}
+					.pending{
+						background:#999999;
+						color:#fff;
+					}
+					.form-control{
+						border-radius:0px;
+						box-shadow:none;
+					}
+				}
+			}
 		}
 	/* right container ends here */
 	
 }	
-
+/* modal styles starts here */
+.modal{
+	border:none;
+	box-shadow:none;
+	top:40px;
+	.modal-content{
+		background:#7bb344;
+		border:none;
+		border-radius:0px;
+		box-shadow:none;
+		text-align:left;
+		.modal-header{
+			color:#fff;
+			border:none;
+			h4{
+				font-size:14px;
+			}
+		}
+			.modal-body{
+				padding:0px 15px 10px 15px;
+				label{
+					  font-weight: 600;
+					  text-transform: uppercase;
+					  color: #fff;
+					  margin-bottom: 5px;
+					  font-size: 13px;
+					  display:block;
+				}
+				.form-control{
+					  height: 36px;
+					  padding: 2px 5px;
+					  border: none;
+					  outline: none;
+					  box-shadow: none;
+					  width: 100%;
+					  border-radius:0px;
+				}
+				.help{
+					  font-size: 12px;
+					  color: #656f75;
+					  margin-top: 2px;
+					  margin-bottom: 15px;
+					  font-weight:normal;
+					  color:#fff;
+					  text-transform:none;
+				}
+			}
+			.modal-footer{
+				border:none;
+				text-align:left;
+				padding:0px 15px 10px 15px;
+				.btn-primary{
+					  color: #FFFFFF;
+					  background-color: #58832E;
+					  border: none;
+					  font-size: 12px;
+					  font-weight: bold;
+					  text-transform: uppercase;
+					  border-radius: 0px;
+				}
+			}
+	}
+}
+/* modal styles ends here */
+		
 
 /* box-content ends here */
+	/* contacts div height */
+.height_wrap{
+	height: 400px;
+}
+/* contacts div height */

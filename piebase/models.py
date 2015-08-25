@@ -10,7 +10,9 @@ from django.core import validators
 from .helper import Memail
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.generic import GenericForeignKey
+from django.core.mail import send_mail
 
+import os
 
 MILESTONE_STATUS = (
     ('planned', 'Planned'),
@@ -32,8 +34,12 @@ def url(self, filename):
 
 
 class Organization(models.Model):
-    name = models.CharField(max_length=250, verbose_name=_("name"),unique=True)
+    name = models.CharField(max_length=250, verbose_name=_("name"), unique=True)
     slug = models.SlugField(max_length=250, unique=True, null=False, blank=True, verbose_name=_("slug"))
+
+
+def profile_path(instance, filename):
+    return os.path.join('profile/', str(instance.username), str(instance.username) + '.jpg')
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -47,10 +53,15 @@ class User(AbstractBaseUser, PermissionsMixin):
     email_verified = models.BooleanField(default=False)
     organization = models.ForeignKey(Organization)
     pietrack_role = models.CharField(_('pietrack_role'), max_length=30, choices=PIETRACK_ROLES)
+    profile_pic = models.ImageField(upload_to=profile_path, null=True, blank=True)
+    biography = models.TextField(_('biography'), default=False)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
     objects = UserManager()
+
+    def __str__(self):
+        return '%s %s' % (self.first_name, self.last_name)
 
     def get_full_name(self):
         full_name = '%s %s' % (self.first_name, self.last_name)
@@ -72,7 +83,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         Memail(settings.DEFAULT_FROM_EMAIL, "Reset your password", rendered, self.email)
 
     def send_activate_mail(self):
-
         uidb64 = urlsafe_base64_encode(str(self.pk))
         token = default_token_generator.make_token(self)
 
@@ -87,22 +97,24 @@ class Project(models.Model):
     name = models.CharField(max_length=250, verbose_name=_("name"))
     slug = models.SlugField(max_length=250, null=False, blank=True, verbose_name=_("slug"))
     description = models.TextField(verbose_name=_("description"))
-    created_date = models.DateTimeField(verbose_name=_("created date"),auto_now_add=True)
+    created_date = models.DateTimeField(verbose_name=_("created date"), auto_now_add=True)
     modified_date = models.DateTimeField(verbose_name=_("modified date"))
     members = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="projects")
     logo = models.ImageField(upload_to=url, blank=True, null=True)
     organization = models.ForeignKey(Organization)
-    
+
     def __str__(self):
         return self.name
 
     class Meta:
         unique_together = [("name", "organization")]
 
+
 class Attachment(models.Model):
     uploaded_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True)
     created_date = models.DateTimeField(verbose_name=_("created date"), auto_now_add=True)
-    attached_file = models.FileField(max_length=500, null=True, blank=True, upload_to=url, verbose_name=_("attached file"))
+    attached_file = models.FileField(max_length=500, null=True, blank=True, upload_to=url,
+                                     verbose_name=_("attached file"))
     order = models.IntegerField(default=0, verbose_name=_("order"))
     project = models.ForeignKey(Project)
 
@@ -194,8 +206,10 @@ class Ticket(models.Model):
     slug = models.SlugField(max_length=250, null=False, blank=True, verbose_name=_("slug"))
     project = models.ForeignKey(Project, related_name="project_tickets", verbose_name=_("project"))
     assigned_to = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True)
-    milestone = models.ForeignKey(Milestone, null=True, blank=True, default=None, related_name="tasks", verbose_name=_("milestone"))
-    requirement = models.ForeignKey(Requirement, null=True, blank=True, default=None, related_name="tasks", verbose_name=_("milestone"))
+    milestone = models.ForeignKey(Milestone, null=True, blank=True, default=None, related_name="tasks",
+                                  verbose_name=_("milestone"))
+    requirement = models.ForeignKey(Requirement, null=True, blank=True, default=None, related_name="tasks",
+                                    verbose_name=_("milestone"))
     created_date = models.DateTimeField(verbose_name=_("created date"), auto_now_add=True)
     modified_date = models.DateTimeField(verbose_name=_("modified date"))
     finished_date = models.DateTimeField(null=True, blank=True, verbose_name=_("finished date"))
@@ -204,8 +218,10 @@ class Ticket(models.Model):
     attachments = models.ManyToManyField(Attachment, blank=True)
     reference = models.ManyToManyField('self', related_name='references', blank=True)
     status = models.ForeignKey(TicketStatus, null=True, blank=True, related_name="tickets", verbose_name=_("status"))
-    severity = models.ForeignKey(Severity, null=True, blank=True, related_name="severity_tickets", verbose_name=_("severity"))
-    priority = models.ForeignKey(Priority, null=True, blank=True, related_name="priority_tickets", verbose_name=_("priority"))
+    severity = models.ForeignKey(Severity, null=True, blank=True, related_name="severity_tickets",
+                                 verbose_name=_("severity"))
+    priority = models.ForeignKey(Priority, null=True, blank=True, related_name="priority_tickets",
+                                 verbose_name=_("priority"))
     ticket_type = models.CharField(max_length=50, null=False, blank=False)
     target_date = models.DateField(null=True, blank=True)
 
@@ -220,8 +236,9 @@ class Comment(models.Model):
     attachments = models.ManyToManyField(Attachment, blank=True)
     created = models.DateTimeField(auto_now_add=True)
 
-    #class Meta:
+    # class Meta:
     #    index_together = [('content_type', 'object_id', 'namespace'), ]
+
 
 class Timeline(models.Model):
     content_type = models.ForeignKey(ContentType, related_name="content_type_timelines")
