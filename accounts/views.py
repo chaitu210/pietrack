@@ -69,6 +69,21 @@ def forgot_password(request):
         return HttpResponse(json.dumps(json_data), content_type='application/json')
 
 
+def change_password(request):
+    user = request.user
+    if request.method == 'POST':
+        form = ChangePasswordForm(request.POST, request=request)
+        if form.is_valid():
+            user.set_password(request.POST['password1'])
+            user.save()
+            response_data = {'error': False, "response": 'Your password is updated !'}
+            return HttpResponse(json.dumps(response_data), content_type='application/json')
+        else:
+            response_data = {'error': True, 'response': form.errors}
+            return HttpResponse(json.dumps(response_data), content_type="application/json")
+    return render(request, 'change_password.html')
+
+
 def user_profile(request):
     user = request.user
 

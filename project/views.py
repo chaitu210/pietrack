@@ -47,13 +47,11 @@ def project_description(request, pk):
 	return render(request, template_name, dict_items)
 
 def project_details(request,slug):
-	# print slug
 	project = Project.objects.get(slug=slug)
 	dictionary = {'project':project}
 	template_name = 'Project-Project_Details.html'
 
 	if(request.method=='POST'):
-		print request.POST['oldname']
 		organization=request.user.organization
 		form = CreateProjectForm(request.POST,organization=organization)
 
@@ -135,17 +133,12 @@ def issues_severities_delete(request,slug):
 def ticket_status(request,slug):
     template_name = 'Attributes_Status.html'
     if(request.method=='POST'):
-        print "before form" 
         form = TicketStatusForm(request.POST,project=slug)
-        print "after form" 
-        print form
         if(form.is_valid()):
-            print "no error"
             tslug = slugify(request.POST['name'])
             project = TicketStatus.objects.create(name=request.POST['name'],slug=tslug,color=request.POST['color'],project=Project.objects.get(slug=slug));
             return HttpResponse(json.dumps({'error':False,'color':request.POST['color'],'name':request.POST['name'],'proj_id':project.id}),content_type="application/json")
         else:
-            print "errors"
             return HttpResponse(json.dumps({'error':True,'errors':form.errors}),content_type="application/json");
     priority_list=TicketStatus.objects.filter(project=Project.objects.get(slug=slug))
     return render(request,template_name,{'slug':slug,'priority_list':priority_list})
