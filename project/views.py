@@ -25,6 +25,8 @@ def create_project(request):
             slug = slugify(request.POST['name'])
             project_obj = Project.objects.create(name=request.POST['name'],slug=slug,description=request.POST['description'],modified_date=timezone.now(),organization=organization)
             project_id = project_obj.id
+            project_obj.members.add(request.user)
+            project_obj.save()
             json_data = {'error':False,'errors':form.errors, 'project_id': project_id}
             return HttpResponse(json.dumps(json_data), content_type="application/json")
         else:
