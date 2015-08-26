@@ -85,8 +85,7 @@ class TicketStatusForm(forms.ModelForm):
 	def clean_name(self):
 		name = self.cleaned_data['name']
 		slug =slugify(name)
-		print slug
-		print "in forms.py"
+		
 		project = Project.objects.get(slug=self.project);
 		if(TicketStatus.objects.filter(name=name,slug=slug,project=project)):
 			raise forms.ValidationError('Status with this name already exists')

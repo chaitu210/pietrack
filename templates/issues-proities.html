@@ -20,9 +20,9 @@
                     <li class="init-un-active"> <a href="javascript:void(0)"> <span class="gw-menu-text"> <i class="fa fa-area-chart"></i> Project Details</span> </a> </li>
                     <li class="init-arrow-down"> <a href="javascript:void(0)"> <span class="gw-menu-text"> <i class="fa fa-sort-amount-asc"></i> Attributes</span> <b class="gw-arrow"></b> </a>
                       <ul class="gw-submenu">
-                        <li> <a href="javascript:void(0)">Status</a> </li>
-                        <li> <a href="javascript:void(0)">Priorities</a> </li>
-                        <li> <a href="javascript:void(0)">Severities</a> </li>
+                        <li> <a href='{%url "project:ticket_status" slug %}'>Status</a> </li>
+                        <li> <a href='{%url "project:issues_priorities" slug %}'>Priorities</a> </li>
+                        <li> <a href='{%url "project:issues_severities" slug %}'>Severities</a> </li>
                       </ul>
                     </li>
                     <li > <a href="javascript:void(0)"> <span class="gw-menu-text"><i class="fa fa-users"></i> Members</span> </a>  </li>
@@ -216,7 +216,6 @@
       	}
         else{
         	var data = $('#id_issue_prio_form').serialize();
-        	console.log(data)
         	$.post('{%url "project:issues_priorities_edit" slug %}',data,function(response){
         		
         		if(response.error){
