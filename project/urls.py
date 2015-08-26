@@ -18,4 +18,5 @@ urlpatterns=[
 	url(r'^ticket_status/edit/(?P<slug>[a-zA-Z0-9-]+)/$',views.ticket_status_edit,name='ticket_status_edit'),
 	url(r'^ticket_status/delete/(?P<slug>[a-zA-Z0-9-]+)/$',views.ticket_status_delete,name='ticket_status_delete'),
     url(r'reset_confirm/(?P<uidb64>[0-9A-Za-z]+)-(?P<token>.+)/$', 'project.views.reset_confirm', name='reset_confirm'),
+	url(r'^members/(?P<slug>([a-zA-Z0-9-]+))/$',views.manage_members,name='manage_members'),
 ]
