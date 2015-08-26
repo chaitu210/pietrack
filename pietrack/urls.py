@@ -26,6 +26,7 @@ urlpatterns = [
     url(r'project/create_member/(\d*)/$', project_views.create_member),
     url(r'^project/', include('project.urls', namespace='project')),
     url(r'^accounts/', include('accounts.urls', namespace='accounts')),
+    url(r'^dashboard/', include('dashboard.urls', namespace='dashboard')),
 ] + static(MEDIA_URL, document_root=MEDIA_ROOT)
 
 urlpatterns += patterns('',
