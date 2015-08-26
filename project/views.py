@@ -234,3 +234,12 @@ def create_member(request, project_id):
 
 def reset_confirm(request, uidb64=None, token=None):
     return password_reset_confirm(request, template_name = 'reset_confirm.html', uidb64=uidb64, token=token, post_reset_redirect = reverse('accounts:login'))
+
+def manage_members(request,slug):
+    template_name = 'Members_list.html'
+    project = Project.objects.get(slug=slug)
+    mem_details=[]
+    for member in  project.members.exclude(email=request.user.email):
+        mem_details.append((member,Role.objects.get(users__email=member.email)))
+    dictionary ={'project_id':project.id,'mem_details':mem_details}
+    return render(request,template_name,dictionary)
