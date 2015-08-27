@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% load compress %}
+{% load static %}
+{% load staticfiles %}
+{% block content %}
+{% compress css %}
+     {% block extra_css_links %}
+        <link rel="stylesheet" type="text/css" href="{%static 'less/bs_leftnavi.less' %}">
+     {% endblock %}
+{% endcompress %}
+
+<section id="box-content">
+  <!-- nav left starts here-->
+  <div class="nav-left">
+    <!-- left menu starts here -->
+    <div class="nano-content">
+      <ul class="gw-nav gw-nav-list">
+        <li class="init-un-active">
+          <a href="{%url 'project:project_details' slug %}"> <span class="gw-menu-text"> <i class="fa fa-area-chart"></i> Project Details</span> </a>
+        </li>
+        <li class="init-arrow-down">
+          <a href="javascript:void(0)"> <span class="gw-menu-text"> <i class="fa fa-sort-amount-asc"></i> Attributes</span> <b class="gw-arrow"></b> </a>
+          <ul class="gw-submenu">
+            <li> <a href='{%url "project:ticket_status" slug %}'>Status</a> </li>
+            <li> <a href='{%url "project:issues_priorities" slug %}'>Priorities</a> </li>
+            <li> <a href='{%url "project:issues_severities" slug %}'>Severities</a> </li>
+          </ul>
+        </li>
+        <li>
+          <a href="{%url 'project:manage_members' slug %}"> <span class="gw-menu-text"><i class="fa fa-users"></i> Members</span> </a>
+        </li>
+        <li>
+          <a href="{%url 'project:manage_role' slug %}"> <span class="gw-menu-text"> <i class="fa fa-lock"></i> Permissions</span> </a>
+        </li>
+      </ul>
+    </div>
+    <!-- left menu ends here -->
+  </div>
+  <!-- nav left ends here-->
+  <!-- nav left ends here-->
+  <!-- right container starts here-->
+  <div class="right-container">
+    <div class="panel panel-default content-panel">
+      <div class="panel-body">
+        <!-- content box starts here -->
+        <div class="content_box">
+          <div class="title">
+            <h4>SAMPL1PROJECT DETAILS</h4>
+            <div class="tag">Compellingly reintermediate premier materials for client-centered markets.for client-centered markets.</div>
+          </div>
+          <form action="" method="post" id="id_form_cproject">
+            {%csrf_token%}
+            <div class="panel_box">
+              <div class="form_group">
+                <label>Project Name</label>
+                <input name='name' type="text" class="form-control" value="{{project.name}}">
+                <input name='oldname' type="hidden" class="form-control" value="{{project.slug}}">
+                <span name="pname_error"></span>
+                <!--Error here -->
+                <div class="help">Dynamically maximize professional models whereas.</div>
+              </div>
+              <div class="form_group">
+                <label>Description</label>
+                <textarea name='description' class="textarea">{{project.description}}</textarea>
+                <span name="pdescription_error"></span>
+                <!--Error here -->
+                <div class="help">Dynamically maximize professional models whereas.</div>
+              </div>
+              <button>Save</button>
+              <span class="del-project"><a href="{%url 'project:delete_project' id=project.id %}">Delete Project</a>
+              </div>
+            </form>
+              <!-- content box starts here -->
+              </div>
+              </div>
+             </div>
+        </div>
+        <!-- right container ends here-->
+    </section>
+
+{% endblock %}
+
+{%block extra_js_links %}
+    <script type="text/javascript" src="{%static 'js/bs_leftnavi.js' %}"></script>
+{%endblock extra_js_links %}
+
+{%block create_project_js%}
+
+      /*Backend code start */
+        function send_error(error)
+          {
+              if(error)
+                  return error;
+              return "";
+          }
+        $('#id_form_cproject').on('submit',function(e){
+          $.post('',$('#id_form_cproject').serialize(),function(response){
+            if(response['error']){
+              $("span[name='pname_error']").text(send_error(response['errors'].name));
+              $("span[name='pdescription_error']").text(send_error(response['errors'].description));
+            }
+            else{
+              /*redirect page here */
+              $("span[name='pname_error']").text("");
+              $("span[name='pdescription_error']").text("");
+              alert("Project edited");
+              window.location.href="{%url 'project:list_of_projects'%}"
+              
+              
+            }
+          });
+          e.preventDefault();
+        });
+      /*Backed code end*/
+{%endblock %}
