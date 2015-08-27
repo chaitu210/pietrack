@@ -27,6 +27,7 @@ urlpatterns = [
     url(r'^project/', include('project.urls', namespace='project')),
     url(r'^accounts/', include('accounts.urls', namespace='accounts')),
     url(r'^dashboard/', include('dashboard.urls', namespace='dashboard')),
+    url(r'^tickets/', include('tickets.urls', namespace='tickets')),
 ] + static(MEDIA_URL, document_root=MEDIA_ROOT)
 
 urlpatterns += patterns('',
