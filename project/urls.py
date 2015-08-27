@@ -19,4 +19,8 @@ urlpatterns=[
 	url(r'^ticket_status/delete/(?P<slug>[a-zA-Z0-9-]+)/$',views.ticket_status_delete,name='ticket_status_delete'),
     url(r'reset_confirm/(?P<uidb64>[0-9A-Za-z]+)-(?P<token>.+)/$', 'project.views.reset_confirm', name='reset_confirm'),
 	url(r'^members/(?P<slug>([a-zA-Z0-9-]+))/$',views.manage_members,name='manage_members'),
+	url(r'^role/(?P<slug>([a-zA-Z0-9-]+))/$',views.manage_role,name='manage_role'),
+	url(r'^role/edit/(?P<slug>([a-zA-Z0-9-]+))/$',views.manage_role_edit,name='manage_role_edit'),
+	url(r'^role/delete/(?P<slug>([a-zA-Z0-9-]+))/$',views.manage_role_delete,name='manage_role_delete'),
+
 ]
