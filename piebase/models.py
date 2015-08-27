@@ -9,7 +9,7 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator, default_toke
 from django.core import validators
 from .helper import Memail
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes.generic import GenericForeignKey
+from django.contrib.contenttypes.fields import GenericForeignKey
 from django.core.mail import send_mail
 
 import os
@@ -53,7 +53,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     email_verified = models.BooleanField(default=False)
     organization = models.ForeignKey(Organization)
     pietrack_role = models.CharField(_('pietrack_role'), max_length=30, choices=PIETRACK_ROLES)
-    profile_pic = models.ImageField(upload_to=profile_path, null=True, blank=True)
+    profile_pic = models.FileField(upload_to=profile_path, null=True, blank=True)
     biography = models.TextField(_('biography'), default=False)
 
     USERNAME_FIELD = 'email'
@@ -100,7 +100,7 @@ class Project(models.Model):
     created_date = models.DateTimeField(verbose_name=_("created date"), auto_now_add=True)
     modified_date = models.DateTimeField(verbose_name=_("modified date"))
     members = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="projects")
-    logo = models.ImageField(upload_to=url, blank=True, null=True)
+    logo = models.FileField(upload_to=url, blank=True, null=True)
     organization = models.ForeignKey(Organization)
 
     def __str__(self):
