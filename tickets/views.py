@@ -7,7 +7,6 @@ def add_task(request):
     if request.method == 'POST':
         json_data = {}
         add_task_form = AddTaskForm(request.POST)
-        print add_task_form, add_task_form.errors
         if add_task_form.is_valid():
             ticket_name = request.POST.get('name')
             if Ticket.objects.filter(name = ticket_name).exists():
