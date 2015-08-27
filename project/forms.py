@@ -9,7 +9,7 @@ from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.utils.translation import ugettext, ugettext_lazy as _
 from .tasks import celery_send_mail
-from piebase.models import Project, Priority, Severity, Organization, User, TicketStatus
+from piebase.models import Project, Priority, Severity, Organization, User, TicketStatus, Role
 from django.template.defaultfilters import slugify
 
 
@@ -164,3 +164,21 @@ class PasswordResetForm(forms.Form):
             celery_send_mail.delay(subject_template_name, email_template_name,
                            context, from_email, user.email,
                            html_email_template_name=html_email_template_name)
+
+class RoleAddForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        self.project = kwargs.pop('project', None)
+        super(RoleAddForm, self).__init__(*args, **kwargs)
+
+    class Meta:
+        model = Role
+        fields = ['name']
+
+    def clean_name(self):
+        name = self.cleaned_data['name']
+        slug =slugify(name)
+        project = Project.objects.get(slug=self.project);
+        if(Role.objects.filter(slug=slug,project=project)):
+            raise forms.ValidationError('Role with this name already exists')
+        return name

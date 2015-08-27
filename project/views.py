@@ -1,6 +1,6 @@
 from django.shortcuts import render,redirect
 from piebase.models import Project,Priority,Severity,TicketStatus
-from forms import CreateProjectForm,PriorityIssueForm,PriorityIssueFormEdit,SeverityIssueForm,SeverityIssueFormEdit,TicketStatusForm,TicketStatusFormEdit
+from forms import CreateProjectForm,PriorityIssueForm,PriorityIssueFormEdit,SeverityIssueForm,SeverityIssueFormEdit,TicketStatusForm,TicketStatusFormEdit, RoleAddForm
 import json, random, string
 from django.utils import timezone
 from django.template.defaultfilters import slugify
@@ -50,7 +50,7 @@ def project_description(request, pk):
 
 def project_details(request,slug):
 	project = Project.objects.get(slug=slug)
-	dictionary = {'project':project}
+	dictionary = {'project':project,'slug':slug}
 	template_name = 'Project-Project_Details.html'
 
 	if(request.method=='POST'):
@@ -241,5 +241,38 @@ def manage_members(request,slug):
     mem_details=[]
     for member in  project.members.exclude(email=request.user.email):
         mem_details.append((member,Role.objects.get(users__email=member.email)))
-    dictionary ={'project_id':project.id,'mem_details':mem_details}
+    dictionary ={'project_id':project.id,'mem_details':mem_details,'slug':slug}
     return render(request,template_name,dictionary)
+
+
+def manage_role(request,slug):
+    template_name = 'Permissions.html'
+    project = Project.objects.get(slug=slug)
+    if request.POST:
+        form = RoleAddForm(request.POST,project=slug)
+        if(form.is_valid()):
+            role = Role.objects.create(name=request.POST['name'],slug=slugify(request.POST['name']),project=project)
+            return HttpResponse(json.dumps({'error':False,'role_id':role.id,'role_name':role.name}),content_type="application/json")
+        else:
+            return HttpResponse(json.dumps({'error':True,'errors':form.errors}),content_type="application/json")
+    list_of_roles = Role.objects.filter(project=project)
+    dictionary = {'list_of_roles':list_of_roles,'slug':slug}
+    return render(request,template_name,dictionary)
+
+def manage_role_edit(request,slug):
+    print request
+    project = Project.objects.get(slug=slug)
+    form = RoleAddForm(request.POST,project=slug)
+    if(form.is_valid()):
+        role = Role.objects.get(id=request.POST['role_id'],project=project)
+        role.name = request.POST['name']
+        role.slug = slugify(request.POST['name'])
+        role.save()
+        return HttpResponse(json.dumps({'error':False,'role_id':role.id,'role_name':role.name}),content_type="application/json")
+    else:
+        return HttpResponse(json.dumps({'error':True,'errors':form.errors}),content_type="application/json")
+
+def manage_role_delete(request,slug):
+    project = Project.objects.get(slug=slug)
+    Role.objects.get(id=request.GET['role_id'],project=project).delete()
+    return HttpResponse(json.dumps({'error':False}),content_type="application/json")
