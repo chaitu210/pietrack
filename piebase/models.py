@@ -211,7 +211,7 @@ class Ticket(models.Model):
     requirement = models.ForeignKey(Requirement, null=True, blank=True, default=None, related_name="tasks",
                                     verbose_name=_("milestone"))
     created_date = models.DateTimeField(verbose_name=_("created date"), auto_now_add=True)
-    modified_date = models.DateTimeField(verbose_name=_("modified date"))
+    modified_date = models.DateTimeField(verbose_name=_("modified date"), auto_now_add= True)
     finished_date = models.DateTimeField(null=True, blank=True, verbose_name=_("finished date"))
     order = models.IntegerField(default=1)
     description = models.TextField(null=False, blank=True, verbose_name=_("description"))
