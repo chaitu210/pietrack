@@ -2,86 +2,92 @@
 {% block content %}
 {% load staticfiles %}
 	<section id="box-content">
-    	<!-- nav left starts here-->
-		<div class="nav-left">
-        	<!-- left menu starts here -->
-            	<div class="nano-content">
-                  <ul class="gw-nav gw-nav-list">
-                    <li class="init-un-active"> <a href="javascript:void(0)"> <span class="gw-menu-text"> <i class="fa fa-area-chart"></i> Project Details</span> </a> </li>
-                    <li class="init-arrow-down"> <a href="javascript:void(0)"> <span class="gw-menu-text"> <i class="fa fa-sort-amount-asc"></i> Attributes</span> <b class="gw-arrow"></b> </a>
-                      <ul class="gw-submenu">
-                        <li> <a href="javascript:void(0)">Status</a> </li>
-                        <li> <a href="javascript:void(0)">Priorities</a> </li>
-                        <li> <a href="javascript:void(0)">Severities</a> </li>
-                      </ul>
-                    </li>
-                    <li > <a href="javascript:void(0)"> <span class="gw-menu-text"><i class="fa fa-users"></i> Members</span> </a>  </li>
-                    <li > <a href="javascript:void(0)"> <span class="gw-menu-text"> <i class="fa fa-lock"></i> Permissions</span>  </a>
-                    </li>
-                  </ul>
-   		 </div>
-            <!-- left menu ends here -->
+  <!-- nav left starts here-->
+  <div class="nav-left">
+    <!-- left menu starts here -->
+    <div class="nano-content">
+      <ul class="gw-nav gw-nav-list">
+        <li class="init-un-active">
+          <a href="javascript:void(0)"> <span class="gw-menu-text"> <i class="fa fa-area-chart"></i> Project Details</span> </a>
+        </li>
+        <li class="init-arrow-down">
+          <a href="javascript:void(0)"> <span class="gw-menu-text"> <i class="fa fa-sort-amount-asc"></i> Attributes</span> <b class="gw-arrow"></b> </a>
+          <ul class="gw-submenu">
+            <li> <a href="javascript:void(0)">Status</a> </li>
+            <li> <a href="javascript:void(0)">Priorities</a> </li>
+            <li> <a href="javascript:void(0)">Severities</a> </li>
+          </ul>
+        </li>
+        <li>
+          <a href="javascript:void(0)"> <span class="gw-menu-text"><i class="fa fa-users"></i> Members</span> </a>
+        </li>
+        <li>
+          <a href="javascript:void(0)"> <span class="gw-menu-text"> <i class="fa fa-lock"></i> Permissions</span> </a>
+        </li>
+      </ul>
+    </div>
+    <!-- left menu ends here -->
+  </div>
+  <!-- nav left ends here-->
+  <!-- right container starts here-->
+  <div class="right-container">
+    <div class="panel panel-default content-panel content-panel-extra">
+      <div class="panel-body">
+        <!-- content box starts here -->
+        <div class="content_box ">
+          <div class="title">
+            <h4>SAMPL1 - <span class="status">MANAGE MEMBERS</span></h4>
+            <div class="tag">Specify the statuses your user stories, tasks and issues will go through</div>
+            <span class="new"><a href="{% url 'project:create_member' project_id %}">Add New Member</a></span>
+          </div>
+          <!-- status table starts here -->
+          <div class="table-responsive member-box">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Member</th>
+                  <th>Role</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for member,role in mem_details %}
+                <tr>
+                  <th scope="row">
+                    <div class="img-text">
+                      <span class="user-pic">
+                    {% if member.profile_pic %}
+                      <img src="{{member.profile_pic.url}}" />
+                    {% else %}
+                      <img src="{% static 'img/user-pic.jpg' %}" />
+                    {%endif%}
+                  </span>
+                      <span class="title-email">
+                                      <span class="title">Mergu</span>
+                      <span class="email">{{member.email}}</span>
+                      </span>
+                    </div>
+                  </th>
+                  <td>
+                    <select class="form-control">
+                      <option>{{role.name}}</option>
+                    </select>
+                  </td>
+                  <td><span class="active-1 status">Active <i class="fa fa-check"></i></span></td>
+                  <td class="actions"><a href="#" class="delete"><i class="fa fa-trash"></i></a></td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          <!-- status table ends here -->
+          <!-- content box starts here -->
         </div>
-        <!-- nav left ends here-->
-        
-        <!-- right container starts here-->
-        <div class="right-container">
-        
-        	<div class="panel panel-default content-panel content-panel-extra">
-            <div class="panel-body">
-        	<!-- content box starts here -->
-        	<div class="content_box ">
-                <div class="title">
-                  <h4>SAMPL1 - <span class="status">MANAGE MEMBERS</span></h4>
-                  <div class="tag">Specify the statuses your user stories, tasks and issues will go through</div>
-                  <span class="new"><a href="{% url 'project:create_member' project_id %}">Add New Member</a></span>
-                </div>
-				<!-- status table starts here -->
-				<div class="table-responsive member-box">
-                  <table class="table table-hover">
-                      <thead>
-                        <tr>
-                          <th>Member</th>
-                          <th>Role</th>
-                          <th>Status</th>
-                          <th>Action</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-				   {% for member,role in mem_details %}
-                        <tr>
-                          <th scope="row">
-                          		<div class="img-text">
-                                	<span class="user-pic">
-										{% if member.profile_pic %}
-											<img src="{{member.profile_pic.url}}" />
-										{% else %}
-											<img src="{% static 'img/user-pic.jpg' %}" />
-										{%endif%}
-									</span>
-                                    <span class="title-email">
-                                    	<span class="title">Mergu</span>
-                                        <span class="email">{{member.email}}</span>
-                                    </span>
-                                </div>
-                          </th>
-                          <td><select class="form-control">
-                                <option>{{role.name}}</option>
-                              </select>
-                          </td>
-                          <td><span class="active-1 status">Active <i class="fa fa-check"></i></span></td>
-                          <td class="actions"><a href="#" class="delete"><i class="fa fa-trash"></i></a></td>
-                        </tr>
-				   {% endfor %}
-                      </tbody>
-                    </table>
-                </div>
-               <!-- status table ends here -->     
-              <!-- content box starts here -->
-              </div>
-              </div>
-             </div>
-        </div>
-        <!-- right container ends here-->
-	</section>
+      </div>
+    </div>
+  </div>
+  <!-- right container ends here-->
+</section>
+
 	{% endblock %}
