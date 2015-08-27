@@ -8,10 +8,10 @@
       <link rel="stylesheet" type="text/css" href="{%static 'less/bootstrap-colorpicker.less' %}">
       <link rel="stylesheet" type="text/css" href="{%static 'less/docs.less' %}">
    {% endblock %}
-{% endcompress %}
+{% endcompress %}  
 
 {% block content %}
-  <section id="box-content">
+<section id="box-content">
   <!-- nav left starts here-->
   <div class="nav-left">
     <!-- left menu starts here -->
@@ -39,6 +39,8 @@
     <!-- left menu ends here -->
   </div>
   <!-- nav left ends here-->
+  </div>
+  <!-- nav left ends here-->
   <!-- right container starts here-->
   <div class="right-container">
     <div class="panel panel-default content-panel">
@@ -46,9 +48,9 @@
         <!-- content box starts here -->
         <div class="content_box">
           <div class="title">
-            <h4>SAMPL1 STATUS - <span class="status"> ISSUE SEVERITIES</span></h4>
+            <h4>SAMPL1 STATUS - <span class="status">Issues Priorities</span></h4>
             <div class="tag">Specify the statuses your user stories, tasks and issues will go through</div>
-            <span class="new"><a href="#" id="id_new_pri">Add New Severity</a></span>
+            <span class="new"><a href="#" id="id_new_pri">Add New Priority</a></span>
           </div>
           <!-- status table starts here -->
           <div class="table-responsive color-box">
@@ -125,9 +127,9 @@
 
  {%endblock content%}
  {%block extra_js_links %}
-  <script type="text/javascript" src="{%static 'js/bs_leftnavi.js' %}"></script>
-  <script src="{%static 'js/bootstrap-colorpicker.min.js' %}"></script>
-  <script src="{%static 'js/docs.js' %}"></script>
+    <script type="text/javascript" src="{%static 'js/bs_leftnavi.js' %}"></script>
+    <script src="{%static 'js/bootstrap-colorpicker.min.js' %}"></script>
+    <script src="{%static 'js/docs.js' %}"></script>
  {%endblock extra_js_links %}
 
  {%block create_project_js%}
@@ -173,10 +175,10 @@
         $('.demo').colorpicker();
         
       }
-      
+
       function delete_priority(color,name,row){
         data_send = 'name='+name+'&color='+color+'&csrfmiddlewaretoken='+'{{csrf_token}}';
-        $.post('{%url "project:issues_severities_delete" slug %}',data_send,function(response){
+        $.post('{%url "project:issues_priorities_delete" slug %}',data_send,function(response){
           if(!response.error){
             $('#'+row).remove();
           }
@@ -194,7 +196,7 @@
 
       });
      
-      /* add & edit issues_severities */
+      /* add & edit priority */
 
       $('#add_form').on('click',function(e){
         var create_data = $("#old_id").val()
@@ -222,7 +224,7 @@
         }
         else{
           var data = $('#id_issue_prio_form').serialize();
-          $.post('{%url "project:issues_severities_edit" slug %}',data,function(response){
+          $.post('{%url "project:issues_priorities_edit" slug %}',data,function(response){
             
             if(response.error){
               if(response.errors['name']){
@@ -244,7 +246,7 @@
         }
         
       });
-      /* add & edit issues_severities ends */
+      /* add & edit priority ends */
 
       /*ends */
 {%endblock create_project_js%}

@@ -18,280 +18,188 @@
     {% endcompress %}
 
   </head>
-  <body>
-    <header id='header_base'>
-
-      <!-- left menu -->
-      <div class='left_header'>
-        <div class="menu">
-          <ul>
-
-      <li>
-         <span class='each_wrap child_one'>
+<body>
+  <header id='header_base'>
+    <!-- left menu -->
+    <div class='left_header'>
+      <div class="menu">
+        <ul>
+          <li>
+            <span class='each_wrap child_one'>
             <i class='fa fa-pie-chart'></i>
             <span class='name'>Pie Track</span>
-         </span>
-      </li>
-
-
-      <li>
-         <span class='each_wrap child_one'>
+            </span>
+          </li>
+          <li>
+            <span class='each_wrap child_one'>
             <i class='fa fa-bookmark-o'></i>
             <span class='name'>Bookmark</span>
-         </span>
-      </li>
-
-              <li>
-         <span class='each_wrap child_one'>
+            </span>
+          </li>
+          <li>
+            <span class='each_wrap child_one'>
             <i class='fa fa-clock-o'></i>
             <span class='name'>TimeLine</span>
-         </span>
-      </li>
-      <li>
-         <span class='each_wrap child_two'>
+            </span>
+          </li>
+          <li>
+            <span class='each_wrap child_two'>
             <i class='fa fa-globe'></i>
             <span class='name'>Backlog</span>
-         </span>
-      </li>
-      <li>
-         <span class='each_wrap child_three'>
+            </span>
+          </li>
+          <li>
+            <span class='each_wrap child_three'>
             <i class='fa fa-bug'></i>
             <span class='name'>Issues</span>
-         </span>
-      </li>
-      <li>
-         <span class='each_wrap child_four'>
+            </span>
+          </li>
+          <li>
+            <span class='each_wrap child_four'>
             <i class='fa fa-language'></i>
             <span class='name'>Wiki</span>
-         </span>
-      </li>
-      <li>
-         <span class='each_wrap child_five'>
+            </span>
+          </li>
+          <li>
+            <span class='each_wrap child_five'>
             <i class='fa fa-users'></i>
             <span class='name'>Team</span>
-         </span>
-      </li>
-      <li>
-         <span class='each_wrap child_six'>
+            </span>
+          </li>
+          <li>
+            <span class='each_wrap child_six'>
             <i class='fa fa-gears'></i>
             <span class='name'>Settings</span>
-         </span>
-      </li>
-          </ul>
-        </div>
+            </span>
+          </li>
+        </ul>
       </div>
-      <!--/ left menu -->
-      <!-- right header -->
-      <div class='right_header'>
-        <div class="menu">
-          <ul>
-            <li class='parent_list'>
-              <span class='each_wrap extras'>
+    </div>
+    <!--/ left menu -->
+    <!-- right header -->
+    <div class='right_header'>
+      <div class="menu">
+        <ul>
+          <li class='parent_list'>
+            <span class='each_wrap extras'>
               <i class='fa fa-arrow-down'></i>
               <span class='name'>Extras</span>
-              </span>
-              <ul class="sub_list_extras">
-                <li>
-                  <a href="{% url 'accounts:user_profile' %}">
-                      <span class='extras_drop_child extras_one'>
+            </span>
+            <ul class="sub_list_extras">
+              <li>
+                <a href="{% url 'accounts:user_profile' %}">
+                  <span class='extras_drop_child extras_one'>
                       <i class='fa fa-user'></i>
                       <span class='name'>Profile</span>
-                      </span>
-                  </a>
-                </li>
-                <li>
-                    <a href="{% url 'accounts:change_password' %}">
-                      <span class='extras_drop_child extras_two'>
+                  </span>
+                </a>
+              </li>
+              <li>
+                <a href="{% url 'accounts:change_password' %}">
+                  <span class='extras_drop_child extras_two'>
                       <i class='fa fa-expeditedssl'></i>
                       <span class='name'>Change Password</span>
-                      </span>
-                    </a>
-                </li>
-              </ul>
-            </li>
-            <li class='parent_list'>
-              <span class='each_wrap notification'>
+                  </span>
+                </a>
+              </li>
+            </ul>
+          </li>
+          <li class='parent_list'>
+            <span class='each_wrap notification'>
               <i class='fa fa-bell'></i>
               <span class='name'>Notifications</span>
-              <span class='number count'>25</span>
-              </span>
-
-                <ul class='sub_list'>
-                  <div class='scroll'>
-                      <li>
-                    <span class='ticket'>
+            <span class='number count'>25</span>
+            </span>
+            <ul class='sub_list'>
+              <div class='scroll'>
+                <li>
+                  <span class='ticket'>
                     <img src='http://i.stack.imgur.com/8sNfT.jpg'>
                     <span class='description'>
-                    <span class='name'>Nazneen</span>
-                    added you to project
-                    <span class='project'>Pie Track</span>
-                    <span class='time'>12 min ago</span>
+                    <span class='name'>Nazneen</span> added you to project
+                  <span class='project'>Pie Track</span>
+                  <span class='time'>12 min ago</span>
+                  </span>
+                  </span>
+                </li>
+                <li>
+                  <span class='ticket'>
+                    <img src='http://i.stack.imgur.com/8sNfT.jpg'>
+                    <span class='description'>
+                      <span class='name'>Nazneen</span> added you to project
+                      <span class='project'>Pie Track</span>
+                      <span class='time'>12 min ago</span>
                     </span>
+                  </span>
+                </li>
+                <li>
+                  <span class='ticket'>
+                    <img src='http://i.stack.imgur.com/8sNfT.jpg'>
+                    <span class='description'>
+                      <span class='name'>Nazneen</span> added you to project
+                      <span class='project'>Pie Track</span>
+                      <span class='time'>12 min ago</span>
                     </span>
-
-                      </li>
-                      <li>
-                        <span class='ticket'>
-                        <img src='http://i.stack.imgur.com/8sNfT.jpg'>
-                        <span class='description'>
-                        <span class='name'>Nazneen</span>
-                        added you to project
-                        <span class='project'>Pie Track</span>
-                        <span class='time'>12 min ago</span>
-                        </span>
-                        </span>
-                      </li>
-                      <li>
-                        <span class='ticket'>
-                        <img src='http://i.stack.imgur.com/8sNfT.jpg'>
-                        <span class='description'>
-                        <span class='name'>Nazneen</span>
-                        added you to project
-                        <span class='project'>Pie Track</span>
-                        <span class='time'>12 min ago</span>
-                        </span>
-                        </span>
-                      </li>
-                      <li>
-                        <span class='ticket'>
-                        <img src='http://i.stack.imgur.com/8sNfT.jpg'>
-                        <span class='description'>
-                        <span class='name'>Nazneen</span>
-                        added you to project
-                        <span class='project'>Pie Track</span>
-                        <span class='time'>12 min ago</span>
-                        </span>
-                        </span>
-                      </li>
-                      <li>
-                        <span class='ticket'>
-                        <img src='http://i.stack.imgur.com/8sNfT.jpg'>
-                        <span class='description'>
-                        <span class='name'>Nazneen</span>
-                        added you to project
-                        <span class='project'>Pie Track</span>
-                        <span class='time'>12 min ago</span>
-                        </span>
-                        </span>
-                      </li>
-                      <li>
-                        <span class='ticket'>
-                        <img src='http://i.stack.imgur.com/8sNfT.jpg'>
-                        <span class='description'>
-                        <span class='name'>Nazneen</span>
-                        added you to project
-                        <span class='project'>Pie Track</span>
-                        <span class='time'>12 min ago</span>
-                        </span>
-                        </span>
-                      </li>
-                      <li>
-                        <span class='ticket'>
-                        <img src='http://i.stack.imgur.com/8sNfT.jpg'>
-                        <span class='description'>
-                        <span class='name'>Nazneen</span>
-                        added you to project
-                        <span class='project'>Pie Track</span>
-                        <span class='time'>12 min ago</span>
-                        </span>
-                        </span>
-                      </li>
-                      <li>
-                        <span class='ticket'>
-                        <img src='http://i.stack.imgur.com/8sNfT.jpg'>
-                        <span class='description'>
-                        <span class='name'>Nazneen</span>
-                        added you to project
-                        <span class='project'>Pie Track</span>
-                        <span class='time'>12 min ago</span>
-                        </span>
-                        </span>
-                      </li>
-                      <li>
-                        <span class='ticket'>
-                        <img src='http://i.stack.imgur.com/8sNfT.jpg'>
-                        <span class='description'>
-                        <span class='name'>Nazneen</span>
-                        added you to project
-                        <span class='project'>Pie Track</span>
-                        <span class='time'>12 min ago</span>
-                        </span>
-                        </span>
-                      </li>
-                      <li>
-                        <span class='ticket'>
-                        <img src='http://i.stack.imgur.com/8sNfT.jpg'>
-                        <span class='description'>
-                        <span class='name'>Nazneen</span>
-                        added you to project
-                        <span class='project'>Pie Track</span>
-                        <span class='time'>12 min ago</span>
-                        </span>
-                        </span>
-                      </li>
-                      <li>
-                        <span class='ticket'>
-                        <img src='http://i.stack.imgur.com/8sNfT.jpg'>
-                        <span class='description'>
-                        <span class='name'>Nazneen</span>
-                        added you to project
-                        <span class='project'>Pie Track</span>
-                        <span class='time'>12 min ago</span>
-                        </span>
-                        </span>
-                      </li>
-                  </div>
-                </ul>
-            </li>
-            <li>
-              <span class='each_wrap logout'>
+                  </span>
+                </li>
+                <li>
+                  <span class='ticket'>
+                    <img src='http://i.stack.imgur.com/8sNfT.jpg'>
+                    <span class='description'>
+                      <span class='name'>Nazneen</span> added you to project
+                      <span class='project'>Pie Track</span>
+                      <span class='time'>12 min ago</span>
+                    </span>
+                  </span>
+                </li>
+              </div>
+            </ul>
+          </li>
+          <li>
+            <span class='each_wrap logout'>
               <i class='fa fa-power-off'></i>
               <span class='name'>Logout</span>
-              </span>
-            </li>
-          </ul>
-        </div>
-      <span class="name_img_wrap">
-          <span class='name'>
-              Hello, <span>{{ user.username }}</span>
-          </span>
-          {% if user.profile_pic %}
-            <img src='{{ user.profile_pic.url }}' alt="{{ user.profile_pic.url }}">
-          {% else %}
-            <img src="{% static 'img/user-pic.jpg' %}" alt="No profile pic :(">
-          {% endif %}
-      </span>
+            </span>
+          </li>
+        </ul>
       </div>
+      <span class="name_img_wrap">
+        <span class='name'>
+          Hello, <span>{{ user.username }}</span>
+        </span>
+        {% if user.profile_pic %}
+        <img src='{{ user.profile_pic.url }}' alt="{{ user.profile_pic.url }}"> {% else %}
+        <img src="{% static 'img/user-pic.jpg' %}" alt="No profile pic :("> {% endif %}
+      </span>
+    </div>
+  </header>
 
-    </header>
-    {%block content%}
-	{%endblock content%}
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-colorpicker/2.3.0/js/bootstrap-colorpicker.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jQuery-slimScroll/1.3.6/jquery.slimscroll.min.js"></script>
-    {%block extra_js_links %}
-    {%endblock extra_js_links %}
+  {%block content%} {%endblock content%}
 
-    <script type="text/javascript">
-      $(function(){
-        $('.scroll').slimscroll({
-          alwaysVisible: false,
-          height: 380
-        });
-      });
-      $('.sub_list,.sub_list_extras').mouseenter(function(event) {
-      	$(this).closest('.parent_list').addClass('active_li_drop')
-      });
-      $('.sub_list,.sub_list_extras').mouseleave(function(event) {
-      	$(this).closest('.parent_list').removeClass('active_li_drop')
-      });
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-colorpicker/2.3.0/js/bootstrap-colorpicker.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jQuery-slimScroll/1.3.6/jquery.slimscroll.min.js"></script>
+  {%block extra_js_links %} {%endblock extra_js_links %}
+  <script type="text/javascript">
+  $(function() {
+    $('.scroll').slimscroll({
+      alwaysVisible: false,
+      height: 380
+    });
+  });
+  $('.sub_list,.sub_list_extras').mouseenter(function(event) {
+    $(this).closest('.parent_list').addClass('active_li_drop')
+  });
+  $('.sub_list,.sub_list_extras').mouseleave(function(event) {
+    $(this).closest('.parent_list').removeClass('active_li_drop')
+  });
 
-      {%block create_project_js%}
-      {%endblock create_project_js%}
+  { % block create_project_js %
+  } { % endblock create_project_js %
+  }
+  </script>
+  {% block jscript %} {% endblock %}
+</body>
 
-    </script>
-  {% block jscript %}
-  {% endblock %}
-  </body>
 </html>

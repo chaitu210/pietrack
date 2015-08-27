@@ -1,32 +1,34 @@
 {%extends 'base.html'%}
 {%block content%}
 {%load staticfiles%}
-    <section id='base_content' class='create_project'>
-      <div class="content_box">
-        <div class="title">
-          <h4>Create your project to access</h4>
-          <div class="tag">Compellingly reintermediate premier materials for client-centered markets.for client-centered markets.</div>
+<section id='base_content' class='create_project'>
+  <div class="content_box">
+    <div class="title">
+      <h4>Create your project to access</h4>
+      <div class="tag">Compellingly reintermediate premier materials for client-centered markets.for client-centered markets.</div>
+    </div>
+    <!-- create project form start-->
+    <form action="" method="post" id="id_form_cproject">
+      {%csrf_token%}
+      <div class="panel_box">
+        <div class="form_group">
+          <label>Project title</label>
+          <input name='name' type="text" class='input'>
+          <span name="pname_error"></span><!--Error here -->
+          <div class="help">Dynamically maximize professional models whereas.</div>
         </div>
-        <!-- create project form start-->
-        <form action="" method="post" id="id_form_cproject">
-          {%csrf_token%}
-          <div class="panel_box">
-            <div class="form_group">
-              <label>Project title</label>
-              <input name='name' type="text" class='input'>
-              <span name="pname_error"></span><!--Error here -->
-              <div class="help">Dynamically maximize professional models whereas.</div>
-            </div>
-            <div class="form_group">
-              <label>Description</label>
-              <textarea name='description' class='textarea'></textarea>
-              <span name="pdescription_error"></span><!--Error here -->
-              <div class="help">Dynamically maximize professional models whereas.</div>
-            </div>
-            <button id="id_submit_cproject">create project</button>
-          </div>
-        </form>
-        <!-- create project form end -->
+        <div class="form_group">
+          <label>Description</label>
+          <textarea name='description' class='textarea'></textarea>
+          <span name="pdescription_error"></span><!--Error here -->
+          <div class="help">Dynamically maximize professional models whereas.</div>
+        </div>
+        <button id="id_submit_cproject">create project</button>
+      </div>
+    </form>
+    <!-- create project form end -->
+  </div>
+</section>
   {%endblock content%}
 
       {%block create_project_js%}
