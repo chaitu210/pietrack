@@ -75,7 +75,7 @@
 
         $('#post-form').ajaxForm(function(){
 
-            $.post("{% url 'accounts:user_profile' %}",$('form').serialize(), function(result){
+            $.post("{% url 'user:user_profile' %}",$('form').serialize(), function(result){
                 if(result['error']){
                     $("span[name='profile_pic']").text(display_error(result['response'].profile_pic));
                     $("span[name='username']").text(display_error(result['response'].username));

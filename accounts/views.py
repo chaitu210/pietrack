@@ -6,7 +6,7 @@ from django.core.mail import send_mail
 from django.http import HttpResponseRedirect, HttpResponse
 from django.conf import settings
 from piebase.models import User, Organization
-from accounts.forms import EditUserModelForm, RegisterForm
+from accounts.forms import EditUserModelForm, RegisterForm, ChangePasswordForm
 
 
 # Create your views here.
@@ -90,7 +90,7 @@ def change_password(request):
         else:
             response_data = {'error': True, 'response': form.errors}
             return HttpResponse(json.dumps(response_data), content_type="application/json")
-    return render(request, 'change_password.html')
+    return render(request, 'user/change_password.html')
 
 
 def user_profile(request):
@@ -119,4 +119,4 @@ def user_profile(request):
     form = EditUserModelForm(instance=user)
 
     context = {'form': form}
-    return render(request, 'user_profile.html', context)
+    return render(request, 'user/user_profile.html', context)
