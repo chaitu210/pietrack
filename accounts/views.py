@@ -91,8 +91,9 @@ def forgot_password(request):
 
 
 def change_password(request):
-    user = request.user
+
     if request.method == 'POST':
+        user = request.user
         form = ChangePasswordForm(request.POST, request=request)
         if form.is_valid():
             user.set_password(request.POST['password1'])
@@ -107,10 +108,9 @@ def change_password(request):
 
 
 def user_profile(request):
-    user = request.user
 
     if request.method == 'POST':
-
+        user = request.user
         form = EditUserModelForm(request.POST, request.FILES, instance=user)
 
         if form.is_valid():
