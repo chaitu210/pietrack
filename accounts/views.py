@@ -5,8 +5,12 @@ from django.contrib import auth
 from django.core.mail import send_mail
 from django.http import HttpResponseRedirect, HttpResponse
 from django.conf import settings
+from django.contrib.auth.views import password_reset_confirm
+from django.contrib.auth.tokens import default_token_generator
 from piebase.models import User, Organization
 from accounts.forms import EditUserModelForm, RegisterForm, ChangePasswordForm
+from project.forms import PasswordResetForm
+from pietrack.settings import EMAIL_HOST_USER
 
 
 # Create your views here.
@@ -66,13 +70,21 @@ def register(request):
 
 def forgot_password(request):
     if request.method == 'POST':
-        email = str(request.POST.get('email'))
+        email = request.POST.get('email')
         if not email:
             json_data = {'error': True, 'error_msg': 'This field is required'}
         else:
             if User.objects.filter(email=email).exists():
+                form = PasswordResetForm(request.POST)
+                if form.is_valid():
+                    opts = {
+                        'use_https': request.is_secure(),
+                        'from_email': EMAIL_HOST_USER,
+                        'email_template_name':'email/reset_email.html',
+                        'subject_template_name': 'email/reset_subject.txt',
+                        'request': request}
+                    form.save(**opts)
                 json_data = {'error': False}
-                # send_mail('Subject here', 'Here is the message.', 'dineshmcmf@gmail.com', [email])
             else:
                 json_data = {'error': True, 'error_msg': 'email not registered'}
         return HttpResponse(json.dumps(json_data), content_type='application/json')
@@ -117,5 +129,7 @@ def user_profile(request):
             response_data = {'error': True, 'response': form.errors}
 
         return HttpResponse(json.dumps(response_data))
-
     return render(request, 'user/user_profile.html')
+
+def reset_confirm(request, uidb64=None, token=None):
+    return password_reset_confirm(request, template_name = 'email/reset_confirm.html', uidb64=uidb64, token=token, post_reset_redirect = reverse('user:login'))
