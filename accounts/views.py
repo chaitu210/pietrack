@@ -105,11 +105,12 @@ def change_password(request):
             user.set_password(request.POST['password1'])
             user.save()
             response_data = {'error': False, "response": 'Your password is updated !'}
-            return HttpResponse(json.dumps(response_data), content_type='application/json')
+
         else:
             response_data = {'error': True, 'response': form.errors}
-            return HttpResponse(json.dumps(response_data), content_type="application/json")
-    return render(request, 'change_password.html')
+
+        return HttpResponse(json.dumps(response_data))
+    return render(request, 'user/change_password.html')
 
 
 def user_profile(request):
@@ -130,15 +131,12 @@ def user_profile(request):
 
             form.save()
             response_data = {'error': False, "response": 'Successfully updated'}
-            return HttpResponse(json.dumps(response_data), content_type='application/json')
+
         else:
             response_data = {'error': True, 'response': form.errors}
 
-            return HttpResponse(json.dumps(response_data), content_type="application/json")
-    form = EditUserModelForm(instance=user)
-
-    context = {'form': form}
-    return render(request, 'user_profile.html', context)
+        return HttpResponse(json.dumps(response_data))
+    return render(request, 'user/user_profile.html')
 
 def reset_confirm(request, uidb64=None, token=None):
     return password_reset_confirm(request, template_name = 'email/reset_confirm.html', uidb64=uidb64, token=token, post_reset_redirect = reverse('accounts:login'))
