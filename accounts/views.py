@@ -10,6 +10,7 @@ from django.contrib.auth.tokens import default_token_generator
 from piebase.models import User, Organization
 from accounts.forms import EditUserModelForm, RegisterForm
 from project.forms import PasswordResetForm
+from pietrack.settings import EMAIL_HOST_USER
 
 
 # Create your views here.
@@ -67,31 +68,23 @@ def register(request):
         return HttpResponse(json.dumps(json_data), content_type = 'application/json')
 
 
-def password_reset(request, to_email):
-    from_email = 'dineshmcmf@gmail.com'
-    to_email_dict = {'email': to_email}
-    token_generator = default_token_generator
-    email_template_name = 'email/reset_email.html'
-    subject_template_name = 'email/reset_subject.txt'
-    form = PasswordResetForm(to_email_dict)
-    if form.is_valid():
-        opts = {
-            'use_https': request.is_secure(),
-            'from_email': from_email,
-            'email_template_name': email_template_name,
-            'subject_template_name': subject_template_name,
-            'request': request}
-        form.save(**opts)
-
 def forgot_password(request):
     if request.method == 'POST':
-        email = str(request.POST.get('email'))
+        email = request.POST.get('email')
         if not email:
             json_data = {'error': True, 'error_msg': 'This field is required'}
         else:
             if User.objects.filter(email=email).exists():
+                form = PasswordResetForm(request.POST)
+                if form.is_valid():
+                    opts = {
+                        'use_https': request.is_secure(),
+                        'from_email': EMAIL_HOST_USER,
+                        'email_template_name':'email/reset_email.html',
+                        'subject_template_name': 'email/reset_subject.txt',
+                        'request': request}
+                    form.save(**opts)
                 json_data = {'error': False}
-                password_reset(request, email)
             else:
                 json_data = {'error': True, 'error_msg': 'email not registered'}
         return HttpResponse(json.dumps(json_data), content_type='application/json')
