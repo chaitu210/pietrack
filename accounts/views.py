@@ -132,4 +132,4 @@ def user_profile(request):
     return render(request, 'user/user_profile.html')
 
 def reset_confirm(request, uidb64=None, token=None):
-    return password_reset_confirm(request, template_name = 'email/reset_confirm.html', uidb64=uidb64, token=token, post_reset_redirect = reverse('accounts:login'))
+    return password_reset_confirm(request, template_name = 'email/reset_confirm.html', uidb64=uidb64, token=token, post_reset_redirect = reverse('user:login'))
