@@ -1,4 +1,5 @@
 {% load compress %}
+{% load staticfiles %}
 <!DOCTYPE html>
 <html>
   <head>
@@ -86,7 +87,7 @@
             </span>
             <ul class="sub_list_extras">
               <li>
-                <a href="{% url 'accounts:user_profile' %}">
+                <a href="{% url 'user:user_profile' %}">
                   <span class='extras_drop_child extras_one'>
                       <i class='fa fa-user'></i>
                       <span class='name'>Profile</span>
@@ -94,7 +95,7 @@
                 </a>
               </li>
               <li>
-                <a href="{% url 'accounts:change_password' %}">
+                <a href="{% url 'user:change_password' %}">
                   <span class='extras_drop_child extras_two'>
                       <i class='fa fa-expeditedssl'></i>
                       <span class='name'>Change Password</span>
@@ -155,10 +156,12 @@
             </ul>
           </li>
           <li>
-            <span class='each_wrap logout'>
-              <i class='fa fa-power-off'></i>
-              <span class='name'>Logout</span>
-            </span>
+            <a href="{% url 'user:logout' %}">
+              <span class='each_wrap logout'>
+                <i class='fa fa-power-off'></i>
+                <span class='name'>Logout</span>
+              </span>
+            </a>
           </li>
         </ul>
       </div>
@@ -194,11 +197,8 @@
     $(this).closest('.parent_list').removeClass('active_li_drop')
   });
 
-  { % block create_project_js %
-  } { % endblock create_project_js %
-  }
   </script>
-  {% block jscript %} {% endblock %}
+  {% block extra_js %} {% endblock %}
 </body>
 
 </html>

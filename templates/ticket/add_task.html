@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% block content %}
+    <section id='base_content' class='create_project'>
+      <div class="content_box">
+        <div class="title">
+          <h4>Add Task</h4>
+          <div class="tag">Compellingly reintermediate premier materials for client-centered markets.for client-centered markets.</div>
+        </div>
+        <div class="panel_box">
+          <form id = 'task_form'>
+          <div class="form_group">
+            <label>Title</label>
+            <input id = 'task_name' name = 'name' type="text" class='input'>
+            <span id = 'task_name_error'></span>
+          </div>
+          <div class="form_group">
+            <label>Requirement</label>
+            <select name = 'requirement' class='input'>
+            {% for requirement_iter in requirement_list %}
+            <option value = '{{ requirement_iter.id }}'>{{ requirement_iter.name }}</option>
+            {% endfor %}
+            </select>
+            <span id = 'task_requirement_error'></span>
+          </div>
+          <div class="form_group">
+            <label>Status</label>
+            <select name = 'status' class='input'>
+            {% for ticket_status_iter in ticket_status_list %}
+            <option value = '{{ ticket_status_iter.id }}'>{{ ticket_status_iter.name }}</option>
+            {% endfor %}
+            </select>
+            <span id = 'task_status_error'></span>
+          </div>
+          <div class="form_group">
+            <label>Finished Date</label>
+            <input id = 'task_finished_date' name = 'finished_date' type="text"  class='input'>
+            <span id = 'task_finished_date_error'></span>
+          </div>
+          <div class="form_group">
+            <label>Assign to</label>
+            <select name = 'assigned_to' class='select2 input' multiple='multiple'>
+            {% for assigned_to_iter in assigned_to_list %}
+            <option value = '{{ assigned_to_iter.id }}'>{{ assigned_to_iter.email }}</option>
+            {% endfor %}
+            </select>
+            <span id = 'task_assigned_to_error'></span>
+          </div>
+           <div class="form_group">
+            <label>Description</label>
+            <textarea id = 'task_description' name = 'description' class="form-control textarea"></textarea>
+            <span id = 'task_description_error'></span>
+          </div>
+          <button id = 'task_save'>Save</button>
+          {% csrf_token %}
+          </form>
+        </div>
+      </div>
+    </section>
+    {% endblock %}
+    {% block extra_js %}
+    <script type="text/javascript" src="{% static 'js/select2.js' %}"></script>
+    <script>
+        $(function() {
+            $( "#task_finished_date" ).datepicker();
+        });
+    </script>
+
+    <script>
+        $(function() {
+            $( "#task_finished_date" ).datepicker();
+            $('.select2').select2();
+        });
+    </script>
+<script>
+    function display_datepicker(){
+$("#task_finished_date").datepicker({
+changeMonth: true,
+changeYear: true,
+dateFormat: 'yy-mm-dd',
+minDate: new Date(),
+});
+};
+display_datepicker()
+</script>
+    <script>
+      $('#task_save').click(function(event){
+          event.preventDefault()
+          $.post('', $('#task_form').serialize(), function(response){
+              if(response['error'] === true){
+                  $('#task_name_error').text('').append(response['form_errors'].name)
+                  $('#task_milestone_error').text('').append(response['form_errors'].milestone)
+                  $('#task_requirement_error').text('').append(response['form_errors'].requirement)
+                  $('#task_status_error').text('').append(response['form_errors'].status)
+                  $('#task_finished_date_error').text('').append(response['form_errors'].finished_date)
+                  $('#task_created_date_error').text('').append(response['form_errors'].created_date)
+                  $('#task_assigned_to_error').text('').append(response['form_errors'].assigned_to)
+              }
+              else{
+                  alert('added')
+              }
+          });
+      });
+    </script>
+  {% endblock %}

@@ -12,6 +12,15 @@ from accounts.forms import EditUserModelForm, RegisterForm
 # Create your views here.
 
 def index(request):
+    return render(request, 'login.html')
+
+
+def logout(request):
+    auth.logout(request)
+    return HttpResponseRedirect("/")
+
+
+def login(request):
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')
@@ -110,4 +119,4 @@ def user_profile(request):
     form = EditUserModelForm(instance=user)
 
     context = {'form': form}
-    return render(request, 'user-profile.html', context)
+    return render(request, 'user_profile.html', context)
