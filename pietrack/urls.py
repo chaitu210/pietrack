@@ -23,6 +23,7 @@ from .settings import MEDIA_ROOT, MEDIA_URL
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
+    url(r'^accounts/', include('accounts.urls', namespace='accounts')),
     url(r'^$', "accounts.views.index", name="index"),
     url(r'project/create_member/(\d*)/$', project_views.create_member),
     url(r'^project/', include('project.urls', namespace='project')),

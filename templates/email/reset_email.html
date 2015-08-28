@@ -1,2 +1,2 @@
-You are assigned for new project, change your password for:{{ email }}. Follow the link below:
-{{ protocol}}://{{ domain }}{% url 'project:reset_confirm' uidb64=uid token=token %}
+change your password:
+{{ protocol}}://{{ domain }}{% url 'accounts:reset_confirm' uidb64=uid token=token %}

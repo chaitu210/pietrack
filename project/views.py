@@ -7,7 +7,6 @@ from django.template.defaultfilters import slugify
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse 
 from django.contrib.auth.tokens import default_token_generator
-from django.contrib.auth.views import password_reset_confirm
 from django.core.urlresolvers import reverse
 from piebase.models import User, Project, Organization, Role
 from forms import CreateProjectForm, CreateMemberForm, PasswordResetForm
@@ -23,10 +22,9 @@ def create_project(request):
         if(form.is_valid()):
             slug = slugify(request.POST['name'])
             project_obj = Project.objects.create(name=request.POST['name'], slug=slug, description=request.POST['description'], modified_date=timezone.now(),organization=organization)
-            project_id = project_obj.id
             project_obj.members.add(request.user)
             project_obj.save()
-            json_data = {'error': False, 'errors': form.errors, 'project_id': project_id}
+            json_data = {'error': False, 'errors': form.errors, 'slug': slug}
             return HttpResponse(json.dumps(json_data), content_type="application/json")
         else:
             return HttpResponse(json.dumps({'error': True, 'errors': form.errors}), content_type="application/json")
@@ -170,8 +168,8 @@ def password_reset(request, to_email):
     from_email = 'dineshmcmf@gmail.com'
     to_email_dict = {'email': to_email}
     token_generator = default_token_generator
-    email_template_name = 'reset_email.html'
-    subject_template_name = 'reset_subject.txt'
+    email_template_name = 'email/reset_email.html'
+    subject_template_name = 'email/reset_subject.txt'
     form = PasswordResetForm(to_email_dict)
     if form.is_valid():
         opts = {
@@ -226,8 +224,8 @@ def create_member(request, slug):
                 project_obj.organization = organization_obj
                 project_obj.save()
 
-                slug = ''.join(random.choice(string.ascii_letters + string.digits) for _ in xrange(10))
-                role_obj = Role.objects.create(name = designation, slug = slug, project = project_obj)
+                random_slug = ''.join(random.choice(string.ascii_letters + string.digits) for _ in xrange(10))
+                role_obj = Role.objects.create(name = designation, slug = random_slug, project = project_obj)
                 role_obj.users.add(user_obj)
                 role_obj.save()
             else:
@@ -241,10 +239,6 @@ def create_member(request, slug):
         return HttpResponse(json.dumps(json_data), content_type = 'application/json')
     else:
         return render(request, 'settings/create_member.html')
-
-
-def reset_confirm(request, uidb64=None, token=None):
-    return password_reset_confirm(request, template_name = 'reset_confirm.html', uidb64=uidb64, token=token, post_reset_redirect = reverse('accounts:login'))
 
 
 def manage_role(request,slug):
@@ -262,7 +256,6 @@ def manage_role(request,slug):
     return render(request,template_name,dictionary)
 
 def manage_role_edit(request,slug):
-    print request
     project = Project.objects.get(slug=slug)
     form = RoleAddForm(request.POST,project=slug)
     if(form.is_valid()):
