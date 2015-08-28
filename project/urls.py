@@ -37,4 +37,6 @@ urlpatterns = [
     url(r'^(?P<slug>[-\w]+)/settings/member_role/(?P<member_role_slug>([a-zA-Z0-9-]+))/edit/$', manage_role_edit, name='manage_role_edit'),
     url(r'^(?P<slug>[-\w]+)/settings/member_role/(?P<member_role_slug>([a-zA-Z0-9-]+))/delete/$', manage_role_delete, name='manage_role_delete'),
 
+    # milestones
+    url(r'^(?P<slug>[a-zA-Z0-9-]+)/milestone/create/$',create_milestone, name='create_milestone'),
 ]

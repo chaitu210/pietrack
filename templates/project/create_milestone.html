@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load compress %}
+{% load staticfiles %}
+
+{% block extra_css_links %}
+<link rel="stylesheet" type="text/less" href="{% static 'less/select2.less' %}">
+{% endblock %}
+
+{% block content %}    
+<section id='base_content' class='create_project'>
+      <div class="content_box">
+        <div class="title">
+          <h4>Add new milestone</h4>
+          <div class="tag">Compellingly reintermediate premier materials for client-centered markets.for client-centered markets.</div>
+        </div>
+        <form id = 'milestone_form'>
+          <div class="panel_box">
+            <div class="form_group">
+              <label>Title</label>
+              <input id = 'milestone_name' name = 'name' type="text" class='input'>
+              <span id = 'milestone_name_error'></span>
+            </div>
+            <div class="form_group">
+              <label>Start Date</label>
+              <input id = 'milestone_start_date' name = 'estimated_start' type="text"  class='input'>
+              <span id = 'milestone_start_date_error'></span>
+            </div>
+            <div class="form_group">
+              <label>Finished Date</label>
+              <input id = 'milestone_finished_date' name = 'estimated_finish' type="text" class='input'>
+              <span id = 'milestone_finished_date_error'></span>
+            </div>
+            <div class="form_group">
+              <label>Status</label>
+              <select id = 'milestone_status' name = 'status' class='input'>
+                  <option value = 'planned'>planned</option>
+                  <option value = 'started'>started</option>
+                  <option value = 'finished'>finished</option>
+              </select>
+            </div>
+            <button id = 'milestone_save'>Save</button>
+          </div>
+          {% csrf_token %}
+        </form>
+      </div>
+    </section>
+    {% endblock %}
+    {% block extra_js_links %}
+    <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+    {% endblock %}
+    {% block extra_js %}
+    <script type="text/javascript" src="{% static 'js/select2.js' %}"></script>
+    <script>
+        $(function() {
+                $( "#milestone_start_date, #milestone_finished_date" ).datepicker();
+        });
+        
+        $('#milestone_save').click(function(event){
+            event.preventDefault()
+            $.post('', $('#milestone_form').serialize(), function(response){
+                if(response['error'] === true){
+                    $('#milestone_name_error').text('').append(response['form_errors'].name)
+                    $('#milestone_start_date_error').text('').append(response['form_errors'].estimated_start)
+                    $('#milestone_finished_date_error').text('').append(response['form_errors'].estimated_finish)
+                }
+                else{
+                    alert('mile-stoned')
+                }
+            });
+        });
+        function display_datepicker(){
+            $("#milestone_start_date, #milestone_finished_date").datepicker({
+                changeMonth: true,
+                changeYear: true,
+                dateFormat: 'yy-mm-dd',
+                minDate: new Date(),
+            });
+        };
+        display_datepicker()
+    </script>
+    {% endblock %}
