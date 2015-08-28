@@ -28,4 +28,4 @@ def add_task(request):
         requirement_list = [requirement for requirement in Requirement.objects.all()]
         ticket_status_list = [ticket_status for ticket_status in TicketStatus.objects.all()]
         assigned_to_list = [assigned_to_user for assigned_to_user in User.objects.all()]
-        return render(request, 'add_task.html', {'requirement_list': requirement_list, 'ticket_status_list': ticket_status_list, 'assigned_to_list': assigned_to_list})
+        return render(request, 'ticket/add_task.html', {'requirement_list': requirement_list, 'ticket_status_list': ticket_status_list, 'assigned_to_list': assigned_to_list})
