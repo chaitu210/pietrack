@@ -86,10 +86,11 @@ def change_password(request):
             user.set_password(request.POST['password1'])
             user.save()
             response_data = {'error': False, "response": 'Your password is updated !'}
-            return HttpResponse(json.dumps(response_data), content_type='application/json')
+
         else:
             response_data = {'error': True, 'response': form.errors}
-            return HttpResponse(json.dumps(response_data), content_type="application/json")
+
+        return HttpResponse(json.dumps(response_data))
     return render(request, 'user/change_password.html')
 
 
@@ -111,12 +112,10 @@ def user_profile(request):
 
             form.save()
             response_data = {'error': False, "response": 'Successfully updated'}
-            return HttpResponse(json.dumps(response_data), content_type='application/json')
+
         else:
             response_data = {'error': True, 'response': form.errors}
 
-            return HttpResponse(json.dumps(response_data), content_type="application/json")
-    form = EditUserModelForm(instance=user)
+        return HttpResponse(json.dumps(response_data))
 
-    context = {'form': form}
-    return render(request, 'user/user_profile.html', context)
+    return render(request, 'user/user_profile.html')
