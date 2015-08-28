@@ -8,7 +8,7 @@ from django.conf import settings
 from django.contrib.auth.views import password_reset_confirm
 from django.contrib.auth.tokens import default_token_generator
 from piebase.models import User, Organization
-from accounts.forms import EditUserModelForm, RegisterForm
+from accounts.forms import EditUserModelForm, RegisterForm, ChangePasswordForm
 from project.forms import PasswordResetForm
 from pietrack.settings import EMAIL_HOST_USER
 
