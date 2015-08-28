@@ -1,6 +1,5 @@
-{%extends 'base.html'%}
-{%block content%}
-{%load staticfiles%}
+{% extends 'base.html' %}
+{% block content %}
 <section id='base_content' class='create_project'>
   <div class="content_box">
     <div class="title">
@@ -14,13 +13,13 @@
         <div class="form_group">
           <label>Project title</label>
           <input name='name' type="text" class='input'>
-          <span name="pname_error"></span><!--Error here -->
+          <span name="pname_error" id="name" class="error"></span><!--Error here -->
           <div class="help">Dynamically maximize professional models whereas.</div>
         </div>
         <div class="form_group">
           <label>Description</label>
           <textarea name='description' class='textarea'></textarea>
-          <span name="pdescription_error"></span><!--Error here -->
+          <span name="pdescription_error" id="description" class="error"></span><!--Error here -->
           <div class="help">Dynamically maximize professional models whereas.</div>
         </div>
         <button id="id_submit_cproject">create project</button>
@@ -29,21 +28,19 @@
     <!-- create project form end -->
   </div>
 </section>
-  {%endblock content%}
+  {% endblock content %}
 
-      {%block create_project_js%}
-      /*Backend code start */
-        function send_error(error)
-          {
-              if(error)
-                  return error;
-              return "";
-          }
+      {% block extra_js %}
+      <script type="text/javascript">
         $('#id_form_cproject').on('submit',function(e){
           $.post('',$('#id_form_cproject').serialize(),function(response){
             if(response['error']){
-              $("span[name='pname_error']").text(send_error(response['errors'].name));
-              $("span[name='pdescription_error']").text(send_error(response['errors'].description));
+              $(".error").text("");
+              for(key in response['errors']){
+                $("#"+key).text(response['errors'][key]);
+              }
+              // $("span[name='pname_error']").text(send_error(response['errors'].name));
+              // $("span[name='pdescription_error']").text(send_error(response['errors'].description));
             }
             else{
               /*redirect page here */
@@ -54,5 +51,5 @@
           });
           e.preventDefault();
         });
-      /*Backed code end*/
-      {%endblock create_project_js%}
+      </script>
+    {% endblock %}

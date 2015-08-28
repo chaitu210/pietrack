@@ -14,95 +14,96 @@ from forms import CreateProjectForm, CreateMemberForm, PasswordResetForm
 from .tasks import send_mail_old_user
 
 
-
 @login_required
 def create_project(request):
-    template_name = 'create_project.html'
-    if(request.method=="POST"):
-        organization=request.user.organization
-        form = CreateProjectForm(request.POST,organization=organization)
+    template_name = 'project/create_project.html'
+    if(request.method == "POST"):
+        organization = request.user.organization
+        form = CreateProjectForm(request.POST, organization=organization)
         if(form.is_valid()):
             slug = slugify(request.POST['name'])
-            project_obj = Project.objects.create(name=request.POST['name'],slug=slug,description=request.POST['description'],modified_date=timezone.now(),organization=organization)
+            project_obj = Project.objects.create(name=request.POST['name'], slug=slug, description=request.POST['description'], modified_date=timezone.now(),organization=organization)
             project_id = project_obj.id
             project_obj.members.add(request.user)
             project_obj.save()
-            json_data = {'error':False,'errors':form.errors, 'project_id': project_id}
+            json_data = {'error': False, 'errors': form.errors, 'project_id': project_id}
             return HttpResponse(json.dumps(json_data), content_type="application/json")
         else:
-            return HttpResponse(json.dumps({'error':True,'errors':form.errors}), content_type="application/json")
-    return render(request,template_name)
+            return HttpResponse(json.dumps({'error': True, 'errors': form.errors}), content_type="application/json")
+    return render(request, template_name)
+
 
 @login_required
 def list_of_projects(request):
-    template_name = 'list_of_projects.html'
-    projects_list=Project.objects.filter(members__email=request.user)
-    dict_items={'projects_list':projects_list}
+    template_name = 'project/projects_list.html'
+    projects_list = Project.objects.filter(members__email=request.user)
+    dict_items = {'projects_list': projects_list}
     return render(request, template_name, dict_items)
 
+
 @login_required
-def project_description(request, pk):
-	template_name='project_description.html'
-	project_object=Project.objects.filter(id=pk)
-	project_members=project_object[0].members.all()
-	dict_items={'project_object':project_object[0], 'project_members':project_members}
-	return render(request, template_name, dict_items)
+def project_detail(request, slug):
+    template_name = 'project/project_description.html'
+    project_object = Project.objects.filter(slug=slug)
+    project_members = project_object[0].members.all()
+    dict_items = {'project_object': project_object[0], 'project_members': project_members}
+    return render(request, template_name, dict_items)
 
 def project_details(request,slug):
-	project = Project.objects.get(slug=slug)
-	dictionary = {'project':project,'slug':slug}
-	template_name = 'Project-Project_Details.html'
+    project = Project.objects.get(slug=slug)
+    dictionary = {'project':project,'slug':slug}
+    template_name = 'project/Project-Project_Details.html'
 
-	if(request.method=='POST'):
-		organization=request.user.organization
-		form = CreateProjectForm(request.POST,organization=organization)
+    if(request.method=='POST'):
+        organization=request.user.organization
+        form = CreateProjectForm(request.POST,organization=organization)
 
-		if(form.is_valid()):
-			slug = slugify(request.POST['name'])
-			project = Project.objects.get(slug=request.POST['oldname'],organization=organization)
-			project.name=request.POST['name']
-			project.slug = slug
-			project.modified_date = timezone.now()
-			project.save()
-			return HttpResponse(json.dumps({'error':False,'slug':slug}), content_type="application/json")
-		else:
-			return HttpResponse(json.dumps({'error':True,'errors':form.errors}), content_type="application/json")
+        if(form.is_valid()):
+            slug = slugify(request.POST['name'])
+            project = Project.objects.get(slug=request.POST['oldname'],organization=organization)
+            project.name=request.POST['name']
+            project.slug = slug
+            project.modified_date = timezone.now()
+            project.save()
+            return HttpResponse(json.dumps({'error':False,'slug':slug}), content_type="application/json")
+        else:
+            return HttpResponse(json.dumps({'error':True,'errors':form.errors}), content_type="application/json")
 
-	return render(request, template_name, dictionary)
+    return render(request, template_name, dictionary)
 
 
 def delete_project(request,id):
-	Project.objects.get(id=id).delete()
-	return redirect("project:list_of_projects")
+    Project.objects.get(id=id).delete()
+    return redirect("project:list_of_projects")
 
 
 def issues_priorities(request,slug):
-	template_name = 'issues-proities.html'
-	if(request.method=='POST'):
-		form = PriorityIssueForm(request.POST,project=slug)
-		if(form.is_valid()):
-			project = Priority.objects.create(name=request.POST['name'],color=request.POST['color'],project=Project.objects.get(slug=slug));
-			return HttpResponse(json.dumps({'error':False,'color':request.POST['color'],'name':request.POST['name'],'proj_id':project.id}),content_type="application/json")
-		else:
-			return HttpResponse(json.dumps({'error':True,'errors':form.errors}),content_type="application/json");
-	priority_list=Priority.objects.filter(project=Project.objects.get(slug=slug))
-	return render(request,template_name,{'slug':slug,'priority_list':priority_list})
+    template_name = 'issues-proities.html'
+    if(request.method=='POST'):
+        form = PriorityIssueForm(request.POST,project=slug)
+        if(form.is_valid()):
+            project = Priority.objects.create(name=request.POST['name'],color=request.POST['color'],project=Project.objects.get(slug=slug));
+            return HttpResponse(json.dumps({'error':False,'color':request.POST['color'],'name':request.POST['name'],'proj_id':project.id}),content_type="application/json")
+        else:
+            return HttpResponse(json.dumps({'error':True,'errors':form.errors}),content_type="application/json");
+    priority_list=Priority.objects.filter(project=Project.objects.get(slug=slug))
+    return render(request,template_name,{'slug':slug,'priority_list':priority_list})
 
 def issues_priorities_edit(request,slug):
-	if(request.method=='POST'):
-		form = PriorityIssueFormEdit(request.POST)
-		if(form.is_valid()):
-			priority = Priority.objects.get(id=request.POST['old_id'],project=Project.objects.get(slug=slug));
-			priority.color = request.POST['color']
-			priority.name = request.POST['name']
-			priority.save()
-			return HttpResponse(json.dumps({'error':False,'color':request.POST['color'],'name':request.POST['name'],'id':request.POST['old_id']}),content_type="application/json")
-		else:
-			return HttpResponse(json.dumps({'error':True,'errors':form.errors}),content_type="application/json");	
+    if(request.method=='POST'):
+        form = PriorityIssueFormEdit(request.POST)
+        if(form.is_valid()):
+            priority = Priority.objects.get(id=request.POST['old_id'],project=Project.objects.get(slug=slug));
+            priority.color = request.POST['color']
+            priority.name = request.POST['name']
+            priority.save()
+            return HttpResponse(json.dumps({'error':False,'color':request.POST['color'],'name':request.POST['name'],'id':request.POST['old_id']}),content_type="application/json")
+        else:
+            return HttpResponse(json.dumps({'error':True,'errors':form.errors}),content_type="application/json");   
 
 def issues_priorities_delete(request,slug):
-	Priority.objects.get(name=request.POST['name'],color=request.POST['color'],project=Project.objects.get(slug=slug)).delete();
-	return HttpResponse(json.dumps({'error':False}),content_type="application/json");
+    Priority.objects.get(name=request.POST['name'],color=request.POST['color'],project=Project.objects.get(slug=slug)).delete();
+    return HttpResponse(json.dumps({'error':False}),content_type="application/json");
 
 def issues_severities(request,slug):
     template_name = 'severities.html'
@@ -182,8 +183,18 @@ def password_reset(request, to_email):
         form.save(**opts)
 
 
+def project_team(request, slug):
+    template_name = 'settings/team.html'
+    project = Project.objects.get(slug=slug)
+    mem_details = []
+    for member in project.members.exclude(email=request.user.email):
+        mem_details.append((member, Role.objects.get(users__email=member.email)))
+    dictionary = {'project_id': project.id, 'mem_details': mem_details, 'slug': slug}
+    return render(request, template_name, dictionary)
+
+
 @login_required
-def create_member(request, project_id):
+def create_member(request, slug):
     if request.method == 'POST':
         error_count = 0
         json_data = {}
@@ -209,7 +220,7 @@ def create_member(request, project_id):
                     random_password = ''.join(random.choice(string.digits) for _ in xrange(8))
                     new_user_obj = User.objects.create_user(email = email, username = email, password = random_password, organization = organization_obj, pietrack_role = 'user')
                     password_reset(request, email_iter)
-                project_obj = Project.objects.get(id = project_id)
+                project_obj = Project.objects.get(slug = slug)
                 user_obj = User.objects.get(email = email)
                 project_obj.members.add(user_obj)
                 project_obj.organization = organization_obj
@@ -229,20 +240,11 @@ def create_member(request, project_id):
             json_data['error'] = True
         return HttpResponse(json.dumps(json_data), content_type = 'application/json')
     else:
-        return render(request, 'create_member.html')
+        return render(request, 'settings/create_member.html')
 
 
 def reset_confirm(request, uidb64=None, token=None):
     return password_reset_confirm(request, template_name = 'reset_confirm.html', uidb64=uidb64, token=token, post_reset_redirect = reverse('accounts:login'))
-
-def manage_members(request,slug):
-    template_name = 'Members_list.html'
-    project = Project.objects.get(slug=slug)
-    mem_details=[]
-    for member in  project.members.exclude(email=request.user.email):
-        mem_details.append((member,Role.objects.get(users__email=member.email)))
-    dictionary ={'project_id':project.id,'mem_details':mem_details,'slug':slug}
-    return render(request,template_name,dictionary)
 
 
 def manage_role(request,slug):
