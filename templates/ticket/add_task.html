@@ -43,7 +43,7 @@
           </div>
           <div class="form_group">
             <label>Assign to</label>
-            <select name = 'assigned_to' class='select2 input' multiple='multiple'>
+            <select name = 'assigned_to' class='select2 input'>
             {% for assigned_to_iter in assigned_to_list %}
             <option value = '{{ assigned_to_iter.id }}'>{{ assigned_to_iter.email }}</option>
             {% endfor %}
