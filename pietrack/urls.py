@@ -24,11 +24,11 @@ from .settings import MEDIA_ROOT, MEDIA_URL
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^$', "accounts.views.index", name="index"),
-    url(r'project/create_member/(\d*)/$', project_views.create_member),
+    #url(r'project/create_member/(\d*)/$', project_views.create_member),
     url(r'^project/', include('project.urls', namespace='project')),
     url(r'^user/', include('accounts.urls', namespace='user')),
     url(r'^dashboard/', include('dashboard.urls', namespace='dashboard')),
-    url(r'^tickets/', include('tickets.urls', namespace='tickets')),
+    url(r'^project/(?P<slug>[-\w]+)/task/', include('task.urls', namespace='task')),
 ] + static(MEDIA_URL, document_root=MEDIA_ROOT)
 
 urlpatterns += patterns('',
