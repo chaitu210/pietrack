@@ -8,6 +8,7 @@ urlpatterns = [
 
     # project settings
     url(r'^(?P<slug>[-\w]+)/settings/$',  project_details, name='project_details'),
+    url(r'^(?P<slug>[-\w]+)/edit/$',  project_edit, name='project_edit'),
 
     # team
     url(r'^(?P<slug>[-\w]+)/team/$',  project_team, name='project_team'),

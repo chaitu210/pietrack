@@ -292,3 +292,15 @@ def create_milestone(request, slug):
             return HttpResponse(json.dumps(json_data), content_type = 'application/json')
     else:
         return render(request, 'project/create_milestone.html')
+
+
+def project_edit(request, slug):
+    milestone_list = Milestone.objects.all()
+    project_obj = Project.objects.get(slug = slug)
+    print project_obj.members.all()
+    member_dict = {}
+    for member_iter in project_obj.members.all():
+        print member_iter.first_name
+        member_dict[member_iter.email] = [role.name for role in member_iter.user_roles.all()]
+    print member_dict
+    return render(request, 'project/project_edit.html', {'milestone_list': milestone_list, 'member_dict': member_dict})
