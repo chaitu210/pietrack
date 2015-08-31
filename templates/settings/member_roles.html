@@ -66,7 +66,7 @@
                               {% for user in role.users.all %}
                               <span class="user-assign"><a href="#"><i class="fa fa-user"></i> {{user}}</a></span> {% endfor %}
                            </td>
-                           <td class="actions"><a href="#" class="edit" data-toggle="modal" data-target="#myModal1" onclick="edit_role('{{role.id}}','{{role.name}}')"><i class="fa fa-edit"></i></a> <a onclick="delete_role('{{role.id}}')" href="#" class="delete"><i class="fa fa-trash"></i></a> </td>
+                           <td class="actions"><a href="#" class="edit" data-toggle="modal" data-target="#myModal1" onclick="edit_role('{{role.id}}','{{role.name}}','{{role.slug}}')"><i class="fa fa-edit"></i></a> <a onclick="delete_role('{{role.slug}}','{{role.id}}')" href="#" class="delete"><i class="fa fa-trash"></i></a> </td>
                         </tr>
                         {% endfor %}
                      </tbody>
@@ -92,6 +92,7 @@
                               </div>
                            </div>
                            <div class="modal-footer">
+                              <input id="edit_slug" val="" style="display:none;"/>
                               <button type="submit" class="btn btn-primary">Submit</button>
                            </div>
                         </div>
@@ -113,30 +114,34 @@
 {% endblock %}
 {% block extra_js %} 
 <script>
-   function edit_role(id,name){
+
+   function edit_role(id,name,slug){
      $('#id_edit_role input[name="name"]').val(name)
      $('#id_edit_role input[name="role_id"]').val(id)
+     $('#edit_slug').val(slug)
    }
-   function delete_role(id){
-     $.get('{% url 'project:manage_role_delete' slug %}',"role_id="+id,function(response){
+
+   function delete_role(slug,id){
+     $.get('/project/{{slug}}/settings/member_role/'+slug+'/delete/',function(response){
        if(!response['error']){
          $("#"+id).remove();
        }
      });
    
    }
+   
    $("#id_add_role").on('submit',function(e){
      var data = $("#id_add_role").serialize();
-     $.post('',data,function(response){
+     $.post("{% url 'project:manage_role_create' slug %}",data,function(response){
        if(response['error']){
          $('#id_role_error').text(response['errors'].name)
        }
        else{
          var role_id = response['role_id'];
          var role_name = response['role_name'];
+         var slug =  response['slug'];
    
-   
-         var row = '<tr id="'+role_id+'"><td>'+role_name+' </td><td></td><td class="actions"><a href="#" class="edit" data-toggle="modal" data-target="#myModal1" onclick="edit_role(\''+role_id+'\',\''+role_name+'\')"><i class="fa fa-edit"></i></a> <a href="#" class="delete" onclick="delete_role(\''+role_id+'\')"><i class="fa fa-trash"></i></a> </td></tr>'
+         var row = '<tr id="'+role_id+'"><td>'+role_name+' </td><td></td><td class="actions"><a href="#" class="edit" data-toggle="modal" data-target="#myModal1" onclick="edit_role(\''+role_id+'\',\''+role_name+'\',\''+slug+'\')"><i class="fa fa-edit"></i></a> <a href="#" class="delete" onclick="delete_role(\''+slug+'\',\''+role_id+'\')"><i class="fa fa-trash"></i></a> </td></tr>'
          $("#role_permissions tbody tr:last-child").after(row);
          $("#id_add_role input[name='name']").val("");
          $('button.close').click();
@@ -147,16 +152,20 @@
    
    $("#id_edit_role").on('submit',function(e){
      var data = $("#id_edit_role").serialize();
-     $.post('{% url "project:manage_role_edit" slug %}',data,function(response){
+     var slug = $("#edit_slug").val()
+  
+     $.post('/project/{{slug}}/settings/member_role/'+slug+'/edit/',data,function(response){
        if(response['error']){
          $('#edit_role_error').text(response['errors'].name)
        }
        else{
-         var role_id = response['role_id'];
-         var role_name = response['role_name'];
-         $('tbody #'+role_id+' td:first-child').text(role_name)
-         $('tbody #'+role_id+' a.edit ').attr('onclick','edit_role("'+role_id+'","'+role_name+'")')
-         $('button.close').click()
+           var role_id = response['role_id'];
+           var role_name = response['role_name'];
+           var slug =  response['slug'];
+           $('tbody #'+role_id+' td:first-child').text(role_name)
+           $('tbody #'+role_id+' a.edit ').attr('onclick','edit_role("'+role_id+'","'+role_name+'","'+slug+'")')
+           $('tbody #'+role_id+' a.delete ').attr('onclick',"delete_role('"+slug+"','"+role_id+"')")
+           $('button.close').click()
        }
      });
      e.preventDefault(); 

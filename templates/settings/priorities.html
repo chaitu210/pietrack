@@ -23,7 +23,7 @@
                <div class="title">
                   <h4>SAMPL1 STATUS - <span class="status">Issues Priorities</span></h4>
                   <div class="tag">Specify the statuses your user stories, tasks and issues will go through</div>
-                  <span class="new"><a href="#" id="id_new_pri">Add New Priority</a></span>
+                  <span class="new"><a href="#" id="add_new">Add New Priority</a></span>
                </div>
                <!-- status table starts here -->
                <div class="table-responsive color-box">
@@ -36,26 +36,27 @@
                         </tr>
                      </thead>
                      <tbody>
-                        {%for priority in priority_list%}
-                        <tr id="row{{priority.id}}">
+                        {% for priority in priority_list%}
+                        <tr id="{{priority.id}}">
                            <td scope="row">
                               <div class="input-group colorpicker-component demo demo-auto">
                                  <input type="text" value="{{priority.color}}" class="form-control" />
-                                 <span class="input-group-addon"><i></i></span>
+                                 <span class="input-group-addon" ><i style="cursor: default;"></i></span>
                               </div>
                            </td>
                            <td>{{priority.name}}</td>
-                           <td class="actions"><a href="#" class="edit" onclick="edit_priority('{{priority.color}}','{{priority.name}}','row{{priority.id}}')"><i class="fa fa-edit"></i></a>
-                              <a href="#" class="delete" onclick="delete_priority('{{priority.color}}','{{priority.name}}','row{{priority.id}}')"><i class="fa fa-trash"></i></a>
+                           <td class="actions"><a href="#" class="edit" onclick="edit_priority('{{priority.color}}','{{priority.name}}','{{priority.slug}}')"><i class="fa fa-edit"></i></a>
+                              <a href="#" class="delete" onclick="delete_priority('{{priority.slug}}','{{priority.id}}')"><i class="fa fa-trash"></i></a>
                            </td>
                         </tr>
-                        {%endfor%}
+                        {% endfor%}
                      </tbody>
                   </table>
                   <!-- form start -->
-                  <form action="" method="post" style="display:none;" id="id_issue_prio_form">
-                     {% csrf_token %}
-                     <input id="old_id" name="old_id" value="none" style="display:none;">
+                  <form action="" method="post" style="display:none;" id="add_form">
+                     {%  csrf_token %}
+                     <input id="status" name="status" value="true" style="display:none;">
+                     <input id="slug" name ="slug" value="" style="display:none;">
                      <table class="table table-striped">
                         <thead>
                            <tr>
@@ -76,7 +77,7 @@
                                  <input name="name" value="" type="text" style="width: 100px; padding: 2px; border:1px solid #929292;" placeholder="Name" />
                               </td>
                               <td class="actions">
-                                 <button type="submit" class="edit" id="add_form"><i class="fa fa-plus"></i></button>
+                                 <button type="submit" class="edit" ><i class="fa fa-plus"></i></button>
                                  <a class="delete" id="id_reset"><span class="glyphicon glyphicon-remove"></span></a>
                               </td>
                            </tr>
@@ -105,60 +106,53 @@
 <script src="{%static 'js/docs.js' %}"></script>
 {%endblock extra_js_links %}
 {%block extra_js%}
-<script type="text/javascript">     
+<script>
+  
    function hexToRgb(hex) {
    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
    return result ? {
-       r: parseInt(result[1], 16),
-       g: parseInt(result[2], 16),
-       b: parseInt(result[3], 16)
-   } : null;
+         r: parseInt(result[1], 16),
+         g: parseInt(result[2], 16),
+         b: parseInt(result[3], 16)
+      } : null;
    }
    
-   function create_issue_priority(form_id){
-     $('#'+form_id).serialize()
-     alert(form_id);
-     alert($('#'+form_id).serialize())
-   
-   }
    function clear_form(){
-     var form = $('#id_issue_prio_form');
+     var form = $('form');
      form.css('display','none');
      form.find('input[name="name"]').val(''); 
-     $('#id_issue_prio_form span[name="error"]').text('')
-     // $('#id_issue_prio_form').find("input[name='old_new']").val("new")
-     $("#old_id").val("none")
+     $('form span[name="error"]').text('')
+     $('#slug').val("")
+     $('#status').val("true")
    }
-   function edit_priority(color,name,row_id){
-     rowId = row_id.substring(3,row_id.length)
+
+   function edit_priority(color,name,slug){
      var r = hexToRgb(color).r
      var g = hexToRgb(color).g
      var b = hexToRgb(color).b
-     
-     $("#old_id").val(rowId)
      var color_box = '<i style="background-color: rgb('+r+','+ g+','+ b+');"></i>'
-     $('#id_issue_prio_form').css('display','block');
-     $('#id_issue_prio_form').find("input[name='color']").val(color)
-     $('#id_issue_prio_form').find("input[name='name']").val(name)
-     
-     $('#id_issue_prio_form span').html(color_box)
+
+     $('#add_form').css('display','block');
+     $('#add_form').find("input[name='color']").val(color)
+     $('#add_form').find("input[name='name']").val(name)
+     $('#status').val("false");
+     $('#slug').val(slug)
+     $('#add_form span').html(color_box)
      $('.demo').colorpicker();
      
    }
    
-   function delete_priority(color,name,row){
-     data_send = 'name='+name+'&color='+color+'&csrfmiddlewaretoken='+'{{csrf_token}}';
-     $.post('{%url "project:issues_priorities_delete" slug %}',data_send,function(response){
+   function delete_priority(slug,id){
+    $.get('/project/{{slug}}/settings/priority/'+slug+'/delete/',function(response){
        if(!response.error){
-         $('#'+row).remove();
+         $('#'+id).remove();
        }
      });
    }
-   $('#id_new_pri').on('click',function(){
-     clear_form()
-   $('#id_issue_prio_form').css('display','block');
-     $('#id_issue_prio_form').find("input[name='old_new']").val("new")
    
+   $('#add_new').on('click',function(){
+        clear_form();
+        $('form').css('display','block');   
    });
    
    $('#id_reset').on('click',function(){
@@ -166,53 +160,63 @@
    
    });
    
-   $('#add_form').on('click',function(e){
-     var create_data = $("#old_id").val()
-     e.preventDefault();
-     if(create_data=="none"){
-       $.post('',$('#id_issue_prio_form').serialize(),function(response){
-         if(response.error){
-           if(response.errors['name']){
-             $("span[name='error']").text(response.errors['name']);
+   $('#add_form').on('submit',function(e){
+       e.preventDefault();
+       if($('#status').val()=="true"){
+       $.post('{% url "project:priorities_create" slug %}',$('#add_form').serialize(),function(response){
+           if(response.error){
+                if(response.errors['name']){
+                   $("span[name='error']").text(response.errors['name']);
+                }
            }
-         }
-         else{
-           
-           name = response['name'];
-           color = response['color'];
-           row_id = response['proj_id']
-   
-           data_row = "<tr id=\"row"+row_id+"\"><td scope=\"row\"><div class=\"input-group colorpicker-component demo demo-auto\"><input type=\"text\" value=\""+color+"\" class=\"form-control\"/><span class=\"input-group-addon\"><i></i></span></div></td><td>"+name+"</td><td class=\"actions\"><a href=\"#\" class=\"edit\" onclick=\"edit_priority('"+color+"','"+name+"','row"+row_id+"')\"><i class=\"fa fa-edit\"></i></a>&nbsp;<a href=\"#\" class=\"delete\" onclick=\"delete_priority('"+color+"','"+name+"','row"+row_id+"')\"><i class=\"fa fa-trash\"></i></a></td></tr>"
-           $('#priority tbody').append(data_row);
-           $('.demo').colorpicker();
-           clear_form();
-         }
+          else{
+               
+               var name = response['name'];
+               var color = response['color'];
+               var row_id = response['proj_id']
+               var slug = response['slug']
+       
+               data_row = "<tr id=\""+row_id+"\"><td scope=\"row\"><div class=\"input-group colorpicker-component demo demo-auto\"><input type=\"text\" value=\""+color+"\" class=\"form-control\"/><span class=\"input-group-addon\"><i></i></span></div></td><td>"+name+"</td><td class=\"actions\"><a href=\"#\" class=\"edit\" onclick=\"edit_priority('"+color+"','"+name+"','"+slug+"')\"><i class=\"fa fa-edit\"></i></a>&nbsp;<a href=\"#\" class=\"delete\" onclick=\"delete_priority('"+slug+"','"+row_id+"')\"><i class=\"fa fa-trash\"></i></a></td></tr>"
+               $('#priority tbody').append(data_row);
+               $('.demo').colorpicker();
+               clear_form();
+             }
    
          });
-     }
-     else{
-       var data = $('#id_issue_prio_form').serialize();
-       $.post('{%url "project:issues_priorities_edit" slug %}',data,function(response){
-         
-         if(response.error){
-           if(response.errors['name']){
-             $("span[name='error']").text(response.errors['name']);
+        }
+        else{
+          var myslug = $('#slug').val();
+          $.post('/project/{{slug}}/settings/priority/'+myslug+'/edit/',$('#add_form').serialize(),function(response){
+           if(response.error){
+                if(response.errors['name']){
+                   $("span[name='error']").text(response.errors['name']);
+                }
            }
-         }
-         else{
-           var name = response['name'];
-       var color = response['color'];
-       var id = response['id'];
-       var row_edit = $('#row'+id)
-           var data_row = "<td scope=\"row\"><div class=\"input-group colorpicker-component demo demo-auto\"><input type=\"text\" value=\""+color+"\" class=\"form-control\"/><span class=\"input-group-addon\"><i></i></span></div></td><td>"+name+"</td><td class=\"actions\"><a href=\"#\" class=\"edit\" onclick=\"edit_priority('"+color+"','"+name+"','row"+id+"')\"><i class=\"fa fa-edit\"></i></a>&nbsp;<a href=\"#\" class=\"delete\" onclick=\"delete_priority('"+color+"','"+name+"','row"+id+"')\"><i class=\"fa fa-trash\"></i></a></td>"
-       
-       row_edit.html(data_row);
-           $('.demo').colorpicker();
-           clear_form();
-         }
-       });
-     }
-     
+          else{
+               
+               var name = response['name'];
+               var color = response['color'];
+               var row_id = response['proj_id']
+               var slug = response['slug']
+
+               $('#'+row_id+' a.edit').attr('onclick',"edit_priority('"+color+"','"+name+"','"+slug+"')")
+               $('#'+row_id+' a.delete').attr("onclick","delete_priority('"+slug+"','"+row_id+"')")
+               $('#'+row_id+' td:nth-child(2)').text(name)
+               $('#'+row_id+' input').val(color)
+               var r = hexToRgb(color).r
+               var g = hexToRgb(color).g
+               var b = hexToRgb(color).b
+               var color_box = '<i style="background-color: rgb('+r+','+ g+','+ b+');"></i>'
+               $('#'+row_id+" span").html(color_box)
+               $('.demo').colorpicker();
+               clear_form();
+             }
+   
+         });
+
+        }
    });
-</script> 
+  
+
+</script>
 {% endblock %}
