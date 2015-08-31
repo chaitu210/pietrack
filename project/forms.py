@@ -40,7 +40,7 @@ class PriorityForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.project = kwargs.pop('project', None)
         super(PriorityForm, self).__init__(*args, **kwargs)
-        #self.projectObj = Project.objects.get(slug=self.project)
+
 
     def clean_name(self):
         name_slug = slugify(self.cleaned_data.get('name'))
@@ -75,7 +75,7 @@ class SeverityForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.project = kwargs.pop('project', None)
         super(SeverityForm, self).__init__(*args, **kwargs)
-        #self.projectObj = Project.objects.get(slug=self.project)
+
 
     def clean_name(self):
         name_slug = slugify(self.cleaned_data.get('name'))
