@@ -95,15 +95,11 @@ display_datepicker()
     <script>
       $('#task_save').click(function(event){
           event.preventDefault()
-          $.post('', $('#task_form').serialize(), function(response){
-              if(response['error'] === true){
-                  $('#task_name_error').text('').append(response['form_errors'].name)
-                  $('#task_milestone_error').text('').append(response['form_errors'].milestone)
-                  $('#task_requirement_error').text('').append(response['form_errors'].requirement)
-                  $('#task_status_error').text('').append(response['form_errors'].status)
-                  $('#task_finished_date_error').text('').append(response['form_errors'].finished_date)
-                  $('#task_created_date_error').text('').append(response['form_errors'].created_date)
-                  $('#task_assigned_to_error').text('').append(response['form_errors'].assigned_to)
+          $.post('', $('#task_form').serialize(), function(data){
+              if(data['error'] === true){
+                for(var key in data['form_errors']){
+                  $('#task_' + key + '_error').text('').append(data['form_errors'][key])
+                }
               }
               else{
                   alert('added')
