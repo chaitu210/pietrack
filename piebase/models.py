@@ -222,7 +222,7 @@ class Ticket(models.Model):
                                  verbose_name=_("severity"))
     priority = models.ForeignKey(Priority, null=True, blank=True, related_name="priority_tickets",
                                  verbose_name=_("priority"))
-    ticket_type = models.CharField(max_length=50, null=False, blank=False)
+    ticket_type = models.CharField(max_length=50, default = 'task', blank = True)
     target_date = models.DateField(null=True, blank=True)
 
     def __str__(self):
