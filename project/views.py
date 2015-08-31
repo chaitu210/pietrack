@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from piebase.models import Project, Priority, Severity, TicketStatus
-from forms import CreateProjectForm, PriorityIssueForm, PriorityIssueFormEdit, SeverityIssueForm, SeverityIssueFormEdit, TicketStatusForm, TicketStatusFormEdit, RoleAddForm, RoleEditForm
+from forms import CreateProjectForm, PriorityForm, SeverityForm, TicketStatusForm, RoleForm
 import json
 import random
 import string
@@ -17,7 +17,6 @@ from .tasks import send_mail_old_user
 
 @login_required
 def create_project(request):
-    template_name = 'project/create_project.html'
     if(request.method == "POST"):
         organization = request.user.organization
         form = CreateProjectForm(request.POST, organization=organization)
@@ -31,7 +30,7 @@ def create_project(request):
             return HttpResponse(json.dumps(json_data), content_type="application/json")
         else:
             return HttpResponse(json.dumps({'error': True, 'errors': form.errors}), content_type="application/json")
-    return render(request, template_name)
+    return render(request, 'project/create_project.html')
 
 
 @login_required
@@ -85,15 +84,15 @@ def delete_project(request, id):
 
 @login_required
 def priorities(request, slug):
-    template_name = 'settings/priorities.html'
     priority_list = Priority.objects.filter(
         project=Project.objects.get(slug=slug))
-    return render(request, template_name, {'slug': slug, 'priority_list': priority_list})
+    return render(request, 'settings/priorities.html', {'slug': slug, 'priority_list': priority_list})
 
 
 @login_required
 def priorities_create(request, slug):
-    form = PriorityIssueForm(request.POST, project=slug)
+    project = Project.objects.get(slug=slug)
+    form = PriorityForm(request.POST, project=project)
     if(form.is_valid()):
         priority = form.save()
         return HttpResponse(json.dumps({'error': False, 'color': priority.color, 'name': priority.name, 'proj_id': priority.id, 'slug': priority.slug}), content_type="application/json")
@@ -105,7 +104,7 @@ def priorities_create(request, slug):
 def priorities_edit(request, slug, priority_slug):
     project = Project.objects.get(slug=slug)
     instance = Priority.objects.get(slug=priority_slug, project=project)
-    form = PriorityIssueFormEdit(request.POST, instance=instance)
+    form = PriorityForm(request.POST, instance=instance,project=project)
     if(form.is_valid()):
         priority = form.save()
         return HttpResponse(json.dumps({'error': False, 'color': priority.color, 'name': priority.name, 'proj_id': priority.id, 'slug': priority.slug}), content_type="application/json")
@@ -122,15 +121,15 @@ def priorities_delete(request, slug, priority_slug):
 
 @login_required
 def severities(request, slug):
-    template_name = 'settings/severities.html'
     severity_list = Severity.objects.filter(
         project=Project.objects.get(slug=slug))
-    return render(request, template_name, {'slug': slug, 'severity_list': severity_list})
+    return render(request, 'settings/severities.html', {'slug': slug, 'severity_list': severity_list})
 
 
 @login_required
 def severities_create(request, slug):
-    form = SeverityIssueForm(request.POST, project=slug)
+    project = Project.objects.get(slug=slug)
+    form = SeverityForm(request.POST, project=project)
     if(form.is_valid()):
         severity = form.save()
         return HttpResponse(json.dumps({'error': False, 'color': severity.color, 'name': severity.name, 'proj_id': severity.id, 'slug': severity.slug}), content_type="application/json")
@@ -142,7 +141,7 @@ def severities_create(request, slug):
 def severity_edit(request, slug, severity_slug):
     project = Project.objects.get(slug=slug)
     instance = Severity.objects.get(slug=severity_slug, project=project)
-    form = SeverityIssueFormEdit(request.POST, instance=instance)
+    form = SeverityForm(request.POST, instance=instance, project=project)
     if(form.is_valid()):
         severity = form.save()
         return HttpResponse(json.dumps({'error': False, 'color': severity.color, 'name': severity.name, 'proj_id': severity.id, 'slug': severity.slug}), content_type="application/json")
@@ -159,15 +158,15 @@ def severity_delete(request, slug, severity_slug):
 
 @login_required
 def ticket_status(request, slug):
-    template_name = 'settings/ticket_status.html'
     ticket_status_list = TicketStatus.objects.filter(
         project=Project.objects.get(slug=slug))
-    return render(request, template_name, {'slug': slug, 'ticket_status_list': ticket_status_list})
+    return render(request, 'settings/ticket_status.html', {'slug': slug, 'ticket_status_list': ticket_status_list})
 
 
 @login_required
 def ticket_status_create(request, slug):
-    form = TicketStatusForm(request.POST, project=slug)
+    project = Project.objects.get(slug=slug)
+    form = TicketStatusForm(request.POST, project=project)
     if(form.is_valid()):
         ticket_status = form.save()
         return HttpResponse(json.dumps({'error': False, 'color': ticket_status.color, 'name': ticket_status.name, 'proj_id': ticket_status.id, 'slug': ticket_status.slug}), content_type="application/json")
@@ -179,7 +178,7 @@ def ticket_status_create(request, slug):
 def ticket_status_edit(request, slug, ticket_slug):
     project = Project.objects.get(slug=slug)
     instance = TicketStatus.objects.get(slug=ticket_slug, project=project)
-    form = TicketStatusFormEdit(request.POST, instance=instance)
+    form = TicketStatusForm(request.POST, instance=instance, project=project)
     if(form.is_valid()):
         ticket_status = form.save()
         return HttpResponse(json.dumps({'error': False, 'color': ticket_status.color, 'name': ticket_status.name, 'proj_id': ticket_status.id, 'slug': ticket_status.slug}), content_type="application/json")
@@ -213,7 +212,6 @@ def password_reset(request, to_email):
 
 @login_required
 def project_team(request, slug):
-    template_name = 'settings/team.html'
     project = Project.objects.get(slug=slug)
     mem_details = []
     for member in project.members.exclude(email=request.user.email):
@@ -221,7 +219,7 @@ def project_team(request, slug):
             (member, Role.objects.get(users__email=member.email)))
     dictionary = {'project_id': project.id,
                   'mem_details': mem_details, 'slug': slug}
-    return render(request, template_name, dictionary)
+    return render(request, 'settings/team.html', dictionary)
 
 
 @login_required
@@ -280,16 +278,16 @@ def create_member(request, slug):
 
 @login_required
 def manage_role(request, slug):
-    template_name = 'settings/member_roles.html'
     project = Project.objects.get(slug=slug)
     list_of_roles = Role.objects.filter(project=project)
     dictionary = {'list_of_roles': list_of_roles, 'slug': slug}
-    return render(request, template_name, dictionary)
+    return render(request, 'settings/member_roles.html', dictionary)
 
 
 @login_required
 def manage_role_create(request, slug):
-    form = RoleAddForm(request.POST, project=slug)
+    project = Project.objects.get(slug=slug)
+    form = RoleForm(request.POST, project=project)
     if(form.is_valid()):
         role = form.save()
         return HttpResponse(json.dumps({'error': False, 'role_id': role.id, 'role_name': role.name, 'slug': role.slug}), content_type="application/json")
@@ -299,9 +297,10 @@ def manage_role_create(request, slug):
 
 @login_required
 def manage_role_edit(request, slug, member_role_slug):
+    project=Project.objects.get(slug=slug)
     instance = Role.objects.get(
-        slug=member_role_slug, project=Project.objects.get(slug=slug))
-    form = RoleEditForm(request.POST, instance=instance)
+        slug=member_role_slug, project=project)
+    form = RoleForm(request.POST, instance=instance, project=project)
     if(form.is_valid()):
         role = form.save()
         return HttpResponse(json.dumps({'error': False, 'role_id': role.id, 'role_name': role.name, 'slug': role.slug}), content_type="application/json")

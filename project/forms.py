@@ -31,7 +31,7 @@ class CreateProjectForm(forms.ModelForm):
         return name
 
 
-class PriorityIssueForm(forms.ModelForm):
+class PriorityForm(forms.ModelForm):
 
     class Meta:
         model = Priority
@@ -39,44 +39,25 @@ class PriorityIssueForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.project = kwargs.pop('project', None)
-        super(PriorityIssueForm, self).__init__(*args, **kwargs)
-        self.projectObj = Project.objects.get(slug=self.project)
-
-    def save(self, commit=True):
-        instance = super(PriorityIssueForm, self).save(commit=False)
-        instance.project = self.projectObj
-        instance.slug = slugify(self.cleaned_data['name'])
-        if commit:
-            instance.save()
-        return instance
-
-    def clean_name(self):
-        name = self.cleaned_data['name']
-        if(Priority.objects.filter(slug=slugify(name), project=self.projectObj)):
-            raise forms.ValidationError(
-                'Priority with this name already exists')
-        elif len(slugify(name)) == 0:
-            raise forms.ValidationError("This field is required.")
-        return name
-
-
-class PriorityIssueFormEdit(forms.ModelForm):
-
-    class Meta:
-        model = Priority
-        fields = ['name', 'color']
+        super(PriorityForm, self).__init__(*args, **kwargs)
+        #self.projectObj = Project.objects.get(slug=self.project)
 
     def clean_name(self):
         name_slug = slugify(self.cleaned_data.get('name'))
-        if(Priority.objects.filter(slug=name_slug, project=self.instance.project) and name_slug != self.instance.slug):
+        existing_slug = ""
+        if self.instance:
+            existing_slug = self.instance.slug
+        if(Priority.objects.filter(slug=name_slug, project=self.project) and name_slug != existing_slug):
             raise forms.ValidationError(
                 'Priority with this name already exists')
         elif len(name_slug) == 0:
-            raise forms.ValidationError("This field is required.")
+            raise forms.ValidationError("Priority name must contain a letter.")
         return self.cleaned_data.get('name')
 
+
     def save(self, commit=True):
-        instance = super(PriorityIssueFormEdit, self).save(commit=False)
+        instance = super(PriorityForm, self).save(commit=False)
+        instance.project = self.project
         instance.slug = slugify(self.cleaned_data['name'])
         instance.name = self.cleaned_data['name']
         instance.color = self.cleaned_data['color']
@@ -85,7 +66,7 @@ class PriorityIssueFormEdit(forms.ModelForm):
         return instance
 
 
-class SeverityIssueForm(forms.ModelForm):
+class SeverityForm(forms.ModelForm):
 
     class Meta:
         model = Severity
@@ -93,44 +74,24 @@ class SeverityIssueForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.project = kwargs.pop('project', None)
-        super(SeverityIssueForm, self).__init__(*args, **kwargs)
-        self.projectObj = Project.objects.get(slug=self.project)
-
-    def save(self, commit=True):
-        instance = super(SeverityIssueForm, self).save(commit=False)
-        instance.project = self.projectObj
-        instance.slug = slugify(self.cleaned_data['name'])
-        if commit:
-            instance.save()
-        return instance
-
-    def clean_name(self):
-        name = self.cleaned_data['name']
-        if(Severity.objects.filter(slug=slugify(name), project=self.projectObj)):
-            raise forms.ValidationError(
-                'Severity with this name already exists')
-        elif len(slugify(name)) == 0:
-            raise forms.ValidationError("This field is required.")
-        return name
-
-
-class SeverityIssueFormEdit(forms.ModelForm):
-
-    class Meta:
-        model = Severity
-        fields = ['name', 'color']
+        super(SeverityForm, self).__init__(*args, **kwargs)
+        #self.projectObj = Project.objects.get(slug=self.project)
 
     def clean_name(self):
         name_slug = slugify(self.cleaned_data.get('name'))
-        if(Severity.objects.filter(slug=name_slug, project=self.instance.project) and name_slug != self.instance.slug):
+        existing_slug = ""
+        if self.instance:
+            existing_slug = self.instance.slug
+        if(Severity.objects.filter(slug=name_slug, project=self.project) and name_slug != existing_slug):
             raise forms.ValidationError(
                 'Severity with this name already exists')
         elif len(name_slug) == 0:
-            raise forms.ValidationError("This field is required.")
+            raise forms.ValidationError("Severity name must contain a letter.")
         return self.cleaned_data.get('name')
 
     def save(self, commit=True):
-        instance = super(SeverityIssueFormEdit, self).save(commit=False)
+        instance = super(SeverityForm, self).save(commit=False)
+        instance.project = self.project
         instance.slug = slugify(self.cleaned_data['name'])
         instance.name = self.cleaned_data['name']
         instance.color = self.cleaned_data['color']
@@ -148,49 +109,29 @@ class TicketStatusForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.project = kwargs.pop('project', None)
         super(TicketStatusForm, self).__init__(*args, **kwargs)
-        self.projectObj = Project.objects.get(slug=self.project)
-
-    def save(self, commit=True):
-        instance = super(TicketStatusForm, self).save(commit=False)
-        instance.project = self.projectObj
-        instance.slug = slugify(self.cleaned_data['name'])
-        if commit:
-            instance.save()
-        return instance
-
-    def clean_name(self):
-        name = self.cleaned_data['name']
-        if(TicketStatus.objects.filter(slug=slugify(name), project=self.projectObj)):
-            raise forms.ValidationError(
-                'Ticket Status with this name already exists')
-        elif len(slugify(name)) == 0:
-            raise forms.ValidationError("This field is required.")
-        return name
-
-
-class TicketStatusFormEdit(forms.ModelForm):
-
-    class Meta:
-        model = TicketStatus
-        fields = ['name', 'color']
 
     def clean_name(self):
         name_slug = slugify(self.cleaned_data.get('name'))
-        if(TicketStatus.objects.filter(slug=name_slug, project=self.instance.project) and name_slug != self.instance.slug):
+        existing_slug = ""
+        if self.instance:
+            existing_slug = self.instance.slug
+        if(TicketStatus.objects.filter(slug=name_slug, project=self.project) and name_slug != existing_slug):
             raise forms.ValidationError(
                 'Ticket Status with this name already exists')
         elif len(name_slug) == 0:
-            raise forms.ValidationError("This field is required.")
+            raise forms.ValidationError("Ticket Status name must contain a letter.")
         return self.cleaned_data.get('name')
 
     def save(self, commit=True):
-        instance = super(TicketStatusFormEdit, self).save(commit=False)
+        instance = super(TicketStatusForm, self).save(commit=False)
+        instance.project = self.project
         instance.slug = slugify(self.cleaned_data['name'])
         instance.name = self.cleaned_data['name']
         instance.color = self.cleaned_data['color']
         if commit:
             instance.save()
         return instance
+
 
 
 class CreateMemberForm(forms.Form):
@@ -264,54 +205,32 @@ class PasswordResetForm(forms.Form):
                                    html_email_template_name=html_email_template_name)
 
 
-class RoleAddForm(forms.ModelForm):
+class RoleForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.project = kwargs.pop('project', None)
-        super(RoleAddForm, self).__init__(*args, **kwargs)
-        self.projectObj = Project.objects.get(slug=self.project)
+        super(RoleForm, self).__init__(*args, **kwargs)
 
     class Meta:
         model = Role
         fields = ['name']
 
     def clean_name(self):
-        name = self.cleaned_data['name']
-        if(Role.objects.filter(slug=slugify(name), project=self.projectObj)):
+        name_slug = slugify(self.cleaned_data['name'])
+        if self.instance:
+            existing_slug = self.instance.slug
+        if(Role.objects.filter(slug=name_slug, project=self.project) and  name_slug != existing_slug):
             raise forms.ValidationError('Role with this name already exists')
-        elif len(slugify(name)) == 0:
-            raise forms.ValidationError("This field is required.")
-        return name
+        elif len(name_slug) == 0:
+            raise forms.ValidationError("Role name must contain a letter.")
+        return self.cleaned_data['name']
 
     def save(self, commit=True):
-        instance = super(RoleAddForm, self).save(commit=False)
-        instance.project = self.projectObj
+        instance = super(RoleForm, self).save(commit=False)
+        instance.project = self.project
         instance.name = self.cleaned_data['name']
         instance.slug = slugify(self.cleaned_data['name'])
 
-        if commit:
-            instance.save()
-        return instance
-
-
-class RoleEditForm(forms.ModelForm):
-
-    class Meta:
-        model = Role
-        fields = ['name']
-
-    def clean_name(self):
-        name = self.cleaned_data['name']
-        if(Role.objects.filter(slug=slugify(name), project=self.instance.project) and  slugify(name)!= self.instance.slug):
-            raise forms.ValidationError('Role with this name already exists')
-        elif len(slugify(name)) == 0:
-            raise forms.ValidationError("This field is required.")
-        return name
-
-    def save(self, commit=True):
-        instance = super(RoleEditForm, self).save(commit=False)
-        instance.name = self.cleaned_data['name']
-        instance.slug = slugify(self.cleaned_data['name'])
         if commit:
             instance.save()
         return instance

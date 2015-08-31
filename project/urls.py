@@ -32,9 +32,9 @@ urlpatterns = [
     url(r'^(?P<slug>[-\w]+)/settings/severity/(?P<severity_slug>[a-zA-Z0-9-]+)/delete/$', severity_delete, name='severity_delete'),
 
     # member roles
-    url(r'^(?P<slug>[-\w]+)/settings/member_roles/$', manage_role, name='manage_role'),
-    url(r'^(?P<slug>[-\w]+)/settings/member_role/create/$', manage_role_create, name='manage_role_create'),
-    url(r'^(?P<slug>[-\w]+)/settings/member_role/(?P<member_role_slug>([a-zA-Z0-9-]+))/edit/$', manage_role_edit, name='manage_role_edit'),
-    url(r'^(?P<slug>[-\w]+)/settings/member_role/(?P<member_role_slug>([a-zA-Z0-9-]+))/delete/$', manage_role_delete, name='manage_role_delete'),
+    url(r'^(?P<slug>[-\w]+)/settings/roles/$', manage_role, name='manage_role'),
+    url(r'^(?P<slug>[-\w]+)/settings/role/create/$', manage_role_create, name='manage_role_create'),
+    url(r'^(?P<slug>[-\w]+)/settings/role/(?P<member_role_slug>([a-zA-Z0-9-]+))/edit/$', manage_role_edit, name='manage_role_edit'),
+    url(r'^(?P<slug>[-\w]+)/settings/role/(?P<member_role_slug>([a-zA-Z0-9-]+))/delete/$', manage_role_delete, name='manage_role_delete'),
 
 ]
