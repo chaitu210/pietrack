@@ -15,26 +15,26 @@ urlpatterns = [
 
     # ticket status
     url(r'^(?P<slug>[-\w]+)/settings/ticket_status/$',  ticket_status, name='ticket_status'),
-    url(r'^(?P<slug>[-\w]+)/settings/ticket_status/create/$',  ticket_status, name='ticket_status'),
+    url(r'^(?P<slug>[-\w]+)/settings/ticket_status/create/$',  ticket_status_create, name='ticket_status_create'),
     url(r'^(?P<slug>[-\w]+)/settings/ticket_status/(?P<ticket_slug>[a-zA-Z0-9-]+)/edit/$', ticket_status_edit, name='ticket_status_edit'),
     url(r'^(?P<slug>[-\w]+)/settings/ticket_status/(?P<ticket_slug>[a-zA-Z0-9-]+)/delete/$', ticket_status_delete, name='ticket_status_delete'),
 
     # priority
-    url(r'^(?P<slug>[-\w]+)/settings/priorities/$', issues_priorities, name='priorities'),
-    url(r'^(?P<slug>[-\w]+)/settings/priority/create/$', issues_priorities_edit, name='issues_priorities_edit'),
-    url(r'^(?P<slug>[-\w]+)/settings/priority/(?P<priority_slug>[a-zA-Z0-9-]+)/edit/$', issues_priorities_edit, name='issues_priorities_edit'),
-    url(r'^(?P<slug>[-\w]+)/settings/priority/(?P<priority_slug>[a-zA-Z0-9-]+)/delete/$', issues_priorities_delete, name='issues_priorities_delete'),
+    url(r'^(?P<slug>[-\w]+)/settings/priorities/$', priorities, name='priorities'),
+    url(r'^(?P<slug>[-\w]+)/settings/priority/create/$', priorities_create, name='priorities_create'),
+    url(r'^(?P<slug>[-\w]+)/settings/priority/(?P<priority_slug>[a-zA-Z0-9-]+)/edit/$', priorities_edit, name='priorities_edit'),
+    url(r'^(?P<slug>[-\w]+)/settings/priority/(?P<priority_slug>[a-zA-Z0-9-]+)/delete/$', priorities_delete, name='priorities_delete'),
 
     # severity
-    url(r'^(?P<slug>[-\w]+)/settings/severities/$', issues_severities, name='issues_severities'),
-    url(r'^(?P<slug>[-\w]+)/settings/severity/create/$', issues_priorities_edit, name='issues_priorities_edit'),
-    url(r'^(?P<slug>[-\w]+)/settings/severity/(?P<severity_slug>[a-zA-Z0-9-]+)/edit/$', issues_priorities_edit, name='issues_priorities_edit'),
-    url(r'^(?P<slug>[-\w]+)/settings/severity/(?P<severity_slug>[a-zA-Z0-9-]+)/delete/$', issues_priorities_delete, name='issues_priorities_delete'),
+    url(r'^(?P<slug>[-\w]+)/settings/severities/$', severities, name='severities'),
+    url(r'^(?P<slug>[-\w]+)/settings/severity/create/$', severities_create, name='severities_create'),
+    url(r'^(?P<slug>[-\w]+)/settings/severity/(?P<severity_slug>[a-zA-Z0-9-]+)/edit/$', severity_edit, name='severity_edit'),
+    url(r'^(?P<slug>[-\w]+)/settings/severity/(?P<severity_slug>[a-zA-Z0-9-]+)/delete/$', severity_delete, name='severity_delete'),
 
     # member roles
-    url(r'^(?P<slug>[-\w]+)/settings/member_roles/$', manage_role, name='manage_role'),
-    url(r'^(?P<slug>[-\w]+)/settings/member_role/create/$', manage_role, name='manage_role'),
-    url(r'^(?P<slug>[-\w]+)/settings/member_role/(?P<member_role_slug>([a-zA-Z0-9-]+))/edit/$', manage_role_edit, name='manage_role_edit'),
-    url(r'^(?P<slug>[-\w]+)/settings/member_role/(?P<member_role_slug>([a-zA-Z0-9-]+))/delete/$', manage_role_delete, name='manage_role_delete'),
+    url(r'^(?P<slug>[-\w]+)/settings/roles/$', manage_role, name='manage_role'),
+    url(r'^(?P<slug>[-\w]+)/settings/role/create/$', manage_role_create, name='manage_role_create'),
+    url(r'^(?P<slug>[-\w]+)/settings/role/(?P<member_role_slug>([a-zA-Z0-9-]+))/edit/$', manage_role_edit, name='manage_role_edit'),
+    url(r'^(?P<slug>[-\w]+)/settings/role/(?P<member_role_slug>([a-zA-Z0-9-]+))/delete/$', manage_role_delete, name='manage_role_delete'),
 
 ]
