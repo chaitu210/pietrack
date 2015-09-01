@@ -122,7 +122,7 @@
    }
 
    function delete_role(slug,id){
-     $.get('/project/{{slug}}/settings/role/'+slug+'/delete/',function(response){
+     $.get('/project/{{slug}}/settings/member_role/'+slug+'/delete/',function(response){
        if(!response['error']){
          $("#"+id).remove();
        }
@@ -132,7 +132,7 @@
    
    $("#id_add_role").on('submit',function(e){
      var data = $("#id_add_role").serialize();
-     $.post("{% url 'project:manage_role_create' slug %}",data,function(response){
+     $.post("{% url 'project:member_role_create' slug %}",data,function(response){
        if(response['error']){
          $('#id_role_error').text(response['errors'].name)
        }
@@ -154,7 +154,7 @@
      var data = $("#id_edit_role").serialize();
      var slug = $("#edit_slug").val()
   
-     $.post('/project/{{slug}}/settings/role/'+slug+'/edit/',data,function(response){
+     $.post('/project/{{slug}}/settings/member_role/'+slug+'/edit/',data,function(response){
        if(response['error']){
          $('#edit_role_error').text(response['errors'].name)
        }

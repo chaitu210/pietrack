@@ -85,12 +85,12 @@ def delete_project(request, id):
 @login_required
 def priorities(request, slug):
     priority_list = Priority.objects.filter(
-        project=Project.objects.get(slug=slug))
+    project=Project.objects.get(slug=slug))
     return render(request, 'settings/priorities.html', {'slug': slug, 'priority_list': priority_list})
 
 
 @login_required
-def priorities_create(request, slug):
+def priority_create(request, slug):
     project = Project.objects.get(slug=slug)
     form = PriorityForm(request.POST, project=project)
     if(form.is_valid()):
@@ -101,7 +101,7 @@ def priorities_create(request, slug):
 
 
 @login_required
-def priorities_edit(request, slug, priority_slug):
+def priority_edit(request, slug, priority_slug):
     project = Project.objects.get(slug=slug)
     instance = Priority.objects.get(slug=priority_slug, project=project)
     form = PriorityForm(request.POST, instance=instance,project=project)
@@ -113,7 +113,7 @@ def priorities_edit(request, slug, priority_slug):
 
 
 @login_required
-def priorities_delete(request, slug, priority_slug):
+def priority_delete(request, slug, priority_slug):
     Priority.objects.get(
         slug=priority_slug, project=Project.objects.get(slug=slug)).delete()
     return HttpResponse(json.dumps({'error': False}), content_type="application/json")
@@ -127,7 +127,7 @@ def severities(request, slug):
 
 
 @login_required
-def severities_create(request, slug):
+def severity_create(request, slug):
     project = Project.objects.get(slug=slug)
     form = SeverityForm(request.POST, project=project)
     if(form.is_valid()):
@@ -277,7 +277,7 @@ def create_member(request, slug):
 
 
 @login_required
-def manage_role(request, slug):
+def member_roles(request, slug):
     project = Project.objects.get(slug=slug)
     list_of_roles = Role.objects.filter(project=project)
     dictionary = {'list_of_roles': list_of_roles, 'slug': slug}
@@ -285,7 +285,7 @@ def manage_role(request, slug):
 
 
 @login_required
-def manage_role_create(request, slug):
+def member_role_create(request, slug):
     project = Project.objects.get(slug=slug)
     form = RoleForm(request.POST, project=project)
     if(form.is_valid()):
@@ -296,7 +296,7 @@ def manage_role_create(request, slug):
 
 
 @login_required
-def manage_role_edit(request, slug, member_role_slug):
+def member_role_edit(request, slug, member_role_slug):
     project=Project.objects.get(slug=slug)
     instance = Role.objects.get(
         slug=member_role_slug, project=project)
@@ -309,7 +309,7 @@ def manage_role_edit(request, slug, member_role_slug):
 
 
 @login_required
-def manage_role_delete(request, slug, member_role_slug):
+def member_role_delete(request, slug, member_role_slug):
     project = Project.objects.get(slug=slug)
     Role.objects.get(slug=member_role_slug, project=project).delete()
     return HttpResponse(json.dumps({'error': False}), content_type="application/json")
