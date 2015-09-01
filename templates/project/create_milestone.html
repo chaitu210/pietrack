@@ -22,13 +22,13 @@
             </div>
             <div class="form_group">
               <label>Start Date</label>
-              <input id = 'milestone_start_date' name = 'estimated_start' type="text"  class='input'>
-              <span id = 'milestone_start_date_error'></span>
+              <input id = 'milestone_estimated_start' name = 'estimated_start' type="text"  class='input'>
+              <span id = 'milestone_estimated_start_error'></span>
             </div>
             <div class="form_group">
               <label>Finished Date</label>
-              <input id = 'milestone_finished_date' name = 'estimated_finish' type="text" class='input'>
-              <span id = 'milestone_finished_date_error'></span>
+              <input id = 'milestone_estimated_finish' name = 'estimated_finish' type="text" class='input'>
+              <span id = 'milestone_estimated_finish_error'></span>
             </div>
             <div class="form_group">
               <label>Status</label>
@@ -57,11 +57,12 @@
         
         $('#milestone_save').click(function(event){
             event.preventDefault()
-            $.post('', $('#milestone_form').serialize(), function(response){
-                if(response['error'] === true){
-                    $('#milestone_name_error').text('').append(response['form_errors'].name)
-                    $('#milestone_start_date_error').text('').append(response['form_errors'].estimated_start)
-                    $('#milestone_finished_date_error').text('').append(response['form_errors'].estimated_finish)
+            $.post('', $('#milestone_form').serialize(), function(data){
+                if(data['error'] === true){
+                    $('span.span_error').remove()
+                    for(var key in data.form_errors){
+                        $('#milestone_' + key + '_error').after("<span class = 'span_error'>" + data.form_errors[key] + "</span>")
+                    }
                 }
                 else{
                     alert('mile-stoned')
@@ -69,7 +70,7 @@
             });
         });
         function display_datepicker(){
-            $("#milestone_start_date, #milestone_finished_date").datepicker({
+            $("#milestone_estimated_start, #milestone_estimated_finish").datepicker({
                 changeMonth: true,
                 changeYear: true,
                 dateFormat: 'yy-mm-dd',
