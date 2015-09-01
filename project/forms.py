@@ -235,7 +235,7 @@ class RoleForm(forms.ModelForm):
             instance.save()
         return instance
 
-class CreateMilestoneForm(forms.ModelForm):
+class MilestoneForm(forms.ModelForm):
     class Meta:
         model = Milestone
         fields = ['name', 'estimated_start', 'estimated_finish', 'status']

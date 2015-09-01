@@ -8,7 +8,6 @@ urlpatterns = [
 
     # project settings
     url(r'^(?P<slug>[-\w]+)/settings/$',  project_details, name='project_details'),
-    url(r'^(?P<slug>[-\w]+)/edit/$',  project_edit, name='project_edit'),
 
     # team
     url(r'^(?P<slug>[-\w]+)/team/$',  project_team, name='project_team'),
@@ -22,22 +21,24 @@ urlpatterns = [
 
     # priority
     url(r'^(?P<slug>[-\w]+)/settings/priorities/$', priorities, name='priorities'),
-    url(r'^(?P<slug>[-\w]+)/settings/priority/create/$', priorities_create, name='priorities_create'),
-    url(r'^(?P<slug>[-\w]+)/settings/priority/(?P<priority_slug>[a-zA-Z0-9-]+)/edit/$', priorities_edit, name='priorities_edit'),
-    url(r'^(?P<slug>[-\w]+)/settings/priority/(?P<priority_slug>[a-zA-Z0-9-]+)/delete/$', priorities_delete, name='priorities_delete'),
+    url(r'^(?P<slug>[-\w]+)/settings/priority/create/$', priority_create, name='priority_create'),
+    url(r'^(?P<slug>[-\w]+)/settings/priority/(?P<priority_slug>[a-zA-Z0-9-]+)/edit/$', priority_edit, name='priority_edit'),
+    url(r'^(?P<slug>[-\w]+)/settings/priority/(?P<priority_slug>[a-zA-Z0-9-]+)/delete/$', priority_delete, name='priority_delete'),
 
     # severity
     url(r'^(?P<slug>[-\w]+)/settings/severities/$', severities, name='severities'),
-    url(r'^(?P<slug>[-\w]+)/settings/severity/create/$', severities_create, name='severities_create'),
+    url(r'^(?P<slug>[-\w]+)/settings/severity/create/$', severity_create, name='severity_create'),
     url(r'^(?P<slug>[-\w]+)/settings/severity/(?P<severity_slug>[a-zA-Z0-9-]+)/edit/$', severity_edit, name='severity_edit'),
     url(r'^(?P<slug>[-\w]+)/settings/severity/(?P<severity_slug>[a-zA-Z0-9-]+)/delete/$', severity_delete, name='severity_delete'),
 
     # member roles
-    url(r'^(?P<slug>[-\w]+)/settings/roles/$', manage_role, name='manage_role'),
-    url(r'^(?P<slug>[-\w]+)/settings/role/create/$', manage_role_create, name='manage_role_create'),
-    url(r'^(?P<slug>[-\w]+)/settings/role/(?P<member_role_slug>([a-zA-Z0-9-]+))/edit/$', manage_role_edit, name='manage_role_edit'),
-    url(r'^(?P<slug>[-\w]+)/settings/role/(?P<member_role_slug>([a-zA-Z0-9-]+))/delete/$', manage_role_delete, name='manage_role_delete'),
+    url(r'^(?P<slug>[-\w]+)/settings/member_roles/$', member_roles, name='member_roles'),
+    url(r'^(?P<slug>[-\w]+)/settings/member_role/create/$', member_role_create, name='member_role_create'),
+    url(r'^(?P<slug>[-\w]+)/settings/member_role/(?P<member_role_slug>([a-zA-Z0-9-]+))/edit/$', member_role_edit, name='member_role_edit'),
+    url(r'^(?P<slug>[-\w]+)/settings/member_role/(?P<member_role_slug>([a-zA-Z0-9-]+))/delete/$', member_role_delete, name='member_role_delete'),
 
-    # milestones
+    #milestone
     url(r'^(?P<slug>[a-zA-Z0-9-]+)/milestone/create/$',create_milestone, name='create_milestone'),
+    url(r'^(?P<slug>[a-zA-Z0-9-]+)/milestone/edit/$',milestone_edit, name='milestone_edit'),
 ]
+
