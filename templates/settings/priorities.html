@@ -163,7 +163,7 @@
    $('#add_form').on('submit',function(e){
        e.preventDefault();
        if($('#status').val()=="true"){
-       $.post('{% url "project:priorities_create" slug %}',$('#add_form').serialize(),function(response){
+       $.post('{% url "project:priority_create" slug %}',$('#add_form').serialize(),function(response){
            if(response.error){
                 if(response.errors['name']){
                    $("span[name='error']").text(response.errors['name']);
