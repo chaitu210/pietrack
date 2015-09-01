@@ -10,8 +10,8 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.contrib.auth.tokens import default_token_generator
 from django.core.urlresolvers import reverse
-from piebase.models import User, Project, Organization, Role
-from forms import CreateProjectForm, CreateMemberForm, PasswordResetForm
+from piebase.models import User, Project, Organization, Role, Milestone
+from forms import CreateProjectForm, CreateMemberForm, PasswordResetForm, MilestoneForm
 from .tasks import send_mail_old_user
 
 
@@ -313,3 +313,25 @@ def member_role_delete(request, slug, member_role_slug):
     project = Project.objects.get(slug=slug)
     Role.objects.get(slug=member_role_slug, project=project).delete()
     return HttpResponse(json.dumps({'error': False}), content_type="application/json")
+
+
+@login_required
+def milestone_create(request, slug):
+    if request.method == 'POST':
+        milestone_form = MilestoneForm(request.POST)
+        json_data = {}
+        if milestone_form.is_valid():
+            project_obj = Project.objects.get(slug = slug)
+            name = request.POST.get('name')
+            # modified date is duplicate, should be changed
+            Milestone.objects.create(name = name, slug = name, project = project_obj, estimated_start = request.POST.get('estimated_start'), 
+                    modified_date = request.POST.get('estimated_finish'), estimated_finish = request.POST.get('estimated_finish'), status = request.POST.get('status'))
+            json_data['error'] = False
+            return HttpResponse(json.dumps(json_data), content_type = 'application/json')
+        else:
+            json_data['error'] = True
+            json_data['form_errors'] = milestone_form.errors
+            return HttpResponse(json.dumps(json_data), content_type = 'application/json')
+    else:
+        return render(request, 'project/milestone.html')
+

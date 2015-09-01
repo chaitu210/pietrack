@@ -9,7 +9,7 @@ from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.utils.translation import ugettext, ugettext_lazy as _
 from .tasks import celery_send_mail
-from piebase.models import Project, Priority, Severity, Organization, User, TicketStatus, Role
+from piebase.models import Project, Priority, Severity, Organization, User, TicketStatus, Role, Milestone
 from django.template.defaultfilters import slugify
 
 
@@ -234,3 +234,8 @@ class RoleForm(forms.ModelForm):
         if commit:
             instance.save()
         return instance
+
+class MilestoneForm(forms.ModelForm):
+    class Meta:
+        model = Milestone
+        fields = ['name', 'estimated_start', 'estimated_finish', 'status']
