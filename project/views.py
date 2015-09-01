@@ -315,14 +315,15 @@ def member_role_delete(request, slug, member_role_slug):
     return HttpResponse(json.dumps({'error': False}), content_type="application/json")
 
 
-def create_milestone(request, slug):
+@login_required
+def milestone_create(request, slug):
     if request.method == 'POST':
         milestone_form = MilestoneForm(request.POST)
         json_data = {}
         if milestone_form.is_valid():
             project_obj = Project.objects.get(slug = slug)
             name = request.POST.get('name')
-            # modified data is duplicate, should be changed
+            # modified date is duplicate, should be changed
             Milestone.objects.create(name = name, slug = name, project = project_obj, estimated_start = request.POST.get('estimated_start'), 
                     modified_date = request.POST.get('estimated_finish'), estimated_finish = request.POST.get('estimated_finish'), status = request.POST.get('status'))
             json_data['error'] = False
