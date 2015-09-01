@@ -39,6 +39,5 @@ urlpatterns = [
 
     #milestone
     url(r'^(?P<slug>[a-zA-Z0-9-]+)/milestone/create/$',create_milestone, name='create_milestone'),
-    url(r'^(?P<slug>[a-zA-Z0-9-]+)/milestone/edit/$',milestone_edit, name='milestone_edit'),
 ]
 
