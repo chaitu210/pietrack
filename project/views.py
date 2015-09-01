@@ -324,7 +324,7 @@ def milestone_create(request, slug):
             project_obj = Project.objects.get(slug = slug)
             name = request.POST.get('name')
             # modified date is duplicate, should be changed
-            Milestone.objects.create(name = name, slug = name, project = project_obj, estimated_start = request.POST.get('estimated_start'), 
+            Milestone.objects.create(name = name, slug = name, project = project_obj, estimated_start = request.POST.get('estimated_start'), created_by = request.user, 
                     modified_date = request.POST.get('estimated_finish'), estimated_finish = request.POST.get('estimated_finish'), status = request.POST.get('status'))
             json_data['error'] = False
             return HttpResponse(json.dumps(json_data), content_type = 'application/json')
@@ -336,6 +336,7 @@ def milestone_create(request, slug):
         return render(request, 'project/milestone.html')
 
 
+@login_required
 def milestone_edit(request, slug):
     milestone_obj = Milestone.objects.get(slug = slug)
     if request.method == 'POST':
@@ -357,11 +358,14 @@ def milestone_edit(request, slug):
     else:
         return render(request, 'project/milestone.html', {'milestone_obj': milestone_obj})
 
+
+@login_required
 def milestone_delete(request, slug):
     Milestone.objects.get(slug = slug).delete()
     return HttpResponse(json.dumps({'error': False}))
 
 
+@login_required
 def project_edit(request, slug):
     milestone_list = Milestone.objects.all()
     project_obj = Project.objects.get(slug = slug)
