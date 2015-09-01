@@ -1,12 +1,10 @@
-{% extends 'base.html' %}
-{% load compress %}
+{% extends 'base.html' %}    
 {% load staticfiles %}
-
-    {% block extra_css_links %}
+<!--<link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">-->
+{% block extra_css_links %}
     <link rel="stylesheet" type="text/less" href="{% static 'less/select2.less' %}">
     {% endblock %}
-
-{% block content %}
+    {% block content %}
     <section id='base_content' class='create_project'>
       <div class="content_box">
         <div class="title">
@@ -45,7 +43,7 @@
           </div>
           <div class="form_group">
             <label>Assign to</label>
-            <select name = 'assigned_to' class='select2 input' multiple='multiple'>
+            <select name = 'assigned_to' class='select2 input'>
             {% for assigned_to_iter in assigned_to_list %}
             <option value = '{{ assigned_to_iter.id }}'>{{ assigned_to_iter.email }}</option>
             {% endfor %}
@@ -64,15 +62,13 @@
       </div>
     </section>
     {% endblock %}
-
     {% block extra_js_links %}
     <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
     <!-- select 2 -->
     <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/js/select2.min.js"></script>-->
-    {% endblock %}
-
-    {% block extra_js %}
     <script type="text/javascript" src="{% static 'js/select2.js' %}"></script>
+    {% endblock %}
+    {% block extra_js %}
     <script>
         $(function() {
             $( "#task_finished_date" ).datepicker();
@@ -99,15 +95,11 @@ display_datepicker()
     <script>
       $('#task_save').click(function(event){
           event.preventDefault()
-          $.post('', $('#task_form').serialize(), function(response){
-              if(response['error'] === true){
-                  $('#task_name_error').text('').append(response['form_errors'].name)
-                  $('#task_milestone_error').text('').append(response['form_errors'].milestone)
-                  $('#task_requirement_error').text('').append(response['form_errors'].requirement)
-                  $('#task_status_error').text('').append(response['form_errors'].status)
-                  $('#task_finished_date_error').text('').append(response['form_errors'].finished_date)
-                  $('#task_created_date_error').text('').append(response['form_errors'].created_date)
-                  $('#task_assigned_to_error').text('').append(response['form_errors'].assigned_to)
+          $.post('', $('#task_form').serialize(), function(data){
+              if(data['error'] === true){
+                for(var key in data['form_errors']){
+                  $('#task_' + key + '_error').text('').append(data['form_errors'][key])
+                }
               }
               else{
                   alert('added')

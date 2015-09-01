@@ -1,226 +1,223 @@
-{% extends 'base.html' %}
-{% load compress %}
-{% load static %}
-{% load staticfiles %}
-{% compress css %}
-   {% block extra_css_links %}
-    <link rel="stylesheet" type="text/css" href="{%static 'less/bs_leftnavi.less' %}">
-      <link rel="stylesheet" type="text/css" href="{%static 'less/bootstrap-colorpicker.less' %}">
-      <link rel="stylesheet" type="text/css" href="{%static 'less/docs.less' %}">
-   {% endblock %}
-{% endcompress %}
+{%  extends 'base.html' %}
+{%  load compress %}
+{%  load static %}
+{%  load staticfiles %}
+{%  compress css %}
+{%  block extra_css_links %}
+<link rel="stylesheet" type="text/css" href="{% static 'less/bs_leftnavi.less' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'less/bootstrap-colorpicker.less' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'less/docs.less' %}">
+{%  endblock %}
+{%  endcompress %}
+{%  block content %}
+<section id="box-content">
+   <!-- nav left starts here-->
+   {%  include "settings/left_menu.html" %}
+   <!-- nav left ends here-->
+   <!-- right container starts here-->
+   <div class="right-container">
+      <div class="panel panel-default content-panel">
+         <div class="panel-body">
+            <!-- content box starts here -->
+            <div class="content_box">
+               <div class="title">
+                  <h4>SAMPL1 STATUS - <span class="status"> ISSUE SEVERITIES</span></h4>
+                  <div class="tag">Specify the statuses your user stories, tasks and issues will go through</div>
+                  <span class="new"><a href="#" id="add_new">Add New Severity</a></span>
+               </div>
+               <!-- status table starts here -->
+               <div class="table-responsive color-box">
+                  <table class="table table-striped" id="priority">
+                     <thead>
+                        <tr>
+                           <th width="40%">Color</th>
+                           <th>Name</th>
+                           <th>Actions</th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                        {% for severity in severity_list%}
+                        <tr id="{{severity.id}}">
+                           <td scope="row">
+                              <div class="input-group colorpicker-component demo demo-auto">
+                                 <input type="text" value="{{severity.color}}" class="form-control" />
+                                 <span class="input-group-addon" ><i style="cursor: default;"></i></span>
+                              </div>
+                           </td>
+                           <td>{{severity.name}}</td>
+                           <td class="actions"><a href="#" class="edit" onclick="edit_severity('{{severity.color}}','{{severity.name}}','{{severity.slug}}')"><i class="fa fa-edit"></i></a>
+                              <a href="#" class="delete" onclick="delete_severity('{{severity.slug}}','{{severity.id}}')"><i class="fa fa-trash"></i></a>
+                           </td>
+                        </tr>
+                        {% endfor%}
+                     </tbody>
+                  </table>
+                  <!-- add form start -->
+                  <form action="" method="post" style="display:none;" id="add_form">
+                     {%  csrf_token %}
+                     <input id="status" name="status" value="true" style="display:none;">
+                     <input id="slug" name ="slug" value="" style="display:none;">
+                     <table class="table table-striped">
+                        <thead>
+                           <tr>
+                              <th width="40%"></th>
+                              <th></th>
+                              <th></th>
+                           </tr>
+                        </thead>
+                        <tbody>
+                           <tr>
+                              <td scope="row">
+                                 <div class="input-group colorpicker-component demo demo-auto">
+                                    <input name="color" type="text" value="#666666" class="form-control" />
+                                    <span class="input-group-addon"><i></i></span>
+                                 </div>
+                              </td>
+                              <td>
+                                 <input name="name" value="" type="text" style="width: 100px; padding: 2px; border:1px solid #929292;" placeholder="Name" />
+                              </td>
+                              <td class="actions">
+                                 <button type="submit" class="edit" ><i class="fa fa-plus"></i></button>
+                                 <a class="delete" id="id_reset"><span class="glyphicon glyphicon-remove"></span></a>
+                              </td>
+                           </tr>
+                           <tr>
+                              <td colspan="3">
+                                 <center><span name="error"></span></center>
+                              </td>
+                           </tr>
+                        </tbody>
+                     </table>
+                  </form>
+                  <!-- edit form ends here -->
 
-{% block content %}
-  <section id="box-content">
-  <!-- nav left starts here-->
-  {% include "settings/left_menu.html" %}
-  <!-- nav left ends here-->
-  <!-- right container starts here-->
-  <div class="right-container">
-    <div class="panel panel-default content-panel">
-      <div class="panel-body">
-        <!-- content box starts here -->
-        <div class="content_box">
-          <div class="title">
-            <h4>SAMPL1 STATUS - <span class="status"> ISSUE SEVERITIES</span></h4>
-            <div class="tag">Specify the statuses your user stories, tasks and issues will go through</div>
-            <span class="new"><a href="#" id="id_new_pri">Add New Severity</a></span>
-          </div>
-          <!-- status table starts here -->
-          <div class="table-responsive color-box">
-            <table class="table table-striped" id="priority">
-              <thead>
-                <tr>
-                  <th width="40%">Color</th>
-                  <th>Name</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {%for priority in priority_list%}
-                <tr id="row{{priority.id}}">
-                  <td scope="row">
-                    <div class="input-group colorpicker-component demo demo-auto">
-                      <input type="text" value="{{priority.color}}" class="form-control" />
-                      <span class="input-group-addon"><i></i></span>
-                    </div>
-                  </td>
-                  <td>{{priority.name}}</td>
-                  <td class="actions"><a href="#" class="edit" onclick="edit_priority('{{priority.color}}','{{priority.name}}','row{{priority.id}}')"><i class="fa fa-edit"></i></a>
-                    <a href="#" class="delete" onclick="delete_priority('{{priority.color}}','{{priority.name}}','row{{priority.id}}')"><i class="fa fa-trash"></i></a></td>
-                </tr>
-                {%endfor%}
-              </tbody>
-            </table>
-            <!-- form start -->
-            <form action="" method="post" style="display:none;" id="id_issue_prio_form">
-              {% csrf_token %}
-              <input id="old_id" name="old_id" value="none" style="display:none;">
-              <table class="table table-striped">
-                <thead>
-                  <tr>
-                    <th width="40%"></th>
-                    <th></th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td scope="row">
-                      <div class="input-group colorpicker-component demo demo-auto">
-                        <input name="color" type="text" value="#666666" class="form-control" />
-                        <span class="input-group-addon"><i></i></span>
-                      </div>
-                    </td>
-                    <td>
-                      <input name="name" value="" type="text" style="width: 100px; padding: 2px; border:1px solid #929292;" placeholder="Name" />
-                    </td>
-                    <td class="actions">
-                      <button type="submit" class="edit" id="add_form"><i class="fa fa-plus"></i></button>
-                      <a class="delete" id="id_reset"><span class="glyphicon glyphicon-remove"></span></a>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td colspan="3">
-                      <center><span name="error"></span></center>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </form>
-            <!-- form ends here -->
-          </div>
-          <!-- status table ends here -->
-          <!-- content box starts here -->
-        </div>
+               </div>
+               <!-- status table ends here -->
+               <!-- content box starts here -->
+            </div>
+         </div>
       </div>
-    </div>
-  </div>
-  <!-- right container ends here-->
+   </div>
+   <!-- right container ends here-->
 </section>
-
- {%endblock content%}
- {%block extra_js_links %}
-  <script type="text/javascript" src="{%static 'js/bs_leftnavi.js' %}"></script>
-  <script src="{%static 'js/bootstrap-colorpicker.min.js' %}"></script>
-  <script src="{%static 'js/docs.js' %}"></script>
- {%endblock extra_js_links %}
-
- {%block create_project_js%}
-
-      /* backend code*/
-      
-      function hexToRgb(hex) {
-      var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-      return result ? {
-          r: parseInt(result[1], 16),
-          g: parseInt(result[2], 16),
-          b: parseInt(result[3], 16)
-      } : null;
-  }
+{% endblock content%}
+{% block extra_js_links %}
+<script type="text/javascript" src="{% static 'js/bs_leftnavi.js' %}"></script>
+<script src="{% static 'js/bootstrap-colorpicker.min.js' %}"></script>
+<script src="{% static 'js/docs.js' %}"></script>
+{% endblock extra_js_links %}
+{% block extra_js%}
+<script>
   
-      function create_issue_priority(form_id){
-        $('#'+form_id).serialize()
-        alert(form_id);
-        alert($('#'+form_id).serialize())
+   function hexToRgb(hex) {
+   var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+   return result ? {
+         r: parseInt(result[1], 16),
+         g: parseInt(result[2], 16),
+         b: parseInt(result[3], 16)
+      } : null;
+   }
+   
+   function clear_form(){
+     var form = $('form');
+     form.css('display','none');
+     form.find('input[name="name"]').val(''); 
+     $('form span[name="error"]').text('')
+     $('#slug').val("")
+     $('#status').val("true")
+   }
 
-      }
-      function clear_form(){
-        var form = $('#id_issue_prio_form');
-        form.css('display','none');
-        form.find('input[name="name"]').val(''); 
-        $('#id_issue_prio_form span[name="error"]').text('')
-        // $('#id_issue_prio_form').find("input[name='old_new']").val("new")
-        $("#old_id").val("none")
-      }
-      function edit_priority(color,name,row_id){
-        rowId = row_id.substring(3,row_id.length)
-        var r = hexToRgb(color).r
-        var g = hexToRgb(color).g
-        var b = hexToRgb(color).b
-        
-        $("#old_id").val(rowId)
-        var color_box = '<i style="background-color: rgb('+r+','+ g+','+ b+');"></i>'
-        $('#id_issue_prio_form').css('display','block');
-        $('#id_issue_prio_form').find("input[name='color']").val(color)
-        $('#id_issue_prio_form').find("input[name='name']").val(name)
-        
-        $('#id_issue_prio_form span').html(color_box)
-        $('.demo').colorpicker();
-        
-      }
-      
-      function delete_priority(color,name,row){
-        data_send = 'name='+name+'&color='+color+'&csrfmiddlewaretoken='+'{{csrf_token}}';
-        $.post('{%url "project:issues_severities_delete" slug %}',data_send,function(response){
-          if(!response.error){
-            $('#'+row).remove();
-          }
-        });
-      }
-      $('#id_new_pri').on('click',function(){
-        clear_form()
-    $('#id_issue_prio_form').css('display','block');
-        $('#id_issue_prio_form').find("input[name='old_new']").val("new")
+   function edit_severity(color,name,slug){
+     var r = hexToRgb(color).r
+     var g = hexToRgb(color).g
+     var b = hexToRgb(color).b
+     var color_box = '<i style="background-color: rgb('+r+','+ g+','+ b+');"></i>'
 
-      });
-
-      $('#id_reset').on('click',function(){
-        clear_form();
-
-      });
+     $('#add_form').css('display','block');
+     $('#add_form').find("input[name='color']").val(color)
+     $('#add_form').find("input[name='name']").val(name)
+     $('#status').val("false");
+     $('#slug').val(slug)
+     $('#add_form span').html(color_box)
+     $('.demo').colorpicker();
      
-      /* add & edit issues_severities */
-
-      $('#add_form').on('click',function(e){
-        var create_data = $("#old_id").val()
-        e.preventDefault();
-        if(create_data=="none"){
-          $.post('',$('#id_issue_prio_form').serialize(),function(response){
-            if(response.error){
-              if(response.errors['name']){
-                $("span[name='error']").text(response.errors['name']);
-              }
-            }
-            else{
-              
-              name = response['name'];
-              color = response['color'];
-              row_id = response['proj_id']
-
-              data_row = "<tr id=\"row"+row_id+"\"><td scope=\"row\"><div class=\"input-group colorpicker-component demo demo-auto\"><input type=\"text\" value=\""+color+"\" class=\"form-control\"/><span class=\"input-group-addon\"><i></i></span></div></td><td>"+name+"</td><td class=\"actions\"><a href=\"#\" class=\"edit\" onclick=\"edit_priority('"+color+"','"+name+"','row"+row_id+"')\"><i class=\"fa fa-edit\"></i></a>&nbsp;<a href=\"#\" class=\"delete\" onclick=\"delete_priority('"+color+"','"+name+"','row"+row_id+"')\"><i class=\"fa fa-trash\"></i></a></td></tr>"
-              $('#priority tbody').append(data_row);
-              $('.demo').colorpicker();
-              clear_form();
-            }
-
-            });
+   }
+   
+   function delete_severity(slug,id){
+    $.get('/project/{{slug}}/settings/severity/'+slug+'/delete/',function(response){
+       if(!response.error){
+         $('#'+id).remove();
+       }
+     });
+   }
+   
+   $('#add_new').on('click',function(){
+        clear_form();
+        $('form').css('display','block');   
+   });
+   
+   $('#id_reset').on('click',function(){
+     clear_form();
+   
+   });
+   
+   $('#add_form').on('submit',function(e){
+       e.preventDefault();
+       if($('#status').val()=="true"){
+       $.post('{% url "project:severities_create" slug %}',$('#add_form').serialize(),function(response){
+           if(response.error){
+                if(response.errors['name']){
+                   $("span[name='error']").text(response.errors['name']);
+                }
+           }
+          else{
+               
+               var name = response['name'];
+               var color = response['color'];
+               var row_id = response['proj_id']
+               var slug = response['slug']
+       
+               data_row = "<tr id=\""+row_id+"\"><td scope=\"row\"><div class=\"input-group colorpicker-component demo demo-auto\"><input type=\"text\" value=\""+color+"\" class=\"form-control\"/><span class=\"input-group-addon\"><i></i></span></div></td><td>"+name+"</td><td class=\"actions\"><a href=\"#\" class=\"edit\" onclick=\"edit_severity('"+color+"','"+name+"','"+slug+"')\"><i class=\"fa fa-edit\"></i></a>&nbsp;<a href=\"#\" class=\"delete\" onclick=\"delete_severity('"+slug+"','"+row_id+"')\"><i class=\"fa fa-trash\"></i></a></td></tr>"
+               $('#priority tbody').append(data_row);
+               $('.demo').colorpicker();
+               clear_form();
+             }
+   
+         });
         }
         else{
-          var data = $('#id_issue_prio_form').serialize();
-          $.post('{%url "project:issues_severities_edit" slug %}',data,function(response){
-            
-            if(response.error){
-              if(response.errors['name']){
-                $("span[name='error']").text(response.errors['name']);
-              }
-            }
-            else{
-              var name = response['name'];
-          var color = response['color'];
-          var id = response['id'];
-          var row_edit = $('#row'+id)
-              var data_row = "<td scope=\"row\"><div class=\"input-group colorpicker-component demo demo-auto\"><input type=\"text\" value=\""+color+"\" class=\"form-control\"/><span class=\"input-group-addon\"><i></i></span></div></td><td>"+name+"</td><td class=\"actions\"><a href=\"#\" class=\"edit\" onclick=\"edit_priority('"+color+"','"+name+"','row"+id+"')\"><i class=\"fa fa-edit\"></i></a>&nbsp;<a href=\"#\" class=\"delete\" onclick=\"delete_priority('"+color+"','"+name+"','row"+id+"')\"><i class=\"fa fa-trash\"></i></a></td>"
-          
-          row_edit.html(data_row);
-              $('.demo').colorpicker();
-              clear_form();
-            }
-          });
-        }
-        
-      });
-      /* add & edit issues_severities ends */
+          var myslug = $('#slug').val();
+          $.post('/project/{{slug}}/settings/severity/'+myslug+'/edit/',$('#add_form').serialize(),function(response){
+           if(response.error){
+                if(response.errors['name']){
+                   $("span[name='error']").text(response.errors['name']);
+                }
+           }
+          else{
+               
+               var name = response['name'];
+               var color = response['color'];
+               var row_id = response['proj_id']
+               var slug = response['slug']
 
-      /*ends */
-{%endblock create_project_js%}
+               $('#'+row_id+' a.edit').attr('onclick',"edit_severity('"+color+"','"+name+"','"+slug+"')")
+               $('#'+row_id+' a.delete').attr("onclick","delete_severity('"+slug+"','"+row_id+"')")
+               $('#'+row_id+' td:nth-child(2)').text(name)
+               $('#'+row_id+' input').val(color)
+               var r = hexToRgb(color).r
+               var g = hexToRgb(color).g
+               var b = hexToRgb(color).b
+               var color_box = '<i style="background-color: rgb('+r+','+ g+','+ b+');"></i>'
+               $('#'+row_id+" span").html(color_box)
+               $('.demo').colorpicker();
+               clear_form();
+             }
+   
+         });
+
+        }
+   });
+  
+
+</script>
+{% endblock %}
