@@ -7,7 +7,7 @@ import string
 from django.utils import timezone
 from django.template.defaultfilters import slugify
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.tokens import default_token_generator
 from django.core.urlresolvers import reverse
 from piebase.models import User, Project, Organization, Role, Milestone
@@ -335,3 +335,37 @@ def milestone_create(request, slug):
     else:
         return render(request, 'project/milestone.html')
 
+
+def milestone_edit(request, slug):
+    milestone_obj = Milestone.objects.get(slug = slug)
+    if request.method == 'POST':
+        json_data = {}
+        milestone_form = MilestoneForm(request.POST, instance = milestone_obj)
+        if milestone_form.is_valid():
+            name = request.POST.get('name')
+            milestone_obj.name = request.POST.get('name')
+            milestone_obj.estimated_start = request.POST.get('estimated_start')
+            milestone_obj.estimated_finish = request.POST.get('estimated_finish')
+            milestone_obj.status = request.POST.get('status')
+            milestone_obj.save()
+            json_data['error'] = False
+            return HttpResponse(json.dumps(json_data), content_type = 'application/json')
+        else:
+            json_data['error'] = True
+            json_data['form_errors'] = milestone_form.errors
+            return HttpResponse(json.dumps(json_data), content_type = 'application/json')
+    else:
+        return render(request, 'project/milestone.html', {'milestone_obj': milestone_obj})
+
+def milestone_delete(request, slug):
+    Milestone.objects.get(slug = slug).delete()
+    return HttpResponse(json.dumps({'error': False}))
+
+
+def project_edit(request, slug):
+    milestone_list = Milestone.objects.all()
+    project_obj = Project.objects.get(slug = slug)
+    member_dict = {}
+    for member_iter in project_obj.members.all():
+        member_dict[member_iter.email] = [role.name for role in member_iter.user_roles.all()]
+    return render(request, 'project/project_edit.html', {'milestone_list': milestone_list, 'member_dict': member_dict, 'project_slug': slug})

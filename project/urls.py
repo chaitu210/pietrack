@@ -8,6 +8,7 @@ urlpatterns = [
 
     # project settings
     url(r'^(?P<slug>[-\w]+)/settings/$',  project_details, name='project_details'),
+    url(r'^(?P<slug>[-\w]+)/edit/$',  project_edit, name='project_edit'),
 
     # team
     url(r'^(?P<slug>[-\w]+)/team/$',  project_team, name='project_team'),
@@ -39,5 +40,7 @@ urlpatterns = [
 
     #milestone
     url(r'^(?P<slug>[a-zA-Z0-9-]+)/milestone/create/$',milestone_create, name='milestone_create'),
+    url(r'^(?P<slug>[a-zA-Z0-9-]+)/milestone/edit/$',milestone_edit, name='milestone_edit'),
+    url(r'^(?P<slug>[a-zA-Z0-9-]+)/milestone/delete/$',milestone_delete, name='milestone_delete'),
 ]
 

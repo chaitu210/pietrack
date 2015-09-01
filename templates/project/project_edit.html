@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block content %}
+<section id='base_content'>
+<div class="project_description">
+        <div class="col-md-9 about_project_wrap">
+          <div class="title">
+            <span>Pie track</span>
+            <span class='header_button_wrap'>
+                <a href = "/project/{{ project_slug }}/task/add/"><span id = 'id_new_task' class='header_button'>New Task</span></a>
+            <span id = 'id_new_requirement' class='header_button'>New Requirement</span>
+            <a href = "/project/{{ project_slug }}/milestone/create/"><span id = 'id_new_milestone' class='header_button'>New MileStone</span></a>
+            </span>
+          </div>
+          <div class="mile_stone_wrap">
+          {% for milestone_iter in milestone_list %}
+          <span id = 'id_milestone_container{{ forloop.counter0 }}' class="col-md-4 mile_stone_each">
+            <span class="milestone_container">
+            <span class='actions_row'>
+            <a href = '/project/{{ milestone_iter.slug }}/milestone/edit/'><i id = 'id_fa_pencil{{ forloop.counter0 }}' class='fa fa-pencil'></i></a>
+            <i id = '{{ milestone_iter.slug }}'  class='fa fa-times'></i>
+            </span>
+              <span class='title'>{{ milestone_iter.name }}</span>
+              <span class='col-md-6 start_date'>
+                <span class='title'>
+                Start date
+                </span>
+                <span class='title'>{{ milestone_iter.estimated_start }}</span>
+              </span>
+              <span class='col-md-6 end_date'>
+                <span class='title'>
+                End date
+                </span>
+                <span class='title'>{{ milestone_iter.estimated_finish }}</span>
+              </span>
+              <span class='clearfix'></span>
+              <span class='author'>
+                by <span class='name'>dntknw</span>
+              </span>
+              <span class='count_wrap'>
+              <span class='count'>
+                  <i class='fa fa-trophy'></i>total_milestones: {{ milestone_list|length }}
+              </span>
+              </span>
+            </span>
+          </span>
+          {% endfor %}
+          <div class="clearfix"></div>
+          </div>
+        </div>
+        <div class="col-md-3 team">
+          <div class="team-block">
+            <div class="title">
+              <span>Contacts</span>
+            </div>
+            <div class="scroll">
+            {% for name, roles in member_dict.items %}
+            <span class='ticket orange'>
+            <img src="https://cdn2.iconfinder.com/data/icons/despicable-me-2-minions/128/Happy-Minion-Icon.png">
+            <span class='description'>
+                <span class='name'>{{ name }}</span>
+                <span class='designation_time'>{{ roles }}</span>
+            </span>
+            </span>
+            {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    {% endblock content %}
+    {% block extra_js %}
+    <script>
+    $('.fa.fa-times').click(function(event){
+            event.preventDefault()
+            var milestone_slug = $(this).attr('id')
+            $.get('/project/' + milestone_slug + '/milestone/delete/')
+            $(this).closest('.col-md-4.mile_stone_each').remove()
+    });
+    </script>
+    {% endblock %}
