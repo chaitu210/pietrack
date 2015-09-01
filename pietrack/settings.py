@@ -60,6 +60,7 @@ INSTALLED_APPS = (
     'reports',
     'djcelery',
     'kombu.transport.django',
+    'task',
 )
 
 MIDDLEWARE_CLASSES = (

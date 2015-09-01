@@ -6,3 +6,4 @@ piebase/migrations/*
 media/profile
 pietrack/local_settings.py
 .coverage
+*.swp
