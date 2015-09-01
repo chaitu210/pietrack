@@ -1,11 +1,4 @@
 {% extends 'base.html' %}
-{% load compress %}
-{% load staticfiles %}
-
-{% block extra_css_links %}
-<link rel="stylesheet" type="text/less" href="{% static 'less/select2.less' %}">
-{% endblock %}
-
 {% block content %}    
 <section id='base_content' class='create_project'>
       <div class="content_box">
@@ -49,7 +42,6 @@
     <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
     {% endblock %}
     {% block extra_js %}
-    <script type="text/javascript" src="{% static 'js/select2.js' %}"></script>
     <script>
         $(function() {
                 $( "#milestone_start_date, #milestone_finished_date" ).datepicker();
