@@ -39,7 +39,7 @@ urlpatterns = [
 
     # taskboard
     url(r'^(?P<slug>[-\w]+)/taskboard/$', taskboard, name="taskboard"),
-    url(r'^(?P<slug>[-\w]+)/update_taskboard/(?P<status_slug>([a-zA-Z0-9-]+))/(?P<task_id>[0-9]+)/$', update_taskboard,name="update_taskboard")
+    url(r'^(?P<slug>[-\w]+)/update_taskboard/(?P<status_slug>([a-zA-Z0-9-]+))/(?P<task_id>[0-9]+)/$', update_taskboard,name="update_taskboard"),
 
     #milestone
     url(r'^(?P<slug>[a-zA-Z0-9-]+)/milestone/create/$',milestone_create, name='milestone_create'),
