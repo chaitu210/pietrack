@@ -170,7 +170,8 @@ class TicketStatus(models.Model):
     slug = models.SlugField(max_length=255, null=False, blank=True, verbose_name=_("slug"))
     color = models.CharField(max_length=20, default="#999999", verbose_name=_("color"))
     project = models.ForeignKey(Project, related_name="task_statuses", verbose_name=_("project"))
-
+    order = models.IntegerField(default=1,blank=True)
+    
     class Meta:
         unique_together = (("project", "name"), ("project", "slug"))
 
@@ -183,6 +184,7 @@ class Priority(models.Model):
     slug = models.SlugField(max_length=255, null=False, blank=True, verbose_name=_("slug"))
     color = models.CharField(max_length=20, default="#999999", verbose_name=_("color"))
     project = models.ForeignKey(Project, related_name="priorities", verbose_name=_("project"))
+    order = models.IntegerField(default=1,blank=True)
 
     class Meta:
         unique_together = ("project", "name")
@@ -196,6 +198,7 @@ class Severity(models.Model):
     slug = models.SlugField(max_length=255, null=False, blank=True, verbose_name=_("slug"))
     color = models.CharField(max_length=20, default="#999999", verbose_name=_("color"))
     project = models.ForeignKey(Project, related_name="severities", verbose_name=_("project"))
+    order = models.IntegerField(default=1,blank=True)
 
     class Meta:
         unique_together = ("project", "name")

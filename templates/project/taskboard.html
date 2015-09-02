@@ -1,0 +1,261 @@
+{% extends 'base.html' %}
+{% load template_tags %}
+{% load static %}
+{% block content %}
+    <section id='base_content'>
+      <div class="project_description">
+        <!-- about project -->
+        <div class="about_project_wrap">
+          <div class="title">
+            <span>Milestone 1</span>
+          </div>
+          <!-- filters -->
+          <div class="filters_wrap">
+            <h3>Refine your search</h3>
+            <div class="row filter_row">
+              <div class="col-md-2">
+                <select class='select2 input' placeholder='Assigned to' multiple='multiple'>
+                  <option>naz</option>
+                  <option>Shirisha</option>
+                </select>
+              </div>
+              <div class="col-md-2">
+                <select class='select2 input' placeholder='Requirement' multiple='multiple'>
+                  <option>naz</option>
+                  <option>Shirisha</option>
+                </select>
+              </div>
+              <div class="col-md-2">
+                <input type="text" class='input' placeholder='Task title'>
+              </div>
+              <div class="col-md-2">
+                <input type="text" class='input' id='sdate' placeholder='Start Date'>
+              </div>
+              <div class="col-md-2">
+                <input type="text" class='input' id='edate' placeholder='End Date'>
+              </div>
+              <div class="col-md-2">
+                <button class='submit_btn'><i class='fa fa-search'></i>Go</button>
+              </div>
+            </div>
+          </div>
+          <!--/ filters -->
+          <!-- lists div -->
+          <div class="lists_div style-1">
+            <div class="hscroll">
+              <!-- requirement list -->
+              <div class="requirement_list_panel">
+                <div class="title">
+                  Requirement list
+                </div>
+                <div class="scroll">
+                <ul>
+                  <li>
+                    <div class='ticket_wrap'>
+                      <a class='name_div_wrap'>
+                      <span class='name_div'>
+                      Requirement 1
+                      <span class='tag'>
+                      <span  data-toggle="modal" data-target="#myModal1">View Description</span></span>
+                      </span></a>
+                      <span class='actions_div'>
+                      <a>
+                      <span class='edit'>
+                      <i class='fa fa-pencil'></i>
+                      </span>
+                      </a>
+                      <a>
+                      <span class='drop'>
+                      <i class='fa fa-angle-down'></i>
+                      </span>
+                      </a>
+                      </span>
+                    </div>
+                  </li>
+                  <li>
+                    <div class='ticket_wrap'>
+                      <a class='name_div_wrap'>
+                      <span class='name_div'>
+                      Requirement 1
+                      <span class='tag'>
+                      <span data-toggle="modal" data-target="#myModal1">View Description</span></span>
+                      </span></a>
+                      <span class='actions_div'>
+                      <a>
+                      <span class='edit'>
+                      <i class='fa fa-pencil'></i>
+                      </span>
+                      </a>
+                      <a>
+                      <span class='drop'>
+                      <i class='fa fa-angle-down'></i>
+                      </span>
+                      </a>
+                      </span>
+                    </div>
+                  </li>
+                  <li>
+                    <div class='ticket_wrap'>
+                      <a class='name_div_wrap'>
+                      <span class='name_div'>
+                      Requirement 1
+                      <span class='tag'>
+                      <span data-toggle="modal" data-target="#myModal1">View Description</span>
+                      </span>
+                      </span></a>
+                      <span class='actions_div'>
+                      <a>
+                      <span class='edit'>
+                      <i class='fa fa-pencil'></i>
+                      </span>
+                      </a>
+                      <a>
+                      <span class='drop'>
+                      <i class='fa fa-angle-down'></i>
+                      </span>
+                      </a>
+                      </span>
+                    </div>
+                  </li>
+                  <li>
+                    <div class='ticket_wrap'>
+                      <a class='name_div_wrap'>
+                      <span class='name_div'>
+                      Requirement 1
+                      <span  class='tag'>
+                      <span data-toggle="modal" data-target="#myModal1">View Description</span>
+                      </span>
+                      </span></a>
+                      <span class='actions_div'>
+                      <a>
+                      <span class='edit'>
+                      <i class='fa fa-pencil'></i>
+                      </span>
+                      </a>
+                      <a>
+                      <span class='drop'>
+                      <i class='fa fa-angle-down'></i>
+                      </span>
+                      </a>
+                      </span>
+                    </div>
+                  </li>
+                  <li>
+                    <div class='ticket_wrap'>
+                      <a class='name_div_wrap'>
+                      <span class='name_div'>
+                      Requirement 1
+                      <span class='tag'>
+                      <span data-toggle="modal" data-target="#myModal1">View Description</span>
+                      </span>
+                      </span></a>
+                      <span class='actions_div'>
+                      <a>
+                      <span class='edit'>
+                      <i class='fa fa-pencil'></i>
+                      </span>
+                      </a>
+                      <a>
+                      <span class='drop'>
+                      <i class='fa fa-angle-down'></i>
+                      </span>
+                      </a>
+                      </span>
+                    </div>
+                  </li>
+                </ul>
+                </div>
+              </div>
+              <!--/ requirement list -->
+              <!-- task  category each -->
+          {% for ticket_status in ticket_status_list %}
+              <div class="task_category_wrap">
+              	<div class="title" style="background:{{ticket_status.color}};">
+              	{{ticket_status.name}} 
+              	</div>
+                <div class="scroll">
+              	<ul class='connectedSortable' id='{{ticket_status.slug}}'>
+              {% for task in  ticket_status|Task_list:ticket_status.project %}
+              		<li id="{{task.id}}">
+              			<span class="task_wrap">
+              			<span class='heading'>
+              				 {{ task.name }}
+              			</span>
+              			<span class='desc'>
+                       {{ task.description }}
+              			</span>
+              			<span class='count'>
+              			{{task|count_comments}}
+              			</span>
+              			</span>
+              		</li>
+              {% endfor %}
+              	</ul>
+                </div>
+              </div>
+          {%endfor%}
+              <!--/ task category each -->
+            </div>
+          </div>
+          <!--/ lists div -->
+          <div class="clearfix"></div>
+        </div>
+        <!--/ about project -->
+      </div>
+      <!-- edit role add modal starts here -->
+      <div class="modal fade" id="myModal1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title" id="myModalLabel">Requirement 1</h4>
+            </div>
+            <div class="modal-body">
+              Monotonectally syndicate premium users without client-centric intellectual capital. Quickly benchmark integrated manufactured products rather.
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-primary" data-dismiss="modal">Ok</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- edit role add modal ends here -->
+    </section>
+{% endblock %}
+{% block extra_js_links%}
+    <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+{% endblock %}
+{% block extra_js %}
+    <script type="text/javascript">
+      $(function() {
+      $("#sdate, #edate").datepicker();
+        $('.select2').select2();
+      });
+    </script>
+    <!-- horizontal scroll -->
+    <script type="text/javascript">
+    $('.hscroll').css('min-width',($('.task_category_wrap').length+1)*270+'px');
+    </script>
+    <!--/ horizontal scroll -->
+    <!-- pick and drop -->
+    <script>
+      $(function() {
+        $( "#sort1, #sort2, #sort3, #sort4, #sort5, #sort6, #sort7, #sort8" ).sortable({
+          connectWith: ".connectedSortable"
+        }).disableSelection();
+      });
+    </script>
+    <!-- update -->
+    <script type="text/javascript">
+      $(function() {
+          $( ".connectedSortable" ).sortable({
+            connectWith: ".connectedSortable",
+            receive: function( event, ui ) {
+                var status = this.id;
+                var task = ui.item.attr('id')
+                $.get('/project/{{slug}}/update_taskboard/'+status+'/'+task+'/');
+            }  
+          }).disableSelection();
+        });
+    </script>
+{% endblock%}
