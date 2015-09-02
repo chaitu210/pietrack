@@ -10,8 +10,8 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.contrib.auth.tokens import default_token_generator
 from django.core.urlresolvers import reverse
-from piebase.models import User, Project, Organization, Role
-from forms import CreateProjectForm, CreateMemberForm, PasswordResetForm
+from piebase.models import User, Project, Organization, Role, Milestone
+from forms import CreateProjectForm, CreateMemberForm, PasswordResetForm, MilestoneForm
 from .tasks import send_mail_old_user
 
 
@@ -320,8 +320,31 @@ def taskboard(request,slug):
     return render(request,'project/taskboard.html',{'ticket_status_list':ticket_status_list,'slug':slug})
 
 def update_taskboard(request,slug,status_slug,task_id):
+    
     task = Ticket.objects.get(id=task_id)
     ticket_status = TicketStatus.objects.get(slug=status_slug,project=Project.objects.get(slug=slug))
     task.status = ticket_status
     task.save()
     return HttpResponse("")
+
+@login_required
+def milestone_create(request, slug):
+    if request.method == 'POST':
+        milestone_form = MilestoneForm(request.POST)
+        json_data = {}
+        if milestone_form.is_valid():
+            project_obj = Project.objects.get(slug = slug)
+            name = request.POST.get('name')
+            # modified date is duplicate, should be changed
+            Milestone.objects.create(name = name, slug = name, project = project_obj, estimated_start = request.POST.get('estimated_start'), 
+                    modified_date = request.POST.get('estimated_finish'), estimated_finish = request.POST.get('estimated_finish'), status = request.POST.get('status'))
+            json_data['error'] = False
+            return HttpResponse(json.dumps(json_data), content_type = 'application/json')
+        else:
+            json_data['error'] = True
+            json_data['form_errors'] = milestone_form.errors
+            return HttpResponse(json.dumps(json_data), content_type = 'application/json')
+    else:
+        return render(request, 'project/milestone.html')
+
+

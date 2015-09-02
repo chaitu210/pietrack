@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% block content %}    
+<section id='base_content' class='create_project'>
+      <div class="content_box">
+        <div class="title">
+          <h4>Add new milestone</h4>
+          <div class="tag">Compellingly reintermediate premier materials for client-centered markets.for client-centered markets.</div>
+        </div>
+        <form id = 'milestone_form'>
+          <div class="panel_box">
+            <div class="form_group">
+              <label>Title</label>
+              <input id = 'milestone_name' name = 'name' type="text" class='input'>
+              <span id = 'milestone_name_error'></span>
+            </div>
+            <div class="form_group">
+              <label>Start Date</label>
+              <input id = 'milestone_estimated_start' name = 'estimated_start' type="text"  class='input'>
+              <span id = 'milestone_estimated_start_error'></span>
+            </div>
+            <div class="form_group">
+              <label>Finished Date</label>
+              <input id = 'milestone_estimated_finish' name = 'estimated_finish' type="text" class='input'>
+              <span id = 'milestone_estimated_finish_error'></span>
+            </div>
+            <div class="form_group">
+              <label>Status</label>
+              <select id = 'milestone_status' name = 'status' class='input'>
+                  <option value = 'planned'>planned</option>
+                  <option value = 'started'>started</option>
+                  <option value = 'finished'>finished</option>
+              </select>
+            </div>
+            <button id = 'milestone_save'>Save</button>
+          </div>
+          {% csrf_token %}
+        </form>
+      </div>
+    </section>
+    {% endblock %}
+    {% block extra_js_links %}
+    <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+    {% endblock %}
+    {% block extra_js %}
+    <script>
+        $(function() {
+                $( "#milestone_start_date, #milestone_finished_date" ).datepicker();
+        });
+        
+        $('#milestone_save').click(function(event){
+            event.preventDefault()
+            $.post('', $('#milestone_form').serialize(), function(data){
+                if(data['error'] === true){
+                    $('span.span_error').remove()
+                    for(var key in data.form_errors){
+                        $('#milestone_' + key + '_error').after("<span class = 'span_error'>" + data.form_errors[key] + "</span>")
+                    }
+                }
+                else{
+                    alert('mile-stoned')
+                }
+            });
+        });
+        function display_datepicker(){
+            $("#milestone_estimated_start, #milestone_estimated_finish").datepicker({
+                changeMonth: true,
+                changeYear: true,
+                dateFormat: 'yy-mm-dd',
+                minDate: new Date(),
+            });
+        };
+        display_datepicker()
+    </script>
+    {% endblock %}
