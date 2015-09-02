@@ -37,4 +37,6 @@ urlpatterns = [
     url(r'^(?P<slug>[-\w]+)/settings/member_role/(?P<member_role_slug>([a-zA-Z0-9-]+))/edit/$', member_role_edit, name='member_role_edit'),
     url(r'^(?P<slug>[-\w]+)/settings/member_role/(?P<member_role_slug>([a-zA-Z0-9-]+))/delete/$', member_role_delete, name='member_role_delete'),
 
+    url(r'^(?P<slug>[-\w]+)/taskboard/$', taskboard, name="taskboard"),
+    url(r'^(?P<slug>[-\w]+)/update_taskboard/(?P<status_slug>([a-zA-Z0-9-]+))/(?P<task_id>[0-9]+)/$', update_taskboard,name="update_taskboard")
 ]
