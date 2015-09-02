@@ -102,6 +102,7 @@ class Project(models.Model):
     members = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="projects")
     logo = models.FileField(upload_to=url, blank=True, null=True)
     organization = models.ForeignKey(Organization)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, null = True, blank = True)
 
     def __str__(self):
         return self.name
@@ -142,6 +143,8 @@ class Milestone(models.Model):
     created_date = models.DateTimeField(verbose_name=_("created date"), auto_now_add=True)
     modified_date = models.DateTimeField(verbose_name=_("modified date"))
     status = models.CharField(max_length=200, choices=MILESTONE_STATUS, default="planned")
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, blank = True, null = True)
+
 
     class Meta:
         ordering = ["created_date"]

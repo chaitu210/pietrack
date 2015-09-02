@@ -9,7 +9,7 @@ from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.utils.translation import ugettext, ugettext_lazy as _
 from .tasks import celery_send_mail
-from piebase.models import Project, Priority, Severity, Organization, User, TicketStatus, Role, Milestone
+from piebase.models import Project, Priority, Severity, Organization, User, TicketStatus, Role, Milestone, Requirement
 from django.template.defaultfilters import slugify
 
 
@@ -236,6 +236,24 @@ class RoleForm(forms.ModelForm):
         return instance
 
 class MilestoneForm(forms.ModelForm):
+    def __init__(self, user, *args, **kwargs):
+        self.user = user
+        super(MilestoneForm, self).__init__(*args, **kwargs)
+
+
     class Meta:
         model = Milestone
-        fields = ['name', 'estimated_start', 'estimated_finish', 'status']
+        fields = ['name', 'estimated_start', 'estimated_finish', 'status', 'project']
+
+    
+    def save(self):
+        milestone = super(MilestoneForm, self).save(commit=False)
+        milestone.slug = self.cleaned_data.get('name')
+        milestone.modified_date = self.cleaned_data.get('estimated_finish')
+        milestone.created_by = self.user
+        milestone.save()
+
+class RequirementForm(forms.ModelForm):
+    class Meta:
+        model = Requirement 
+        fields = ['name', 'milestone', 'description']
