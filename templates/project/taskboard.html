@@ -140,6 +140,7 @@
     <!-- pick and drop -->
     <script>
       $(function() {
+
         $( "#sort1, #sort2, #sort3, #sort4, #sort5, #sort6, #sort7, #sort8" ).sortable({
           connectWith: ".connectedSortable"
         }).disableSelection();
@@ -162,12 +163,11 @@
         $('.scroll').on('scroll',function() {
           
             if($(this).scrollTop() + $(this).innerHeight() >= this.scrollHeight-2) {
-                page = $('#page_num').val();
+                page = $(this).find('input[name="page_num"]').val();
                 var status_slug = $(this).children("ul").attr("id")
                 var count = $(this).find('li').length
-                
                 if(page){
-                  $('#page_num').remove();
+                  $(this).find('input[name="page_num"]').remove();
                   $.get("/project/{{slug}}/{{milestone.name}}/"+status_slug+"/load_tasks/",{"page":page},function(response){
                         $('ul#'+status_slug).append(response)
                   });
@@ -181,7 +181,7 @@
         var req_id = $(this).attr('id');
         // $('.connectedSortable').empty();
         $.get("/project/{{slug}}/{{milestone.name}}/"+req_id+"/",function(response){
-          $('.lists_div.task_category_wrap').html(response)  
+          //$('.lists_div.task_category_wrap').html(response)  
         });
       });
     </script>
