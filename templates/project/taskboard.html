@@ -7,7 +7,7 @@
         <!-- about project -->
         <div class="about_project_wrap">
           <div class="title">
-            <span>Milestone 1</span>
+            <span>{{milestone.name}}</span>
           </div>
           <!-- filters -->
           <div class="filters_wrap">
@@ -50,13 +50,14 @@
                 </div>
                 <div class="scroll">
                 <ul>
+                {%for requirement in milestone.project.requirements.all %}
                   <li>
                     <div class='ticket_wrap'>
                       <a class='name_div_wrap'>
-                      <span class='name_div'>
-                      Requirement 1
+                      <span class='name_div' id="{{requirement.id}}">
+                        {{requirement.name}}
                       <span class='tag'>
-                      <span  data-toggle="modal" data-target="#myModal1">View Description</span></span>
+                      <span  data-toggle="modal" data-target="#myModal{{requirement.id}}">View Description</span></span>
                       </span></a>
                       <span class='actions_div'>
                       <a>
@@ -72,97 +73,7 @@
                       </span>
                     </div>
                   </li>
-                  <li>
-                    <div class='ticket_wrap'>
-                      <a class='name_div_wrap'>
-                      <span class='name_div'>
-                      Requirement 1
-                      <span class='tag'>
-                      <span data-toggle="modal" data-target="#myModal1">View Description</span></span>
-                      </span></a>
-                      <span class='actions_div'>
-                      <a>
-                      <span class='edit'>
-                      <i class='fa fa-pencil'></i>
-                      </span>
-                      </a>
-                      <a>
-                      <span class='drop'>
-                      <i class='fa fa-angle-down'></i>
-                      </span>
-                      </a>
-                      </span>
-                    </div>
-                  </li>
-                  <li>
-                    <div class='ticket_wrap'>
-                      <a class='name_div_wrap'>
-                      <span class='name_div'>
-                      Requirement 1
-                      <span class='tag'>
-                      <span data-toggle="modal" data-target="#myModal1">View Description</span>
-                      </span>
-                      </span></a>
-                      <span class='actions_div'>
-                      <a>
-                      <span class='edit'>
-                      <i class='fa fa-pencil'></i>
-                      </span>
-                      </a>
-                      <a>
-                      <span class='drop'>
-                      <i class='fa fa-angle-down'></i>
-                      </span>
-                      </a>
-                      </span>
-                    </div>
-                  </li>
-                  <li>
-                    <div class='ticket_wrap'>
-                      <a class='name_div_wrap'>
-                      <span class='name_div'>
-                      Requirement 1
-                      <span  class='tag'>
-                      <span data-toggle="modal" data-target="#myModal1">View Description</span>
-                      </span>
-                      </span></a>
-                      <span class='actions_div'>
-                      <a>
-                      <span class='edit'>
-                      <i class='fa fa-pencil'></i>
-                      </span>
-                      </a>
-                      <a>
-                      <span class='drop'>
-                      <i class='fa fa-angle-down'></i>
-                      </span>
-                      </a>
-                      </span>
-                    </div>
-                  </li>
-                  <li>
-                    <div class='ticket_wrap'>
-                      <a class='name_div_wrap'>
-                      <span class='name_div'>
-                      Requirement 1
-                      <span class='tag'>
-                      <span data-toggle="modal" data-target="#myModal1">View Description</span>
-                      </span>
-                      </span></a>
-                      <span class='actions_div'>
-                      <a>
-                      <span class='edit'>
-                      <i class='fa fa-pencil'></i>
-                      </span>
-                      </a>
-                      <a>
-                      <span class='drop'>
-                      <i class='fa fa-angle-down'></i>
-                      </span>
-                      </a>
-                      </span>
-                    </div>
-                  </li>
+                {% endfor %}
                 </ul>
                 </div>
               </div>
@@ -175,25 +86,11 @@
               	</div>
                 <div class="scroll">
               	<ul class='connectedSortable' id='{{ticket_status.slug}}'>
-              {% for task in  ticket_status|Task_list:ticket_status.project %}
-              		<li id="{{task.id}}">
-              			<span class="task_wrap">
-              			<span class='heading'>
-              				 {{ task.name }}
-              			</span>
-              			<span class='desc'>
-                       {{ task.description }}
-              			</span>
-              			<span class='count'>
-              			{{task|count_comments}}
-              			</span>
-              			</span>
-              		</li>
-              {% endfor %}
+                    {% include "project/partials/task.html" with tasks=ticket_status|Task_list:milestone %}
               	</ul>
                 </div>
               </div>
-          {%endfor%}
+          {% endfor %}
               <!--/ task category each -->
             </div>
           </div>
@@ -203,15 +100,16 @@
         <!--/ about project -->
       </div>
       <!-- edit role add modal starts here -->
-      <div class="modal fade" id="myModal1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    {%for requirement in milestone.project.requirements.all %}
+      <div class="modal fade" id="myModal{{requirement.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
         <div class="modal-dialog" role="document">
           <div class="modal-content">
             <div class="modal-header">
               <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-              <h4 class="modal-title" id="myModalLabel">Requirement 1</h4>
+              <h4 class="modal-title" id="myModalLabel">{{requirement.name}}</h4>
             </div>
             <div class="modal-body">
-              Monotonectally syndicate premium users without client-centric intellectual capital. Quickly benchmark integrated manufactured products rather.
+              {{ requirement.description }}
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-primary" data-dismiss="modal">Ok</button>
@@ -219,7 +117,9 @@
           </div>
         </div>
       </div>
+    {% endfor %}
       <!-- edit role add modal ends here -->
+
     </section>
 {% endblock %}
 {% block extra_js_links%}
@@ -257,5 +157,32 @@
             }  
           }).disableSelection();
         });
+
+      jQuery(function($) {
+        $('.scroll').on('scroll',function() {
+          
+            if($(this).scrollTop() + $(this).innerHeight() >= this.scrollHeight-2) {
+                page = $('#page_num').val();
+                var status_slug = $(this).children("ul").attr("id")
+                var count = $(this).find('li').length
+                
+                if(page){
+                  $('#page_num').remove();
+                  $.get("/project/{{slug}}/{{milestone.name}}/"+status_slug+"/load_tasks/",{"page":page},function(response){
+                        $('ul#'+status_slug).append(response)
+                  });
+                }
+
+            }
+        })
+      });
+
+      $('.name_div').on('click',function(){
+        var req_id = $(this).attr('id');
+        // $('.connectedSortable').empty();
+        $.get("/project/{{slug}}/{{milestone.name}}/"+req_id+"/",function(response){
+          $('.lists_div.task_category_wrap').html(response)  
+        });
+      });
     </script>
 {% endblock%}

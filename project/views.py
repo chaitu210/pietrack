@@ -1,5 +1,5 @@
-from django.shortcuts import render, redirect
-from piebase.models import Project, Priority, Severity, TicketStatus, Ticket
+from django.shortcuts import render, redirect,render_to_response
+from piebase.models import Project, Priority, Severity, TicketStatus, Ticket, Comment,Requirement
 from forms import CreateProjectForm, PriorityForm, SeverityForm, TicketStatusForm, RoleForm
 import json
 import random
@@ -7,12 +7,17 @@ import string
 from django.utils import timezone
 from django.template.defaultfilters import slugify
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse
 from django.contrib.auth.tokens import default_token_generator
 from django.core.urlresolvers import reverse
 from piebase.models import User, Project, Organization, Role, Milestone, Requirement
 from forms import CreateProjectForm, CreateMemberForm, PasswordResetForm, MilestoneForm, RequirementForm
 from .tasks import send_mail_old_user
+from django.core import serializers
+
+from django.core.paginator import Paginator,PageNotAnInteger,EmptyPage
+
+
 
 
 @login_required
@@ -44,10 +49,9 @@ def list_of_projects(request):
 @login_required
 def project_detail(request, slug):
     template_name = 'project/project_description.html'
-    project_object = Project.objects.filter(slug=slug)
-    project_members = project_object[0].members.all()
-    dict_items = {'project_object': project_object[
-        0], 'project_members': project_members}
+    project_object = Project.objects.get(slug=slug)
+    project_members = project_object.members.all()
+    dict_items = {'project_object': project_object, 'project_members': project_members}
     return render(request, template_name, dict_items)
 
 
@@ -314,18 +318,46 @@ def member_role_delete(request, slug, member_role_slug):
     Role.objects.get(slug=member_role_slug, project=project).delete()
     return HttpResponse(json.dumps({'error': False}), content_type="application/json")
 
-def taskboard(request,slug):
-
-    ticket_status_list = TicketStatus.objects.filter(project=Project.objects.get(slug=slug))
-    return render(request,'project/taskboard.html',{'ticket_status_list':ticket_status_list,'slug':slug})
+def taskboard(request,slug,milestone_name):
+    project = Project.objects.get(slug=slug)
+    milestone = Milestone.objects.get(name=milestone_name,project=project)
+    ticket_status_list = TicketStatus.objects.filter(project=project)
+    return render(request,'project/taskboard.html',{'ticket_status_list':ticket_status_list,'slug':slug,'milestone':milestone})
 
 def update_taskboard(request,slug,status_slug,task_id):
-    
     task = Ticket.objects.get(id=task_id)
     ticket_status = TicketStatus.objects.get(slug=status_slug,project=Project.objects.get(slug=slug))
     task.status = ticket_status
     task.save()
     return HttpResponse("")
+
+def load_tasks(request,slug,milestone_name,status_name):
+    project = Project.objects.get(slug=slug)
+    status = TicketStatus.objects.get(name=status_name,project=project)
+    milestone = Milestone.objects.get(name=milestone_name,project=project)
+    tasks = Ticket.objects.filter(status=status,milestone=milestone) 
+
+    paginator = Paginator(tasks, 10)
+    page = request.GET.get('page')
+    try:
+        tasks = paginator.page(page)
+    except PageNotAnInteger:
+        pass
+    except EmptyPage:
+        pass
+    return render_to_response('project/partials/task.html',{'tasks':tasks})
+
+   
+def task_comment_count(request,slug,ticket_id):
+    count = Comment.objects.filter(ticket__id=ticket_id).count()
+    return HttpResponse(json.dumps({'count':count}),content_type="application/json")
+
+def requirement_tasks(request,slug,milestone_name,requirement_id):
+    project = Project.objects.get(slug=slug)
+    milestone = Milestone.objects.get(name=milestone_name,project=project)
+    ticket_status_list = TicketStatus.objects.filter(project=project)
+    return render(request,'project/partials/requirement_tasks.html',{'ticket_status_list':ticket_status_list,'slug':slug,'milestone':milestone})
+
 
 @login_required
 def milestone_create(request, slug):
