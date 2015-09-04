@@ -10,22 +10,22 @@
           <div class="panel_box">
             <div class="form_group">
               <label>Title</label>
-              <input id = 'milestone_name' name = 'name' type="text" class='input'>
+              <input id = 'milestone_name' name = 'name' value = '{{ milestone_obj.name }}' type="text" class='input'>
               <span id = 'milestone_name_error'></span>
             </div>
             <div class="form_group">
               <label>Start Date</label>
-              <input id = 'milestone_estimated_start' name = 'estimated_start' type="text"  class='input'>
+              <input id = 'milestone_estimated_start' name = 'estimated_start' value = '{{ milestone_obj.estimated_start|date:"Y-m-d"}}' type="text"  class='input'>
               <span id = 'milestone_estimated_start_error'></span>
             </div>
             <div class="form_group">
               <label>Finished Date</label>
-              <input id = 'milestone_estimated_finish' name = 'estimated_finish' type="text" class='input'>
+              <input id = 'milestone_estimated_finish' name = 'estimated_finish' value = '{{ milestone_obj.estimated_finish|date:"Y-m-d" }}'type="text" class='input'>
               <span id = 'milestone_estimated_finish_error'></span>
             </div>
             <div class="form_group">
               <label>Status</label>
-              <select id = 'milestone_status' name = 'status' class='input'>
+              <select id = 'milestone_status' name = 'status' value = '{{ milestone_obj.status }}' class='input'>
                   <option value = 'planned'>planned</option>
                   <option value = 'started'>started</option>
                   <option value = 'finished'>finished</option>

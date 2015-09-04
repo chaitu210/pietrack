@@ -7,11 +7,11 @@ import string
 from django.utils import timezone
 from django.template.defaultfilters import slugify
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.tokens import default_token_generator
 from django.core.urlresolvers import reverse
-from piebase.models import User, Project, Organization, Role, Milestone
-from forms import CreateProjectForm, CreateMemberForm, PasswordResetForm, MilestoneForm
+from piebase.models import User, Project, Organization, Role, Milestone, Requirement
+from forms import CreateProjectForm, CreateMemberForm, PasswordResetForm, MilestoneForm, RequirementForm
 from .tasks import send_mail_old_user
 from django.core import serializers
 
@@ -372,14 +372,13 @@ def status_slug(request,slug,status_id):
 @login_required
 def milestone_create(request, slug):
     if request.method == 'POST':
-        milestone_form = MilestoneForm(request.POST)
         json_data = {}
+        milestone_dict = request.POST.copy()
+        project_id = Project.objects.get(slug = slug).id
+        milestone_dict['project'] = project_id
+        milestone_form = MilestoneForm(request.user, milestone_dict)
         if milestone_form.is_valid():
-            project_obj = Project.objects.get(slug = slug)
-            name = request.POST.get('name')
-            # modified date is duplicate, should be changed
-            Milestone.objects.create(name = name, slug = name, project = project_obj, estimated_start = request.POST.get('estimated_start'), 
-                    modified_date = request.POST.get('estimated_finish'), estimated_finish = request.POST.get('estimated_finish'), status = request.POST.get('status'))
+            milestone_form.save()
             json_data['error'] = False
             return HttpResponse(json.dumps(json_data), content_type = 'application/json')
         else:
@@ -390,3 +389,59 @@ def milestone_create(request, slug):
         return render(request, 'project/milestone.html')
 
 
+@login_required
+def milestone_edit(request, slug):
+    milestone_obj = Milestone.objects.get(slug = slug)
+    if request.method == 'POST':
+        json_data = {}
+        milestone_dict = request.POST.copy()
+        project_id = milestone_obj.project.id
+        milestone_dict['project'] = project_id
+        milestone_form = MilestoneForm(request.user, milestone_dict, instance = milestone_obj)
+        if milestone_form.is_valid():
+            milestone_form.save()
+            json_data['error'] = False
+            return HttpResponse(json.dumps(json_data), content_type = 'application/json')
+        else:
+            json_data['error'] = True
+            json_data['form_errors'] = milestone_form.errors
+            return HttpResponse(json.dumps(json_data), content_type = 'application/json')
+    else:
+        return render(request, 'project/milestone.html', {'milestone_obj': milestone_obj})
+
+
+@login_required
+def milestone_delete(request, slug):
+    Milestone.objects.get(slug = slug).delete()
+    return HttpResponse(json.dumps({'error': False}))
+
+
+@login_required
+def project_edit(request, slug):
+    milestone_list = Milestone.objects.all()
+    project_obj = Project.objects.get(slug = slug)
+    member_dict = {}
+    for member_iter in project_obj.members.all():
+        member_dict[member_iter.email] = [role.name for role in member_iter.user_roles.all()]
+    return render(request, 'project/project_edit.html', {'milestone_list': milestone_list, 'member_dict': member_dict, 'project_slug': slug})
+
+
+@login_required
+def requirement_create(request, slug):
+    project_obj = Project.objects.get(slug=slug)
+    if request.POST:
+        json_data = {}
+        requirement_form = RequirementForm(request.POST)
+        if requirement_form.is_valid():
+            name = request.POST.get('name')
+            milestone_obj = Milestone.objects.get(id=request.POST.get('milestone'))
+            Requirement.objects.create(name=name, slug=name, description=request.POST.get('description'), project=project_obj, milestone=milestone_obj)
+            json_data['error'] = False
+            return HttpResponse(json.dumps(json_data), content_type='application/json')
+        else:
+            json_data['error'] = True
+            json_data['form_errors'] = requirement_form.errors
+            return HttpResponse(json.dumps(json_data), content_type='application/json')
+    else:
+        milestone = project_obj.milestones.all()
+        return render(request, 'project/requirement.html', {'milestone': milestone})
