@@ -86,7 +86,6 @@
               	</div>
                 <div class="scroll">
               	<ul class='connectedSortable' id='{{ticket_status.slug}}'>
-                    {{ticket_status|Task_list:milestone}}
                     {% include "project/partials/task.html" with tasks=ticket_status|Task_list:milestone %}
               	</ul>
                 </div>
@@ -161,46 +160,18 @@
 
       jQuery(function($) {
         $('.scroll').on('scroll',function() {
-            
-            if($(this).scrollTop() + $(this).innerHeight() >= this.scrollHeight-1) {
+          
+            if($(this).scrollTop() + $(this).innerHeight() >= this.scrollHeight-2) {
+                page = $('#page_num').val();
                 var status_slug = $(this).children("ul").attr("id")
                 var count = $(this).find('li').length
-                console.log($(this).find('li').length)
-                console.log($(this).children("ul").attr("id"))
-                console.log("reached endblock")
-                $.get("/project/{{slug}}/{{milestone.name}}/"+status_slug+"/load_tasks/?count="+count,function(response){
-
-                  $('ul#'+status_slug).append(response)
-
-
-
-
-
-                  // console.log(response['more'])
-                  // if(response['more']){
-                  //       console.log("please load tasks");
-                  //       // console.log(response['data']);
-                  //        var task_liist = JSON.parse(response['data']);
-                  //        $.each(task_liist, function(index, value) {
-                  //             var clone = $('#'+status_slug+' li:last-child').clone()
-                  //             var comment_id = value.pk;
-                  //             clone.find('.heading').text(value.fields.name)
-                  //             clone.find('.desc').text(value.fields.description)
-                  //             clone.attr('id',value.pk)
-                  //             // console.log(clone)
-
-                  //             $.get("/project/{{slug}}/{{milestone.name}}/"+comment_id+"/",function(response){
-                  //               clone.find('.count').text(response['count']);
-                  //             });
-
-                  //             $("#"+status_slug).append(clone);
-                  //         });
-                  // }else{
-
-                  //       console.log("there are no tasks to load")
-                  // }
-
-                });
+                
+                if(page){
+                  $('#page_num').remove();
+                  $.get("/project/{{slug}}/{{milestone.name}}/"+status_slug+"/load_tasks/",{"page":page},function(response){
+                        $('ul#'+status_slug).append(response)
+                  });
+                }
 
             }
         })
@@ -208,13 +179,10 @@
 
       $('.name_div').on('click',function(){
         var req_id = $(this).attr('id');
-        console.log(req_id);
         // $('.connectedSortable').empty();
         $.get("/project/{{slug}}/{{milestone.name}}/"+req_id+"/",function(response){
           $('.lists_div.task_category_wrap').html(response)  
-          console.log(response)       
         });
-
       });
     </script>
 {% endblock%}

@@ -14,3 +14,7 @@
   </span>
 </li>                                    
 {% endfor %}
+
+{% if tasks.has_next %}
+<input type="hidden" id="page_num" value="{{tasks.next_page_number}}">
+{% endif %}

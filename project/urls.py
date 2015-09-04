@@ -44,7 +44,6 @@ urlpatterns = [
     url(r'^(?P<slug>[-\w]+)/(?P<milestone_name>[-\w]+)/(?P<status_name>[-\w]+)/load_tasks/$', load_tasks, name="load_tasks"),
     url(r'^(?P<slug>[-\w]+)/(?P<ticket_id>[0-9]+)/$',task_comment_count, name="task_comment_count"),
     url(r'^(?P<slug>[-\w]+)/(?P<milestone_name>[-\w]+)/(?P<requirement_id>[0-9]+)/$',requirement_tasks, name="requirement_tasks"),
-    url(r'^(?P<slug>[-\w]+)/(?P<status_id>[0-9]+)/$',status_slug, name="status_slug"),
 
 
     #milestone

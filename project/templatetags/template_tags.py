@@ -6,8 +6,8 @@ register = template.Library()
 @register.filter
 def Task_list(status,milestone):
 	tasks = Ticket.objects.filter(status=status,milestone=milestone)
-	# p = Paginator(tasks,10)
-	return tasks#p.page(1).object_list
+	p = Paginator(tasks,10)
+	return p.page(1)
 
 @register.filter
 def count_comments(ticket):
