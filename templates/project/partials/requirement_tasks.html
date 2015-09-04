@@ -1,0 +1,14 @@
+{% load template_tags %}
+
+{% for ticket_status in ticket_status_list %}
+    <div class="task_category_wrap">
+    	<div class="title" style="background:{{ticket_status.color}};">
+    	{{ticket_status.name}} 
+    	</div>
+      <div class="scroll">
+    	<ul class='connectedSortable' id='{{ticket_status.slug}}'>
+          {% include "project/partials/task.html" with tasks=ticket_status|Task_list:milestone %}
+    	</ul>
+      </div>
+    </div>
+{% endfor %}

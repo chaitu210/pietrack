@@ -38,8 +38,13 @@ urlpatterns = [
     url(r'^(?P<slug>[-\w]+)/settings/member_role/(?P<member_role_slug>([a-zA-Z0-9-]+))/delete/$', member_role_delete, name='member_role_delete'),
 
     # taskboard
-    url(r'^(?P<slug>[-\w]+)/taskboard/$', taskboard, name="taskboard"),
+    url(r'^(?P<slug>[-\w]+)/(?P<milestone_name>[-\w]+)/taskboard/$', taskboard, name="taskboard"),
     url(r'^(?P<slug>[-\w]+)/update_taskboard/(?P<status_slug>([a-zA-Z0-9-]+))/(?P<task_id>[0-9]+)/$', update_taskboard,name="update_taskboard"),
+    url(r'^(?P<slug>[-\w]+)/(?P<milestone_name>[-\w]+)/(?P<status_name>[-\w]+)/load_tasks/$', load_tasks, name="load_tasks"),
+    url(r'^(?P<slug>[-\w]+)/(?P<ticket_id>[0-9]+)/$',task_comment_count, name="task_comment_count"),
+    url(r'^(?P<slug>[-\w]+)/(?P<milestone_name>[-\w]+)/(?P<requirement_id>[0-9]+)/$',requirement_tasks, name="requirement_tasks"),
+    url(r'^(?P<slug>[-\w]+)/(?P<status_id>[0-9]+)/$',status_slug, name="status_slug"),
+
 
     #milestone
     url(r'^(?P<slug>[a-zA-Z0-9-]+)/milestone/create/$',milestone_create, name='milestone_create'),
