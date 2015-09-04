@@ -362,14 +362,13 @@ def requirement_tasks(request,slug,milestone_name,requirement_id):
 @login_required
 def milestone_create(request, slug):
     if request.method == 'POST':
-        milestone_form = MilestoneForm(request.POST)
         json_data = {}
+        milestone_dict = request.POST.copy()
+        project_id = Project.objects.get(slug = slug).id
+        milestone_dict['project'] = project_id
+        milestone_form = MilestoneForm(request.user, milestone_dict)
         if milestone_form.is_valid():
-            project_obj = Project.objects.get(slug = slug)
-            name = request.POST.get('name')
-            # modified date is duplicate, should be changed
-            Milestone.objects.create(name = name, slug = name, project = project_obj, estimated_start = request.POST.get('estimated_start'), 
-                    modified_date = request.POST.get('estimated_finish'), estimated_finish = request.POST.get('estimated_finish'), status = request.POST.get('status'))
+            milestone_form.save()
             json_data['error'] = False
             return HttpResponse(json.dumps(json_data), content_type = 'application/json')
         else:
@@ -378,6 +377,7 @@ def milestone_create(request, slug):
             return HttpResponse(json.dumps(json_data), content_type = 'application/json')
     else:
         return render(request, 'project/milestone.html')
+
 
 @login_required
 def milestone_edit(request, slug):
