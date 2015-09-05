@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect,render_to_response
-from piebase.models import Project, Priority, Severity, TicketStatus, Ticket, Comment,Requirement
+from piebase.models import Project, Priority, Severity, TicketStatus, Ticket, Requirement
 from forms import CreateProjectForm, PriorityForm, SeverityForm, TicketStatusForm, RoleForm
 import json
 import random
@@ -324,16 +324,16 @@ def taskboard(request,slug,milestone_name):
     ticket_status_list = TicketStatus.objects.filter(project=project)
     return render(request,'project/taskboard.html',{'ticket_status_list':ticket_status_list,'slug':slug,'milestone':milestone})
 
-def update_taskboard(request,slug,status_slug,task_id):
+def update_taskboard_status(request,slug,status_slug,task_id):
     task = Ticket.objects.get(id=task_id)
     ticket_status = TicketStatus.objects.get(slug=status_slug,project=Project.objects.get(slug=slug))
     task.status = ticket_status
     task.save()
     return HttpResponse("")
 
-def load_tasks(request,slug,milestone_name,status_name):
+def load_tasks(request,slug,milestone_name,status_slug):
     project = Project.objects.get(slug=slug)
-    status = TicketStatus.objects.get(name=status_name,project=project)
+    status = TicketStatus.objects.get(name=status_slug,project=project)
     milestone = Milestone.objects.get(name=milestone_name,project=project)
     tasks = Ticket.objects.filter(status=status,milestone=milestone) 
 
@@ -347,17 +347,25 @@ def load_tasks(request,slug,milestone_name,status_name):
         pass
     return render_to_response('project/partials/task.html',{'tasks':tasks})
 
-   
-def task_comment_count(request,slug,ticket_id):
-    count = Comment.objects.filter(ticket__id=ticket_id).count()
-    return HttpResponse(json.dumps({'count':count}),content_type="application/json")
 
 def requirement_tasks(request,slug,milestone_name,requirement_id):
     project = Project.objects.get(slug=slug)
     milestone = Milestone.objects.get(name=milestone_name,project=project)
     ticket_status_list = TicketStatus.objects.filter(project=project)
-    return render(request,'project/partials/requirement_tasks.html',{'ticket_status_list':ticket_status_list,'slug':slug,'milestone':milestone})
+    return render(request,'project/partials/requirement_tasks.html',{'ticket_status_list':ticket_status_list,'slug':slug,'requirement_id':requirement_id})
 
+def requirement_tasks_more(request,status_slug,requirement_id):
+    requirement = Requirement.objects.get(id=requirement_id)
+    tasks = requirement.tasks.filter(status__slug=status_slug)
+    paginator = Paginator(tasks,10)
+    page = request.GET.get('page')
+    try:
+        tasks = paginator.page(page)
+    except PageNotAnInteger:
+        pass
+    except EmptyPage:
+        pass
+    return render_to_response('project/partials/task.html',{'tasks':tasks})
 
 @login_required
 def milestone_create(request, slug):
