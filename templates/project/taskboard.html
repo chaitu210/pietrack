@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load template_tags %}
+{% load project_tags %}
 {% load static %}
 {% block content %}
     <section id='base_content'>
@@ -41,7 +41,7 @@
           </div>
           <!--/ filters -->
           <!-- lists div -->
-          <div class="lists_div style-1">
+          <div class="lists_div style-1" id="tasks_container">
             <div class="hscroll">
               <!-- requirement list -->
               <div class="requirement_list_panel">
@@ -84,7 +84,7 @@
               	<div class="title" style="background:{{ticket_status.color}};">
               	{{ticket_status.name}} 
               	</div>
-                <div class="scroll">
+                <div class="scroll all">
               	<ul class='connectedSortable' id='{{ticket_status.slug}}'>
                     {% include "project/partials/task.html" with tasks=ticket_status|Task_list:milestone %}
               	</ul>
@@ -126,28 +126,45 @@
     <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 {% endblock %}
 {% block extra_js %}
+
+<script type="text/javascript">
+      $(function(){
+        $('.scroll').slimscroll({
+          alwaysVisible: false,
+          height: 350
+        });
+      });
+      $('.sub_list').mouseenter(function(event) {
+        $(this).closest('.parent_list').addClass('active_li_drop')
+      });
+      $('.sub_list').mouseleave(function(event) {
+        $(this).closest('.parent_list').removeClass('active_li_drop')
+      });
+    </script>
     <script type="text/javascript">
       $(function() {
       $("#sdate, #edate").datepicker();
         $('.select2').select2();
       });
-    </script>
+    </script> 
     <!-- horizontal scroll -->
     <script type="text/javascript">
     $('.hscroll').css('min-width',($('.task_category_wrap').length+1)*270+'px');
     </script>
     <!--/ horizontal scroll -->
-    <!-- pick and drop -->
-    <script>
-      $(function() {
 
-        $( "#sort1, #sort2, #sort3, #sort4, #sort5, #sort6, #sort7, #sort8" ).sortable({
-          connectWith: ".connectedSortable"
-        }).disableSelection();
-      });
-    </script>
-    <!-- update -->
+    <!-- update status -->
     <script type="text/javascript">
+    var drag_options = {
+            connectWith: ".connectedSortable",
+            
+            receive: function( event, ui ) {
+                var status = this.id;
+                var task = ui.item.attr('id')
+                $.get('/project/{{slug}}/update_taskboard/'+status+'/'+task+'/');
+            }  
+          }
+
       $(function() {
           $( ".connectedSortable" ).sortable({
             connectWith: ".connectedSortable",
@@ -159,13 +176,14 @@
           }).disableSelection();
         });
 
+      /* load tasks all */
       jQuery(function($) {
-        $('.scroll').on('scroll',function() {
+        $('.scroll.all').on('scroll',function() {
           
             if($(this).scrollTop() + $(this).innerHeight() >= this.scrollHeight-2) {
                 page = $(this).find('input[name="page_num"]').val();
                 var status_slug = $(this).children("ul").attr("id")
-                var count = $(this).find('li').length
+
                 if(page){
                   $(this).find('input[name="page_num"]').remove();
                   $.get("/project/{{slug}}/{{milestone.name}}/"+status_slug+"/load_tasks/",{"page":page},function(response){
@@ -176,13 +194,43 @@
             }
         })
       });
+      /* end load all tasks */
 
-      $('.name_div').on('click',function(){
+$(document).ready(function(){
+
+
+  $('.name_div').on('click',function(){
         var req_id = $(this).attr('id');
-        // $('.connectedSortable').empty();
         $.get("/project/{{slug}}/{{milestone.name}}/"+req_id+"/",function(response){
-          //$('.lists_div.task_category_wrap').html(response)  
+           $('.task_category_wrap').remove()
+           $('.requirement_list_panel').after(response) 
+           $('.scroll').slimscroll({
+              alwaysVisible: false,
+              height: 350
+            });
+            $('ul.connectedSortable').sortable(drag_options);
+
+          /* start requirement tasks update */
+          $('.requirement').on('scroll',function() {
+            if($(this).scrollTop() + $(this).innerHeight() >= this.scrollHeight-2) {
+                page = $(this).find('input[name="page_num"]').val();
+                var status_slug = $(this).children("ul").attr("id")
+                var requirement_id = $(this).attr('id')
+                if(page){
+                  $(this).find('input[name="page_num"]').remove();
+                  $.get("/project/"+status_slug+"/"+requirement_id+"/load_tasks/",{"page":page},function(response){
+                        $('ul#'+status_slug).append(response)
+                   });
+                }
+
+              }
+          })
+          /*end  requirement tasks update */          
         });
+           
       });
-    </script>
+
+});  
+</script>
+
 {% endblock%}
