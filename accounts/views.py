@@ -12,13 +12,26 @@ from accounts.forms import EditUserModelForm, RegisterForm, ChangePasswordForm
 from project.forms import PasswordResetForm
 from pietrack.settings import EMAIL_HOST_USER
 
+# for authentication and login required
+from django.contrib.auth.decorators import user_passes_test, login_required
+
+user_login_required = user_passes_test(lambda user: user.is_active, login_url='/')
+
+
+def active_user_required(view_func):
+    decorated_view_func = login_required(user_login_required(view_func), login_url='/')
+    return decorated_view_func
+
 
 # Create your views here.
 
 def index(request):
+    if request.user.id:
+        return HttpResponseRedirect(reverse('user:user_profile'))
     return render(request, 'login.html')
 
 
+@active_user_required
 def logout(request):
     auth.logout(request)
     return HttpResponseRedirect("/")
@@ -52,20 +65,22 @@ def register(request):
         username = request.POST.get('username')
         organization_name = request.POST.get('organization')
         if password == confirm_password:
-            if Organization.objects.filter(name = organization_name):
+            if Organization.objects.filter(name=organization_name):
                 pietrack_role = 'user'
-                organization_obj = Organization.objects.get(name = organization_name)
+                organization_obj = Organization.objects.get(name=organization_name)
             else:
                 pietrack_role = 'admin'
-                organization_obj = Organization.objects.create(name = organization_name, slug = organization_name)
+                organization_obj = Organization.objects.create(name=organization_name, slug=organization_name)
             json_data = {'error': False}
-            new_user = User.objects.create_user(username = username, email = email, password = password, first_name = first_name, organization = organization_obj, pietrack_role = pietrack_role)
+            new_user = User.objects.create_user(username=username, email=email, password=password,
+                                                first_name=first_name, organization=organization_obj,
+                                                pietrack_role=pietrack_role)
         else:
             json_data = {'error': True, 'error_password': 'password mismatch'}
-        return HttpResponse(json.dumps(json_data), content_type = 'application/json')
+        return HttpResponse(json.dumps(json_data), content_type='application/json')
     else:
         json_data = {'error': True, 'response': register_form.errors}
-        return HttpResponse(json.dumps(json_data), content_type = 'application/json')
+        return HttpResponse(json.dumps(json_data), content_type='application/json')
 
 
 def forgot_password(request):
@@ -80,7 +95,7 @@ def forgot_password(request):
                     opts = {
                         'use_https': request.is_secure(),
                         'from_email': EMAIL_HOST_USER,
-                        'email_template_name':'email/reset_email.html',
+                        'email_template_name': 'email/reset_email.html',
                         'subject_template_name': 'email/reset_subject.txt',
                         'request': request}
                     form.save(**opts)
@@ -90,8 +105,8 @@ def forgot_password(request):
         return HttpResponse(json.dumps(json_data), content_type='application/json')
 
 
+@active_user_required
 def change_password(request):
-
     if request.method == 'POST':
         user = request.user
         form = ChangePasswordForm(request.POST, request=request)
@@ -107,8 +122,8 @@ def change_password(request):
     return render(request, 'user/change_password.html')
 
 
+@active_user_required
 def user_profile(request):
-
     if request.method == 'POST':
         user = request.user
         form = EditUserModelForm(request.POST, request.FILES, instance=user)
@@ -118,7 +133,7 @@ def user_profile(request):
 
                 user.profile_pic = request.FILES['profile_pic']
                 try:
-                    os.remove(settings.MEDIA_ROOT+'profile/'+user.username+'/'+user.username+'.jpg')
+                    os.remove(settings.MEDIA_ROOT + 'profile/' + user.username + '/' + user.username + '.jpg')
                 except:
                     pass
 
@@ -131,5 +146,7 @@ def user_profile(request):
         return HttpResponse(json.dumps(response_data))
     return render(request, 'user/user_profile.html')
 
+
 def reset_confirm(request, uidb64=None, token=None):
-    return password_reset_confirm(request, template_name = 'email/reset_confirm.html', uidb64=uidb64, token=token, post_reset_redirect = reverse('user:login'))
+    return password_reset_confirm(request, template_name='email/reset_confirm.html', uidb64=uidb64, token=token,
+                                  post_reset_redirect=reverse('user:login'))
