@@ -1,7 +1,7 @@
 {% load project_tags %}
 
-
 {% for task in tasks %}
+<a href="{% url 'project:task_details' slug milestone.slug task.id %}">
 <li id="{{task.id}}">
   <span class="task_wrap">
   <span class='heading'>
@@ -15,6 +15,7 @@
   </span>
   </span>
 </li>                                    
+</a>
 {% endfor %}
 
 {% if tasks.has_next %}

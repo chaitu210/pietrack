@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect,render_to_response
 from piebase.models import Project, Priority, Severity, TicketStatus, Ticket, Requirement
-from forms import CreateProjectForm, PriorityForm, SeverityForm, TicketStatusForm, RoleForm
+from forms import CreateProjectForm, PriorityForm, SeverityForm, TicketStatusForm, RoleForm, CommentForm
 import json
 import random
 import string
@@ -318,12 +318,14 @@ def member_role_delete(request, slug, member_role_slug):
     Role.objects.get(slug=member_role_slug, project=project).delete()
     return HttpResponse(json.dumps({'error': False}), content_type="application/json")
 
-def taskboard(request,slug,milestone_name):
+@login_required
+def taskboard(request,slug,milestone_slug):
     project = Project.objects.get(slug=slug)
-    milestone = Milestone.objects.get(name=milestone_name,project=project)
+    milestone = Milestone.objects.get(slug=milestone_slug,project=project)
     ticket_status_list = TicketStatus.objects.filter(project=project)
     return render(request,'project/taskboard.html',{'ticket_status_list':ticket_status_list,'slug':slug,'milestone':milestone})
 
+@login_required
 def update_taskboard_status(request,slug,status_slug,task_id):
     task = Ticket.objects.get(id=task_id)
     ticket_status = TicketStatus.objects.get(slug=status_slug,project=Project.objects.get(slug=slug))
@@ -331,10 +333,11 @@ def update_taskboard_status(request,slug,status_slug,task_id):
     task.save()
     return HttpResponse("")
 
-def load_tasks(request,slug,milestone_name,status_slug):
+@login_required
+def load_tasks(request,slug,milestone_slug,status_slug):
     project = Project.objects.get(slug=slug)
-    status = TicketStatus.objects.get(name=status_slug,project=project)
-    milestone = Milestone.objects.get(name=milestone_name,project=project)
+    status = TicketStatus.objects.get(slug=status_slug,project=project)
+    milestone = Milestone.objects.get(slug=milestone_slug,project=project)
     tasks = Ticket.objects.filter(status=status,milestone=milestone) 
 
     paginator = Paginator(tasks, 10)
@@ -345,17 +348,21 @@ def load_tasks(request,slug,milestone_name,status_slug):
         pass
     except EmptyPage:
         pass
-    return render_to_response('project/partials/task.html',{'tasks':tasks})
+    return render_to_response('project/partials/task.html',{'tasks':tasks,'milestone':milestone,'slug':slug})
 
 
-def requirement_tasks(request,slug,milestone_name,requirement_id):
+@login_required
+def requirement_tasks(request,slug,milestone_slug,requirement_id):
     project = Project.objects.get(slug=slug)
-    milestone = Milestone.objects.get(name=milestone_name,project=project)
+    milestone = Milestone.objects.get(slug=milestone_slug,project=project)
     ticket_status_list = TicketStatus.objects.filter(project=project)
-    return render(request,'project/partials/requirement_tasks.html',{'ticket_status_list':ticket_status_list,'slug':slug,'requirement_id':requirement_id})
+    return render(request,'project/partials/requirement_tasks.html',{'ticket_status_list':ticket_status_list,'slug':slug,'requirement_id':requirement_id,'milestone':milestone})
 
-def requirement_tasks_more(request,status_slug,requirement_id):
+@login_required
+def requirement_tasks_more(request,slug,milestone_slug,status_slug,requirement_id):
     requirement = Requirement.objects.get(id=requirement_id)
+    project = Project.objects.get(slug=slug)
+    milestone = Milestone.objects.get(slug=milestone_slug,project=project)
     tasks = requirement.tasks.filter(status__slug=status_slug)
     paginator = Paginator(tasks,10)
     page = request.GET.get('page')
@@ -365,7 +372,29 @@ def requirement_tasks_more(request,status_slug,requirement_id):
         pass
     except EmptyPage:
         pass
-    return render_to_response('project/partials/task.html',{'tasks':tasks})
+    return render_to_response('project/partials/task.html',{'tasks':tasks,'milestone':milestone,'slug':slug})
+
+@login_required
+def task_details(request,slug,milestone_slug,task_id):
+    task = Ticket.objects.get(id=task_id)
+    return render(request,'task/Task_detail.html',{'task':task,'slug':slug})
+    
+
+
+def task_comment(request,slug,task_id):
+    print request.POST.get('comment')
+    print request.FILES.get('file')
+    project = Project.objects.get(slug=slug,organization=request.user.organization)
+    task = Ticket.objects.get(id=task_id)
+    form = CommentForm(request.POST,task=task,user=request.user,file=request.FILES.get('file'),project=project)
+
+    print form.is_valid()
+    if form.is_valid():
+        comment = form.save()
+        print comment
+        return HttpResponse(json.dumps({'error':False}), content_type="json/application")
+    else:
+        return HttpResponse(json.dumps({'error':True,'errors':form.errors}), content_type="json/application")
 
 @login_required
 def milestone_create(request, slug):

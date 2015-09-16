@@ -39,12 +39,15 @@ urlpatterns = [
     url(r'^(?P<slug>[-\w]+)/settings/member_role/(?P<member_role_slug>([a-zA-Z0-9-]+))/delete/$', member_role_delete, name='member_role_delete'),
 
     # taskboard
-    url(r'^(?P<slug>[-\w]+)/(?P<milestone_name>[-\w]+)/taskboard/$', taskboard, name="taskboard"),
+    url(r'^(?P<slug>[-\w]+)/(?P<milestone_slug>[-\w]+)/taskboard/$', taskboard, name="taskboard"),
     url(r'^(?P<slug>[-\w]+)/update_taskboard/(?P<status_slug>([a-zA-Z0-9-]+))/(?P<task_id>[0-9]+)/$', update_taskboard_status,name="update_taskboard_status"),
-    url(r'^(?P<slug>[-\w]+)/(?P<milestone_name>[-\w]+)/(?P<status_slug>[-\w]+)/load_tasks/$', load_tasks, name="load_tasks"),
-    url(r'^(?P<slug>[-\w]+)/(?P<milestone_name>[-\w]+)/(?P<requirement_id>[0-9]+)/$',requirement_tasks, name="requirement_tasks"),
-    url(r'^(?P<status_slug>[-\w]+)/(?P<requirement_id>[0-9]+)/load_tasks/$', requirement_tasks_more, name="requirement_tasks_more"),    
+    url(r'^(?P<slug>[-\w]+)/(?P<milestone_slug>[-\w]+)/(?P<status_slug>[-\w]+)/load_tasks/$', load_tasks, name="load_tasks"),
+    url(r'^(?P<slug>[-\w]+)/(?P<milestone_slug>[-\w]+)/(?P<requirement_id>[0-9]+)/$',requirement_tasks, name="requirement_tasks"),
+    url(r'^(?P<slug>[-\w]+)/(?P<milestone_slug>[-\w]+)/(?P<status_slug>[-\w]+)/(?P<requirement_id>[0-9]+)/load_tasks/$', requirement_tasks_more, name="requirement_tasks_more"),    
+    url(r'^(?P<slug>[-\w]+)/(?P<milestone_slug>[-\w]+)/task/(?P<task_id>[0-9]+)/$',task_details, name="task_details"),
 
+    #comments 
+    url(r'^(?P<slug>[-\w]+)/task/(?P<task_id>[0-9]+)/comment/$',task_comment, name="task_comment"),
 
 
     #milestone
