@@ -9,7 +9,8 @@ def add_task(request, slug):
         add_task_dict= request.POST.copy()
         add_task_dict['project'] = project_obj.id
         json_data = {}
-        add_task_form = TaskForm(add_task_dict)
+        print request.user
+        add_task_form = TaskForm(add_task_dict,user=request.user)
         if add_task_form.is_valid():
             json_data['error'] = False
             add_task_form.save()

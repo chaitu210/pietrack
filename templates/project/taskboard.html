@@ -86,7 +86,7 @@
               	</div>
                 <div class="scroll all">
               	<ul class='connectedSortable' id='{{ticket_status.slug}}'>
-                    {% include "project/partials/task.html" with tasks=ticket_status|Task_list:milestone %}
+                    {% include "project/partials/task.html" with milestone=milestone slug=slug tasks=ticket_status|Task_list:milestone %}
               	</ul>
                 </div>
               </div>
@@ -179,29 +179,26 @@
       /* load tasks all */
       jQuery(function($) {
         $('.scroll.all').on('scroll',function() {
-          
+           
             if($(this).scrollTop() + $(this).innerHeight() >= this.scrollHeight-2) {
                 page = $(this).find('input[name="page_num"]').val();
                 var status_slug = $(this).children("ul").attr("id")
 
                 if(page){
                   $(this).find('input[name="page_num"]').remove();
-                  $.get("/project/{{slug}}/{{milestone.name}}/"+status_slug+"/load_tasks/",{"page":page},function(response){
+                  $.get("/project/{{slug}}/{{milestone.slug}}/"+status_slug+"/load_tasks/",{"page":page},function(response){
                         $('ul#'+status_slug).append(response)
                   });
                 }
-
             }
         })
       });
       /* end load all tasks */
 
 $(document).ready(function(){
-
-
   $('.name_div').on('click',function(){
         var req_id = $(this).attr('id');
-        $.get("/project/{{slug}}/{{milestone.name}}/"+req_id+"/",function(response){
+        $.get("/project/{{slug}}/{{milestone.slug}}/"+req_id+"/",function(response){
            $('.task_category_wrap').remove()
            $('.requirement_list_panel').after(response) 
            $('.scroll').slimscroll({
@@ -218,7 +215,7 @@ $(document).ready(function(){
                 var requirement_id = $(this).attr('id')
                 if(page){
                   $(this).find('input[name="page_num"]').remove();
-                  $.get("/project/"+status_slug+"/"+requirement_id+"/load_tasks/",{"page":page},function(response){
+                  $.get("/project/{{slug}}/{{milestone.slug}}/"+status_slug+"/"+requirement_id+"/load_tasks/",{"page":page},function(response){
                         $('ul#'+status_slug).append(response)
                    });
                 }

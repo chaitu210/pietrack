@@ -9,7 +9,7 @@ from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.utils.translation import ugettext, ugettext_lazy as _
 from .tasks import celery_send_mail
-from piebase.models import Project, Priority, Severity, Organization, User, TicketStatus, Role, Milestone, Requirement
+from piebase.models import Project, Priority, Severity, Organization, User, TicketStatus, Role, Milestone, Requirement, Comment, Attachment
 from django.template.defaultfilters import slugify
 
 
@@ -257,3 +257,26 @@ class RequirementForm(forms.ModelForm):
     class Meta:
         model = Requirement 
         fields = ['name', 'milestone', 'description']
+
+class CommentForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        self.task = kwargs.pop('task',None)
+        self.user = kwargs.pop('user',None)
+        self.file = kwargs.pop('file',None)
+        self.project = kwargs.pop('project',None)
+        super(CommentForm,self).__init__(*args,**kwargs)
+
+    class Meta:
+        model = Comment
+        fields = ['comment']
+
+    def save(self, commit=True):
+        instance = super(CommentForm,self).save(commit=False)
+        instance.commented_by = self.user
+        instance.ticket = self.task
+        attachment = Attachment.objects.create(uploaded_by=self.user,attached_file=self.file,project=self.project)
+        instance.attachments.add(attachment)
+
+        if commit:
+            instance.save()
+        return instance

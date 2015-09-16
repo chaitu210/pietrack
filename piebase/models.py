@@ -12,7 +12,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.core.mail import send_mail
 
-import os
+import os, string, random
 
 MILESTONE_STATUS = (
     ('planned', 'Planned'),
@@ -26,6 +26,8 @@ PIETRACK_ROLES = (
     ('PIE_User', 'PIE User'),
 )
 
+def rand_str(number):
+    ''.join(random.sample(string.ascii_lowercase, number))
 
 def url(self, filename):
     if self.__class__ == "Project":
@@ -230,13 +232,14 @@ class Ticket(models.Model):
                                  verbose_name=_("priority"))
     ticket_type = models.CharField(max_length=50, default = 'task', blank = True)
     target_date = models.DateField(null=True, blank=True)
-
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="user_tickets", null=True, blank=True)
+    
     def __str__(self):
         return self.name
 
 
 class Comment(models.Model):
-    comment = models.TextField(blank=True)
+    comment = models.TextField(null=False)
     commented_by = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="comments")
     ticket = models.ForeignKey(Ticket, related_name="ticket_comments")
     attachments = models.ManyToManyField(Attachment, blank=True)

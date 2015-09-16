@@ -6,7 +6,7 @@
       </div>
       <div class="scroll requirement" id="{{requirement_id}}">
       <ul class='connectedSortable' id='{{ticket_status.slug}}'>
-          {% include "project/partials/task.html" with tasks=ticket_status|Requirement_Task_list:requirement_id %}
+          {% include "project/partials/task.html" with milestone=milestone slug=slug tasks=ticket_status|Requirement_Task_list:requirement_id %}
       </ul>
       </div>
     </div>
