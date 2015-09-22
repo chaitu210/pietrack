@@ -22,12 +22,26 @@ def count_comments(ticket):
 
 @register.filter
 def Team_mem(task):
-	return task.project.members.all().exclude(pietrack_role='admin')
+	return task.project.members.all()
 
 @register.filter
 def get_user_Role(user):
 	try:
 		return Role.objects.get(users=user)
 	except Exception, e:
-		return ""
+		return user.pietrack_role
 	
+@register.filter
+def sub_comments(sub_comment):
+	l=[]
+	reply = sub_comment.comment_parent.all()
+	if(reply):
+		l.append(sub_comment)
+		for sc in reply:
+			l.extend(sub_comments(sc))
+		return l
+	return [sub_comment]
+
+@register.filter
+def level1comments(task):
+	return Comment.objects.filter(ticket=task, parent=None)[::-1]

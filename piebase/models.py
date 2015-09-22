@@ -33,6 +33,7 @@ def url(self, filename):
     if self.__class__ == "Project":
         return "%s/%s/%s" % (self.slug, rand_str(6), filename)
     return "%s/%s/%s" % (self.project.slug, rand_str(6), filename)
+    
 
 
 class Organization(models.Model):
@@ -244,10 +245,11 @@ class Comment(models.Model):
     ticket = models.ForeignKey(Ticket, related_name="ticket_comments")
     attachments = models.ManyToManyField(Attachment, blank=True)
     created = models.DateTimeField(auto_now_add=True)
-
+    parent = models.ForeignKey('self',blank=True,null=True, related_name="comment_parent")
     # class Meta:
     #    index_together = [('content_type', 'object_id', 'namespace'), ]
-
+    def __str__(self):
+        return self.comment
 
 class Timeline(models.Model):
     content_type = models.ForeignKey(ContentType, related_name="content_type_timelines")
