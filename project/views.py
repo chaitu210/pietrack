@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect,render_to_response
-from piebase.models import Project, Priority, Severity, TicketStatus, Ticket, Requirement
+from piebase.models import Project, Priority, Severity, TicketStatus, Ticket, Requirement, Attachment
 from forms import CreateProjectForm, PriorityForm, SeverityForm, TicketStatusForm, RoleForm, CommentForm
 import json
 import random
 import string
+import os
 from django.utils import timezone
 from django.template.defaultfilters import slugify
 from django.contrib.auth.decorators import login_required
@@ -380,21 +381,33 @@ def task_details(request,slug,milestone_slug,task_id):
     return render(request,'task/Task_detail.html',{'task':task,'slug':slug})
     
 
-
+@login_required
 def task_comment(request,slug,task_id):
-    print request.POST.get('comment')
-    print request.FILES.get('file')
     project = Project.objects.get(slug=slug,organization=request.user.organization)
     task = Ticket.objects.get(id=task_id)
-    form = CommentForm(request.POST,task=task,user=request.user,file=request.FILES.get('file'),project=project)
+    form = CommentForm(request.POST,task=task,user=request.user,project=project)
 
-    print form.is_valid()
     if form.is_valid():
         comment = form.save()
-        print comment
-        return HttpResponse(json.dumps({'error':False}), content_type="json/application")
+        if request.GET.get('parent_id',False):
+            comment.parent_id = request.GET.get('parent_id')
+        if request.FILES.get('file'):
+            attachment = Attachment.objects.create(uploaded_by=request.user,attached_file=request.FILES.get('file'),project=project)
+            comment.attachments.add(attachment)
+        comment.save()
+        return HttpResponse(render_to_response('task/partials/comment_add.html',{'comment':comment,'slug':slug}))
     else:
         return HttpResponse(json.dumps({'error':True,'errors':form.errors}), content_type="json/application")
+
+@login_required
+def delete_attachment(request,slug,attachment_id):
+    attach = Attachment.objects.get(id=attachment_id,project__slug=slug)
+    try:
+        os.remove(attach.attached_file.url)
+    except OSError as e:
+        pass
+
+    return HttpResponse(json.dumps({'result':True}), content_type="json/application")
 
 @login_required
 def milestone_create(request, slug):
