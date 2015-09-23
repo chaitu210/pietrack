@@ -5,6 +5,7 @@ import json
 import random
 import string
 import os
+import shutil
 from django.utils import timezone
 from django.template.defaultfilters import slugify
 from django.contrib.auth.decorators import login_required
@@ -15,7 +16,6 @@ from piebase.models import User, Project, Organization, Role, Milestone, Require
 from forms import CreateProjectForm, CreateMemberForm, PasswordResetForm, MilestoneForm, RequirementForm
 from .tasks import send_mail_old_user
 from django.core import serializers
-
 from django.core.paginator import Paginator,PageNotAnInteger,EmptyPage
 
 
@@ -403,10 +403,10 @@ def task_comment(request,slug,task_id):
 def delete_attachment(request,slug,attachment_id):
     attach = Attachment.objects.get(id=attachment_id,project__slug=slug)
     try:
-        os.remove(attach.attached_file.url)
+        shutil.rmtree(os.path.abspath(os.path.join(attach.attached_file.path, os.pardir)))
+        attach.delete()
     except OSError as e:
         pass
-
     return HttpResponse(json.dumps({'result':True}), content_type="json/application")
 
 @login_required
