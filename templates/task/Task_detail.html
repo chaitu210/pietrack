@@ -17,7 +17,6 @@
               </div> 
               <span class="desc">
                 {{task.description}}
-                <!-- <img src='img/user-pic.jpg' class="main-attachment"> -->
               </span>
               <div class="attachments_wrap">
                {% for attachment in task.attachments.all %}
@@ -29,20 +28,6 @@
                 </div>
                 {% endfor %}
               </div>
-              <!--<div class="attachement-gallery">
-                <a class="fancybox-thumb" rel="fancybox-thumb" href="http://farm8.staticflickr.com/7495/16346747871_60b27a54b9_b.jpg" title="Bråviken (jarnasen)">
-                <img src="http://farm8.staticflickr.com/7495/16346747871_60b27a54b9_m.jpg" alt="" />
-                </a>
-                <a class="fancybox-thumb" rel="fancybox-thumb" href="http://farm8.staticflickr.com/7381/16327260776_c3fa8ee76d_b.jpg" title="From the garden (*Jilltoo)">
-                <img src="http://farm8.staticflickr.com/7381/16327260776_c3fa8ee76d_m.jpg" alt="" />
-                </a>
-                <a class="fancybox-thumb" rel="fancybox-thumb" href="http://farm9.staticflickr.com/8591/16141566979_347348e72c_b.jpg" title="cold forest (picturesbywalther)">
-                <img src="http://farm9.staticflickr.com/8591/16141566979_347348e72c_m.jpg" alt="" />
-                </a>
-                <a class="fancybox-thumb" rel="fancybox-thumb" href="http://farm3.staticflickr.com/2895/14503817856_2f5d4b667b_b.jpg" title="Holly blue (Masa_N)">
-                <img src="http://farm3.staticflickr.com/2895/14503817856_2f5d4b667b_m.jpg" alt="" />
-                </a>
-                          </div>-->
             </div>
           </div>
           <div class="clearfix"></div>
@@ -127,7 +112,7 @@
               {% for attachment in comment.attachments.all %}
               <div class="attachments_wrap">
                 <div class="attachment_each">
-                  <i class='fa fa-paperclip'></i>{{attachment.attached_file}}
+                  <i class='fa fa-paperclip'></i>{{attachment}}
                   <a href="{{attachment.attached_file.url}}" target="_blank"><span class='view_link' data-toggle="modal" ><i class='fa fa-eye'></i>View</span></a>
                   <a href="{{attachment.attached_file.url}}" download><span class='download_link'><i class='fa fa-download'></i>Download</span></a>
                   <span class='delete_link'><a href="/project/{{slug}}/task/attachment/delete/{{attachment.id}}/"><i class='fa fa-trash'></i>Delete</a></span>
@@ -155,7 +140,6 @@
           <span>team members</span>
         </div>
         <!-- ticket -->
-        
         <div class="height_wrap">
           {% for team_member in task|Team_mem %}
           <span class='ticket orange'>
@@ -164,7 +148,6 @@
           {% else %}
             <img src="{% static 'img/user-pic.jpg' %}">
           {% endif%}
-          
           <span class='description'>
           <span class='name'>{{team_member.username}}</span>
           <span class='designation_time'>{{team_member|get_user_Role}}</span>
@@ -175,31 +158,11 @@
         </div>
         <!--/ team -->
       </div>
-  
-      <div class="modal fade" id="myModal1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" style="display: none;">
-        <div class="modal-dialog" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-              <h4 class="modal-title" id="myModalLabel">Requirement 1</h4>
-            </div>
-            <div class="modal-body">
-              Monotonectally syndicate premium users without client-centric intellectual capital. Quickly benchmark integrated manufactured products rather.
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-primary" data-dismiss="modal">Ok</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
 
 {%endblock%}
 
 {% block extra_js %}
 <script type="text/javascript">
-
-
 $('form#comment_form').submit(function(e){
           var formData = new FormData($(this)[0]);
           var form = this
@@ -225,7 +188,6 @@ $('form#comment_form').submit(function(e){
           });
           e.preventDefault()
     });
-
 
 $('body').on('click', ".reply_button button", function(e) {
     
@@ -279,6 +241,7 @@ $('body').on('submit', 'form.comment_reply', function(e){
 
     e.preventDefault();
   });
+
 $('body').on('click','.delete_link a',function(e){
   url = $(this).attr('href')
   parent = this
@@ -289,5 +252,6 @@ $('body').on('click','.delete_link a',function(e){
   });
   e.preventDefault()
 });
+
 </script>
 {% endblock %}
