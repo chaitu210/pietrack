@@ -27,7 +27,7 @@ PIETRACK_ROLES = (
 )
 
 def rand_str(number):
-    ''.join(random.sample(string.ascii_lowercase, number))
+    return ''.join(random.sample(string.ascii_lowercase, number))
 
 def url(self, filename):
     if self.__class__ == "Project":
@@ -122,6 +122,11 @@ class Attachment(models.Model):
     order = models.IntegerField(default=0, verbose_name=_("order"))
     project = models.ForeignKey(Project)
 
+    def filename(self):
+        return os.path.basename(self.attached_file.name)
+
+    def __str__(self):
+        return self.filename()
 
 class Role(models.Model):
     name = models.CharField(max_length=200, verbose_name=_("name"))
@@ -131,6 +136,7 @@ class Role(models.Model):
 
     class Meta:
         unique_together = [("slug", "project")]
+
 
     def __str__(self):
         return self.name

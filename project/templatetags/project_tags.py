@@ -1,3 +1,4 @@
+import os
 from django import template
 from piebase.models import Ticket,Comment,Requirement,Role
 from django.core.paginator import Paginator
@@ -45,3 +46,7 @@ def sub_comments(sub_comment):
 @register.filter
 def level1comments(task):
 	return Comment.objects.filter(ticket=task, parent=None)[::-1]
+
+@register.filter
+def filename(value):
+	return os.path.basename(value.file.name)
