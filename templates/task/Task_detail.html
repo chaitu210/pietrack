@@ -90,7 +90,7 @@
               {% for attachment in comment.attachments.all %}
               <div class="attachments_wrap">
                 <div class="attachment_each">
-                  <i class='fa fa-paperclip'></i>{{attachment.attached_file|filename}}
+                  <i class='fa fa-paperclip'></i>{{attachment.filename}}
                   <a href="{{attachment.attached_file.url}}" target="_blank"><span class='view_link' data-toggle="modal" ><i class='fa fa-eye'></i>View</span></a>
                   <a href="{{attachment.attached_file.url}}" download><span class='download_link'><i class='fa fa-download'></i>Download</span></a>
                   <span class='delete_link'><a href="/project/{{slug}}/task/attachment/delete/{{attachment.id}}/"><i class='fa fa-trash'></i>Delete</a></span>
