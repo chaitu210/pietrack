@@ -1,26 +1,50 @@
-# pietrack
-opensource project management software.
+Pietrack
+=========
 
-[![Code Health](https://landscape.io/github/MicroPyramid/pietrack/master/landscape.svg?style=flat)](https://landscape.io/github/MicroPyramid/pietrack/master) [![Documentation Status](https://readthedocs.org/projects/pietrack/badge/?version=latest)](https://readthedocs.org/projects/pietrack/?badge=latest) [![Build Status](https://travis-ci.org/MicroPyramid/pietrack.svg?branch=master)](https://travis-ci.org/MicroPyramid/pietrack) [![Coverage Status](https://coveralls.io/repos/MicroPyramid/pietrack/badge.svg?branch=master&service=github)](https://coveralls.io/github/MicroPyramid/pietrack?branch=master)
+An Open Source Project Management Software.
 
-head to http://pietrack.readthedocs.org/ for latest documentation
+
+.. image:: https://landscape.io/github/MicroPyramid/pietrack/master/landscape.svg?style=flat
+   :target: https://landscape.io/github/MicroPyramid/pietrack/master
+   :alt: Code Health
+
+.. image:: https://readthedocs.org/projects/pietrack/badge/?version=latest
+   :target: https://readthedocs.org/projects/pietrack/?badge=latest
+   :alt: Documentation Status
+
+.. image:: https://travis-ci.org/MicroPyramid/pietrack.svg?branch=master
+   :target: https://travis-ci.org/MicroPyramid/pietrack
+   :alt: Build Status
+
+.. image:: https://coveralls.io/repos/MicroPyramid/pietrack/badge.svg?branch=master&service=github
+   :target: https://coveralls.io/github/MicroPyramid/pietrack?branch=master
+   :alt: Coverage Status
+
+Head to http://pietrack.readthedocs.org/ for latest documentation.
+
 
 Features:
----------
+-----------
 * Project Wiki
 * Bug Tracking
 * Project backlog
 * Activity log
 
+
 Contribute:
-----------
-* Fork [pietrack repository](https://github.com/MicroPyramid/pietrack)
-on GitHub to start making your changes to the pietrack(Project Management Tool).
+--------------
+
+* Fork Pietrack Repository_ on GitHub to start making your changes to the pietrack(Project Management Tool).
 * Write Python3 compatable code.
-* Write a tests which shows that the code works as expected or bug fixed.
+* Write tests which shows that the code works as expected or bug fixed.
 * Send a pull request to author.
 
 
-## Community
+Community:
+--------------
 
-Questions or comments? Join us [on Slack](https://micropyramid.slack.com)
+Questions or comments? Join us on Slack_
+
+
+.. _Repository: https://github.com/MicroPyramid/pietrack
+.. _Slack: https://micropyramid.slack.com
