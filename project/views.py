@@ -25,11 +25,10 @@ from django.core.paginator import Paginator,PageNotAnInteger,EmptyPage
 def create_project(request):
     if(request.method == "POST"):
         organization = request.user.organization
-        form = CreateProjectForm(request.POST, organization=organization)
+        form = CreateProjectForm(request.POST, organization=organization, user = request.user)
         if(form.is_valid()):
             slug = slugify(request.POST['name'])
-            project_obj = Project.objects.create(name=request.POST['name'], slug=slug, description=request.POST[
-                                                 'description'], modified_date=timezone.now(), organization=organization)
+            project_obj = form.save()
             project_obj.members.add(request.user)
             project_obj.save()
             json_data = {'error': False, 'errors': form.errors, 'slug': slug}

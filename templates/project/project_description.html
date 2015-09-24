@@ -1,5 +1,6 @@
 {%extends 'base.html'%}
-
+{% load project_tags %}
+{%load static %}
 {%block content%}
 <section id='base_content'>
    <div class="project_description">
@@ -17,7 +18,11 @@
                </div>
             </div>
             <div class="col-md-3 logo">
-               <img src="img/user-pic.jpg" alt="user-profile-pic" />
+            {%if team_member.profile_pic %}
+               <img src="{{ request.user.profile_pic.url }}">
+             {% else %}
+               <img src="{% static 'img/user-pic.jpg' %}">
+             {% endif%}
             </div>
             <div class="clearfix"></div>
          </div>
@@ -80,15 +85,19 @@
             <span>team members</span>
          </div>
          <!-- ticket -->
-         {% for member in project_members %}
-            <span class='ticket orange'>
-            <img src="https://cdn2.iconfinder.com/data/icons/despicable-me-2-minions/128/Happy-Minion-Icon.png">
-            <span class='description'>
-            <span class='name'>{{member.username}}</span>
-            <span class='designation_time'>{{member.user_roles.all.0.name}}</span>
-            </span>
-            </span>
-         {% endfor %}
+         {% for team_member in project_members %}
+         <span class='ticket orange'>
+          {%if team_member.profile_pic %}
+            <img src="{{ team_member.profile_pic.url }}">
+          {% else %}
+            <img src="{% static 'img/user-pic.jpg' %}">
+          {% endif%}
+          <span class='description'>
+          <span class='name'>{{team_member.username}}</span>
+          <span class='designation_time'>{{team_member|get_user_Role}}</span>
+          </span>
+          </span>
+          {% endfor %}
 
          <!--/ ticket -->
       </div>
