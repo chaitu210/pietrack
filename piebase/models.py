@@ -262,12 +262,12 @@ class Timeline(models.Model):
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
     namespace = models.CharField(max_length=250, default="default", db_index=True)
-    event_type = models.CharField(max_length=250, db_index=True)
+    event_type = models.CharField(max_length=250, db_index=True)#created,updated,commented,movedfrom(task), 
     project = models.ForeignKey(Project, null=True)
-    data = models.TextField(null=False, blank=True, verbose_name=_("data"))
-    data_content_type = models.ForeignKey(ContentType, related_name="data_timelines")
+    data = models.TextField(null=True, blank=True, verbose_name=_("data"))# left as blank
+    data_content_type = models.ForeignKey(ContentType, related_name="data_timelines",null=True)# left as blank
     created = models.DateTimeField(auto_now_add=True)
-
+    user = models.ForeignKey(User)
     class Meta:
         index_together = [('content_type', 'object_id', 'namespace'), ]
         

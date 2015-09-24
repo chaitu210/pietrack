@@ -9,14 +9,19 @@ from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.utils.translation import ugettext, ugettext_lazy as _
 from .tasks import celery_send_mail
-from piebase.models import Project, Priority, Severity, Organization, User, TicketStatus, Role, Milestone, Requirement, Comment
+from piebase.models import Project, Priority, Severity, Organization, User, TicketStatus, Role, Milestone, Requirement, Comment, Timeline
 from django.template.defaultfilters import slugify
+from django.utils import timezone
+
+# def CreateTimeline(content_object, event_type, project, user):
+#     Timeline.objects.create(content_object=content_object, event_type=event_type, project=project)
 
 
 class CreateProjectForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.organization = kwargs.pop('organization', None)
+        self.user = kwargs.pop('user',None)
         super(CreateProjectForm, self).__init__(*args, **kwargs)
 
     class Meta:
@@ -30,6 +35,17 @@ class CreateProjectForm(forms.ModelForm):
                 'Project with this name already exists.')
         return name
 
+    def save(self, commit=True):
+        instance = super(CreateProjectForm, self).save(commit=False)
+        instance.organization = self.organization
+        instance.name = self.cleaned_data['name']
+        instance.slug = slugify(self.cleaned_data['name'])
+        instance.description = self.cleaned_data['description']
+        instance.modified_date = timezone.now()
+        if commit:
+            instance.save()
+            # CreateTimeline(project,"created",project,self.user)
+        return instance
 
 class PriorityForm(forms.ModelForm):
 
