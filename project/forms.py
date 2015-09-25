@@ -261,12 +261,14 @@ class MilestoneForm(forms.ModelForm):
         fields = ['name', 'estimated_start',
                   'estimated_finish', 'status', 'project']
 
-    def save(self):
+    def save(self, commit=True):
         milestone = super(MilestoneForm, self).save(commit=False)
         milestone.slug = self.cleaned_data.get('name')
         milestone.modified_date = self.cleaned_data.get('estimated_finish')
         milestone.created_by = self.user
-        milestone.save()
+        if commit:
+            milestone.save()
+        return milestone
 
 
 class RequirementForm(forms.ModelForm):

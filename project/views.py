@@ -17,7 +17,7 @@ from forms import CreateProjectForm, CreateMemberForm, PasswordResetForm, Milest
 from .tasks import send_mail_old_user
 from django.core import serializers
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-
+from signals import create_timeline
 
 @login_required
 def create_project(request):
@@ -261,6 +261,9 @@ def create_member(request, slug):
                 project_obj.organization = organization_obj
                 project_obj.save()
 
+                msg = " added "+user_obj.username+" as a team member"
+                create_timeline.send(sender=request.user,content_object=user_obj, namespace=msg, event_type="member added",project=project_obj)
+
                 random_slug = ''.join(
                     random.choice(string.ascii_letters + string.digits) for _ in xrange(10))
                 role_obj = Role.objects.create(
@@ -403,18 +406,27 @@ def task_comment(request, slug, task_id):
                 uploaded_by=request.user, attached_file=request.FILES.get('file'), project=project)
             comment.attachments.add(attachment)
         comment.save()
-        return HttpResponse(render_to_response('task/partials/comment_add.html', {'comment': comment, 'slug': slug}))
+        msg = "commented on "+task.name
+        if request.GET.get('parent_id', False):
+            msg="gave reply to "+comment.parent.commented_by.username+"  on "+task.name
+        create_timeline.send(sender=request.user,content_object=comment, namespace=msg, event_type="commented",project=project)
+        return HttpResponse(render_to_response('task/partials/comment_add.html', {'comment': comment, 'slug': slug,'task':task}))
     else:
         return HttpResponse(json.dumps({'error': True, 'errors': form.errors}), content_type="json/application")
 
 
 @login_required
-def delete_attachment(request, slug, attachment_id):
-    attach = Attachment.objects.get(id=attachment_id, project__slug=slug)
+def delete_attachment(request, slug, task_id, attachment_id):
+    project = Project.objects.get(slug=slug,organization=request.user.organization)
+    attach = Attachment.objects.get(id=attachment_id, project=project)
+    task = Ticket.objects.get(id=task_id)
+
     try:
         shutil.rmtree(
             os.path.abspath(os.path.join(attach.attached_file.path, os.pardir)))
         attach.delete()
+        msg=" deleted attachment of "+task.name
+        create_timeline.send(sender=request.user,content_object=task, namespace=msg, event_type="deleted",project=project)
     except OSError as e:
         pass
     return HttpResponse(json.dumps({'result': True}), content_type="json/application")
@@ -425,11 +437,14 @@ def milestone_create(request, slug):
     if request.method == 'POST':
         json_data = {}
         milestone_dict = request.POST.copy()
-        project_id = Project.objects.get(slug=slug).id
+        project = Project.objects.get(slug=slug, organization=request.user.organization)
+        project_id = project.id
         milestone_dict['project'] = project_id
         milestone_form = MilestoneForm(request.user, milestone_dict)
         if milestone_form.is_valid():
-            milestone_form.save()
+            milestone = milestone_form.save()
+            msg = " created milestone "+milestone.name
+            create_timeline.send(sender=request.user,content_object=milestone, namespace=msg, event_type="milestone created",project=project)
             json_data['error'] = False
             return HttpResponse(json.dumps(json_data), content_type='application/json')
         else:
@@ -481,7 +496,7 @@ def project_edit(request, slug):
 
 @login_required
 def requirement_create(request, slug):
-    project_obj = Project.objects.get(slug=slug)
+    project_obj = Project.objects.get(slug=slug,organization=request.user.organization)
     if request.POST:
         json_data = {}
         requirement_form = RequirementForm(request.POST)
@@ -489,8 +504,12 @@ def requirement_create(request, slug):
             name = request.POST.get('name')
             milestone_obj = Milestone.objects.get(
                 id=request.POST.get('milestone'))
-            Requirement.objects.create(name=name, slug=name, description=request.POST.get(
+            requirement = Requirement.objects.create(name=name, slug=name, description=request.POST.get(
                 'description'), project=project_obj, milestone=milestone_obj)
+
+            msg = " created requirement "+requirement.name
+            create_timeline.send(sender=request.user,content_object=requirement, namespace=msg, event_type="requirement_form",project=project_obj)
+
             json_data['error'] = False
             return HttpResponse(json.dumps(json_data), content_type='application/json')
         else:

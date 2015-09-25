@@ -75,7 +75,7 @@ urlpatterns = [
         task_comment, name="task_comment"),
 
     # attachment
-    url(r'^(?P<slug>[-\w]+)/task/attachment/delete/(?P<attachment_id>[0-9]+)/$',
+    url(r'^(?P<slug>[-\w]+)/task/(?P<task_id>[0-9]+)/attachment/delete/(?P<attachment_id>[0-9]+)/$',
         delete_attachment, name="delete_attachment"),
 
     # milestone
