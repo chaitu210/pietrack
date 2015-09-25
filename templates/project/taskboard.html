@@ -2,232 +2,236 @@
 {% load project_tags %}
 {% load static %}
 {% block content %}
-    <section id='base_content'>
-      <div class="project_description">
+  <section id='base_content'>
+    <div class="project_description">
         <!-- about project -->
         <div class="about_project_wrap">
-          <div class="title">
-            <span>{{milestone.name}}</span>
-          </div>
-          <!-- filters -->
-          <div class="filters_wrap">
-            <h3>Refine your search</h3>
-            <div class="row filter_row">
-              <div class="col-md-2">
-                <select class='select2 input' placeholder='Assigned to' multiple='multiple'>
-                  <option>naz</option>
-                  <option>Shirisha</option>
-                </select>
-              </div>
-              <div class="col-md-2">
-                <select class='select2 input' placeholder='Requirement' multiple='multiple'>
-                  <option>naz</option>
-                  <option>Shirisha</option>
-                </select>
-              </div>
-              <div class="col-md-2">
-                <input type="text" class='input' placeholder='Task title'>
-              </div>
-              <div class="col-md-2">
-                <input type="text" class='input' id='sdate' placeholder='Start Date'>
-              </div>
-              <div class="col-md-2">
-                <input type="text" class='input' id='edate' placeholder='End Date'>
-              </div>
-              <div class="col-md-2">
-                <button class='submit_btn'><i class='fa fa-search'></i>Go</button>
-              </div>
+            <div class="title">
+                <span>{{milestone.name}}</span>
             </div>
-          </div>
-          <!--/ filters -->
-          <!-- lists div -->
-          <div class="lists_div style-1" id="tasks_container">
-            <div class="hscroll">
-              <!-- requirement list -->
-              <div class="requirement_list_panel">
-                <div class="title">
-                  Requirement list
-                </div>
-                <div class="scroll">
-                <ul>
-                {%for requirement in milestone.project.requirements.all %}
-                  <li>
-                    <div class='ticket_wrap'>
-                      <a class='name_div_wrap'>
-                      <span class='name_div' id="{{requirement.id}}">
-                        {{requirement.name}}
-                      <span class='tag'>
-                      <span  data-toggle="modal" data-target="#myModal{{requirement.id}}">View Description</span></span>
-                      </span></a>
-                      <span class='actions_div'>
-                      <a>
-                      <span class='edit'>
-                      <i class='fa fa-pencil'></i>
-                      </span>
-                      </a>
-                      <a>
-                      <span class='drop'>
-                      <i class='fa fa-angle-down'></i>
-                      </span>
-                      </a>
-                      </span>
+            <!-- filters -->
+            <div class="filters_wrap">
+                <h3>Refine your search</h3>
+                <div class="row filter_row">
+                    <div class="col-md-2">
+                        <select class='select2 input' placeholder='Assigned to' multiple='multiple'>
+                            <option>naz</option>
+                            <option>Shirisha</option>
+                        </select>
                     </div>
-                  </li>
-                {% endfor %}
-                </ul>
+                    <div class="col-md-2">
+                        <select class='select2 input' placeholder='Requirement' multiple='multiple'>
+                            <option>naz</option>
+                            <option>Shirisha</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <input type="text" class='input' placeholder='Task title'>
+                    </div>
+                    <div class="col-md-2">
+                        <input type="text" class='input' id='sdate' placeholder='Start Date'>
+                    </div>
+                    <div class="col-md-2">
+                        <input type="text" class='input' id='edate' placeholder='End Date'>
+                    </div>
+                    <div class="col-md-2">
+                        <button class='submit_btn'><i class='fa fa-search'></i>Go</button>
+                    </div>
                 </div>
-              </div>
-              <!--/ requirement list -->
-              <!-- task  category each -->
-          {% for ticket_status in ticket_status_list %}
-              <div class="task_category_wrap">
-              	<div class="title" style="background:{{ticket_status.color}};">
-              	{{ticket_status.name}} 
-              	</div>
-                <div class="scroll all">
-              	<ul class='connectedSortable' id='{{ticket_status.slug}}'>
-                    {% include "project/partials/task.html" with milestone=milestone slug=slug tasks=ticket_status|Task_list:milestone %}
-              	</ul>
-                </div>
-              </div>
-          {% endfor %}
-              <!--/ task category each -->
             </div>
-          </div>
-          <!--/ lists div -->
-          <div class="clearfix"></div>
+            <!--/ filters -->
+            <!-- lists div -->
+            <div class="lists_div style-1" id="tasks_container">
+                <div class="hscroll">
+                    <!-- requirement list -->
+                    <div class="requirement_list_panel">
+                        <div class="title">
+                            Requirement list
+                        </div>
+                        <div class="scroll">
+                            <ul>
+                                {%for requirement in milestone.project.requirements.all %}
+                                    <li>
+                                        <div class='ticket_wrap'>
+                                            <a class='name_div_wrap'>
+                                                <span class='name_div' id="{{requirement.id}}">
+                                                {{requirement.name}}
+                                                    <span class='tag'>
+                                                        <span  data-toggle="modal" data-target="#myModal{{requirement.id}}">
+                                                            View Description
+                                                        </span>
+                                                    </span>
+                                                </span>
+                                            </a>
+                                            <span class='actions_div'>
+                                                <a>
+                                                    <span class='edit'>
+                                                        <i class='fa fa-pencil'></i>
+                                                        </span>
+                                                </a>
+                                                <a>
+                                                    <span class='drop'>
+                                                    <i class='fa fa-angle-down'></i>
+                                                    </span>
+                                                </a>
+                                            </span>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                    <!--/ requirement list -->
+                    <!-- task  category each -->
+                    {% for ticket_status in ticket_status_list %}
+                        <div class="task_category_wrap">
+                            <div class="title" style="background:{{ticket_status.color}};">
+                                {{ticket_status.name}}
+                            </div>
+                            <div class="scroll all">
+                                <ul class='connectedSortable' id='{{ticket_status.slug}}'>
+                                    {% include "project/partials/task.html" with milestone=milestone slug=slug tasks=ticket_status|Task_list:milestone %}
+                                </ul>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    <!--/ task category each -->
+                </div>
+            </div>
+            <!--/ lists div -->
+            <div class="clearfix"></div>
         </div>
         <!--/ about project -->
-      </div>
-      <!-- edit role add modal starts here -->
+    </div>
+    <!-- edit role add modal starts here -->
     {%for requirement in milestone.project.requirements.all %}
-      <div class="modal fade" id="myModal{{requirement.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-        <div class="modal-dialog" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-              <h4 class="modal-title" id="myModalLabel">{{requirement.name}}</h4>
+        <div class="modal fade" id="myModal{{requirement.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">{{requirement.name}}</h4>
+                    </div>
+                    <div class="modal-body">
+                        {{ requirement.description }}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">Ok</button>
+                    </div>
+                </div>
             </div>
-            <div class="modal-body">
-              {{ requirement.description }}
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-primary" data-dismiss="modal">Ok</button>
-            </div>
-          </div>
         </div>
-      </div>
     {% endfor %}
-      <!-- edit role add modal ends here -->
-
-    </section>
+    <!-- edit role add modal ends here -->
+  </section>
 {% endblock %}
 {% block extra_js_links%}
     <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 {% endblock %}
 {% block extra_js %}
-
-<script type="text/javascript">
-      $(function(){
+  <script type="text/javascript">
+    $(function() {
         $('.scroll').slimscroll({
-          alwaysVisible: false,
-          height: 350
+            alwaysVisible: false,
+            height: 350
         });
-      });
-      $('.sub_list').mouseenter(function(event) {
+    });
+    $('.sub_list').mouseenter(function(event) {
         $(this).closest('.parent_list').addClass('active_li_drop')
-      });
-      $('.sub_list').mouseleave(function(event) {
+    });
+    $('.sub_list').mouseleave(function(event) {
         $(this).closest('.parent_list').removeClass('active_li_drop')
-      });
+    });
     </script>
     <script type="text/javascript">
-      $(function() {
-      $("#sdate, #edate").datepicker();
+    $(function() {
+        $("#sdate, #edate").datepicker();
         $('.select2').select2();
-      });
-    </script> 
+    });
+    </script>
     <!-- horizontal scroll -->
     <script type="text/javascript">
-    $('.hscroll').css('min-width',($('.task_category_wrap').length+1)*270+'px');
+    $('.hscroll').css('min-width', ($('.task_category_wrap').length + 1) * 270 + 'px');
     </script>
     <!--/ horizontal scroll -->
-
     <!-- update status -->
     <script type="text/javascript">
     var drag_options = {
+        connectWith: ".connectedSortable",
+
+        receive: function(event, ui) {
+            var status = this.id;
+            var task = ui.item.attr('id')
+            $.get('/project/{{slug}}/update_taskboard/' + status + '/' + task + '/');
+        }
+    }
+
+    $(function() {
+        $(".connectedSortable").sortable({
             connectWith: ".connectedSortable",
-            
-            receive: function( event, ui ) {
+            receive: function(event, ui) {
                 var status = this.id;
                 var task = ui.item.attr('id')
-                $.get('/project/{{slug}}/update_taskboard/'+status+'/'+task+'/');
-            }  
-          }
+                $.get('/project/{{slug}}/update_taskboard/' + status + '/' + task + '/');
+            }
+        }).disableSelection();
+    });
 
-      $(function() {
-          $( ".connectedSortable" ).sortable({
-            connectWith: ".connectedSortable",
-            receive: function( event, ui ) {
-                var status = this.id;
-                var task = ui.item.attr('id')
-                $.get('/project/{{slug}}/update_taskboard/'+status+'/'+task+'/');
-            }  
-          }).disableSelection();
-        });
+    /* load tasks all */
+    jQuery(function($) {
+        $('.scroll.all').on('scroll', function() {
 
-      /* load tasks all */
-      jQuery(function($) {
-        $('.scroll.all').on('scroll',function() {
-           
-            if($(this).scrollTop() + $(this).innerHeight() >= this.scrollHeight-2) {
+            if ($(this).scrollTop() + $(this).innerHeight() >= this.scrollHeight - 2) {
                 page = $(this).find('input[name="page_num"]').val();
                 var status_slug = $(this).children("ul").attr("id")
 
-                if(page){
-                  $(this).find('input[name="page_num"]').remove();
-                  $.get("/project/{{slug}}/{{milestone.slug}}/"+status_slug+"/load_tasks/",{"page":page},function(response){
-                        $('ul#'+status_slug).append(response)
-                  });
+                if (page) {
+                    $(this).find('input[name="page_num"]').remove();
+                    $.get("/project/{{slug}}/{{milestone.slug}}/" + status_slug + "/load_tasks/", {
+                        "page": page
+                    }, function(response) {
+                        $('ul#' + status_slug).append(response)
+                    });
                 }
             }
         })
-      });
-      /* end load all tasks */
+    });
+    /* end load all tasks */
 
-$(document).ready(function(){
-  $('.name_div').on('click',function(){
-        var req_id = $(this).attr('id');
-        $.get("/project/{{slug}}/{{milestone.slug}}/"+req_id+"/",function(response){
-           $('.task_category_wrap').remove()
-           $('.requirement_list_panel').after(response) 
-           $('.scroll').slimscroll({
-              alwaysVisible: false,
-              height: 350
+    $(document).ready(function() {
+        $('.name_div').on('click', function() {
+            var req_id = $(this).attr('id');
+            $.get("/project/{{slug}}/{{milestone.slug}}/" + req_id + "/", function(response) {
+                $('.task_category_wrap').remove()
+                $('.requirement_list_panel').after(response)
+                $('.scroll').slimscroll({
+                    alwaysVisible: false,
+                    height: 350
+                });
+                $('ul.connectedSortable').sortable(drag_options);
+
+                /* start requirement tasks update */
+                $('.requirement').on('scroll', function() {
+                        if ($(this).scrollTop() + $(this).innerHeight() >= this.scrollHeight - 2) {
+                            page = $(this).find('input[name="page_num"]').val();
+                            var status_slug = $(this).children("ul").attr("id")
+                            var requirement_id = $(this).attr('id')
+                            if (page) {
+                                $(this).find('input[name="page_num"]').remove();
+                                $.get("/project/{{slug}}/{{milestone.slug}}/" + status_slug + "/" + requirement_id + "/load_tasks/", {
+                                    "page": page
+                                }, function(response) {
+                                    $('ul#' + status_slug).append(response)
+                                });
+                            }
+
+                        }
+                    })
+                    /*end  requirement tasks update */
             });
-            $('ul.connectedSortable').sortable(drag_options);
 
-          /* start requirement tasks update */
-          $('.requirement').on('scroll',function() {
-            if($(this).scrollTop() + $(this).innerHeight() >= this.scrollHeight-2) {
-                page = $(this).find('input[name="page_num"]').val();
-                var status_slug = $(this).children("ul").attr("id")
-                var requirement_id = $(this).attr('id')
-                if(page){
-                  $(this).find('input[name="page_num"]').remove();
-                  $.get("/project/{{slug}}/{{milestone.slug}}/"+status_slug+"/"+requirement_id+"/load_tasks/",{"page":page},function(response){
-                        $('ul#'+status_slug).append(response)
-                   });
-                }
-
-              }
-          })
-          /*end  requirement tasks update */          
         });
-           
-      });
 
-});  
-</script>
-
+    });
+  </script>
 {% endblock%}

@@ -4,55 +4,54 @@
 {% load staticfiles %}
 {% block content %}
 {% compress css %}
-     {% block extra_css_links %}
-        <link rel="stylesheet" type="text/css" href="{%static 'less/bs_leftnavi.less' %}">
-     {% endblock %}
+  {% block extra_css_links %}
+    <link rel="stylesheet" type="text/css" href="{%static 'less/bs_leftnavi.less' %}">
+  {% endblock %}
 {% endcompress %}
-
-<section id="box-content">
-  <!-- nav left starts here-->
-     {% include "settings/left_menu.html" %}
-  <!-- nav left ends here-->
-  <!-- right container starts here-->
-  <div class="right-container">
-    <div class="panel panel-default content-panel">
-      <div class="panel-body">
-        <!-- content box starts here -->
-        <div class="content_box">
-          <div class="title">
-            <h4>SAMPL1PROJECT DETAILS</h4>
-            <div class="tag">Compellingly reintermediate premier materials for client-centered markets.for client-centered markets.</div>
-          </div>
-          <form action="" method="post" id="id_form_cproject">
-            {%csrf_token%}
-            <div class="panel_box">
-              <div class="form_group">
-                <label>Project Name</label>
-                <input name='name' type="text" class="form-control" value="{{project.name}}">
-                <input name='oldname' type="hidden" class="form-control" value="{{project.slug}}">
-                <span name="pname_error"></span>
-                <!--Error here -->
-                <div class="help">Dynamically maximize professional models whereas.</div>
-              </div>
-              <div class="form_group">
-                <label>Description</label>
-                <textarea name='description' class="textarea">{{project.description}}</textarea>
-                <span name="pdescription_error"></span>
-                <!--Error here -->
-                <div class="help">Dynamically maximize professional models whereas.</div>
-              </div>
-              <button>Save</button>
-              <span class="del-project"><a href="{%url 'project:delete_project' id=project.id %}">Delete Project</a>
-              </div>
-            </form>
+  <section id="box-content">
+    <!-- nav left starts here-->
+    {% include "settings/left_menu.html" %}
+    <!-- right container starts here-->
+    <div class="right-container">
+        <div class="panel panel-default content-panel">
+            <div class="panel-body">
+                <!-- content box starts here -->
+                <div class="content_box">
+                    <div class="title">
+                        <h4>SAMPL1PROJECT DETAILS</h4>
+                        <div class="tag">
+                          Compellingly reintermediate premier materials for client-centered markets.for client-centered markets.
+                        </div>
+                    </div>
+                    <form action="" method="post" id="id_form_cproject">
+                        {%csrf_token%}
+                        <div class="panel_box">
+                            <div class="form_group">
+                                <label>Project Name</label>
+                                <input name='name' type="text" class="form-control" value="{{project.name}}">
+                                <input name='oldname' type="hidden" class="form-control" value="{{project.slug}}">
+                                <span name="pname_error"></span>
+                                <!--Error here -->
+                                <div class="help">Dynamically maximize professional models whereas.</div>
+                            </div>
+                            <div class="form_group">
+                                <label>Description</label>
+                                <textarea name='description' class="textarea">{{project.description}}</textarea>
+                                <span name="pdescription_error"></span>
+                                <!--Error here -->
+                                <div class="help">Dynamically maximize professional models whereas.</div>
+                            </div>
+                            <button>Save</button>
+                            <span class="del-project"><a href="{%url 'project:delete_project' id=project.id %}">Delete Project</a>
+                      </div>
+                    </form>
               <!-- content box starts here -->
+                </div>
               </div>
-              </div>
-             </div>
+           </div>
         </div>
         <!-- right container ends here-->
-    </section>
-
+  </section>
 {% endblock %}
 
 {%block extra_js_links %}
@@ -60,7 +59,7 @@
 {%endblock extra_js_links %}
 
 {%block extra_js %}
-<script type="text/javascript">
+  <script type="text/javascript">
         function send_error(error)
           {
               if(error)
@@ -85,5 +84,5 @@
           });
           e.preventDefault();
         });
-</script>
+  </script>
 {%endblock %}

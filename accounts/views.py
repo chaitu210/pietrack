@@ -1,4 +1,5 @@
-import os, json
+import os
+import json
 from django.core.urlresolvers import reverse
 from django.shortcuts import render
 from django.contrib import auth
@@ -15,15 +16,15 @@ from pietrack.settings import EMAIL_HOST_USER
 # for authentication and login required
 from django.contrib.auth.decorators import user_passes_test, login_required
 
-user_login_required = user_passes_test(lambda user: user.is_active, login_url='/')
+user_login_required = user_passes_test(
+    lambda user: user.is_active, login_url='/')
 
 
 def active_user_required(view_func):
-    decorated_view_func = login_required(user_login_required(view_func), login_url='/')
+    decorated_view_func = login_required(
+        user_login_required(view_func), login_url='/')
     return decorated_view_func
 
-
-# Create your views here.
 
 def index(request):
     if request.user.id:
@@ -47,9 +48,11 @@ def login(request):
                 auth.login(request, user)
                 json_data = {'error': False}
             else:
-                json_data = {'error': True, 'error_msg': 'User account is disabled'}
+                json_data = {
+                    'error': True, 'error_msg': 'User account is disabled'}
         else:
-            json_data = {'error': True, 'error_msg': 'Authenticating user failed, wrong email or password'}
+            json_data = {'error': True, 'error_msg':
+                         'Authenticating user failed, wrong email or password'}
         return HttpResponse(json.dumps(json_data), content_type='application/json')
     else:
         return render(request, 'login.html')
@@ -67,10 +70,12 @@ def register(request):
         if password == confirm_password:
             if Organization.objects.filter(name=organization_name):
                 pietrack_role = 'user'
-                organization_obj = Organization.objects.get(name=organization_name)
+                organization_obj = Organization.objects.get(
+                    name=organization_name)
             else:
                 pietrack_role = 'admin'
-                organization_obj = Organization.objects.create(name=organization_name, slug=organization_name)
+                organization_obj = Organization.objects.create(
+                    name=organization_name, slug=organization_name)
             json_data = {'error': False}
             new_user = User.objects.create_user(username=username, email=email, password=password,
                                                 first_name=first_name, organization=organization_obj,
@@ -101,7 +106,8 @@ def forgot_password(request):
                     form.save(**opts)
                 json_data = {'error': False}
             else:
-                json_data = {'error': True, 'error_msg': 'email not registered'}
+                json_data = {
+                    'error': True, 'error_msg': 'email not registered'}
         return HttpResponse(json.dumps(json_data), content_type='application/json')
 
 
@@ -113,7 +119,8 @@ def change_password(request):
         if form.is_valid():
             user.set_password(request.POST['password1'])
             user.save()
-            response_data = {'error': False, "response": 'Your password is updated !'}
+            response_data = {
+                'error': False, "response": 'Your password is updated !'}
 
         else:
             response_data = {'error': True, 'response': form.errors}
@@ -133,12 +140,14 @@ def user_profile(request):
 
                 user.profile_pic = request.FILES['profile_pic']
                 try:
-                    os.remove(settings.MEDIA_ROOT + 'profile/' + user.username + '/' + user.username + '.jpg')
+                    os.remove(settings.MEDIA_ROOT + 'profile/' +
+                              user.username + '/' + user.username + '.jpg')
                 except:
                     pass
 
             form.save()
-            response_data = {'error': False, "response": 'Successfully updated'}
+            response_data = {
+                'error': False, "response": 'Successfully updated'}
 
         else:
             response_data = {'error': True, 'response': form.errors}

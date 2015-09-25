@@ -1,185 +1,191 @@
-{% extends 'base.html' %}
+{% extends 'base.html' %} 
 {% load compress %}
 {% load static %}
 {% compress css %}
-{% block extra_css_links %}
-<link rel="stylesheet" type="text/less" href="{% static 'less/bs_leftnavi.less' %}">
-{% endblock %}
-{% endcompress %}
+    {% block extra_css_links %}
+        <link rel="stylesheet" type="text/less" href="{% static 'less/bs_leftnavi.less' %}">
+    {% endblock %} {% endcompress %}
 {% block content %}
-<section id="box-content">
-   <!-- nav left starts here-->
-   {% include "settings/left_menu.html" %}
-   <!-- nav left ends here-->
-   <!-- right container starts here-->
-   <div class="right-container">
-      <div class="panel panel-default content-panel content-panel-extra">
-         <div class="panel-body">
-            <!-- content box starts here -->
-            <div class="content_box ">
-               <div class="title">
-                  <h4>SAMPL1 - <span class="status">MANAGE Permissions</span></h4>
-                  <div class="tag">Specify the statuses your user stories, tasks and issues will go through</div>
-                  <span class="new"><a href="#" data-toggle="modal" data-target="#myModal">Add New Role</a></span>
-                  <!-- new role add modal starts here -->
-                  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-                     <div class="modal-dialog" role="document">
-                        <div class="modal-content" id="id_hide_role">
-                           <div class="modal-header">
-                              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                              <h4 class="modal-title" id="myModalLabel">Add New Role</h4>
-                           </div>
-                           <form action="" method="post" id="id_add_role">
-                              {% csrf_token %}
-                              <div class="modal-body">
-                                 <div class="form_group">
-                                    <label>Role Name</label>
-                                    <input name="name" type="text" class="form-control">
-                                    <span id="id_role_error" class="help error"></span>
-                                    <div class="help">add new class role for your project</div>
-                                 </div>
-                              </div>
-                              <div class="modal-footer">
-                                 <button type="submit" class="btn btn-primary">Submit</button>
-                              </div>
-                           </form>
+  <section id="box-content">
+    <!-- nav left starts here-->
+    {% include "settings/left_menu.html" %}
+    <!-- right container starts here-->
+    <div class="right-container">
+        <div class="panel panel-default content-panel content-panel-extra">
+            <div class="panel-body">
+                <!-- content box starts here -->
+                <div class="content_box ">
+                    <div class="title">
+                        <h4>SAMPL1 - <span class="status">MANAGE Permissions</span></h4>
+                        <div class="tag">
+                            Specify the statuses your user stories, tasks and issues will go through
                         </div>
-                     </div>
-                  </div>
-                  <!-- new role add modal ends here -->
-               </div>
-               <!-- status table starts here -->
-               <div class="table-responsive member-box">
-                  <table class="table table-hover" id="role_permissions">
-                     <thead>
-                        <tr>
-                           <th>Role</th>
-                           <th>Users</th>
-                           <th>Action</th>
-                        </tr>
-                     </thead>
-                     <tbody>
-                        {% for role in list_of_roles %}
-                        <tr id="{{role.id}}">
-                           <td>{{role.name}} </td>
-                           <td>
-                              {% for user in role.users.all %}
-                              <span class="user-assign"><a href="#"><i class="fa fa-user"></i> {{user}}</a></span> {% endfor %}
-                           </td>
-                           <td class="actions"><a href="#" class="edit" data-toggle="modal" data-target="#myModal1" onclick="edit_role('{{role.id}}','{{role.name}}','{{role.slug}}')"><i class="fa fa-edit"></i></a> <a onclick="delete_role('{{role.slug}}','{{role.id}}')" href="#" class="delete"><i class="fa fa-trash"></i></a> </td>
-                        </tr>
-                        {% endfor %}
-                     </tbody>
-                  </table>
-               </div>
-               <form action="" method="post" id="id_edit_role">
-                  {% csrf_token %}
-                  <!-- edit role add modal starts here -->
-                  <div class="modal fade" id="myModal1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-                     <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                           <div class="modal-header">
-                              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                              <h4 class="modal-title" id="myModalLabel">Edit Role</h4>
-                           </div>
-                           <div class="modal-body">
-                              <div class="form_group">
-                                 <label>Role Name</label>
-                                 <input name="role_id" value="0" style="display:none;">
-                                 <input name="name" type="text" value="" class="form-control" placeholder="Ex: UX Developer">
-                                 <span id="edit_role_error" class="help error"></span>
-                                 <div class="help">add new role for your project</div>
-                              </div>
-                           </div>
-                           <div class="modal-footer">
-                              <input id="edit_slug" val="" style="display:none;"/>
-                              <button type="submit" class="btn btn-primary">Submit</button>
-                           </div>
+                        <span class="new">
+                            <a href="#" data-toggle="modal" data-target="#myModal">
+                                Add New Role
+                            </a>
+                        </span>
+                        <!-- new role add modal starts here -->
+                        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content" id="id_hide_role">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                          <span aria-hidden="true">&times;</span>
+                                        </button>
+                                        <h4 class="modal-title" id="myModalLabel">Add New Role</h4>
+                                    </div>
+                                    <form action="" method="post" id="id_add_role">
+                                        {% csrf_token %}
+                                        <div class="modal-body">
+                                            <div class="form_group">
+                                                <label>Role Name</label>
+                                                <input name="name" type="text" class="form-control">
+                                                <span id="id_role_error" class="help error"></span>
+                                                <div class="help">add new class role for your project</div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="submit" class="btn btn-primary">Submit</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
                         </div>
-                     </div>
-                  </div>
-                  <!-- edit role add modal ends here -->
-               </form>
-               <!-- status table ends here -->
-               <!-- content box starts here -->
+                        <!-- new role add modal ends here -->
+                    </div>
+                    <!-- status table starts here -->
+                    <div class="table-responsive member-box">
+                        <table class="table table-hover" id="role_permissions">
+                            <thead>
+                                <tr>
+                                    <th>Role</th>
+                                    <th>Users</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                              {% for role in list_of_roles %}
+                                <tr id="{{role.id}}">
+                                    <td>{{role.name}} </td>
+                                    <td>
+                                        {% for user in role.users.all %}
+                                          <span class="user-assign">
+                                            <a href="#"><i class="fa fa-user"></i> {{user}}</a>
+                                          </span>
+                                        {% endfor %}
+                                    </td>
+                                    <td class="actions"><a href="#" class="edit" data-toggle="modal" data-target="#myModal1" onclick="edit_role('{{role.id}}','{{role.name}}','{{role.slug}}')"><i class="fa fa-edit"></i></a> <a onclick="delete_role('{{role.slug}}','{{role.id}}')" href="#" class="delete"><i class="fa fa-trash"></i></a> </td>
+                                </tr>
+                              {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <form action="" method="post" id="id_edit_role">
+                        {% csrf_token %}
+                        <!-- edit role add modal starts here -->
+                        <div class="modal fade" id="myModal1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                        <h4 class="modal-title" id="myModalLabel">Edit Role</h4>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="form_group">
+                                            <label>Role Name</label>
+                                            <input name="role_id" value="0" style="display:none;">
+                                            <input name="name" type="text" value="" class="form-control" placeholder="Ex: UX Developer">
+                                            <span id="edit_role_error" class="help error"></span>
+                                            <div class="help">add new role for your project</div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <input id="edit_slug" val="" style="display:none;" />
+                                        <button type="submit" class="btn btn-primary">Submit</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- edit role add modal ends here -->
+                    </form>
+                    <!-- status table ends here -->
+                    <!-- content box starts here -->
+                </div>
             </div>
-         </div>
-      </div>
-   </div>
-   <!-- right container ends here-->
-</section>
+        </div>
+    </div>
+    <!-- right container ends here-->
+  </section>
 {% endblock %}
 {% block extra_js_links %}
-<script type="text/javascript" src="{% static 'js/bs_leftnavi.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/bs_leftnavi.js' %}"></script>
 {% endblock %}
-{% block extra_js %} 
-<script>
+{% block extra_js %}
+  <script>
+  function edit_role(id, name, slug) {
+      $('#id_edit_role input[name="name"]').val(name)
+      $('#id_edit_role input[name="role_id"]').val(id)
+      $('#edit_slug').val(slug)
+  }
 
-   function edit_role(id,name,slug){
-     $('#id_edit_role input[name="name"]').val(name)
-     $('#id_edit_role input[name="role_id"]').val(id)
-     $('#edit_slug').val(slug)
-   }
+  function delete_role(slug, id) {
+      $.get('/project/{{slug}}/settings/member_role/' + slug + '/delete/', function(response) {
+          if (!response['error']) {
+              $("#" + id).remove();
+          }
+      });
 
-   function delete_role(slug,id){
-     $.get('/project/{{slug}}/settings/member_role/'+slug+'/delete/',function(response){
-       if(!response['error']){
-         $("#"+id).remove();
-       }
-     });
-   
-   }
-   
-   $("#id_add_role").on('submit',function(e){
-     var data = $("#id_add_role").serialize();
-     $.post("{% url 'project:member_role_create' slug %}",data,function(response){
-       if(response['error']){
-         $('#id_role_error').text(response['errors'].name)
-       }
-       else{
-         var role_id = response['role_id'];
-         var role_name = response['role_name'];
-         var slug =  response['slug'];
-   
-         var row = '<tr id="'+role_id+'"><td>'+role_name+' </td><td></td><td class="actions"><a href="#" class="edit" data-toggle="modal" data-target="#myModal1" onclick="edit_role(\''+role_id+'\',\''+role_name+'\',\''+slug+'\')"><i class="fa fa-edit"></i></a> <a href="#" class="delete" onclick="delete_role(\''+slug+'\',\''+role_id+'\')"><i class="fa fa-trash"></i></a> </td></tr>'
-         $("#role_permissions tbody tr:last-child").after(row);
-         $("#id_add_role input[name='name']").val("");
-         $('button.close').click();
-       }
-     });
-     e.preventDefault();
-   });
-   
-   $("#id_edit_role").on('submit',function(e){
-     var data = $("#id_edit_role").serialize();
-     var slug = $("#edit_slug").val()
-  
-     $.post('/project/{{slug}}/settings/member_role/'+slug+'/edit/',data,function(response){
-       if(response['error']){
-         $('#edit_role_error').text(response['errors'].name)
-       }
-       else{
-           var role_id = response['role_id'];
-           var role_name = response['role_name'];
-           var slug =  response['slug'];
-           $('tbody #'+role_id+' td:first-child').text(role_name)
-           $('tbody #'+role_id+' a.edit ').attr('onclick','edit_role("'+role_id+'","'+role_name+'","'+slug+'")')
-           $('tbody #'+role_id+' a.delete ').attr('onclick',"delete_role('"+slug+"','"+role_id+"')")
-           $('button.close').click()
-       }
-     });
-     e.preventDefault(); 
-   });
-   
-   $('button.close').on('click',function(){
-     $('#id_add_role input[name="name"]').val("")
-     $('.error').text("");
-   });
-   
-   $('.modal').on('hidden.bs.modal', function(){
-     $('button.close').click()
-   });
-   
-   
-</script>
+  }
+
+  $("#id_add_role").on('submit', function(e) {
+      var data = $("#id_add_role").serialize();
+      $.post("{% url 'project:member_role_create' slug %}", data, function(response) {
+          if (response['error']) {
+              $('#id_role_error').text(response['errors'].name)
+          } else {
+              var role_id = response['role_id'];
+              var role_name = response['role_name'];
+              var slug = response['slug'];
+
+              var row = '<tr id="' + role_id + '"><td>' + role_name + ' </td><td></td><td class="actions"><a href="#" class="edit" data-toggle="modal" data-target="#myModal1" onclick="edit_role(\'' + role_id + '\',\'' + role_name + '\',\'' + slug + '\')"><i class="fa fa-edit"></i></a> <a href="#" class="delete" onclick="delete_role(\'' + slug + '\',\'' + role_id + '\')"><i class="fa fa-trash"></i></a> </td></tr>'
+              $("#role_permissions tbody tr:last-child").after(row);
+              $("#id_add_role input[name='name']").val("");
+              $('button.close').click();
+          }
+      });
+      e.preventDefault();
+  });
+
+  $("#id_edit_role").on('submit', function(e) {
+      var data = $("#id_edit_role").serialize();
+      var slug = $("#edit_slug").val()
+
+      $.post('/project/{{slug}}/settings/member_role/' + slug + '/edit/', data, function(response) {
+          if (response['error']) {
+              $('#edit_role_error').text(response['errors'].name)
+          } else {
+              var role_id = response['role_id'];
+              var role_name = response['role_name'];
+              var slug = response['slug'];
+              $('tbody #' + role_id + ' td:first-child').text(role_name)
+              $('tbody #' + role_id + ' a.edit ').attr('onclick', 'edit_role("' + role_id + '","' + role_name + '","' + slug + '")')
+              $('tbody #' + role_id + ' a.delete ').attr('onclick', "delete_role('" + slug + "','" + role_id + "')")
+              $('button.close').click()
+          }
+      });
+      e.preventDefault();
+  });
+
+  $('button.close').on('click', function() {
+      $('#id_add_role input[name="name"]').val("")
+      $('.error').text("");
+  });
+
+  $('.modal').on('hidden.bs.modal', function() {
+      $('button.close').click()
+  });
+  </script>
 {% endblock %}

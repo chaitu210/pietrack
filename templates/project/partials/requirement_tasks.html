@@ -1,13 +1,13 @@
 {% load project_tags %}
 {% for ticket_status in ticket_status_list %}
-    <div class="task_category_wrap">
-      <div class="title" style="background:{{ticket_status.color}};">
-      {{ticket_status.name}} 
-      </div>
-      <div class="scroll requirement" id="{{requirement_id}}">
-      <ul class='connectedSortable' id='{{ticket_status.slug}}'>
-          {% include "project/partials/task.html" with milestone=milestone slug=slug tasks=ticket_status|Requirement_Task_list:requirement_id %}
-      </ul>
-      </div>
+  <div class="task_category_wrap">
+    <div class="title" style="background:{{ticket_status.color}};">
+        {{ticket_status.name}}
     </div>
+    <div class="scroll requirement" id="{{requirement_id}}">
+        <ul class='connectedSortable' id='{{ticket_status.slug}}'>
+            {% include "project/partials/task.html" with milestone=milestone slug=slug tasks=ticket_status|Requirement_Task_list:requirement_id %}
+        </ul>
+    </div>
+  </div>
 {% endfor %}

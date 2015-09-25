@@ -8,8 +8,8 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
     {% compress css %}
-    <link rel="stylesheet" type="text/less" href="{% static 'less/hexagon.less' %}">
-    <link rel="stylesheet" type="text/less" href="{% static 'less/main.less' %}">
+        <link rel="stylesheet" type="text/less" href="{% static 'less/hexagon.less' %}">
+        <link rel="stylesheet" type="text/less" href="{% static 'less/main.less' %}">
     {% endcompress %}
   </head>
   <body class="container login_container">
@@ -19,8 +19,10 @@
         <span>PIE TRACK</span>
       </div>
       <div class='text'>
-        <h3>Track your project</h3>
-        <div class="tag">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent sed malesuada justo. Nam sed lectus vel sem accumsan mollis.</div>
+        <h3>Track your </h3>
+        <div class="tag">
+         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent sed malesuada justo. Nam sed lectus vel sem accumsan mollis.
+        </div>
       </div>
       <div class="clearfix"></div>
     </header>
@@ -98,7 +100,9 @@
           </div>
           <div class="ticket">
             <h3>Time Management</h3>
-            <div class="tag_description"> Quisque vehicula euismod lacinia. Ut diam sem, rutrum ut lectus et, tempor </div>
+            <div class="tag_description">
+                 Quisque vehicula euismod lacinia. Ut diam sem, rutrum ut lectus et, tempor 
+            </div>
           </div>
         </div>
       </div>
@@ -133,34 +137,34 @@
       <!--/ tag -->
       <!-- create_div -->
       <div class="create_div" id='create_account'>
-        <form id = 'form_create_account_id' method = 'POST' action = "{% url 'user:register' %}">
+        <form id='form_create_account_id' method='POST' action="{% url 'user:register' %}">
           <div class="title_flap">Create account</div>
           <div class="form-group">
             <label>Email address</label>
-            <input id = 'email_id' name = 'email' type="email" class="form-control"><span id = 'error_email_id'></span>
+            <input id='email_id' name='email' type="email" class="form-control"><span id='error_email_id'></span>
           </div>
           <div class="form-group">
             <label>Full name</label>
-            <input id = 'first_name_id' name = 'first_name' type="text" class="form-control"><span id = 'error_first_name_id'></span>
+            <input id='first_name_id' name='first_name' type="text" class="form-control"><span id='error_first_name_id'></span>
           </div>
           <div class="form-group">
             <label>Password</label>
-            <input id = 'password_id' name = 'password' type="password" class="form-control"><span id = 'error_password_id'></span>
+            <input id='password_id' name='password' type="password" class="form-control"><span id='error_password_id'></span>
           </div>
           <div class="form-group">
             <label>Confirm passowrd</label>
-            <input id = 'confirm_password_id' name = 'confirm_password' type="password" class="form-control"><span id = 'error_confirm_password_id'></span>
+            <input id='confirm_password_id' name='confirm_password' type="password" class="form-control"><span id='error_confirm_password_id'></span>
           </div>
           <div class="form-group">
             <label>user name (case sensitive)</label>
-            <input id = 'username_id' name = 'username' type="text" class="form-control"><span id = 'error_username_id'></span>
+            <input id='username_id' name='username' type="text" class="form-control"><span id='error_username_id'></span>
           </div>
           <div class="form-group">
             <label>organization</label>
-            <input id = 'organization_id' name = 'organization' type="text" class="form-control"><span id = 'error_organization_id'></span>
+            <input id='organization_id' name='organization' type="text" class="form-control"><span id='error_organization_id'></span>
           </div>
           <div class="form-group">
-            <button id = 'create_account_button_id' type = 'submit' class='button'>Sign up for free</button>
+            <button id='create_account_button_id' type='submit' class='button'>Sign up for free</button>
           </div>
           <!--<div class="form-group">
             <span class='tag_text'>Are you an exixting member? <a>log in</a></span>
@@ -174,18 +178,18 @@
         <div class="bg_blur"></div>
         <!--login -->
         <div class="login_active actvive_login_forgot" id='login'>
-          <form id = 'form_login_id' method = 'POST' action = "{% url 'user:login' %}">
+          <form id='form_login_id' method='POST' action="{% url 'user:login' %}">
             <div class="title_flap">login</div>
             <div class="form-group">
               <label>Email address</label>
-              <input id = 'login_email_id' name = 'email' type="email" class="form-control">
+              <input id='login_email_id' name='email' type="email" class="form-control">
             </div>
             <div class="form-group">
               <label>Password</label>
-              <input id = 'login_password_id' name = 'password' type="password" class="form-control"><span id = 'login_error_id'></span>
+              <input id='login_password_id' name='password' type="password" class="form-control"><span id='login_error_id'></span>
             </div>
             <div class="form-group">
-              <button id = 'login_button_id' class='button'>LOgin</button>
+              <button id='login_button_id' class='button'>LOgin</button>
             </div>
             {% csrf_token %}
           </form>
@@ -193,14 +197,14 @@
         <!--/ login -->
         <!-- forgot password -->
         <div class="forgot_active" id='forgot_password'>
-          <form id = 'form_forgot_password_id' method = 'POST'>
+          <form id='form_forgot_password_id' method='POST'>
             <div class="title_flap forgot_flap">forgot password</div>
             <div class="form-group">
               <label>Email address</label>
-              <input id = 'fp_email_id' name = 'email' type="email" class="form-control" ><span id = 'error_fp_email_id'></span>
+              <input id='fp_email_id' name='email' type="email" class="form-control"><span id='error_fp_email_id'></span>
             </div>
             <div class="form-group">
-              <button id = 'forgot_password_button_id' class='button'>Reset password</button>
+              <button id='forgot_password_button_id' class='button'>Reset password</button>
             </div>
             <!--/ forgot password -->
         </div>
@@ -215,79 +219,73 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="{% static 'js/hexagon.js' %}"></script>
     <script type="text/javascript">
-      $('.login_panel_tab_button').click(function(e){
-        var id=$(this).attr('panelId');
-        var btn_bg=$(this).css('border-color');
-        $('.form_div').children('div').removeClass('active');
-        $('.login_panel_tab_button').removeClass('active_button').css('color','inherit');
-        
-        $(this).addClass('active_button').css('color',btn_bg);
-        if(id== 'create_account'){
-          $('#'+id).addClass('active');
-        }
-        else{
-          $('.forgot_login_div').addClass('active').children().removeClass('actvive_login_forgot');
-          $('#'+id).addClass('actvive_login_forgot');
-        }
+      $('.login_panel_tab_button').click(function(e) {
+          var id = $(this).attr('panelId');
+          var btn_bg = $(this).css('border-color');
+          $('.form_div').children('div').removeClass('active');
+          $('.login_panel_tab_button').removeClass('active_button').css('color', 'inherit');
+      
+          $(this).addClass('active_button').css('color', btn_bg);
+          if (id == 'create_account') {
+              $('#' + id).addClass('active');
+          } else {
+              $('.forgot_login_div').addClass('active').children().removeClass('actvive_login_forgot');
+              $('#' + id).addClass('actvive_login_forgot');
+          }
       })
     </script>
     <!--login script-->
     <script>
-      $('#login_button_id').click(function(event){
-              event.preventDefault();
-              $.post("{% url 'user:login' %}", $('#form_login_id').serialize(), function(result){
-                  if(result.error === true){
-                      $('#login_error_id').text(result.error_msg)
-                  }
-                  else{
-                      alert('You are successfully logged in !');
-                      window.location="{% url 'user:user_profile' %}";
-                  }
-              });
+      $('#login_button_id').click(function(event) {
+          event.preventDefault();
+          $.post("{% url 'user:login' %}", $('#form_login_id').serialize(), function(result) {
+              if (result.error === true) {
+                  $('#login_error_id').text(result.error_msg)
+              } else {
+                  alert('You are successfully logged in !');
+                  window.location = "{% url 'user:user_profile' %}";
+              }
+          });
       });
     </script>
     <script>
-      function disp_error(result){
-          if(result){
+      function disp_error(result) {
+          if (result) {
               return result;
-          }
-          else{
+          } else {
               return '';
           }
       }
     </script>
     <script>
-      $('#create_account_button_id').click(function(event){
-              event.preventDefault();
-              $.post("{% url 'user:register' %}", $('#form_create_account_id').serialize(), function(result){
-                  if(result['response']){
-                      $('#error_email_id').text(disp_error(result['response'].email))
-                      $('#error_username_id').text(disp_error(result['response'].username))
-                      $('#error_password_id').text(disp_error(result['response'].password))
-                      $('#error_confirm_password_id').text(disp_error(result['response'].confirm_password))
-                      $('#error_organization_id').text(disp_error(result['response'].organization))
-                  }
-                  else if(result['error_password']){
-                          $('#error_confirm_password_id').text(result['error_password'])
-                  }
-                  else{
-                      alert('user_created')
-                      window.url
-                  }
-              });
+      $('#create_account_button_id').click(function(event) {
+          event.preventDefault();
+          $.post("{% url 'user:register' %}", $('#form_create_account_id').serialize(), function(result) {
+              if (result['response']) {
+                  $('#error_email_id').text(disp_error(result['response'].email))
+                  $('#error_username_id').text(disp_error(result['response'].username))
+                  $('#error_password_id').text(disp_error(result['response'].password))
+                  $('#error_confirm_password_id').text(disp_error(result['response'].confirm_password))
+                  $('#error_organization_id').text(disp_error(result['response'].organization))
+              } else if (result['error_password']) {
+                  $('#error_confirm_password_id').text(result['error_password'])
+              } else {
+                  alert('user_created')
+                  window.url
+              }
+          });
       });
     </script>
     <script>
-      $('#forgot_password_button_id').click(function(event){
-              event.preventDefault();
-              $.post("{% url 'user:forgot_password' %}", $('#form_forgot_password_id').serialize(), function(result){
-                  if(result['error']){
-                      $('#error_fp_email_id').text(disp_error(result['error_msg']))
-                  }
-                  else{
-                      alert('forgot password done')
-                  }
-              },'json');
+      $('#forgot_password_button_id').click(function(event) {
+          event.preventDefault();
+          $.post("{% url 'user:forgot_password' %}", $('#form_forgot_password_id').serialize(), function(result) {
+              if (result['error']) {
+                  $('#error_fp_email_id').text(disp_error(result['error_msg']))
+              } else {
+                  alert('forgot password done')
+              }
+          }, 'json');
       });
     </script>
   </body>

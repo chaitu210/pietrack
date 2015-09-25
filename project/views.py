@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect,render_to_response
+from django.shortcuts import render, redirect, render_to_response
 from piebase.models import Project, Priority, Severity, TicketStatus, Ticket, Requirement, Attachment
 from forms import CreateProjectForm, PriorityForm, SeverityForm, TicketStatusForm, RoleForm, CommentForm
 import json
@@ -16,16 +16,15 @@ from piebase.models import User, Project, Organization, Role, Milestone, Require
 from forms import CreateProjectForm, CreateMemberForm, PasswordResetForm, MilestoneForm, RequirementForm
 from .tasks import send_mail_old_user
 from django.core import serializers
-from django.core.paginator import Paginator,PageNotAnInteger,EmptyPage
-
-
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 
 
 @login_required
 def create_project(request):
     if(request.method == "POST"):
         organization = request.user.organization
-        form = CreateProjectForm(request.POST, organization=organization, user = request.user)
+        form = CreateProjectForm(
+            request.POST, organization=organization, user=request.user)
         if(form.is_valid()):
             slug = slugify(request.POST['name'])
             project_obj = form.save()
@@ -51,7 +50,8 @@ def project_detail(request, slug):
     template_name = 'project/project_description.html'
     project_object = Project.objects.get(slug=slug)
     project_members = project_object.members.all()
-    dict_items = {'project_object': project_object, 'project_members': project_members}
+    dict_items = {'project_object': project_object,
+                  'project_members': project_members}
     return render(request, template_name, dict_items)
 
 
@@ -89,7 +89,7 @@ def delete_project(request, id):
 @login_required
 def priorities(request, slug):
     priority_list = Priority.objects.filter(
-    project=Project.objects.get(slug=slug))
+        project=Project.objects.get(slug=slug))
     return render(request, 'settings/priorities.html', {'slug': slug, 'priority_list': priority_list})
 
 
@@ -108,7 +108,7 @@ def priority_create(request, slug):
 def priority_edit(request, slug, priority_slug):
     project = Project.objects.get(slug=slug)
     instance = Priority.objects.get(slug=priority_slug, project=project)
-    form = PriorityForm(request.POST, instance=instance,project=project)
+    form = PriorityForm(request.POST, instance=instance, project=project)
     if(form.is_valid()):
         priority = form.save()
         return HttpResponse(json.dumps({'error': False, 'color': priority.color, 'name': priority.name, 'proj_id': priority.id, 'slug': priority.slug}), content_type="application/json")
@@ -301,7 +301,7 @@ def member_role_create(request, slug):
 
 @login_required
 def member_role_edit(request, slug, member_role_slug):
-    project=Project.objects.get(slug=slug)
+    project = Project.objects.get(slug=slug)
     instance = Role.objects.get(
         slug=member_role_slug, project=project)
     form = RoleForm(request.POST, instance=instance, project=project)
@@ -318,27 +318,31 @@ def member_role_delete(request, slug, member_role_slug):
     Role.objects.get(slug=member_role_slug, project=project).delete()
     return HttpResponse(json.dumps({'error': False}), content_type="application/json")
 
-@login_required
-def taskboard(request,slug,milestone_slug):
-    project = Project.objects.get(slug=slug)
-    milestone = Milestone.objects.get(slug=milestone_slug,project=project)
-    ticket_status_list = TicketStatus.objects.filter(project=project)
-    return render(request,'project/taskboard.html',{'ticket_status_list':ticket_status_list,'slug':slug,'milestone':milestone})
 
 @login_required
-def update_taskboard_status(request,slug,status_slug,task_id):
+def taskboard(request, slug, milestone_slug):
+    project = Project.objects.get(slug=slug)
+    milestone = Milestone.objects.get(slug=milestone_slug, project=project)
+    ticket_status_list = TicketStatus.objects.filter(project=project)
+    return render(request, 'project/taskboard.html', {'ticket_status_list': ticket_status_list, 'slug': slug, 'milestone': milestone})
+
+
+@login_required
+def update_taskboard_status(request, slug, status_slug, task_id):
     task = Ticket.objects.get(id=task_id)
-    ticket_status = TicketStatus.objects.get(slug=status_slug,project=Project.objects.get(slug=slug))
+    ticket_status = TicketStatus.objects.get(
+        slug=status_slug, project=Project.objects.get(slug=slug))
     task.status = ticket_status
     task.save()
     return HttpResponse("")
 
+
 @login_required
-def load_tasks(request,slug,milestone_slug,status_slug):
+def load_tasks(request, slug, milestone_slug, status_slug):
     project = Project.objects.get(slug=slug)
-    status = TicketStatus.objects.get(slug=status_slug,project=project)
-    milestone = Milestone.objects.get(slug=milestone_slug,project=project)
-    tasks = Ticket.objects.filter(status=status,milestone=milestone) 
+    status = TicketStatus.objects.get(slug=status_slug, project=project)
+    milestone = Milestone.objects.get(slug=milestone_slug, project=project)
+    tasks = Ticket.objects.filter(status=status, milestone=milestone)
 
     paginator = Paginator(tasks, 10)
     page = request.GET.get('page')
@@ -348,23 +352,24 @@ def load_tasks(request,slug,milestone_slug,status_slug):
         pass
     except EmptyPage:
         pass
-    return render_to_response('project/partials/task.html',{'tasks':tasks,'milestone':milestone,'slug':slug})
+    return render_to_response('project/partials/task.html', {'tasks': tasks, 'milestone': milestone, 'slug': slug})
 
 
 @login_required
-def requirement_tasks(request,slug,milestone_slug,requirement_id):
+def requirement_tasks(request, slug, milestone_slug, requirement_id):
     project = Project.objects.get(slug=slug)
-    milestone = Milestone.objects.get(slug=milestone_slug,project=project)
+    milestone = Milestone.objects.get(slug=milestone_slug, project=project)
     ticket_status_list = TicketStatus.objects.filter(project=project)
-    return render(request,'project/partials/requirement_tasks.html',{'ticket_status_list':ticket_status_list,'slug':slug,'requirement_id':requirement_id,'milestone':milestone})
+    return render(request, 'project/partials/requirement_tasks.html', {'ticket_status_list': ticket_status_list, 'slug': slug, 'requirement_id': requirement_id, 'milestone': milestone})
+
 
 @login_required
-def requirement_tasks_more(request,slug,milestone_slug,status_slug,requirement_id):
+def requirement_tasks_more(request, slug, milestone_slug, status_slug, requirement_id):
     requirement = Requirement.objects.get(id=requirement_id)
     project = Project.objects.get(slug=slug)
-    milestone = Milestone.objects.get(slug=milestone_slug,project=project)
+    milestone = Milestone.objects.get(slug=milestone_slug, project=project)
     tasks = requirement.tasks.filter(status__slug=status_slug)
-    paginator = Paginator(tasks,10)
+    paginator = Paginator(tasks, 10)
     page = request.GET.get('page')
     try:
         tasks = paginator.page(page)
@@ -372,96 +377,105 @@ def requirement_tasks_more(request,slug,milestone_slug,status_slug,requirement_i
         pass
     except EmptyPage:
         pass
-    return render_to_response('project/partials/task.html',{'tasks':tasks,'milestone':milestone,'slug':slug})
+    return render_to_response('project/partials/task.html', {'tasks': tasks, 'milestone': milestone, 'slug': slug})
+
 
 @login_required
-def task_details(request,slug,milestone_slug,task_id):
+def task_details(request, slug, milestone_slug, task_id):
     task = Ticket.objects.get(id=task_id)
-    return render(request,'task/Task_detail.html',{'task':task,'slug':slug})
-    
+    return render(request, 'task/Task_detail.html', {'task': task, 'slug': slug})
+
 
 @login_required
-def task_comment(request,slug,task_id):
-    project = Project.objects.get(slug=slug,organization=request.user.organization)
+def task_comment(request, slug, task_id):
+    project = Project.objects.get(
+        slug=slug, organization=request.user.organization)
     task = Ticket.objects.get(id=task_id)
-    form = CommentForm(request.POST,task=task,user=request.user,project=project)
+    form = CommentForm(
+        request.POST, task=task, user=request.user, project=project)
 
     if form.is_valid():
         comment = form.save()
-        if request.GET.get('parent_id',False):
+        if request.GET.get('parent_id', False):
             comment.parent_id = request.GET.get('parent_id')
         if request.FILES.get('file'):
-            attachment = Attachment.objects.create(uploaded_by=request.user,attached_file=request.FILES.get('file'),project=project)
+            attachment = Attachment.objects.create(
+                uploaded_by=request.user, attached_file=request.FILES.get('file'), project=project)
             comment.attachments.add(attachment)
         comment.save()
-        return HttpResponse(render_to_response('task/partials/comment_add.html',{'comment':comment,'slug':slug}))
+        return HttpResponse(render_to_response('task/partials/comment_add.html', {'comment': comment, 'slug': slug}))
     else:
-        return HttpResponse(json.dumps({'error':True,'errors':form.errors}), content_type="json/application")
+        return HttpResponse(json.dumps({'error': True, 'errors': form.errors}), content_type="json/application")
+
 
 @login_required
-def delete_attachment(request,slug,attachment_id):
-    attach = Attachment.objects.get(id=attachment_id,project__slug=slug)
+def delete_attachment(request, slug, attachment_id):
+    attach = Attachment.objects.get(id=attachment_id, project__slug=slug)
     try:
-        shutil.rmtree(os.path.abspath(os.path.join(attach.attached_file.path, os.pardir)))
+        shutil.rmtree(
+            os.path.abspath(os.path.join(attach.attached_file.path, os.pardir)))
         attach.delete()
     except OSError as e:
         pass
-    return HttpResponse(json.dumps({'result':True}), content_type="json/application")
+    return HttpResponse(json.dumps({'result': True}), content_type="json/application")
+
 
 @login_required
 def milestone_create(request, slug):
     if request.method == 'POST':
         json_data = {}
         milestone_dict = request.POST.copy()
-        project_id = Project.objects.get(slug = slug).id
+        project_id = Project.objects.get(slug=slug).id
         milestone_dict['project'] = project_id
         milestone_form = MilestoneForm(request.user, milestone_dict)
         if milestone_form.is_valid():
             milestone_form.save()
             json_data['error'] = False
-            return HttpResponse(json.dumps(json_data), content_type = 'application/json')
+            return HttpResponse(json.dumps(json_data), content_type='application/json')
         else:
             json_data['error'] = True
             json_data['form_errors'] = milestone_form.errors
-            return HttpResponse(json.dumps(json_data), content_type = 'application/json')
+            return HttpResponse(json.dumps(json_data), content_type='application/json')
     else:
         return render(request, 'project/milestone.html')
 
 
 @login_required
 def milestone_edit(request, slug):
-    milestone_obj = Milestone.objects.get(slug = slug)
+    milestone_obj = Milestone.objects.get(slug=slug)
     if request.method == 'POST':
         json_data = {}
         milestone_dict = request.POST.copy()
         project_id = milestone_obj.project.id
         milestone_dict['project'] = project_id
-        milestone_form = MilestoneForm(request.user, milestone_dict, instance = milestone_obj)
+        milestone_form = MilestoneForm(
+            request.user, milestone_dict, instance=milestone_obj)
         if milestone_form.is_valid():
             milestone_form.save()
             json_data['error'] = False
-            return HttpResponse(json.dumps(json_data), content_type = 'application/json')
+            return HttpResponse(json.dumps(json_data), content_type='application/json')
         else:
             json_data['error'] = True
             json_data['form_errors'] = milestone_form.errors
-            return HttpResponse(json.dumps(json_data), content_type = 'application/json')
+            return HttpResponse(json.dumps(json_data), content_type='application/json')
     else:
         return render(request, 'project/milestone.html', {'milestone_obj': milestone_obj})
 
 
 @login_required
 def milestone_delete(request, slug):
-    Milestone.objects.get(slug = slug).delete()
+    Milestone.objects.get(slug=slug).delete()
     return HttpResponse(json.dumps({'error': False}))
 
 
 @login_required
 def project_edit(request, slug):
     milestone_list = Milestone.objects.all()
-    project_obj = Project.objects.get(slug = slug)
+    project_obj = Project.objects.get(slug=slug)
     member_dict = {}
     for member_iter in project_obj.members.all():
-        member_dict[member_iter.email] = [role.name for role in member_iter.user_roles.all()]
+        member_dict[member_iter.email] = [
+            role.name for role in member_iter.user_roles.all()]
     return render(request, 'project/project_edit.html', {'milestone_list': milestone_list, 'member_dict': member_dict, 'project_slug': slug})
 
 
@@ -473,8 +487,10 @@ def requirement_create(request, slug):
         requirement_form = RequirementForm(request.POST)
         if requirement_form.is_valid():
             name = request.POST.get('name')
-            milestone_obj = Milestone.objects.get(id=request.POST.get('milestone'))
-            Requirement.objects.create(name=name, slug=name, description=request.POST.get('description'), project=project_obj, milestone=milestone_obj)
+            milestone_obj = Milestone.objects.get(
+                id=request.POST.get('milestone'))
+            Requirement.objects.create(name=name, slug=name, description=request.POST.get(
+                'description'), project=project_obj, milestone=milestone_obj)
             json_data['error'] = False
             return HttpResponse(json.dumps(json_data), content_type='application/json')
         else:

@@ -13,7 +13,8 @@ def Memail(mfrom, msubject, mbody, mto, msubscribe=''):
         'us-east-1',
         aws_access_key_id=settings.AM_ACCESS_KEY,
         aws_secret_access_key=settings.AM_PASS_KEY)
-    conn.send_email(settings.DEFAULT_FROM_EMAIL, msubject, mbody, mto, format='html')
+    conn.send_email(
+        settings.DEFAULT_FROM_EMAIL, msubject, mbody, mto, format='html')
 
 
 def rand_string(size=6, chars=string.ascii_letters + string.digits):
