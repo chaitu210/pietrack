@@ -1,54 +1,56 @@
 {% extends 'base.html' %}
 {% block content %}
-<section id='base_content' class='create_project'>
-  <div class="content_box">
-    <div class="title">
-      <h4>Create your project to access</h4>
-      <div class="tag">Compellingly reintermediate premier materials for client-centered markets.for client-centered markets.</div>
+  <section id='base_content' class='create_project'>
+    <div class="content_box">
+        <div class="title">
+            <h4>Create your project to access</h4>
+            <div class="tag">
+                Compellingly reintermediate premier materials for client-centered markets.for client-centered markets.
+            </div>
+        </div>
+        <!-- create project form start-->
+        <form action="" method="post" id="id_form_cproject">
+            {%csrf_token%}
+            <div class="panel_box">
+                <div class="form_group">
+                    <label>Project title</label>
+                    <input name='name' type="text" class='input'>
+                    <span name="pname_error" id="name" class="error"></span>
+                    <!--Error here -->
+                    <div class="help">Dynamically maximize professional models whereas.</div>
+                </div>
+                <div class="form_group">
+                    <label>Description</label>
+                    <textarea name='description' class='textarea'></textarea>
+                    <span name="pdescription_error" id="description" class="error"></span>
+                    <!--Error here -->
+                    <div class="help">Dynamically maximize professional models whereas.</div>
+                </div>
+                <button id="id_submit_cproject">create project</button>
+            </div>
+        </form>
+        <!-- create project form end -->
     </div>
-    <!-- create project form start-->
-    <form action="" method="post" id="id_form_cproject">
-      {%csrf_token%}
-      <div class="panel_box">
-        <div class="form_group">
-          <label>Project title</label>
-          <input name='name' type="text" class='input'>
-          <span name="pname_error" id="name" class="error"></span><!--Error here -->
-          <div class="help">Dynamically maximize professional models whereas.</div>
-        </div>
-        <div class="form_group">
-          <label>Description</label>
-          <textarea name='description' class='textarea'></textarea>
-          <span name="pdescription_error" id="description" class="error"></span><!--Error here -->
-          <div class="help">Dynamically maximize professional models whereas.</div>
-        </div>
-        <button id="id_submit_cproject">create project</button>
-      </div>
-    </form>
-    <!-- create project form end -->
-  </div>
-</section>
-  {% endblock content %}
-
-      {% block extra_js %}
-      <script type="text/javascript">
-        $('#id_form_cproject').on('submit',function(e){
-          $.post('',$('#id_form_cproject').serialize(),function(response){
-            if(response['error']){
-              $(".error").text("");
-              for(key in response['errors']){
-                $("#"+key).text(response['errors'][key]);
-              }
-              // $("span[name='pname_error']").text(send_error(response['errors'].name));
-              // $("span[name='pdescription_error']").text(send_error(response['errors'].description));
+  </section>
+{% endblock content %}
+{% block extra_js %}
+    <script type="text/javascript">
+    $('#id_form_cproject').on('submit', function(e) {
+        $.post('', $('#id_form_cproject').serialize(), function(response) {
+            if (response['error']) {
+                $(".error").text("");
+                for (key in response['errors']) {
+                    $("#" + key).text(response['errors'][key]);
+                }
+                // $("span[name='pname_error']").text(send_error(response['errors'].name));
+                // $("span[name='pdescription_error']").text(send_error(response['errors'].description));
+            } else {
+                /*redirect page here */
+                var slug = response['slug']
+                window.location = '/project/' + slug + '/' + 'create_member'
             }
-            else{
-              /*redirect page here */
-              var slug = response['slug']
-              window.location = '/project/' + slug + '/' + 'create_member'
-            }
-          });
-          e.preventDefault();
         });
-      </script>
-    {% endblock %}
+        e.preventDefault();
+    });
+    </script>
+{% endblock %}

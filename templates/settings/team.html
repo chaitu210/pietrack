@@ -3,75 +3,88 @@
 {% block content %}
 {% load staticfiles %}
 {% compress css %}
-{% block extra_css_links %}
-<link rel="stylesheet" type="text/css" href="{%static 'less/bs_leftnavi.less' %}">
-{% endblock %}
+    {% block extra_css_links %}
+        <link rel="stylesheet" type="text/css" href="{%static 'less/bs_leftnavi.less' %}">
+    {% endblock %}
 {% endcompress %}
 <section id="box-content">
-   <!-- nav left starts here-->
-   {% include "settings/left_menu.html" %}
-   <!-- nav left ends here-->
-   <!-- right container starts here-->
-   <div class="right-container">
-      <div class="panel panel-default content-panel content-panel-extra">
-         <div class="panel-body">
-            <!-- content box starts here -->
-            <div class="content_box ">
-               <div class="title">
-                  <h4>SAMPL1 - <span class="status">MANAGE MEMBERS</span></h4>
-                  <div class="tag">Specify the statuses your user stories, tasks and issues will go through</div>
-                  <span class="new"><a href="{% url 'project:create_member' slug %}">Add New Member</a></span>
-               </div>
-               <!-- status table starts here -->
-               <div class="table-responsive member-box">
-                  <table class="table table-hover">
-                     <thead>
-                        <tr>
-                           <th>Member</th>
-                           <th>Role</th>
-                           <th>Status</th>
-                           <th>Action</th>
-                        </tr>
-                     </thead>
-                     <tbody>
-                        {% for member,role in mem_details %}
-                        <tr>
-                           <th scope="row">
-                              <div class="img-text">
-                                 <span class="user-pic">
-                                 {% if member.profile_pic %}
-                                 <img src="{{member.profile_pic.url}}" />
-                                 {% else %}
-                                 <img src="{% static 'img/user-pic.jpg' %}" />
-                                 {%endif%}
-                                 </span>
-                                 <span class="title-email">
-                                 <span class="title">Mergu</span>
-                                 <span class="email">{{member.email}}</span>
-                                 </span>
-                              </div>
-                           </th>
-                           <td>
-                              <select class="form-control">
-                                 <option>{{role.name}}</option>
-                              </select>
-                           </td>
-                           <td><span class="active-1 status">Active <i class="fa fa-check"></i></span></td>
-                           <td class="actions"><a href="#" class="delete" onclick="delete_member('{{member.id}}')"><i class="fa fa-trash"></i></a></td>
-                        </tr>
-                        {% endfor %}
-                     </tbody>
-                  </table>
-               </div>
-               <!-- status table ends here -->
-               <!-- content box starts here -->
+    <!-- nav left starts here-->
+    {% include "settings/left_menu.html" %}
+    <!-- right container starts here-->
+    <div class="right-container">
+        <div class="panel panel-default content-panel content-panel-extra">
+            <div class="panel-body">
+                <!-- content box starts here -->
+                <div class="content_box ">
+                    <div class="title">
+                        <h4>SAMPL1 - <span class="status">MANAGE MEMBERS</span></h4>
+                        <div class="tag">
+                            Specify the statuses your user stories, tasks and issues will go through</div>
+                        <span class="new">
+                            <a href="{% url 'project:create_member' slug %}">
+                                Add New Member
+                            </a>
+                        </span>
+                    </div>
+                    <!-- status table starts here -->
+                    <div class="table-responsive member-box">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Member</th>
+                                    <th>Role</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% for member,role in mem_details %}
+                                <tr>
+                                    <th scope="row">
+                                        <div class="img-text">
+                                            <span class="user-pic">
+                                             {% if member.profile_pic %}
+                                                 <img src="{{member.profile_pic.url}}" />
+                                             {% else %}
+                                                 <img src="{% static 'img/user-pic.jpg' %}" />
+                                             {%endif%}
+                                             </span>
+                                            <span class="title-email">
+                                                <span class="title">Mergu</span>
+                                                <span class="email">{{member.email}}</span>
+                                            </span>
+                                        </div>
+                                    </th>
+                                    <td>
+                                        <select class="form-control">
+                                            <option>{{role.name}}</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <span class="active-1 status">
+                                            Active
+                                            <i class="fa fa-check"></i>
+                                        </span>
+                                    </td>
+                                    <td class="actions">
+                                        <a href="#" class="delete" onclick="delete_member('{{member.id}}')">
+                                            <i class="fa fa-trash"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- status table ends here -->
+                    <!-- content box starts here -->
+                </div>
             </div>
-         </div>
-      </div>
-   </div>
-   <!-- right container ends here-->
-</section>
+        </div>
+    </div>
+    <!-- right container ends here-->
+  </section>
 {% endblock %}
 {% block extra_js %}
-<script type="text/javascript" src="{%static 'js/bs_leftnavi.js' %}"></script>
+    <script type="text/javascript" src="{%static 'js/bs_leftnavi.js' %}"></script>
 {% endblock %}

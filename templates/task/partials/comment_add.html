@@ -1,34 +1,49 @@
 {% load project_tags %}
 {%load static %}
-          <div class="comment_each">
-            <div class="img_div">
-            <div class="img_wrap">
-            {% if comment.commented_by.profile_pic%}
-              <img src='{{comment.commented_by.profile_pic.url}}'>
-            {% else %}
-              <img src='{% static "img/user-pic.jpg" %}'>
-            {% endif %} 
-              </div>
-              <div class="name" id="{{comment.id}}">
-                {{comment.commented_by}}
-                <div class="designation">({{ comment.commented_by|get_user_Role }} )</div>
-                <div class="posted_details">{{comment.created|date:"d F,Y \a\t P"}}</div>
-              </div>
-            </div>
-            <div class="comment_text">
-              {{comment.comment}}
-              {% for attachment in comment.attachments.all %}
-              <div class="attachments_wrap">
-                <div class="attachment_each">
-                  <i class='fa fa-paperclip'></i>{{attachment}}
-                  <a href="{{attachment.attached_file.url}}" target="_blank"><span class='view_link' data-toggle="modal" ><i class='fa fa-eye'></i>View</span></a>
-                  <a href="{{attachment.attached_file.url}}" download><span class='download_link'><i class='fa fa-download'></i>Download</span></a>
-                  <span class='delete_link'><a href="/project/{{slug}}/task/attachment/delete/{{attachment.id}}/"><i class='fa fa-trash'></i>Delete</a></span>
-                </div>
-              </div>
-              {% endfor %}
-              <div class="reply_button">
-                <button class="reply"><i class='fa fa-reply'></i>Reply</button>
-              </div>
-            </div>
-          </div>
+<div class="comment_each">
+  <div class="img_div">
+    <div class="img_wrap">
+      {% if comment.commented_by.profile_pic%}
+        <img src='{{comment.commented_by.profile_pic.url}}'>
+      {% else %}
+        <img src='{% static "img/user-pic.jpg" %}'>
+      {% endif %} 
+    </div>
+    <div class="name" id="{{comment.id}}">
+      {{comment.commented_by}}
+      <div class="designation">({{ comment.commented_by|get_user_Role }} )</div>
+      <div class="posted_details">{{comment.created|date:"d F,Y \a\t P"}}</div>
+    </div>
+  </div>
+  <div class="comment_text">
+    {{comment.comment}}
+    {% for attachment in comment.attachments.all %}
+      <div class="attachments_wrap">
+        <div class="attachment_each">
+          <i class='fa fa-paperclip'></i>{{attachment}}
+          <a href="{{attachment.attached_file.url}}" target="_blank">
+            <span class='view_link' data-toggle="modal" >
+              <i class='fa fa-eye'></i>
+              View
+            </span>
+          </a>
+          <a href="{{attachment.attached_file.url}}" download>
+            <span class='download_link'>
+              <i class='fa fa-download'></i>
+              Download
+            </span>
+          </a>
+          <span class='delete_link'>
+            <a href="/project/{{slug}}/task/attachment/delete/{{attachment.id}}/">
+              <i class='fa fa-trash'></i>
+              Delete
+            </a>
+          </span>
+        </div>
+      </div>
+    {% endfor %}
+    <div class="reply_button">
+      <button class="reply"><i class='fa fa-reply'></i>Reply</button>
+    </div>
+  </div>
+</div>

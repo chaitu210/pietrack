@@ -2,106 +2,73 @@
 {% load project_tags %}
 {%load static %}
 {%block content%}
-<section id='base_content'>
-   <div class="project_description">
-      <!-- about project -->
-      <div class="col-md-9 about_project_wrap">
-         <div class="title">
-            <span>{{project_object.name}}</span>
-         </div>
-         <div class="profile-pic-count">
-            <div class="col-md-9 content">
-               <div class="profile-content">
-                  <span class="desc">
-                     {{project_object.description}}
-                  </span>
-               </div>
+  <section id='base_content'>
+    <div class="project_description">
+        <!-- about project -->
+        <div class="col-md-9 about_project_wrap">
+            <div class="title">
+                <span>{{project_object.name}}</span>
             </div>
-            <div class="col-md-3 logo">
-            {%if team_member.profile_pic %}
-               <img src="{{ request.user.profile_pic.url }}">
-             {% else %}
-               <img src="{% static 'img/user-pic.jpg' %}">
-             {% endif%}
+            <div class="profile-pic-count">
+                <div class="col-md-9 content">
+                    <div class="profile-content">
+                        <span class="desc">
+                       {{project_object.description}}
+                  </span>
+                    </div>
+                </div>
+                <div class="col-md-3 logo">
+                    {%if team_member.profile_pic %}
+                        <img src="{{ request.user.profile_pic.url }}">
+                    {% else %}
+                        <img src="{% static 'img/user-pic.jpg' %}">
+                    {% endif%}
+                </div>
+                <div class="clearfix"></div>
             </div>
             <div class="clearfix"></div>
-         </div>
-         <div class="clearfix"></div>
-         <!-- tickets -->
-         <span class='ticket blue'>
-         <img src="https://cdn2.iconfinder.com/data/icons/despicable-me-2-minions/128/Happy-Minion-Icon.png">
-         <span class='description'>
-         <span class='name'>Nazneen Shaik</span> seamlessly maintain team building strategic theme areas.
-         <span class='project_name'>#xyz test</span> in <span class='project_name'>Pie track</span>
-         <span class='designation_time'>12 min ago</span>
-         </span>
-         </span>
-         <span class='ticket blue'>
-         <img src="https://cdn2.iconfinder.com/data/icons/despicable-me-2-minions/128/Happy-Minion-Icon.png">
-         <span class='description'>
-         <span class='name'>Nazneen Shaik</span> seamlessly maintain team building strategic theme areas.
-         <span class='project_name'>#xyz test</span> in <span class='project_name'>Pie track</span>
-         <span class='designation_time'>12 min ago</span>
-         </span>
-         </span>
-         <span class='ticket blue'>
-         <img src="https://cdn2.iconfinder.com/data/icons/despicable-me-2-minions/128/Happy-Minion-Icon.png">
-         <span class='description'>
-         <span class='name'>Nazneen Shaik</span> seamlessly maintain team building strategic theme areas.
-         <span class='project_name'>#xyz test</span> in <span class='project_name'>Pie track</span>
-         <span class='designation_time'>12 min ago</span>
-         </span>
-         </span>
-         <span class='ticket blue'>
-         <img src="https://cdn2.iconfinder.com/data/icons/despicable-me-2-minions/128/Happy-Minion-Icon.png">
-         <span class='description'>
-         <span class='name'>Nazneen Shaik</span> seamlessly maintain team building strategic theme areas.
-         <span class='project_name'>#xyz test</span> in <span class='project_name'>Pie track</span>
-         <span class='designation_time'>12 min ago</span>
-         </span>
-         </span>
-         <span class='ticket blue'>
-         <img src="https://cdn2.iconfinder.com/data/icons/despicable-me-2-minions/128/Happy-Minion-Icon.png">
-         <span class='description'>
-         <span class='name'>Nazneen Shaik</span> seamlessly maintain team building strategic theme areas.
-         <span class='project_name'>#xyz test</span> in <span class='project_name'>Pie track</span>
-         <span class='designation_time'>12 min ago</span>
-         </span>
-         </span>
-         <span class='ticket blue'>
-         <img src="https://cdn2.iconfinder.com/data/icons/despicable-me-2-minions/128/Happy-Minion-Icon.png">
-         <span class='description'>
-         <span class='name'>Nazneen Shaik</span> seamlessly maintain team building strategic theme areas.
-         <span class='project_name'>#xyz test</span> in <span class='project_name'>Pie track</span>
-         <span class='designation_time'>12 min ago</span>
-         </span>
-         </span>
-         <!--/ tickets -->
-      </div>
-      <!--/ about project -->
-      <!-- team -->
-      <div class="col-md-3 team">
-         <div class="title">
-            <span>team members</span>
-         </div>
-         <!-- ticket -->
-         {% for team_member in project_members %}
-         <span class='ticket orange'>
-          {%if team_member.profile_pic %}
-            <img src="{{ team_member.profile_pic.url }}">
-          {% else %}
-            <img src="{% static 'img/user-pic.jpg' %}">
-          {% endif%}
-          <span class='description'>
-          <span class='name'>{{team_member.username}}</span>
-          <span class='designation_time'>{{team_member|get_user_Role}}</span>
-          </span>
-          </span>
-          {% endfor %}
-
-         <!--/ ticket -->
-      </div>
-      <!--/ team -->
-   </div>
-</section>
+            <!-- tickets -->
+            <span class='ticket blue'>
+             <img src="https://cdn2.iconfinder.com/data/icons/despicable-me-2-minions/128/Happy-Minion-Icon.png">
+              <span class='description'>
+                <span class='name'>Nazneen Shaik</span> seamlessly maintain team building strategic theme areas.
+                <span class='project_name'>#xyz test</span> in <span class='project_name'>Pie track</span>
+                <span class='designation_time'>12 min ago</span>
+              </span>
+            </span>
+            <span class='ticket blue'>
+                 <img src="https://cdn2.iconfinder.com/data/icons/despicable-me-2-minions/128/Happy-Minion-Icon.png">
+                 <span class='description'>
+                 <span class='name'>Nazneen Shaik</span> seamlessly maintain team building strategic theme areas.
+                <span class='project_name'>#xyz test</span> in <span class='project_name'>Pie track</span>
+                <span class='designation_time'>12 min ago</span>
+                </span>
+            </span>
+            <!--/ tickets -->
+        </div>
+        <!--/ about project -->
+        <!-- team -->
+        <div class="col-md-3 team">
+            <div class="title">
+                <span>team members</span>
+            </div>
+            <!-- ticket -->
+            {% for team_member in project_members %}
+            <span class='ticket orange'>
+                {%if team_member.profile_pic %}
+                    <img src="{{ team_member.profile_pic.url }}">
+                {% else %}
+                    <img src="{% static 'img/user-pic.jpg' %}">
+                {% endif%}
+                <span class='description'>
+                    <span class='name'>{{team_member.username}}</span>
+                    <span class='designation_time'>{{team_member|get_user_Role}}</span>
+                </span>
+            </span>
+            {% endfor %}
+            <!--/ ticket -->
+        </div>
+        <!--/ team -->
+    </div>
+  </section>
 {%endblock content%}

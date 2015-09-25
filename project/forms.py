@@ -21,7 +21,7 @@ class CreateProjectForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.organization = kwargs.pop('organization', None)
-        self.user = kwargs.pop('user',None)
+        self.user = kwargs.pop('user', None)
         super(CreateProjectForm, self).__init__(*args, **kwargs)
 
     class Meta:
@@ -47,6 +47,7 @@ class CreateProjectForm(forms.ModelForm):
             # CreateTimeline(project,"created",project,self.user)
         return instance
 
+
 class PriorityForm(forms.ModelForm):
 
     class Meta:
@@ -56,7 +57,6 @@ class PriorityForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.project = kwargs.pop('project', None)
         super(PriorityForm, self).__init__(*args, **kwargs)
-
 
     def clean_name(self):
         name_slug = slugify(self.cleaned_data.get('name'))
@@ -69,7 +69,6 @@ class PriorityForm(forms.ModelForm):
         elif len(name_slug) == 0:
             raise forms.ValidationError("Priority name must contain a letter.")
         return self.cleaned_data.get('name')
-
 
     def save(self, commit=True):
         instance = super(PriorityForm, self).save(commit=False)
@@ -91,7 +90,6 @@ class SeverityForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.project = kwargs.pop('project', None)
         super(SeverityForm, self).__init__(*args, **kwargs)
-
 
     def clean_name(self):
         name_slug = slugify(self.cleaned_data.get('name'))
@@ -135,7 +133,8 @@ class TicketStatusForm(forms.ModelForm):
             raise forms.ValidationError(
                 'Ticket Status with this name already exists')
         elif len(name_slug) == 0:
-            raise forms.ValidationError("Ticket Status name must contain a letter.")
+            raise forms.ValidationError(
+                "Ticket Status name must contain a letter.")
         return self.cleaned_data.get('name')
 
     def save(self, commit=True):
@@ -147,7 +146,6 @@ class TicketStatusForm(forms.ModelForm):
         if commit:
             instance.save()
         return instance
-
 
 
 class CreateMemberForm(forms.Form):
@@ -235,7 +233,7 @@ class RoleForm(forms.ModelForm):
         name_slug = slugify(self.cleaned_data['name'])
         if self.instance:
             existing_slug = self.instance.slug
-        if(Role.objects.filter(slug=name_slug, project=self.project) and  name_slug != existing_slug):
+        if(Role.objects.filter(slug=name_slug, project=self.project) and name_slug != existing_slug):
             raise forms.ValidationError('Role with this name already exists')
         elif len(name_slug) == 0:
             raise forms.ValidationError("Role name must contain a letter.")
@@ -251,17 +249,18 @@ class RoleForm(forms.ModelForm):
             instance.save()
         return instance
 
+
 class MilestoneForm(forms.ModelForm):
+
     def __init__(self, user, *args, **kwargs):
         self.user = user
         super(MilestoneForm, self).__init__(*args, **kwargs)
 
-
     class Meta:
         model = Milestone
-        fields = ['name', 'estimated_start', 'estimated_finish', 'status', 'project']
+        fields = ['name', 'estimated_start',
+                  'estimated_finish', 'status', 'project']
 
-    
     def save(self):
         milestone = super(MilestoneForm, self).save(commit=False)
         milestone.slug = self.cleaned_data.get('name')
@@ -269,24 +268,28 @@ class MilestoneForm(forms.ModelForm):
         milestone.created_by = self.user
         milestone.save()
 
+
 class RequirementForm(forms.ModelForm):
+
     class Meta:
-        model = Requirement 
+        model = Requirement
         fields = ['name', 'milestone', 'description']
 
+
 class CommentForm(forms.ModelForm):
+
     def __init__(self, *args, **kwargs):
-        self.task = kwargs.pop('task',None)
-        self.user = kwargs.pop('user',None)
-        self.project = kwargs.pop('project',None)
-        super(CommentForm,self).__init__(*args,**kwargs)
+        self.task = kwargs.pop('task', None)
+        self.user = kwargs.pop('user', None)
+        self.project = kwargs.pop('project', None)
+        super(CommentForm, self).__init__(*args, **kwargs)
 
     class Meta:
         model = Comment
         fields = ['comment']
 
     def save(self, commit=True):
-        instance = super(CommentForm,self).save(commit=False)
+        instance = super(CommentForm, self).save(commit=False)
         instance.commented_by = self.user
         instance.ticket = self.task
 

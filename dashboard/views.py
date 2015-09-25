@@ -13,7 +13,8 @@ def profile_activity(request):
         for member_iter in project_iter.members.all():
             roles_list = member_iter.user_roles.all()
             if roles_list:
-                member_dict[member_iter.email] = list(set(role.name for role in roles_list))
+                member_dict[member_iter.email] = list(
+                    set(role.name for role in roles_list))
     member_count = len(member_dict)
     return render(request, 'profile_activity.html',
                   {'project_list': project_list, 'member_dict': member_dict, 'project_count': project_count,

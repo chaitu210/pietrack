@@ -1,13 +1,14 @@
 <html>
+
 <body>
-{% if validlink %}
+    {% if validlink %}
     <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
+        {% csrf_token %} {{ form.as_p }}
         <button type="submit">Submit</button>
     </form>
-{% else %}
+    {% else %}
     <p>This reset link is no longer valid!</p>
-{% endif %}
+    {% endif %}
+
 </html>
 </body>
