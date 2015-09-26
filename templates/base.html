@@ -26,53 +26,70 @@
         <div class="menu">
           <ul>
             <li>
-              <span class='each_wrap child_one'>
-              <i class='fa fa-pie-chart'></i>
-              <span class='name'>Pie Track</span>
-              </span>
+              <a href="{%url 'project:list_of_projects'%}">
+                <span class='each_wrap child_one'>
+                  <i class='fa fa-pie-chart'></i>
+                  <span class='name'>Pie Track</span>
+                </span>
+              </a>
             </li>
+            
             <li>
-              <span class='each_wrap child_one'>
-              <i class='fa fa-bookmark-o'></i>
-              <span class='name'>Bookmark</span>
-              </span>
+              <a href="{% url 'project:list_of_projects' %}">
+                <span class='each_wrap child_one'>
+                <i class='fa fa-folder-open-o'></i>
+                <span class='name'>Projects</span>
+                </span>
+              </a>
             </li>
+            {% if slug %}
             <li>
+              <a href="{% url 'project:project_detail' slug %}">
               <span class='each_wrap child_one'>
               <i class='fa fa-clock-o'></i>
               <span class='name'>TimeLine</span>
               </span>
+              </a>
             </li>
             <li>
-              <span class='each_wrap child_two'>
-              <i class='fa fa-globe'></i>
-              <span class='name'>Backlog</span>
-              </span>
+              <a href="{% url 'project:milestone_display' slug %}">
+                <span class='each_wrap child_two'>
+                <i class='fa fa-globe'></i>
+                <span class='name'>Milestones</span>
+                </span>
+              </a>
             </li>
             <li>
-              <span class='each_wrap child_three'>
-              <i class='fa fa-bug'></i>
-              <span class='name'>Issues</span>
-              </span>
+                <a href="{% url 'project:tickets' slug %}">
+                  <span class='each_wrap child_three'>
+                  <i class='fa fa-bug'></i>
+                  <span class='name'>Tickets</span>
+                  </span>
+                </a>
             </li>
-            <li>
+            <!-- <li>
               <span class='each_wrap child_four'>
               <i class='fa fa-language'></i>
               <span class='name'>Wiki</span>
               </span>
+            </li> -->
+            <li>
+              <a href="{% url 'project:project_team' slug %}">
+                  <span class='each_wrap child_five'>
+                  <i class='fa fa-users'></i>
+                  <span class='name'>Team</span>
+                  </span>
+              </a>
             </li>
             <li>
-              <span class='each_wrap child_five'>
-              <i class='fa fa-users'></i>
-              <span class='name'>Team</span>
-              </span>
+              <a href="{% url 'project:project_details' slug %}">
+                  <span class='each_wrap child_six'>
+                  <i class='fa fa-gears'></i>
+                  <span class='name'>Settings</span>
+                  </span>
+              </a>
             </li>
-            <li>
-              <span class='each_wrap child_six'>
-              <i class='fa fa-gears'></i>
-              <span class='name'>Settings</span>
-              </span>
-            </li>
+            {% endif %}
           </ul>
         </div>
       </div>

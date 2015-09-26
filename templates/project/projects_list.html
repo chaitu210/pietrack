@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+
 {% block content %}
   <section id='base_content'>
     <div class="list_of_projects">
@@ -21,7 +22,11 @@
                     {% for project in projects_list %}
                         <tr data-href="{% url 'project:project_detail' slug=project.slug %}">
                             <td>
-                                <img src='http://www.freelargeimages.com/wp-content/uploads/2014/12/Happy_birthday_minions-4.jpg'>
+                            {% if project.logo %}
+                                <img src='{{project.logo.url}}'>
+                            {% else %}
+                                <img src='http://www.livecollision.com/wp-content/uploads/Project-logo.jpg'>
+                            {% endif %}
                             </td>
                             <td>
                                 <h2>{{project.name}}</h2>

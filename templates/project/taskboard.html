@@ -8,6 +8,14 @@
         <div class="about_project_wrap">
             <div class="title">
                 <span>{{milestone.name}}</span>
+                <span class='header_button_wrap'>
+                    <a href="{% url 'task:add_task' slug %}">
+                        <span class='header_button'>New Task</span>
+                    </a>
+                    <a href="{% url 'project:requirement_create' slug %}">
+                        <span class='header_button'>New Requirement</span>
+                    </a>
+                </span>
             </div>
             <!-- filters -->
             <div class="filters_wrap">

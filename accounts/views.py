@@ -28,7 +28,7 @@ def active_user_required(view_func):
 
 def index(request):
     if request.user.id:
-        return HttpResponseRedirect(reverse('user:user_profile'))
+        return HttpResponseRedirect(reverse('project:list_of_projects'))
     return render(request, 'login.html')
 
 
