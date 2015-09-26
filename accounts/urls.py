@@ -9,7 +9,7 @@ urlpatterns = [
     url(r'^register/$', 'accounts.views.register', name='register'),
     url(r'^forgot_password/$', 'accounts.views.forgot_password',
         name='forgot_password'),
-    url(r'^user_profile/$', 'accounts.views.user_profile',
+    url(r'^profile/$', 'accounts.views.user_profile',
         name='user_profile'),
     url(r'^change_password/$', 'accounts.views.change_password',
         name='change_password'),
