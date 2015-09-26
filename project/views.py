@@ -282,7 +282,7 @@ def create_member(request, slug):
             json_data['error'] = True
         return HttpResponse(json.dumps(json_data), content_type='application/json')
     else:
-        return render(request, 'settings/create_member.html')
+        return render(request, 'settings/create_member.html',{'slug':slug})
 
 
 @login_required
@@ -440,8 +440,9 @@ def delete_attachment(request, slug, task_id, attachment_id):
 
 @login_required
 def milestone_display(request,slug):
-    milestones_list = Milestone.objects.filter(project__slug=slug,project__organization=request.user.organization)
-    return render(request,'project/milestones_list.html',{'slug':slug,'milestones_list':milestones_list})
+    project = Project.objects.get(slug=slug, organization=request.user.organization)
+    milestones_list = Milestone.objects.filter(project=project,project__organization=request.user.organization)
+    return render(request,'project/milestones_list.html',{'slug':slug,'milestones_list':milestones_list,'project':project})
 
 @login_required
 def milestone_create(request, slug):
@@ -463,12 +464,12 @@ def milestone_create(request, slug):
             json_data['form_errors'] = milestone_form.errors
             return HttpResponse(json.dumps(json_data), content_type='application/json')
     else:
-        return render(request, 'project/milestone.html')
+        return render(request, 'project/milestone.html',{'slug':slug})
 
 
 @login_required
-def milestone_edit(request, slug):
-    milestone_obj = Milestone.objects.get(slug=slug)
+def milestone_edit(request, slug, milestone_slug):
+    milestone_obj = Milestone.objects.get(project__slug=slug,slug=milestone_slug,project__organization=request.user.organization)
     if request.method == 'POST':
         json_data = {}
         milestone_dict = request.POST.copy()
@@ -485,13 +486,14 @@ def milestone_edit(request, slug):
             json_data['form_errors'] = milestone_form.errors
             return HttpResponse(json.dumps(json_data), content_type='application/json')
     else:
-        return render(request, 'project/milestone.html', {'milestone_obj': milestone_obj})
+        return render(request, 'project/milestone.html', {'milestone_obj': milestone_obj,'slug':slug})
 
 
 @login_required
-def milestone_delete(request, slug):
-    Milestone.objects.get(slug=slug).delete()
-    return HttpResponse(json.dumps({'error': False}))
+def milestone_delete(request, slug, milestone_slug):
+    print slug,milestone_slug
+    Milestone.objects.get(project__slug=slug, slug=milestone_slug, project__organization=request.user.organization).delete()
+    return HttpResponse(json.dumps({'result':True}),content_type='application/json')
 
 
 @login_required
@@ -529,4 +531,4 @@ def requirement_create(request, slug):
             return HttpResponse(json.dumps(json_data), content_type='application/json')
     else:
         milestone = project_obj.milestones.all()
-        return render(request, 'project/requirement.html', {'milestone': milestone})
+        return render(request, 'project/requirement.html', {'milestone': milestone,'slug':slug})

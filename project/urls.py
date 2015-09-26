@@ -83,10 +83,9 @@ urlpatterns = [
     url(r'^(?P<slug>[a-zA-Z0-9-]+)/milestones/$',milestone_display, name='milestone_display'),
     url(r'^(?P<slug>[a-zA-Z0-9-]+)/milestone/create/$',
         milestone_create, name='milestone_create'),
-    url(r'^(?P<slug>[a-zA-Z0-9-]+)/milestone/edit/$',
+    url(r'^(?P<slug>[a-zA-Z0-9-]+)/milestone/(?P<milestone_slug>[a-zA-Z0-9-]+)/edit/$',
         milestone_edit, name='milestone_edit'),
-    url(r'^(?P<slug>[a-zA-Z0-9-]+)/milestone/delete/$',
-        milestone_delete, name='milestone_delete'),
+    url(r'^(?P<slug>[a-zA-Z0-9-]+)/milestone/(?P<milestone_slug>[a-zA-Z0-9-]+)/delete/$', milestone_delete, name='milestone_delete'),
 
     # requirement
     url(r'^(?P<slug>[a-zA-Z0-9-]+)/requirement/create/$',
