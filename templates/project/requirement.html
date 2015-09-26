@@ -1,12 +1,15 @@
 {% extends 'base.html' %}
 {% block content %}
   <section id='base_content' class='create_project'>
-    <form id='requirement_form'>
-        <div class="content_box">
-            <div class="title">
-                <h4>Requirement</h4>
+   <div class="content_box">
+        <div class="title">
+            <h4>Requirement</h4>
+            <div class="tag">
+              Compellingly reintermediate premier materials for client-centered markets.for client-centered markets.
             </div>
-            <div class="panel_box">
+        </div>
+        <div class="panel_box">
+             <form id='requirement_form'>
                 <div class="form_group">
                     <label>Title</label>
                     <input id='requirement_name' name='name' type="text" class='input'>
@@ -26,11 +29,11 @@
                     <textarea id='requirement_desc' name='description' class="form-control textarea"></textarea>
                     <span id='requirement_description_error'></span>
                 </div>
+                <br>
                 <button id='requirement_save'>Save</button>
-            </div>
+             </form>
         </div>
-        {% csrf_token %}
-    </form>
+    </div>
   </section>
 {% endblock %}
 {% block extra_js %}

@@ -3,11 +3,12 @@
 {% load project_tags %}
 {%block content %}
     <section id='base_content'>
+    
       <div class="project_description">
         <!-- about project -->
         <div class="col-md-9 about_project_wrap">
           <div class="title">
-            <span>{{milestones_list.0.project.name}}</span>
+            <span>{{project.name}}</span>
             <span class='header_button_wrap'>
             <!-- <span class='header_button'>New Task</span>
             <span class='header_button'>New Requirement</span> -->
@@ -17,14 +18,16 @@
           <!-- mile stones -->
           <div class="mile_stone_wrap">
           <!-- milestone -->
-      {% for milestone in milestones_list %}
-        <a href="{% url 'project:taskboard' slug milestone.slug %}">    
+      {% if milestones_list %}
+        {% for milestone in milestones_list %}
+            
           <span class="col-md-4 mile_stone_each">
             <span class="milestone_container">
             <span class='actions_row'>
-            <i class='fa fa-pencil'></i>
-            <i class='fa fa-times'></i>
+            <a href="{% url 'project:milestone_edit' slug milestone.slug %}"><i class='fa fa-pencil'></i></a>
+            <a href="{% url 'project:milestone_delete' slug milestone.slug %}"><i class='fa fa-times'></i></a>
             </span>
+            <a href="{% url 'project:taskboard' slug milestone.slug %}">
               <span class='title'>
                 {{milestone.name}}
               </span>
@@ -33,7 +36,7 @@
                 Start date
                 </span>
                 <span class='date'>
-                  {{milestone.estimated_start}}
+                  {{milestone.estimated_start|date:"d/m/Y"}}
                 </span>
               </span>
               <span class='col-md-6 end_date'>
@@ -41,7 +44,7 @@
                 End date
                 </span>
                 <span class='date'>
-                  {{milestone.estimated_finish}}
+                  {{milestone.estimated_finish|date:"d/m/Y"}}
                 </span>
               </span>
               <span class='clearfix'></span>
@@ -50,14 +53,19 @@
               </span>
               <span class='count_wrap'>
               <span class='count'>
-              <i class='fa fa-trophy'></i>No. of tasks : {{milestone.tasks.count}}</span>
+              <i class='fa fa-trophy'></i>Tasks : {{milestone.tasks.count}}</span>
               </span>
+              </a>
             </span>
           </span>
-        </a>
-      {% endfor %}
+        {% endfor %}
           <!--/ milestone -->
           <div class="clearfix"></div>
+      {% else %}
+          <span class="ticket blue">
+             <center><h1> No milestones were added </h1></center>
+          </span>
+      {% endif %}
           </div>
           <!--/ mile stones -->
         </div>
@@ -69,7 +77,7 @@
               <span>Team Members</span>
             </div>
             <!-- ticket -->
-            {% for team_member in milestones_list.0.project.members.all %}
+            {% for team_member in project.members.all %}
             <span class='ticket orange'>
                 {%if team_member.profile_pic %}
                     <img src="{{ team_member.profile_pic.url }}">
@@ -86,5 +94,21 @@
         </div>
         <!--/ team -->
       </div>
+
+
     </section>
 {% endblock %}
+{% block extra_js %}
+<script>
+  $('body').on('click','a .fa-times', function(e){
+    var url = $(this).parent().attr('href');
+    var milestone = this;
+    $.get(url,function(response){
+      if(response['result']){
+        $(milestone).closest('.mile_stone_each').remove();
+      }
+    });
+    e.preventDefault();
+  });
+</script>
+{% endblock%}
