@@ -80,6 +80,11 @@ def register(request):
             new_user = User.objects.create_user(username=username, email=email, password=password,
                                                 first_name=first_name, organization=organization_obj,
                                                 pietrack_role=pietrack_role)
+            user = auth.authenticate(username=email, password=password)
+            if user:
+                if user.is_active:
+                    auth.login(request, user)
+
         else:
             json_data = {'error': True, 'error_password': 'password mismatch'}
         return HttpResponse(json.dumps(json_data), content_type='application/json')
@@ -136,6 +141,13 @@ def user_profile(request):
         form = EditUserModelForm(request.POST, request.FILES, instance=user)
 
         if form.is_valid():
+            if not request.POST.get('organization'):
+                response_data = {'error': True, "response": {"organization": 'Please provide organization name'}}
+                return HttpResponse(json.dumps(response_data))
+            organization = Organization.objects.get(id=request.user.organization.id)
+            organization.name = request.POST.get('organization')
+            organization.save()
+
             if 'profile_pic' in request.FILES:
 
                 user.profile_pic = request.FILES['profile_pic']
@@ -146,8 +158,7 @@ def user_profile(request):
                     pass
 
             form.save()
-            response_data = {
-                'error': False, "response": 'Successfully updated'}
+            response_data = {'error': False, "response": 'Successfully updated'}
 
         else:
             response_data = {'error': True, 'response': form.errors}
