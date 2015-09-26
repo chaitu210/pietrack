@@ -28,22 +28,28 @@
             </div>
             <div class="clearfix"></div>
             <!-- tickets -->
+        {% for event in project_object.timeline_set.all reversed %}    
             <span class='ticket blue'>
-             <img src="https://cdn2.iconfinder.com/data/icons/despicable-me-2-minions/128/Happy-Minion-Icon.png">
+                {%if event.user.profile_pic %}
+                    <img src="{{ team_member.profile_pic.url }}">
+                {% else %}
+                    <img src="{% static 'img/user-pic.jpg' %}">
+                {% endif%}
               <span class='description'>
-                <span class='name'>Nazneen Shaik</span> seamlessly maintain team building strategic theme areas.
-                <span class='project_name'>#xyz test</span> in <span class='project_name'>Pie track</span>
-                <span class='designation_time'>12 min ago</span>
+                <span class='name'>{{event.user.username}}</span> 
+                {{event.namespace}}
+                <!-- <span class='project_name'>#xyz test</span> --> in <span class='project_name'>{{event.project}}</span>
+                <span class='designation_time'>
+                    {{event.created|timesince}} &nbsp;
+                    {% if event.created|timesince == 0  %}
+                        just now
+                    {% else %}
+                        ago
+                    {% endif %}
+                </span>
               </span>
             </span>
-            <span class='ticket blue'>
-                 <img src="https://cdn2.iconfinder.com/data/icons/despicable-me-2-minions/128/Happy-Minion-Icon.png">
-                 <span class='description'>
-                 <span class='name'>Nazneen Shaik</span> seamlessly maintain team building strategic theme areas.
-                <span class='project_name'>#xyz test</span> in <span class='project_name'>Pie track</span>
-                <span class='designation_time'>12 min ago</span>
-                </span>
-            </span>
+        {% endfor %}
             <!--/ tickets -->
         </div>
         <!--/ about project -->

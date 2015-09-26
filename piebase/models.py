@@ -313,8 +313,8 @@ class Timeline(models.Model):
     content_object = GenericForeignKey('content_type', 'object_id')
     namespace = models.CharField(
         max_length=250, default="default", db_index=True)
-    # created,updated,commented,movedfrom(task),
-    event_type = models.CharField(max_length=250, db_index=True)
+    # explination
+    event_type = models.CharField(max_length=250, db_index=True)#created,updated,commented,movedfrom(task),
     project = models.ForeignKey(Project, null=True)
     data = models.TextField(
         null=True, blank=True, verbose_name=_("data"))  # left as blank
