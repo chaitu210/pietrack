@@ -267,8 +267,8 @@
               } else if (result['error_password']) {
                   $('#error_confirm_password_id').text(result['error_password'])
               } else {
-                  alert('user_created')
-                  window.url
+                  alert('Successfully registered!');
+                  window.location = "{% url 'user:user_profile' %}";
               }
           });
       });
