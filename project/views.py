@@ -40,7 +40,7 @@ def create_project(request):
 @login_required
 def list_of_projects(request):
     template_name = 'project/projects_list.html'
-    projects_list = Project.objects.filter(members__email=request.user)
+    projects_list = Project.objects.filter(members__email=request.user.email, organization=request.user.organization)
     dict_items = {'projects_list': projects_list}
     return render(request, template_name, dict_items)
 
@@ -51,7 +51,9 @@ def project_detail(request, slug):
     project_object = Project.objects.get(slug=slug)
     project_members = project_object.members.all()
     dict_items = {'project_object': project_object,
-                  'project_members': project_members}
+                  'project_members': project_members,
+                  'slug' : slug
+                  }
     return render(request, template_name, dict_items)
 
 
