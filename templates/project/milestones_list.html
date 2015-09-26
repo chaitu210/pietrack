@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{%load static %}
+{% load project_tags %}
+{%block content %}
+    <section id='base_content'>
+      <div class="project_description">
+        <!-- about project -->
+        <div class="col-md-9 about_project_wrap">
+          <div class="title">
+            <span>{{milestones_list.0.project.name}}</span>
+            <span class='header_button_wrap'>
+            <!-- <span class='header_button'>New Task</span>
+            <span class='header_button'>New Requirement</span> -->
+            <a href="{% url 'project:milestone_create' slug %}"><span class='header_button'>New MileStone</span></a>
+            </span>
+          </div>
+          <!-- mile stones -->
+          <div class="mile_stone_wrap">
+          <!-- milestone -->
+      {% for milestone in milestones_list %}
+        <a href="{% url 'project:taskboard' slug milestone.slug %}">    
+          <span class="col-md-4 mile_stone_each">
+            <span class="milestone_container">
+            <span class='actions_row'>
+            <i class='fa fa-pencil'></i>
+            <i class='fa fa-times'></i>
+            </span>
+              <span class='title'>
+                {{milestone.name}}
+              </span>
+              <span class='col-md-6 start_date'>
+                <span class='title'>
+                Start date
+                </span>
+                <span class='date'>
+                  {{milestone.estimated_start}}
+                </span>
+              </span>
+              <span class='col-md-6 end_date'>
+                <span class='title'>
+                End date
+                </span>
+                <span class='date'>
+                  {{milestone.estimated_finish}}
+                </span>
+              </span>
+              <span class='clearfix'></span>
+              <span class='author'>
+                by <span class='name'>{{milestone.created_by.username}}</span>
+              </span>
+              <span class='count_wrap'>
+              <span class='count'>
+              <i class='fa fa-trophy'></i>No. of tasks : {{milestone.tasks.count}}</span>
+              </span>
+            </span>
+          </span>
+        </a>
+      {% endfor %}
+          <!--/ milestone -->
+          <div class="clearfix"></div>
+          </div>
+          <!--/ mile stones -->
+        </div>
+        <!--/ about project -->
+        <!-- team -->
+        <div class="col-md-3 team">
+          <div class="team-block">
+            <div class="title">
+              <span>Team Members</span>
+            </div>
+            <!-- ticket -->
+            {% for team_member in milestones_list.0.project.members.all %}
+            <span class='ticket orange'>
+                {%if team_member.profile_pic %}
+                    <img src="{{ team_member.profile_pic.url }}">
+                {% else %}
+                    <img src="{% static 'img/user-pic.jpg' %}">
+                {% endif%}
+                <span class='description'>
+                    <span class='name'>{{team_member.username}}</span>
+                    <span class='designation_time'>{{team_member|get_user_Role}}</span>
+                </span>
+            </span>
+            {% endfor %}
+            <!--/ ticket -->
+        </div>
+        <!--/ team -->
+      </div>
+    </section>
+{% endblock %}

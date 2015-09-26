@@ -51,17 +51,21 @@
               </span>
               </a>
             </li>
-            <!-- <li>
-              <span class='each_wrap child_two'>
-              <i class='fa fa-globe'></i>
-              <span class='name'>Backlog</span>
-              </span>
-            </li> -->
             <li>
-              <span class='each_wrap child_three'>
-              <i class='fa fa-bug'></i>
-              <span class='name'>Tickets</span>
-              </span>
+              <a href="{% url 'project:milestone_display' slug %}">
+                <span class='each_wrap child_two'>
+                <i class='fa fa-globe'></i>
+                <span class='name'>Milestones</span>
+                </span>
+              </a>
+            </li>
+            <li>
+                <a href="{% url 'project:tickets' slug %}">
+                  <span class='each_wrap child_three'>
+                  <i class='fa fa-bug'></i>
+                  <span class='name'>Tickets</span>
+                  </span>
+                </a>
             </li>
             <!-- <li>
               <span class='each_wrap child_four'>

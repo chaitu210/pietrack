@@ -9,7 +9,7 @@ import shutil
 from django.utils import timezone
 from django.template.defaultfilters import slugify
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.tokens import default_token_generator
 from django.core.urlresolvers import reverse
 from piebase.models import User, Project, Organization, Role, Milestone, Requirement
@@ -323,6 +323,10 @@ def member_role_delete(request, slug, member_role_slug):
     Role.objects.get(slug=member_role_slug, project=project).delete()
     return HttpResponse(json.dumps({'error': False}), content_type="application/json")
 
+@login_required
+def tickets(request,slug):
+    milestone_slug = Milestone.objects.filter(project__slug=slug,project__organization=request.user.organization)[0].slug
+    return HttpResponseRedirect(reverse('project:taskboard', kwargs={'slug': slug, 'milestone_slug':milestone_slug}))
 
 @login_required
 def taskboard(request, slug, milestone_slug):
@@ -433,6 +437,11 @@ def delete_attachment(request, slug, task_id, attachment_id):
         pass
     return HttpResponse(json.dumps({'result': True}), content_type="json/application")
 
+
+@login_required
+def milestone_display(request,slug):
+    milestones_list = Milestone.objects.filter(project__slug=slug,project__organization=request.user.organization)
+    return render(request,'project/milestones_list.html',{'slug':slug,'milestones_list':milestones_list})
 
 @login_required
 def milestone_create(request, slug):
