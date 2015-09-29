@@ -28,6 +28,8 @@ def create_project(request):
         if(form.is_valid()):
             slug = slugify(request.POST['name'])
             project_obj = form.save()
+            if(request.FILES.get('logo',False)):
+                project_obj.logo = request.FILES.get('logo')
             project_obj.members.add(request.user)
             project_obj.save()
             json_data = {'error': False, 'errors': form.errors, 'slug': slug}

@@ -37,6 +37,8 @@ def url(self, filename):
         return "%s/%s/%s" % (self.slug, rand_str(6), filename)
     return "%s/%s/%s" % (self.project.slug, rand_str(6), filename)
 
+def logo(self, filename):
+    return "%s/%s/%s" % (self.slug, 'logo', filename)
 
 class Organization(models.Model):
     name = models.CharField(
@@ -113,7 +115,7 @@ class Project(models.Model):
     modified_date = models.DateTimeField(verbose_name=_("modified date"))
     members = models.ManyToManyField(
         settings.AUTH_USER_MODEL, related_name="projects")
-    logo = models.FileField(upload_to=url, blank=True, null=True)
+    logo = models.FileField(upload_to=logo, blank=True, null=True)
     organization = models.ForeignKey(Organization)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, null=True, blank=True)
