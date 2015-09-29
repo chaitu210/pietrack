@@ -89,25 +89,11 @@
             }, 'json');
         });
 
-
-//        function readURL(input){
-//            if (input.files && input.files[0]){
-//                var reader = new FileReader();
-//                reader.onload = function (e) {
-//                    $('#profile_picture').attr('src', e.target.result);
-//                 }
-//                reader.readAsDataURL(input.files[0]);
-//                 }
-//            }
-//            $("#id_profile_pic").change(function(){
-//                readURL(this);
-//            });
-
-            // for changing the profile-picture on browsing
-                var loadFile = function(event) {
-                    var output = document.getElementById('profile_picture');
-                    output.src = URL.createObjectURL(event.target.files[0]);
-                };
+  // for changing the profile-picture on browsing
+        var loadFile = function(event) {
+            var output = document.getElementById('profile_picture');
+            output.src = URL.createObjectURL(event.target.files[0]);
+        };
 
 
     </script>
