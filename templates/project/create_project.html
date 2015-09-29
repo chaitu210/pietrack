@@ -24,6 +24,7 @@
                 <div class="form_group">
                     <label>Project Logo</label>
                     <input class="form-control" name="logo" type="file" value=""/>
+                    <span name="pdescription_error" id="logo" class="error"></span>
                 </div>
 
                 <button id="id_submit_cproject">create project</button>
@@ -51,8 +52,11 @@
                 for (key in response['errors']) {
                     $("#" + key).text(response['errors'][key]);
                 }
+                if(response['logo'])
+                {
+                    $("#logo").text("Please choose a Image(png/jpg/gif)")
+                }
                 } else {
-                    /*redirect page here */
                     var slug = response['slug']
                     window.location = '/project/' + slug + '/' + 'create_member'
                 }

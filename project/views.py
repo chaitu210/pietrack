@@ -6,6 +6,7 @@ import random
 import string
 import os
 import shutil
+import imghdr
 from django.utils import timezone
 from django.template.defaultfilters import slugify
 from django.contrib.auth.decorators import login_required
@@ -22,10 +23,15 @@ from signals import create_timeline
 @login_required
 def create_project(request):
     if(request.method == "POST"):
+        img = False
+        if(request.FILES.get('logo',False)):
+            img = True
+            if(imghdr.what(request.FILES.get('logo'))):
+                img = False
         organization = request.user.organization
         form = CreateProjectForm(
             request.POST, organization=organization, user=request.user)
-        if(form.is_valid()):
+        if(form.is_valid() and not img):
             slug = slugify(request.POST['name'])
             project_obj = form.save()
             if(request.FILES.get('logo',False)):
@@ -35,7 +41,7 @@ def create_project(request):
             json_data = {'error': False, 'errors': form.errors, 'slug': slug}
             return HttpResponse(json.dumps(json_data), content_type="application/json")
         else:
-            return HttpResponse(json.dumps({'error': True, 'errors': form.errors}), content_type="application/json")
+            return HttpResponse(json.dumps({'error': True, 'errors': form.errors,'logo':img}), content_type="application/json")
     return render(request, 'project/create_project.html')
 
 
