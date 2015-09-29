@@ -24,7 +24,7 @@
                     <div class="title">
                         <h4>{{ project.name }} DETAILS</h4>
                         <div class="tag">
-                          Compellingly reintermediate premier materials for client-centered markets.for client-centered markets.
+                          The project plan serves as a roadmap for the entire project team 
                         </div>
                     </div>
                     <form action="" method="post" id="id_form_cproject">
@@ -45,9 +45,18 @@
                                 <!--Error here -->
                                 <div class="help">Dynamically maximize professional models whereas.</div>
                             </div>
+                            <div class="form_group">
+                                <label>Logo</label>
+                                {% if project.logo %}
+                                   <img id="logo" src="{{project.logo.url}}" class="img-responsive img-thumbnail" style="width:100px;height:100px;margin-left:20px;margin-bottom:10px;" />
+                                {% else %}
+                                    <img id="logo" src="http://www.livecollision.com/wp-content/uploads/Project-logo.jpg" class="img-responsive img-thumbnail" style="width:100px;height:100px;margin-left:20px;margin-bottom:10px;" />
+                                {% endif %}
+                                    <input id="file" name="logo" type="file" value=""/>
+                            </div>
                             <button class="special-button">Save</button>
                             <span class="del-project">
-                                <a href="{%url 'project:delete_project' id=project.id %}"><input type="button" class="special-button" value="Delete Project"/></a>
+                                <a href="{%url 'project:delete_project' id=project.id %}"><input type="button" class="special-button" value="Delete"/></a>
                             </span>
                       </div>
                     </form>
@@ -66,6 +75,17 @@
 
 {%block extra_js %}
   <script type="text/javascript">
+        // $("#logo").click(function(e){
+        //     $("#file").click()
+        // });
+        // $("#file").change(function(e){
+        //     img = $("#file").val();
+        //     if(img){
+        //       console.log(img)
+        //     }
+        //     $("#logo").attr('src',img)
+
+        // });
         function send_error(error)
           {
               if(error)
