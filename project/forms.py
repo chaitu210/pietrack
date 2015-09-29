@@ -18,7 +18,6 @@ from django.utils import timezone
 
 
 class CreateProjectForm(forms.ModelForm):
-
     def __init__(self, *args, **kwargs):
         self.organization = kwargs.pop('organization', None)
         self.user = kwargs.pop('user', None)
@@ -30,9 +29,12 @@ class CreateProjectForm(forms.ModelForm):
 
     def clean_name(self):
         name = self.cleaned_data['name']
-        if (Project.objects.filter(name=name, organization=self.organization)):
-            raise forms.ValidationError(
-                'Project with this name already exists.')
+        if self.instance.id:
+            if Project.objects.filter(name=name, organization=self.organization).exclude(id=self.instance.id):
+                raise forms.ValidationError('Project with this name already exists.')
+        else:
+            if Project.objects.filter(name=name, organization=self.organization):
+                raise forms.ValidationError('Project with this name already exists.')
         return name
 
     def save(self, commit=True):
