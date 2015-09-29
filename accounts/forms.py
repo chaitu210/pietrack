@@ -8,7 +8,7 @@ class EditUserModelForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ['profile_pic', 'username', 'email',
+        fields = ['profile_pic', 'username',
                   'first_name', 'last_name', 'biography']
 
 
