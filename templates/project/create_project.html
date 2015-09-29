@@ -21,6 +21,12 @@
                     <span name="pdescription_error" id="description" class="error"></span>
                     <!--Error here -->
                 </div>
+                <div class="form_group">
+                    <label>Project Logo</label>
+                    <input class="form-control" name="logo" type="file" value=""/>
+                    <span name="pdescription_error" id="logo" class="error"></span>
+                </div>
+
                 <button id="id_submit_cproject">create project</button>
             </div>
         </form>
@@ -31,20 +37,31 @@
 {% block extra_js %}
     <script type="text/javascript">
     $('#id_form_cproject').on('submit', function(e) {
-        $.post('', $('#id_form_cproject').serialize(), function(response) {
-            if (response['error']) {
+      var form = this
+      var formData = new FormData($(this)[0]);
+      $.ajax({
+          url: "",
+          data: formData,
+          enctype: 'multipart/form-data',
+          processData: false,
+          contentType: false,
+          type: 'POST',
+          success: function(response) {
+              if (response['error']) {
                 $(".error").text("");
                 for (key in response['errors']) {
                     $("#" + key).text(response['errors'][key]);
                 }
-                // $("span[name='pname_error']").text(send_error(response['errors'].name));
-                // $("span[name='pdescription_error']").text(send_error(response['errors'].description));
-            } else {
-                /*redirect page here */
-                var slug = response['slug']
-                window.location = '/project/' + slug + '/' + 'create_member'
-            }
-        });
+                if(response['logo'])
+                {
+                    $("#logo").text("Please choose a Image(png/jpg/gif)")
+                }
+                } else {
+                    var slug = response['slug']
+                    window.location = '/project/' + slug + '/' + 'create_member'
+                }
+          }
+      });
         e.preventDefault();
     });
     </script>
