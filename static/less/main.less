@@ -1061,6 +1061,7 @@ header{
 						}
 						&:first-child{
 							text-align: center;
+							width: 125px;
 						}
 						&:last-child{
 							vertical-align: middle;
@@ -1280,6 +1281,11 @@ header{
 					margin-bottom:20px;
 					span{
 						display:block;
+						/* below lines added */
+						background: white;
+						width: 100%;
+						padding: 20px;
+						/* -- */
 					}
 					.task_details{
 						em{
@@ -1434,7 +1440,11 @@ header{
 			padding: 0px 10px;
 			img{
 				max-width: 100%;
-				height: auto;
+				/* below lines added */
+				width: 50%;
+				height: 50%;
+				float: right;
+				/* -- */
 				border:3px solid #E3E6E8;
 			}
 		}
