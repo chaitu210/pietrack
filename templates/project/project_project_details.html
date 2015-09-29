@@ -22,7 +22,7 @@
                 <!-- content box starts here -->
                 <div class="content_box">
                     <div class="title">
-                        <h4>SAMPL1PROJECT DETAILS</h4>
+                        <h4>{{ project.name }} DETAILS</h4>
                         <div class="tag">
                           Compellingly reintermediate premier materials for client-centered markets.for client-centered markets.
                         </div>
@@ -45,8 +45,10 @@
                                 <!--Error here -->
                                 <div class="help">Dynamically maximize professional models whereas.</div>
                             </div>
-                            <button>Save</button>
-                            <span class="del-project"><a href="{%url 'project:delete_project' id=project.id %}">Delete Project</a>
+                            <button class="special-button">Save</button>
+                            <span class="del-project">
+                                <a href="{%url 'project:delete_project' id=project.id %}"><input type="button" class="special-button" value="Delete Project"/></a>
+                            </span>
                       </div>
                     </form>
               <!-- content box starts here -->
