@@ -11,11 +11,12 @@
                 <div class="left">my projects</div>
                 <div class="right">
                     <a href="{% url 'project:create_project' %}">
-                        <button>create Project</button>
+                        <button> create Project</button>
                     </a>
                 </div>
             </div>
         </div>
+
         <div class="table_div">
             <table class='table table-hover'>
                 <tbody>
@@ -23,7 +24,7 @@
                         <tr data-href="{% url 'project:project_detail' slug=project.slug %}">
                             <td>
                             {% if project.logo %}
-                                <img src='{{project.logo.url}}'>
+                                <img src='{{project.logo.url}}' width="50%" height="50%">
                             {% else %}
                                 <img src='http://www.livecollision.com/wp-content/uploads/Project-logo.jpg'>
                             {% endif %}

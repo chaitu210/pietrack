@@ -2,47 +2,6 @@
 {% load project_tags %}
 {%load static %}
 
-
-{% block project_notifications %}
-      <span class='each_wrap notification'>
-      <i class='fa fa-bell'></i>
-      <span class='name'>Notifications</span>
-        <span class='number count'>{{ project_object.timeline_set.all.count }}</span>
-        </span>
-        <ul class='sub_list'>
-          <div class='scroll'>
-
-        {% for event in project_object.timeline_set.all reversed %}
-          <li>
-            <span class='ticket'>
-            {%if event.user.profile_pic %}
-                <img src="{{ event.user.profile_pic.url }}">
-            {% else %}
-                <img src="{% static 'img/user-pic.jpg' %}">
-            {% endif%}
-            <span class='description'>
-                <span class='name'>{{event.user.username}}</span> {{event.namespace}}
-                in <span class='project'>{{event.project}}</span>
-                <br />
-                <span class='designation_time'>
-                    {{event.created|timesince}} &nbsp;
-                    {% if event.created|timesince == 0  %}
-                        just now
-                    {% else %}
-                        ago
-                    {% endif %}
-                </span>
-                </span>
-            </span>
-          </li>
-
-        {% endfor %}
-
-          </div>
-        </ul>
-{% endblock %}
-
-
 {%block content%}
   <section id='base_content'>
     <div class="project_description">
@@ -55,15 +14,22 @@
                 <div class="col-md-9 content">
                     <div class="profile-content">
                         <span class="desc">
-                       {{project_object.description}}
-                  </span>
+                            {{project_object.description}}
+                        </span>
                     </div>
                 </div>
-
+                <div class="col-md-3 logo">
+                    {% if project_object.logo %}
+                        <img src='{{project_object.logo.url}}' class="img-circle">
+                    {% else %}
+                        <img src='http://www.livecollision.com/wp-content/uploads/Project-logo.jpg' class="img-circle">
+                    {% endif %}
+                </div>
                 <div class="clearfix"></div>
             </div>
             <div class="clearfix"></div>
             <!-- tickets -->
+            <h4> Activity </h4>
         {% for event in project_object.timeline_set.all reversed %}    
             <span class='ticket blue'>
                 {%if event.user.profile_pic %}
