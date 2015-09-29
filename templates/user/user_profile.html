@@ -11,16 +11,14 @@
       {% csrf_token %}
       <div class="user-pic-block">
         <span class="user-picture">
-                     {% if user.profile_pic %}
-                    <img src="{{ user.profile_pic.url }}" width="100px" height="100px"/>
-                     {% else %}
-                     <img src="{% static 'img/user-pic.jpg' %}" />
-                     {% endif %}
+
+        <img id="profile_picture" src="{% if user.profile_pic %}{{ user.profile_pic.url }}{% else %}{% static 'img/user-pic.jpg' %}{% endif %}" width="100px" height="100px"/>
+
                  </span>
         <span class="pic-size">The image will be scaled to 80x80px.</span>
         <span class="pic-btn">
                      <button id="change_picture_button">Change Picture</button>
-                    <input id="id_profile_pic" name="profile_pic" type="file" style='display:none;'/>
+                    <input id="id_profile_pic" name="profile_pic" type="file" style='display:none;' onchange="loadFile(event)" />
                  </span>
       </div>
       <div class="form_group">
@@ -90,6 +88,13 @@
                 }
             }, 'json');
         });
+
+  // for changing the profile-picture on browsing
+        var loadFile = function(event) {
+            var output = document.getElementById('profile_picture');
+            output.src = URL.createObjectURL(event.target.files[0]);
+        };
+
 
     </script>
 
