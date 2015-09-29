@@ -1,6 +1,6 @@
+<!DOCTYPE html>
 {% load compress %}
 {% load staticfiles %}
-<!DOCTYPE html>
 <html>
   <head>
     <title>Pie Track</title>
@@ -123,55 +123,29 @@
               </ul>
             </li>
             <li class='parent_list'>
+              {% block project_notifications %}
               <span class='each_wrap notification'>
               <i class='fa fa-bell'></i>
               <span class='name'>Notifications</span>
-              <span class='number count'>25</span>
-              </span>
-              <ul class='sub_list'>
-                <div class='scroll'>
-                  <li>
-                    <span class='ticket'>
-                    <img src='http://i.stack.imgur.com/8sNfT.jpg'>
-                    <span class='description'>
-                    <span class='name'>Nazneen</span> added you to project
-                    <span class='project'>Pie Track</span>
-                    <span class='time'>12 min ago</span>
-                    </span>
-                    </span>
-                  </li>
-                  <li>
-                    <span class='ticket'>
-                    <img src='http://i.stack.imgur.com/8sNfT.jpg'>
-                    <span class='description'>
-                    <span class='name'>Nazneen</span> added you to project
-                    <span class='project'>Pie Track</span>
-                    <span class='time'>12 min ago</span>
-                    </span>
-                    </span>
-                  </li>
-                  <li>
-                    <span class='ticket'>
-                    <img src='http://i.stack.imgur.com/8sNfT.jpg'>
-                    <span class='description'>
-                    <span class='name'>Nazneen</span> added you to project
-                    <span class='project'>Pie Track</span>
-                    <span class='time'>12 min ago</span>
-                    </span>
-                    </span>
-                  </li>
-                  <li>
-                    <span class='ticket'>
-                    <img src='http://i.stack.imgur.com/8sNfT.jpg'>
-                    <span class='description'>
-                    <span class='name'>Nazneen</span> added you to project
-                    <span class='project'>Pie Track</span>
-                    <span class='time'>12 min ago</span>
-                    </span>
-                    </span>
-                  </li>
-                </div>
-              </ul>
+                <span class='number count'>25</span>
+                </span>
+                <ul class='sub_list'>
+                  <div class='scroll'>
+
+                    <li>
+                      <span class='ticket'>
+                      <img src='http://i.stack.imgur.com/8sNfT.jpg'>
+                      <span class='description'>
+                      <span class='name'>Nazneen</span> added you to project
+                      <span class='project'>Pie Track</span>
+                      <span class='time'>12 min ago</span>
+                      </span>
+                      </span>
+                    </li>
+
+                  </div>
+                </ul>
+             {% endblock %}
             </li>
             <li>
               <a href="{% url 'user:logout' %}">

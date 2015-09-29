@@ -84,7 +84,7 @@ header{
 		padding: 20px;
 		padding-bottom: 10px;
 		position: relative;
-		height: 500px;
+		height: auto; /* height changed from 500px to auto */
 		box-shadow: @login_form_shadow;
 		.create_div{
 			display: none;
@@ -106,7 +106,7 @@ header{
 			border-top: 2px dotted @login_button_bg;
 			padding-top: 61px;
 			margin-top: 20px;
-			padding-bottom: 41px;
+			padding-bottom: 15px; /* padding bottom changed from 41px to 15px */
 		}
 		/* forgot active */
 		/* login_btn */
@@ -1478,6 +1478,8 @@ header{
 			background:#2e404c;
 			height:100%;
 			width:250px;
+			color: white;
+			padding-top: 10px; /* added this line for left nav-menu */
 		}
 	/*nav-left ends here */
 	
@@ -1591,17 +1593,19 @@ header{
 							height: 120px!important;
 							border-radius:0px;
 						}
-						button{
+						.special-button {
 						  padding: 7px;
 						  text-transform: uppercase;
 						  font-size: 13px;
 						  font-weight: bold;
-						  width: 100%;
+						  width: 15%; /* changed value from 100 to 15 */
 						  box-shadow: none;
 						  border-radius: 0px;
 						  color: #fff;
 						  border: 1px solid #7bb344;
 						  background: #7bb344;
+						  float: left;
+						  margin-left: 10px;
 						}
 						.del-project{
 							a{

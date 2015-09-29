@@ -71,16 +71,17 @@ def project_details(request, slug):
     dictionary = {'project': project, 'slug': slug}
     template_name = 'project/project_project_details.html'
 
-    if(request.method == 'POST'):
+    if request.method == 'POST':
         organization = request.user.organization
-        form = CreateProjectForm(request.POST, organization=organization)
+        form = CreateProjectForm(request.POST, organization=organization, instance=project)
 
-        if(form.is_valid()):
+        if form.is_valid():
             slug = slugify(request.POST['name'])
             project = Project.objects.get(
                 slug=request.POST['oldname'], organization=organization)
             project.name = request.POST['name']
             project.slug = slug
+            project.description = request.POST['description']
             project.modified_date = timezone.now()
             project.save()
             return HttpResponse(json.dumps({'error': False, 'slug': slug}), content_type="application/json")
