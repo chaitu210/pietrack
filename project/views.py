@@ -56,7 +56,7 @@ def list_of_projects(request):
 @login_required
 def project_detail(request, slug):
     template_name = 'project/project_description.html'
-    project_object = Project.objects.get(slug=slug)
+    project_object = Project.objects.get(slug=slug,organization=request.user.organization)
     project_members = project_object.members.all()
     dict_items = {'project_object': project_object,
                   'project_members': project_members,
@@ -67,7 +67,7 @@ def project_detail(request, slug):
 
 @login_required
 def project_details(request, slug):
-    project = Project.objects.get(slug=slug)
+    project = Project.objects.get(slug=slug,organization=request.user.organization)
     dictionary = {'project': project, 'slug': slug}
     template_name = 'project/project_project_details.html'
 
@@ -93,20 +93,20 @@ def project_details(request, slug):
 
 @login_required
 def delete_project(request, id):
-    Project.objects.get(id=id).delete()
+    Project.objects.get(id=id, organization=request.user.organization).delete()
     return redirect("project:list_of_projects")
 
 
 @login_required
 def priorities(request, slug):
     priority_list = Priority.objects.filter(
-        project=Project.objects.get(slug=slug))
+        project=Project.objects.get(slug=slug, organization=request.user.organization))
     return render(request, 'settings/priorities.html', {'slug': slug, 'priority_list': priority_list})
 
 
 @login_required
 def priority_create(request, slug):
-    project = Project.objects.get(slug=slug)
+    project = Project.objects.get(slug=slug,organization=request.user.organization)
     form = PriorityForm(request.POST, project=project)
     if(form.is_valid()):
         priority = form.save()
@@ -117,7 +117,7 @@ def priority_create(request, slug):
 
 @login_required
 def priority_edit(request, slug, priority_slug):
-    project = Project.objects.get(slug=slug)
+    project = Project.objects.get(slug=slug, organization=request.user.organization)
     instance = Priority.objects.get(slug=priority_slug, project=project)
     form = PriorityForm(request.POST, instance=instance, project=project)
     if(form.is_valid()):
@@ -130,20 +130,20 @@ def priority_edit(request, slug, priority_slug):
 @login_required
 def priority_delete(request, slug, priority_slug):
     Priority.objects.get(
-        slug=priority_slug, project=Project.objects.get(slug=slug)).delete()
+        slug=priority_slug, project=Project.objects.get(slug=slug,organization=request.user.organization)).delete()
     return HttpResponse(json.dumps({'error': False}), content_type="application/json")
 
 
 @login_required
 def severities(request, slug):
     severity_list = Severity.objects.filter(
-        project=Project.objects.get(slug=slug))
+        project=Project.objects.get(slug=slug, organization=request.user.organization))
     return render(request, 'settings/severities.html', {'slug': slug, 'severity_list': severity_list})
 
 
 @login_required
 def severity_create(request, slug):
-    project = Project.objects.get(slug=slug)
+    project = Project.objects.get(slug=slug, organization=request.user.organization)
     form = SeverityForm(request.POST, project=project)
     if(form.is_valid()):
         severity = form.save()
@@ -154,7 +154,7 @@ def severity_create(request, slug):
 
 @login_required
 def severity_edit(request, slug, severity_slug):
-    project = Project.objects.get(slug=slug)
+    project = Project.objects.get(slug=slug,organization=request.user.organization)
     instance = Severity.objects.get(slug=severity_slug, project=project)
     form = SeverityForm(request.POST, instance=instance, project=project)
     if(form.is_valid()):
@@ -167,20 +167,20 @@ def severity_edit(request, slug, severity_slug):
 @login_required
 def severity_delete(request, slug, severity_slug):
     Severity.objects.get(
-        slug=severity_slug, project=Project.objects.get(slug=slug)).delete()
+        slug=severity_slug, project=Project.objects.get(slug=slug, organization=request.user.organization)).delete()
     return HttpResponse(json.dumps({'error': False}), content_type="application/json")
 
 
 @login_required
 def ticket_status(request, slug):
     ticket_status_list = TicketStatus.objects.filter(
-        project=Project.objects.get(slug=slug))
+        project=Project.objects.get(slug=slug, organization=request.user.organization))
     return render(request, 'settings/ticket_status.html', {'slug': slug, 'ticket_status_list': ticket_status_list})
 
 
 @login_required
 def ticket_status_create(request, slug):
-    project = Project.objects.get(slug=slug)
+    project = Project.objects.get(slug=slug, organization=request.user.organization)
     form = TicketStatusForm(request.POST, project=project)
     if(form.is_valid()):
         ticket_status = form.save()
@@ -191,7 +191,7 @@ def ticket_status_create(request, slug):
 
 @login_required
 def ticket_status_edit(request, slug, ticket_slug):
-    project = Project.objects.get(slug=slug)
+    project = Project.objects.get(slug=slug,organization=request.user.organization)
     instance = TicketStatus.objects.get(slug=ticket_slug, project=project)
     form = TicketStatusForm(request.POST, instance=instance, project=project)
     if(form.is_valid()):
@@ -204,7 +204,7 @@ def ticket_status_edit(request, slug, ticket_slug):
 @login_required
 def ticket_status_delete(request, slug, ticket_slug):
     TicketStatus.objects.get(
-        slug=ticket_slug, project=Project.objects.get(slug=slug)).delete()
+        slug=ticket_slug, project=Project.objects.get(slug=slug, organization=request.user.organization)).delete()
     return HttpResponse(json.dumps({'error': False}), content_type="application/json")
 
 
@@ -227,7 +227,7 @@ def password_reset(request, to_email):
 
 @login_required
 def project_team(request, slug):
-    project = Project.objects.get(slug=slug)
+    project = Project.objects.get(slug=slug, organization=request.user.organization)
     mem_details = []
     for member in project.members.exclude(email=request.user.email):
         mem_details.append(
@@ -296,7 +296,7 @@ def create_member(request, slug):
 
 @login_required
 def member_roles(request, slug):
-    project = Project.objects.get(slug=slug)
+    project = Project.objects.get(slug=slug, organization=request.user.organization)
     list_of_roles = Role.objects.filter(project=project)
     dictionary = {'list_of_roles': list_of_roles, 'slug': slug}
     return render(request, 'settings/member_roles.html', dictionary)
@@ -304,7 +304,7 @@ def member_roles(request, slug):
 
 @login_required
 def member_role_create(request, slug):
-    project = Project.objects.get(slug=slug)
+    project = Project.objects.get(slug=slug, organization=request.user.organization)
     form = RoleForm(request.POST, project=project)
     if(form.is_valid()):
         role = form.save()
@@ -315,7 +315,7 @@ def member_role_create(request, slug):
 
 @login_required
 def member_role_edit(request, slug, member_role_slug):
-    project = Project.objects.get(slug=slug)
+    project = Project.objects.get(slug=slug, organization=request.user.organization)
     instance = Role.objects.get(
         slug=member_role_slug, project=project)
     form = RoleForm(request.POST, instance=instance, project=project)
@@ -328,7 +328,7 @@ def member_role_edit(request, slug, member_role_slug):
 
 @login_required
 def member_role_delete(request, slug, member_role_slug):
-    project = Project.objects.get(slug=slug)
+    project = Project.objects.get(slug=slug, organization=request.user.organization)
     Role.objects.get(slug=member_role_slug, project=project).delete()
     return HttpResponse(json.dumps({'error': False}), content_type="application/json")
 
@@ -339,7 +339,7 @@ def tickets(request,slug):
 
 @login_required
 def taskboard(request, slug, milestone_slug):
-    project = Project.objects.get(slug=slug)
+    project = Project.objects.get(slug=slug, organization=request.user.organization)
     milestone = Milestone.objects.get(slug=milestone_slug, project=project)
     ticket_status_list = TicketStatus.objects.filter(project=project)
     return render(request, 'project/taskboard.html', {'ticket_status_list': ticket_status_list, 'slug': slug, 'milestone': milestone})
@@ -349,7 +349,7 @@ def taskboard(request, slug, milestone_slug):
 def update_taskboard_status(request, slug, status_slug, task_id):
     task = Ticket.objects.get(id=task_id)
     ticket_status = TicketStatus.objects.get(
-        slug=status_slug, project=Project.objects.get(slug=slug))
+        slug=status_slug, project=Project.objects.get(slug=slug, organization=request.user.organization))
     task.status = ticket_status
     task.save()
     return HttpResponse("")
@@ -357,7 +357,7 @@ def update_taskboard_status(request, slug, status_slug, task_id):
 
 @login_required
 def load_tasks(request, slug, milestone_slug, status_slug):
-    project = Project.objects.get(slug=slug)
+    project = Project.objects.get(slug=slug, organization=request.user.organization)
     status = TicketStatus.objects.get(slug=status_slug, project=project)
     milestone = Milestone.objects.get(slug=milestone_slug, project=project)
     tasks = Ticket.objects.filter(status=status, milestone=milestone)
@@ -375,7 +375,7 @@ def load_tasks(request, slug, milestone_slug, status_slug):
 
 @login_required
 def requirement_tasks(request, slug, milestone_slug, requirement_id):
-    project = Project.objects.get(slug=slug)
+    project = Project.objects.get(slug=slug, organization=request.user.organization)
     milestone = Milestone.objects.get(slug=milestone_slug, project=project)
     ticket_status_list = TicketStatus.objects.filter(project=project)
     return render(request, 'project/partials/requirement_tasks.html', {'ticket_status_list': ticket_status_list, 'slug': slug, 'requirement_id': requirement_id, 'milestone': milestone})
@@ -384,7 +384,7 @@ def requirement_tasks(request, slug, milestone_slug, requirement_id):
 @login_required
 def requirement_tasks_more(request, slug, milestone_slug, status_slug, requirement_id):
     requirement = Requirement.objects.get(id=requirement_id)
-    project = Project.objects.get(slug=slug)
+    project = Project.objects.get(slug=slug, organization=request.user.organization)
     milestone = Milestone.objects.get(slug=milestone_slug, project=project)
     tasks = requirement.tasks.filter(status__slug=status_slug)
     paginator = Paginator(tasks, 10)
@@ -400,7 +400,7 @@ def requirement_tasks_more(request, slug, milestone_slug, status_slug, requireme
 
 @login_required
 def task_details(request, slug, milestone_slug, task_id):
-    task = Ticket.objects.get(id=task_id)
+    task = Ticket.objects.get(id=task_id, milestone__slug=milestone_slug, project__organization=request.user.organization)
     return render(request, 'task/Task_detail.html', {'task': task, 'slug': slug})
 
 
@@ -408,7 +408,7 @@ def task_details(request, slug, milestone_slug, task_id):
 def task_comment(request, slug, task_id):
     project = Project.objects.get(
         slug=slug, organization=request.user.organization)
-    task = Ticket.objects.get(id=task_id)
+    task = Ticket.objects.get(id=task_id, project=project)
     form = CommentForm(
         request.POST, task=task, user=request.user, project=project)
 
@@ -450,7 +450,7 @@ def delete_attachment(request, slug, task_id, attachment_id):
 @login_required
 def milestone_display(request,slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
-    milestones_list = Milestone.objects.filter(project=project,project__organization=request.user.organization)
+    milestones_list = Milestone.objects.filter(project=project)
     return render(request,'project/milestones_list.html',{'slug':slug,'milestones_list':milestones_list,'project':project})
 
 @login_required
@@ -500,7 +500,6 @@ def milestone_edit(request, slug, milestone_slug):
 
 @login_required
 def milestone_delete(request, slug, milestone_slug):
-    print slug,milestone_slug
     Milestone.objects.get(project__slug=slug, slug=milestone_slug, project__organization=request.user.organization).delete()
     return HttpResponse(json.dumps({'result':True}),content_type='application/json')
 
