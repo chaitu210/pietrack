@@ -11,22 +11,22 @@
         <form id='milestone_form'>
             <div class="panel_box">
                 <div class="form_group">
-                    <label>Title</label>
+                    <label for="milestone_name">Title</label>
                     <input id='milestone_name' name='name' value='{{ milestone_obj.name }}' type="text" class='input'>
                     <span id='milestone_name_error'></span>
                 </div>
                 <div class="form_group">
-                    <label>Start Date</label>
+                    <label for="milestone_estimated_start">Start Date</label>
                     <input id='milestone_estimated_start' name='estimated_start' value='{{ milestone_obj.estimated_start|date:"Y-m-d"}}' type="text" class='input'>
                     <span id='milestone_estimated_start_error'></span>
                 </div>
                 <div class="form_group">
-                    <label>Finished Date</label>
+                    <label for="milestone_estimated_finish">Finished Date</label>
                     <input id='milestone_estimated_finish' name='estimated_finish' value='{{ milestone_obj.estimated_finish|date:"Y-m-d" }}' type="text" class='input'>
                     <span id='milestone_estimated_finish_error'></span>
                 </div>
                 <div class="form_group">
-                    <label>Status</label>
+                    <label for="milestone_status">Status</label>
                     <select id='milestone_status' name='status' value='{{ milestone_obj.status }}' class='input'>
                         <option value='planned'>planned</option>
                         <option value='started'>started</option>
@@ -58,7 +58,8 @@
                     $('#milestone_' + key + '_error').after("<span class = 'span_error'>" + data.form_errors[key] + "</span>")
                 }
             } else {
-                alert('mile-stoned')
+                alert('Successfully created your mile-stone !');
+                window.location = '/project/{{ slug }}/milestones/';
             }
         });
     });
@@ -71,6 +72,6 @@
             minDate: new Date(),
         });
     };
-    display_datepicker()
+    display_datepicker();
     </script>
 {% endblock %}

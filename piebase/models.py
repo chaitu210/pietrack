@@ -16,6 +16,7 @@ import string
 import random
 import shutil
 from pietrack.settings import MEDIA_ROOT
+
 MILESTONE_STATUS = (
     ('planned', 'Planned'),
     ('started', 'Started'),
@@ -38,8 +39,10 @@ def url(self, filename):
         return "%s/%s/%s/%s" % (self.organization.slug, self.slug, rand_str(6), filename)
     return "%s/%s/%s/%s" % (self.organization.slug, self.project.slug, rand_str(6), filename)
 
+
 def logo(self, filename):
     return "%s/%s/%s/%s" % (self.organization.slug, self.slug, 'logo', filename)
+
 
 class Organization(models.Model):
     name = models.CharField(
@@ -64,8 +67,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     organization = models.ForeignKey(Organization)
     pietrack_role = models.CharField(
         _('pietrack_role'), max_length=30, choices=PIETRACK_ROLES)
-    profile_pic = models.FileField(
-        upload_to=profile_path, null=True, blank=True)
+    profile_pic = models.FileField(upload_to=profile_path, null=True, blank=True)
     biography = models.TextField(_('biography'), blank=True, max_length=5000)
 
     USERNAME_FIELD = 'email'
@@ -125,8 +127,9 @@ class Project(models.Model):
         return self.name
 
     def delete(self, *args, **kwargs):
-        super(Project,self).delete(*args, **kwargs)
-        shutil.rmtree(MEDIA_ROOT+"%s/%s/"%(self.organization.slug,self.slug))
+        super(Project, self).delete(*args, **kwargs)
+        shutil.rmtree(MEDIA_ROOT + "%s/%s/" % (self.organization.slug, self.slug))
+
     class Meta:
         unique_together = [("name", "organization")]
 
@@ -146,10 +149,11 @@ class Attachment(models.Model):
 
     def __str__(self):
         return self.filename()
-    
+
     def delete(self, *args, **kwargs):
         super(Attachment, self).delete(*args, **kwargs)
         shutil.rmtree(os.path.abspath(os.path.join(self.attached_file.path, os.pardir)))
+
 
 class Role(models.Model):
     name = models.CharField(max_length=200, verbose_name=_("name"))
@@ -319,7 +323,6 @@ class Comment(models.Model):
         self.attachments.all().delete()
 
 
-
 class Timeline(models.Model):
     content_type = models.ForeignKey(
         ContentType, related_name="content_type_timelines")
@@ -328,7 +331,7 @@ class Timeline(models.Model):
     namespace = models.CharField(
         max_length=250, default="default", db_index=True)
     # explination
-    event_type = models.CharField(max_length=250, db_index=True)#created,updated,commented,movedfrom(task),
+    event_type = models.CharField(max_length=250, db_index=True)  # created,updated,commented,movedfrom(task),
     project = models.ForeignKey(Project, null=True)
     data = models.TextField(
         null=True, blank=True, verbose_name=_("data"))  # left as blank

@@ -235,7 +235,7 @@ class RoleForm(forms.ModelForm):
         name_slug = slugify(self.cleaned_data['name'])
         if self.instance:
             existing_slug = self.instance.slug
-        if(Role.objects.filter(slug=name_slug, project=self.project) and name_slug != existing_slug):
+        if Role.objects.filter(slug=name_slug, project=self.project) and name_slug != existing_slug:
             raise forms.ValidationError('Role with this name already exists')
         elif len(name_slug) == 0:
             raise forms.ValidationError("Role name must contain a letter.")
@@ -265,7 +265,7 @@ class MilestoneForm(forms.ModelForm):
 
     def save(self, commit=True):
         milestone = super(MilestoneForm, self).save(commit=False)
-        milestone.slug = self.cleaned_data.get('name')
+        milestone.slug = slugify(self.cleaned_data.get('name'))
         milestone.modified_date = self.cleaned_data.get('estimated_finish')
         milestone.created_by = self.user
         if commit:

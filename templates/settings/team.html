@@ -17,7 +17,7 @@
                 <!-- content box starts here -->
                 <div class="content_box ">
                     <div class="title">
-                        <h4>SAMPL1 - <span class="status">MANAGE MEMBERS</span></h4>
+                        <h4>{{ project.name }} - <span class="status">MANAGE MEMBERS</span></h4>
                         <div class="tag">
                             Specify the statuses your user stories, tasks and issues will go through</div>
                         <span class="new">
@@ -50,15 +50,13 @@
                                              {%endif%}
                                              </span>
                                             <span class="title-email">
-                                                <span class="title">Mergu</span>
+                                                <span class="title">{{ member.username }}</span>
                                                 <span class="email">{{member.email}}</span>
                                             </span>
                                         </div>
                                     </th>
                                     <td>
-                                        <select class="form-control">
-                                            <option>{{role.name}}</option>
-                                        </select>
+                                        <p>{{role.name}}</p>
                                     </td>
                                     <td>
                                         <span class="active-1 status">
