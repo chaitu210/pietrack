@@ -166,7 +166,7 @@
       $.post('/project/{{slug}}/settings/member_role/' + slug + '/edit/', data, function(response) {
           if (response['error']) {
               $('#edit_role_error').text(response['errors'].name)
-          } else {
+          } else {)
               var role_id = response['role_id'];
               var role_name = response['role_name'];
               var slug = response['slug'];

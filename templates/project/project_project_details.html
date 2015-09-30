@@ -43,11 +43,9 @@
                             </div>
                             <div class="form_group">
                                 <label>Logo</label>
-                                {% if project.logo %}
-                                   <img id="logo" src="{{project.logo.url}}" class="img-responsive img-thumbnail" style="width:100px;height:100px;margin-left:20px;margin-bottom:10px;" />
-                                {% else %}
-                                    <img id="logo" src="http://www.livecollision.com/wp-content/uploads/Project-logo.jpg" class="img-responsive img-thumbnail" style="width:100px;height:100px;margin-left:20px;margin-bottom:10px;" />
-                                {% endif %}
+
+                                   <img id="logo" src="{% if project.logo %}{{project.logo.url}}{% else %}http://www.livecollision.com/wp-content/uploads/Project-logo.jpg{% endif %}" class="img-responsive img-thumbnail" style="width:100px;height:100px;margin-left:20px;margin-bottom:10px;" />
+
                                     <input id="file" name="logo" type="file" value="" style="display:none;"/>
                                     <br>
                                     <span  id="logo-err" class="help" style="margin-left:20px;margin-bottom:10px;"></span>
@@ -112,10 +110,9 @@
                   else{
                     $("span[name='pname_error']").text("");
                     $("span[name='pdescription_error']").text("");
-                    alert("Project edited");
-                    window.location.href="{%url 'project:list_of_projects'%}" 
+                    /*alert("Project edited");*/
+                    window.location="{%url 'project:list_of_projects'%}"
                   }
-
             }
           });
 

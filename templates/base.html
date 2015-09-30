@@ -20,7 +20,17 @@
     {% endcompress %}
   </head>
   <body>
+
+
     <header id='header_base'>
+      {% if messages %}
+          {% for message in messages %}
+          <div class="alert alert-{% if message.tags %}{{ message.tags }}{% endif %} alert-dismissible my_alert" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <strong>{% if message.tags %}{{ message.tags|title }} !{% endif %}</strong> {{ message }}.
+          </div>
+          {% endfor %}
+      {% endif %}
       <!-- left menu -->
       <div class='left_header'>
         <div class="menu">
@@ -195,6 +205,7 @@
         </span>
       </div>
     </header>
+
     {%block content%}
     {%endblock content%}
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
@@ -218,6 +229,48 @@
           $(this).closest('.parent_list').removeClass('active_li_drop')
       });
     </script>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+                setTimeout(function() {
+                      $('.my_alert').fadeOut(2000, function(){
+                    });
+                      }, 3000);
+
+        });
+        //window.setTimeout(function() {
+        //    $(".alert-message").fadeTo(500, 0).slideUp(500, function(){
+        //        $(this).remove();
+        //    });
+        //}, 5000);
+    </script>
+
+    <script type="text/javascript">
+
+        // for pagination
+
+        $('.pagination li a.active').each(function(){
+            $(this).css('background', '#337AB7');
+            $(this).css('color', '#fff');
+        });
+
+       if($('.pagination li:first').find('a span').text() == '<<'){
+            $('.pagination li:first').find('a span').text('First');
+        }
+
+        if($('.pagination li:nth-child(2)').find('a span').text() == '<'){
+            $('.pagination li:nth-child(2)').find('a span').text('Prev');
+        }
+
+        if($('.pagination li:last').find('a span').text() == '>>'){
+            $('.pagination li:last').find('a span').text('Last');
+        }
+        if($('.pagination li:nth-last-child(2)').find('a span').text() == '>'){
+            $('.pagination li:nth-last-child(2)').find('a span').text('Next');
+        }
+
+    </script>
+
     {% block extra_js %}
     {% endblock %}
   </body>
