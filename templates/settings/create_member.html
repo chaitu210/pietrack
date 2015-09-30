@@ -28,8 +28,8 @@
                     <div class="form_group">
                         <label>Member Designation</label>
                         <select name='designation' type="text" class='input'>
-                            <option>UX</option>
-                            <option>Front end Developer</option>
+                            <option value="ux">UX</option>
+                            <option value="front end developer">Front end Developer</option>
                         </select>
                         <span></span>
                     </div>
@@ -115,13 +115,14 @@
                     $('#' + span_id_array[key]).text('').append(display_error(response[key].email))
                 }
             } else {
-                alert('members added')
+                window.location='/project/{{ slug }}/';
             }
         });
     });
 
 
         // Your application has indicated there's an error
+/*
         window.setTimeout(function(){
 
             // Move to a new location or you can do something else
@@ -129,6 +130,7 @@
 
         }, 5000);
 
+*/
 
     </script>
 {% endblock %}

@@ -13,6 +13,9 @@ from accounts.forms import EditUserModelForm, RegisterForm, ChangePasswordForm
 from project.forms import PasswordResetForm
 from pietrack.settings import EMAIL_HOST_USER
 
+# for messages in views and templates
+from django.contrib import messages
+
 # for authentication and login required
 from django.contrib.auth.decorators import user_passes_test, login_required
 
@@ -35,6 +38,7 @@ def index(request):
 @active_user_required
 def logout(request):
     auth.logout(request)
+    messages.success(request, 'Successfully logged out !')
     return HttpResponseRedirect("/")
 
 
@@ -53,6 +57,7 @@ def login(request):
         else:
             json_data = {'error': True, 'error_msg':
                          'Authenticating user failed, wrong email or password'}
+        messages.success(request, 'Successfully logged in !')
         return HttpResponse(json.dumps(json_data), content_type='application/json')
     else:
         return render(request, 'login.html')
@@ -87,6 +92,7 @@ def register(request):
 
         else:
             json_data = {'error': True, 'error_password': 'password mismatch'}
+        messages.success(request, 'You are successfully registered !')
         return HttpResponse(json.dumps(json_data), content_type='application/json')
     else:
         json_data = {'error': True, 'response': register_form.errors}
@@ -113,6 +119,7 @@ def forgot_password(request):
             else:
                 json_data = {
                     'error': True, 'error_msg': 'email not registered'}
+        messages.success(request, 'Password recovery mail has been sent to your account !')
         return HttpResponse(json.dumps(json_data), content_type='application/json')
 
 
@@ -159,7 +166,7 @@ def user_profile(request):
 
             form.save()
             response_data = {'error': False, "response": 'Successfully updated'}
-
+            messages.success(request, 'Your profile updated successfully !')
         else:
             response_data = {'error': True, 'response': form.errors}
 

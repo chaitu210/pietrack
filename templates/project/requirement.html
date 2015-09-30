@@ -48,7 +48,8 @@
                     $('#requirement_' + key + '_error').after("<span class = 'span_error'>" + data.form_errors[key] + "</span>")
                 }
             } else {
-                alert('Successfully added requirement !');
+                /*alert('Successfully added requirement !');*/
+                window.location='/project/{{ slug }}/tickets/'
             }
         });
     });
