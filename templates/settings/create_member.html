@@ -25,11 +25,13 @@
                     <a class="action" href="#">
                         <i id='id_i_fa_add' class="fa fa-plus"></i>
                     </a>
+
                 </div>
             </div>
             {% csrf_token %}
         </form>
         <form id='id_form_description'>
+
             <div class="panel_box">
                 <div class="form_group">
                     <label>Description</label>
@@ -41,6 +43,9 @@
         </form>
         <div id='id_div_create_member' class="panel_box">
             <button id='id_button_create_member'>create memeber</button>
+            <div id="dup_email" class="alert alert-warning" role="alert" style="padding:0px;margin-top:5px;">
+              <div class="container"> Duplicate e-mails were found.</div>
+            </div>
             <div class="help">
                 The user will get an invite soon.
             </div>
@@ -81,7 +86,7 @@
         }
         return ''
     }
-
+    $("#dup_email").hide()
     $('#id_button_create_member').click(function(event) {
         var id_span_array = []
         $("#id_div_append").find("span").each(function() {
@@ -102,6 +107,9 @@
                 });
                 for (var key in response) {
                     $('#' + span_id_array[key]).text('').append(display_error(response[key].email))
+                }
+                if(response['emails']){
+                    $("#dup_email").show()
                 }
             } else {
                 alert('members added')

@@ -262,46 +262,50 @@ def create_member(request, slug):
         description = request.POST.get('description')
         post_dict = {'description': description}
         post_tuple = zip(email_list, designation_list)
-        for email_iter, designation_iter in post_tuple:
-            post_dict['email'] = email_iter
-            post_dict['designation'] = designation_iter
-            create_member_form = CreateMemberForm(post_dict)
-            if create_member_form.is_valid():
-                email = post_dict['email']
-                designation = post_dict['designation']
-                description = post_dict['description']
-                organization_obj = request.user.organization
-                if User.objects.filter(email=email).exists():
-                    send_mail_old_user.delay(email)
-                    pass
+        if len(email_list)==len(set(email_list)):
+            for email_iter, designation_iter in post_tuple:
+                post_dict['email'] = email_iter
+                post_dict['designation'] = designation_iter
+                create_member_form = CreateMemberForm(post_dict)
+                if create_member_form.is_valid():
+                    email = post_dict['email']
+                    designation = post_dict['designation']
+                    description = post_dict['description']
+                    organization_obj = request.user.organization
+                    if User.objects.filter(email=email).exists():
+                        send_mail_old_user.delay(email)
+                        pass
+                    else:
+                        random_password = ''.join(
+                            random.choice(string.digits) for _ in xrange(8))
+                        new_user_obj = User.objects.create_user(
+                            email=email, username=email, password=random_password, organization=organization_obj, pietrack_role='user')
+                        password_reset(request, email_iter)
+                    project_obj = Project.objects.get(slug=slug)
+                    user_obj = User.objects.get(email=email)
+                    project_obj.members.add(user_obj)
+                    project_obj.organization = organization_obj
+                    project_obj.save()
+
+                    msg = " added "+user_obj.username+" as a team member"
+                    create_timeline.send(sender=request.user,content_object=user_obj, namespace=msg, event_type="member added",project=project_obj)
+
+                    random_slug = ''.join(
+                        random.choice(string.ascii_letters + string.digits) for _ in xrange(10))
+                    role_obj = Role.objects.create(
+                        name=designation, slug=random_slug, project=project_obj)
+                    role_obj.users.add(user_obj)
+                    role_obj.save()
                 else:
-                    random_password = ''.join(
-                        random.choice(string.digits) for _ in xrange(8))
-                    new_user_obj = User.objects.create_user(
-                        email=email, username=email, password=random_password, organization=organization_obj, pietrack_role='user')
-                    password_reset(request, email_iter)
-                project_obj = Project.objects.get(slug=slug)
-                user_obj = User.objects.get(email=email)
-                project_obj.members.add(user_obj)
-                project_obj.organization = organization_obj
-                project_obj.save()
-
-                msg = " added "+user_obj.username+" as a team member"
-                create_timeline.send(sender=request.user,content_object=user_obj, namespace=msg, event_type="member added",project=project_obj)
-
-                random_slug = ''.join(
-                    random.choice(string.ascii_letters + string.digits) for _ in xrange(10))
-                role_obj = Role.objects.create(
-                    name=designation, slug=random_slug, project=project_obj)
-                role_obj.users.add(user_obj)
-                role_obj.save()
+                    error_count += 1
+                json_data[json_post_index] = create_member_form.errors
+                json_post_index += 1
+            if error_count == 0:
+                json_data['error'] = False
             else:
-                error_count += 1
-            json_data[json_post_index] = create_member_form.errors
-            json_post_index += 1
-        if error_count == 0:
-            json_data['error'] = False
+                json_data['error'] = True
         else:
+            json_data['emails'] = True
             json_data['error'] = True
         return HttpResponse(json.dumps(json_data), content_type='application/json')
     else:
