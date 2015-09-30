@@ -24,7 +24,7 @@
                     <div class="title">
                         <h4>{{ project.name }} DETAILS</h4>
                         <div class="tag">
-                          Compellingly reintermediate premier materials for client-centered markets.for client-centered markets.
+                          The project plan serves as a roadmap for the entire project team 
                         </div>
                     </div>
                     <form action="" method="post" id="id_form_cproject">
@@ -34,20 +34,28 @@
                                 <label>Project Name</label>
                                 <input name='name' type="text" class="form-control" value="{{project.name}}">
                                 <input name='oldname' type="hidden" class="form-control" value="{{project.slug}}">
-                                <span name="pname_error"></span>
-                                <!--Error here -->
-                                <div class="help">Dynamically maximize professional models whereas.</div>
+                                <span name="pname_error" class="help"></span>
                             </div>
                             <div class="form_group">
                                 <label>Description</label>
                                 <textarea name='description' class="textarea">{{project.description}}</textarea>
-                                <span name="pdescription_error"></span>
-                                <!--Error here -->
-                                <div class="help">Dynamically maximize professional models whereas.</div>
+                                <span name="pdescription_error" class="help"></span>
+                            </div>
+                            <div class="form_group">
+                                <label>Logo</label>
+                                {% if project.logo %}
+                                   <img id="logo" src="{{project.logo.url}}" class="img-responsive img-thumbnail" style="width:100px;height:100px;margin-left:20px;margin-bottom:10px;" />
+                                {% else %}
+                                    <img id="logo" src="http://www.livecollision.com/wp-content/uploads/Project-logo.jpg" class="img-responsive img-thumbnail" style="width:100px;height:100px;margin-left:20px;margin-bottom:10px;" />
+                                {% endif %}
+                                    <input id="file" name="logo" type="file" value="" style="display:none;"/>
+                                    <br>
+                                    <span  id="logo-err" class="help" style="margin-left:20px;margin-bottom:10px;"></span>
+
                             </div>
                             <button class="special-button">Save</button>
                             <span class="del-project">
-                                <a href="{%url 'project:delete_project' id=project.id %}"><input type="button" class="special-button" value="Delete Project"/></a>
+                                <a href="{%url 'project:delete_project' id=project.id %}"><input type="button" class="special-button" value="Delete"/></a>
                             </span>
                       </div>
                     </form>
@@ -66,6 +74,15 @@
 
 {%block extra_js %}
   <script type="text/javascript">
+        $("#logo").click(function(e){
+            $("#file").click()
+        });
+        $("#file").change(function(e){
+            var tmppath = URL.createObjectURL(event.target.files[0]);
+            if(tmppath){
+              $("#logo").attr('src',tmppath)  
+            }
+        });
         function send_error(error)
           {
               if(error)
@@ -73,21 +90,35 @@
               return "";
           }
         $('#id_form_cproject').on('submit',function(e){
-          $.post('',$('#id_form_cproject').serialize(),function(response){
-            if(response['error']){
-              $("span[name='pname_error']").text(send_error(response['errors'].name));
-              $("span[name='pdescription_error']").text(send_error(response['errors'].description));
-            }
-            else{
-              /*redirect page here */
-              $("span[name='pname_error']").text("");
-              $("span[name='pdescription_error']").text("");
-              alert("Project edited");
-              window.location.href="{%url 'project:list_of_projects'%}"
-              
-              
+          var form = this
+          var formData = new FormData($(this)[0]);
+          $.ajax({
+            url: "",
+            data: formData,
+            enctype: 'multipart/form-data',
+            processData: false,
+            contentType: false,
+            type: 'POST',
+            success: function(response) {
+                if(response['error']){
+                    $("span[name='pname_error']").text(send_error(response['errors'].name));
+                    $("span[name='pdescription_error']").text(send_error(response['errors'].description));
+
+                    if(response['logo'])
+                      {
+                          $("#logo-err").text("Please choose a Image(png/jpg/gif)")
+                      }
+                  }
+                  else{
+                    $("span[name='pname_error']").text("");
+                    $("span[name='pdescription_error']").text("");
+                    alert("Project edited");
+                    window.location.href="{%url 'project:list_of_projects'%}" 
+                  }
+
             }
           });
+
           e.preventDefault();
         });
   </script>

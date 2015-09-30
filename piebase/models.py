@@ -14,7 +14,8 @@ from django.core.mail import send_mail
 import os
 import string
 import random
-
+import shutil
+from pietrack.settings import MEDIA_ROOT
 MILESTONE_STATUS = (
     ('planned', 'Planned'),
     ('started', 'Started'),
@@ -34,11 +35,11 @@ def rand_str(number):
 
 def url(self, filename):
     if self.__class__ == "Project":
-        return "%s/%s/%s" % (self.slug, rand_str(6), filename)
-    return "%s/%s/%s" % (self.project.slug, rand_str(6), filename)
+        return "%s/%s/%s/%s" % (self.organization.slug, self.slug, rand_str(6), filename)
+    return "%s/%s/%s/%s" % (self.organization.slug, self.project.slug, rand_str(6), filename)
 
 def logo(self, filename):
-    return "%s/%s/%s" % (self.slug, 'logo', filename)
+    return "%s/%s/%s/%s" % (self.organization.slug, self.slug, 'logo', filename)
 
 class Organization(models.Model):
     name = models.CharField(
@@ -115,14 +116,17 @@ class Project(models.Model):
     modified_date = models.DateTimeField(verbose_name=_("modified date"))
     members = models.ManyToManyField(
         settings.AUTH_USER_MODEL, related_name="projects")
-    logo = models.FileField(upload_to=logo, blank=True, null=True)
     organization = models.ForeignKey(Organization)
+    logo = models.FileField(upload_to=logo, blank=True, null=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, null=True, blank=True)
 
     def __str__(self):
         return self.name
 
+    def delete(self, *args, **kwargs):
+        super(Project,self).delete(*args, **kwargs)
+        shutil.rmtree(MEDIA_ROOT+"%s/%s/"%(self.organization.slug,self.slug))
     class Meta:
         unique_together = [("name", "organization")]
 
@@ -142,7 +146,10 @@ class Attachment(models.Model):
 
     def __str__(self):
         return self.filename()
-
+    
+    def delete(self, *args, **kwargs):
+        super(Attachment, self).delete(*args, **kwargs)
+        shutil.rmtree(os.path.abspath(os.path.join(self.attached_file.path, os.pardir)))
 
 class Role(models.Model):
     name = models.CharField(max_length=200, verbose_name=_("name"))
@@ -306,6 +313,11 @@ class Comment(models.Model):
 
     def __str__(self):
         return self.comment
+
+    def delete(self, *args, **kwargs):
+        super(Comment, self).delete(*args, **kwargs)
+        self.attachments.all().delete()
+
 
 
 class Timeline(models.Model):
