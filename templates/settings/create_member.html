@@ -2,16 +2,15 @@
 {% load compress %}
 {% block content %}
   <section id='base_content' class='create_project'>
-
     <div class="content_box">
-
-
-        <div class="role-alert col-md-5 pull-right">
-            <div class="alert alert-warning alert-dismissible" role="alert">
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <strong><span class="fa fa-warning"> Alert!</span></strong> Please create a role to add a member !
+        {% if project_roles|length == 0 %}
+            <div class="role-alert pull-right">
+                <div class="alert alert-warning alert-dismissible" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <strong><span class="fa fa-warning"></span></strong> Please create a role to add a member !
+                </div>
             </div>
-        </div>
+        {% endif %}
         <br clear="clearfixall" />
         <div class="title">
             <h4>New Member</h4>
@@ -22,25 +21,28 @@
                 <div id='id_div_add0' class="panel_box">
                     <div class="form_group">
                         <label>Email Address</label>
-                        <input name='email' type="text" class='input'>
+                        <input name='email' type="text" class='input' value="">
                         <span id='id_span_error_email0' class='class_span0'></span>
                     </div>
                     <div class="form_group">
                         <label>Member Designation</label>
                         <select name='designation' type="text" class='input'>
-                            <option value="ux">UX</option>
-                            <option value="front end developer">Front end Developer</option>
+                            {% for role in project_roles %}
+                            <option value="{{ role.slug }}">{{ role.name }}</option>
+                            {% endfor %}
                         </select>
                         <span></span>
                     </div>
                     <a class="action" href="#">
                         <i id='id_i_fa_add' class="fa fa-plus"></i>
                     </a>
+
                 </div>
             </div>
             {% csrf_token %}
         </form>
         <form id='id_form_description'>
+
             <div class="panel_box">
                 <div class="form_group">
                     <label>Description</label>
@@ -52,6 +54,9 @@
         </form>
         <div id='id_div_create_member' class="panel_box">
             <button id='id_button_create_member'>create memeber</button>
+            <div id="dup_email" class="alert alert-warning" role="alert" style="padding:0px;margin-top:5px;">
+              <div class="container"> Duplicate e-mails were found.</div>
+            </div>
             <div class="help">
                 The user will get an invite soon.
             </div>
@@ -74,6 +79,8 @@
             $('#' + clone.id + " a i").attr('id', 'id_i_fa_del' + i)
             clone.id = "id_div_add" + ++i;
             clone.querySelectorAll("[id = 'id_span_error_email" + (i - 1) + "']")[0].id = 'id_span_error_email' + i
+            $(clone).find('input').val("")
+            $(clone).find('span').text("")
             document.getElementById('id_form_append').appendChild(clone);
             $('#id_i_fa_add').on('click', duplicate);
             $('.fa.fa-trash').on('click', duplicate_trash)
@@ -92,7 +99,7 @@
         }
         return ''
     }
-
+    $("#dup_email").hide()
     $('#id_button_create_member').click(function(event) {
         var id_span_array = []
         $("#id_div_append").find("span").each(function() {
@@ -114,23 +121,24 @@
                 for (var key in response) {
                     $('#' + span_id_array[key]).text('').append(display_error(response[key].email))
                 }
+                if(response['emails']){
+                    $("#dup_email").show()
+                }
+                else{
+                    $("#dup_email").hide()
+                }
             } else {
-                window.location='/project/{{ slug }}/';
+                window.location.href = "{% url 'project:project_team' slug %}";
             }
         });
     });
 
 
-        // Your application has indicated there's an error
-/*
+    {% if project_roles|length == 0 %}
         window.setTimeout(function(){
-
-            // Move to a new location or you can do something else
-            window.location.href = "/project/{{ slug }}/settings/member_roles/";
-
-        }, 5000);
-
-*/
+            window.location.href = "{% url 'project:member_roles' slug %}";
+        }, 3000);
+    {% endif %}
 
     </script>
 {% endblock %}

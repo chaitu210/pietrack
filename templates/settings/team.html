@@ -19,7 +19,8 @@
                     <div class="title">
                         <h4>{{ project.name }} - <span class="status">MANAGE MEMBERS</span></h4>
                         <div class="tag">
-                            Specify the statuses your user stories, tasks and issues will go through</div>
+                            You can quickly add members to your team and re-order them at anytime
+                        </div>
                         <span class="new">
                             <a href="{% url 'project:create_member' slug %}">
                                 Add New Member
@@ -39,7 +40,7 @@
                             </thead>
                             <tbody>
                             {% for member,role in mem_details %}
-                                <tr>
+                                <tr id="{{ member.id }}">
                                     <th scope="row">
                                         <div class="img-text">
                                             <span class="user-pic">
@@ -85,4 +86,14 @@
 {% endblock %}
 {% block extra_js %}
     <script type="text/javascript" src="{%static 'js/bs_leftnavi.js' %}"></script>
+    <script>
+        function delete_member(id){
+            $.get("{% url 'project:delete_member' slug%}"+"?id="+id, function(response){
+                if(response['result'])
+                {
+                    $("#"+id).remove();
+                }
+            });
+        }
+    </script>
 {% endblock %}

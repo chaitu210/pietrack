@@ -12,6 +12,7 @@ from .tasks import celery_send_mail
 from piebase.models import Project, Priority, Severity, Organization, User, TicketStatus, Role, Milestone, Requirement, Comment, Timeline
 from django.template.defaultfilters import slugify
 from django.utils import timezone
+from django.core.exceptions import ValidationError
 
 # def CreateTimeline(content_object, event_type, project, user):
 #     Timeline.objects.create(content_object=content_object, event_type=event_type, project=project)
@@ -155,6 +156,16 @@ class CreateMemberForm(forms.Form):
     designation = forms.CharField()
     description = forms.Textarea()
 
+    def __init__(self,*args,**kwargs):
+        self.slug = kwargs.pop('slug',None)
+        self.organization = kwargs.pop('organization',None)
+        super(CreateMemberForm,self).__init__(*args, **kwargs)
+
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        if Role.objects.filter(users__email=email,project__slug=self.slug,project__organization=self.organization):
+            raise ValidationError("This user is assigned to the project.")
+        return email
 
 class PasswordResetForm(forms.Form):
     email = forms.EmailField(label=_("Email"), max_length=254)

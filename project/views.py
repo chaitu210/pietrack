@@ -269,8 +269,11 @@ def password_reset(request, to_email):
 def project_team(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     mem_details = []
-    for member in project.members.exclude(email=request.user.email):
-        mem_details.append((member, Role.objects.get(users__email=member.email, project=project)))
+    for member in project.members.all():
+        try:
+            mem_details.append((member, Role.objects.get(users__email=member.email, project=project)))
+        except:
+            pass
     dictionary = {'project': project, 'mem_details': mem_details, 'slug': slug}
     return render(request, 'settings/team.html', dictionary)
 
@@ -289,50 +292,62 @@ def create_member(request, slug):
         for email_iter, designation_iter in post_tuple:
             post_dict['email'] = email_iter
             post_dict['designation'] = designation_iter
-            create_member_form = CreateMemberForm(post_dict)
-            if create_member_form.is_valid():
-                email = post_dict['email']
-                designation = post_dict['designation']
-                description = post_dict['description']
-                organization_obj = request.user.organization
-                if User.objects.filter(email=email).exists():
-                    send_mail_old_user.delay(email)
-                    pass
+            create_member_form = CreateMemberForm(post_dict,slug=slug,organization=request.user.organization)
+            if len(email_list)==len(set(email_list)) or email_list.count('')>0 :
+                if create_member_form.is_valid() and email_list.count('')==0 :
+                    email = post_dict['email']
+                    designation = post_dict['designation']
+                    description = post_dict['description']
+                    organization_obj = request.user.organization
+                    if User.objects.filter(email=email).exists():
+                        send_mail_old_user.delay(email)
+                        pass
+                    else:
+                        random_password = ''.join(
+                            random.choice(string.digits) for _ in xrange(8))
+                        new_user_obj = User.objects.create_user(
+                            email=email, username=email, password=random_password, organization=organization_obj, pietrack_role='user')
+                        password_reset(request, email_iter)
+                    project_obj = Project.objects.get(slug=slug, organization=request.user.organization)
+                    user_obj = User.objects.get(email=email)
+                    project_obj.members.add(user_obj)
+                    project_obj.organization = organization_obj
+                    role = Role.objects.get(slug=designation, project=project_obj)
+                    role.users.add(User.objects.get(email=email))
+                    role.save()
+                    project_obj.save()
+
+                    msg = " added "+user_obj.username+" as a team member"
+                    create_timeline.send(sender=request.user,content_object=user_obj, namespace=msg, event_type="member added",project=project_obj)
                 else:
-                    random_password = ''.join(
-                        random.choice(string.digits) for _ in xrange(8))
-                    new_user_obj = User.objects.create_user(
-                        email=email, username=email, password=random_password, organization=organization_obj,
-                        pietrack_role='user')
-                    password_reset(request, email_iter)
-                project_obj = Project.objects.get(slug=slug)
-                user_obj = User.objects.get(email=email)
-                project_obj.members.add(user_obj)
-                project_obj.organization = organization_obj
-                project_obj.save()
+                    error_count += 1
+                    json_data[json_post_index] = create_member_form.errors
+                    json_post_index += 1
+            if len(email_list)!=len(set(email_list)) and email_list.count('')<2:
+                json_data['emails'] = True
 
-                msg = " added " + user_obj.username + " as a team member"
-                create_timeline.send(sender=request.user, content_object=user_obj, namespace=msg,
-                                     event_type="member added", project=project_obj)
-
-                random_slug = ''.join(
-                    random.choice(string.ascii_letters + string.digits) for _ in xrange(10))
-                role_obj = Role.objects.create(name=designation, slug=random_slug, project=project_obj)
-                role_obj.users.add(user_obj)
-                role_obj.save()
-            else:
-                error_count += 1
-            json_data[json_post_index] = create_member_form.errors
-            json_post_index += 1
-        if error_count == 0:
+        if error_count == 0 and len(email_list)==len(set(email_list)):
             json_data['error'] = False
         else:
             json_data['error'] = True
         messages.success(request, 'Successfully added project members !')
         return HttpResponse(json.dumps(json_data), content_type='application/json')
     else:
-        return render(request, 'settings/create_member.html', {'slug': slug})
+        project_roles = Role.objects.filter(project__slug=slug, project__organization=request.user.organization)
+        return render(request, 'settings/create_member.html', {'slug': slug,'project_roles':project_roles})
 
+
+@login_required
+def delete_member(request,slug):
+    project = Project.objects.get(slug=slug, organization=request.user.organization)
+    result=False
+    if request.GET.get('id',False):
+        if request.user.pietrack_role != 'admin':
+            project.members.remove(project.members.get(id=request.GET.get('id')))
+        role = Role.objects.get(project=project)
+        role.users.remove(role.users.get(id=request.GET.get('id')))
+        result=True
+    return HttpResponse(json.dumps({'result':result}), content_type="application/json")
 
 @login_required
 def member_roles(request, slug):
