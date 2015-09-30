@@ -12,13 +12,13 @@
              <form id='requirement_form'>
                 {% csrf_token %}
                 <div class="form_group">
-                    <label>Title</label>
+                    <label for="requirement_name">Title</label>
                     <input id='requirement_name' name='name' type="text" class='input'>
                     <span id='requirement_name_error'></span>
                 </div>
                 <div class="form_group">
-                    <label>Milestone</label>
-                    <select name='milestone' class='input'>
+                    <label for="requirement_milestone">Milestone</label>
+                    <select id="requirement_milestone" name='milestone' class='input'>
                         {% for milestone_iter in milestone %}
                            <option value='{{ milestone_iter.id }}'>{{ milestone_iter.name }}</option>
                         {% endfor %}
@@ -26,7 +26,7 @@
                     <span id='requirement_milestone_error'></span>
                 </div>
                 <div class="form_group">
-                    <label>Description</label>
+                    <label for="requirement_desc">Description</label>
                     <textarea id='requirement_desc' name='description' class="form-control textarea"></textarea>
                     <span id='requirement_description_error'></span>
                 </div>
@@ -40,15 +40,15 @@
 {% block extra_js %}
   <script>
     $('#requirement_save').click(function(event) {
-        event.preventDefault()
+        event.preventDefault();
         $.post('', $('#requirement_form').serialize(), function(data) {
             if (data['error'] === true) {
-                $('span.span_error').remove()
+                $('span.span_error').remove();
                 for (var key in data.form_errors) {
                     $('#requirement_' + key + '_error').after("<span class = 'span_error'>" + data.form_errors[key] + "</span>")
                 }
             } else {
-                alert('requirement added')
+                alert('Successfully added requirement !');
             }
         });
     });

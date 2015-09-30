@@ -151,7 +151,7 @@
               var slug = response['slug'];
 
               var row = '<tr id="' + role_id + '"><td>' + role_name + ' </td><td></td><td class="actions"><a href="#" class="edit" data-toggle="modal" data-target="#myModal1" onclick="edit_role(\'' + role_id + '\',\'' + role_name + '\',\'' + slug + '\')"><i class="fa fa-edit"></i></a> <a href="#" class="delete" onclick="delete_role(\'' + slug + '\',\'' + role_id + '\')"><i class="fa fa-trash"></i></a> </td></tr>'
-              $("#role_permissions tbody tr:last-child").after(row);
+              $("#role_permissions tbody").append(row);
               $("#id_add_role input[name='name']").val("");
               $('button.close').click();
           }

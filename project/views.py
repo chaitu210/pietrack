@@ -17,11 +17,12 @@ from .tasks import send_mail_old_user
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from signals import create_timeline
 
+
 @login_required
 def create_project(request):
-    if(request.method == "POST"):
+    if (request.method == "POST"):
         img = False
-        if(request.FILES.get('logo',False)):
+        if (request.FILES.get('logo', False)):
             img = True
             try:
                 Image.open(request.FILES.get('logo'))
@@ -31,17 +32,18 @@ def create_project(request):
         organization = request.user.organization
         form = CreateProjectForm(
             request.POST, organization=organization, user=request.user)
-        if(form.is_valid() and not img):
+        if (form.is_valid() and not img):
             slug = slugify(request.POST['name'])
             project_obj = form.save()
-            if(request.FILES.get('logo',False)):
+            if (request.FILES.get('logo', False)):
                 project_obj.logo = request.FILES.get('logo')
             project_obj.members.add(request.user)
             project_obj.save()
             json_data = {'error': False, 'errors': form.errors, 'slug': slug}
             return HttpResponse(json.dumps(json_data), content_type="application/json")
         else:
-            return HttpResponse(json.dumps({'error': True, 'errors': form.errors,'logo':img}), content_type="application/json")
+            return HttpResponse(json.dumps({'error': True, 'errors': form.errors, 'logo': img}),
+                                content_type="application/json")
     return render(request, 'project/create_project.html')
 
 
@@ -60,14 +62,14 @@ def project_detail(request, slug):
     project_members = project_object.members.all()
     dict_items = {'project_object': project_object,
                   'project_members': project_members,
-                  'slug' : slug
+                  'slug': slug
                   }
     return render(request, template_name, dict_items)
 
 
 @login_required
 def project_details(request, slug):
-    project = Project.objects.get(slug=slug,organization=request.user.organization)
+    project = Project.objects.get(slug=slug, organization=request.user.organization)
     dictionary = {'project': project, 'slug': slug}
     template_name = 'project/project_project_details.html'
     if request.method == 'POST':
@@ -120,11 +122,13 @@ def priorities(request, slug):
 
 @login_required
 def priority_create(request, slug):
-    project = Project.objects.get(slug=slug,organization=request.user.organization)
+    project = Project.objects.get(slug=slug, organization=request.user.organization)
     form = PriorityForm(request.POST, project=project)
-    if(form.is_valid()):
+    if (form.is_valid()):
         priority = form.save()
-        return HttpResponse(json.dumps({'error': False, 'color': priority.color, 'name': priority.name, 'proj_id': priority.id, 'slug': priority.slug}), content_type="application/json")
+        return HttpResponse(json.dumps(
+            {'error': False, 'color': priority.color, 'name': priority.name, 'proj_id': priority.id,
+             'slug': priority.slug}), content_type="application/json")
     else:
         return HttpResponse(json.dumps({'error': True, 'errors': form.errors}), content_type="application/json")
 
@@ -134,9 +138,11 @@ def priority_edit(request, slug, priority_slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     instance = Priority.objects.get(slug=priority_slug, project=project)
     form = PriorityForm(request.POST, instance=instance, project=project)
-    if(form.is_valid()):
+    if (form.is_valid()):
         priority = form.save()
-        return HttpResponse(json.dumps({'error': False, 'color': priority.color, 'name': priority.name, 'proj_id': priority.id, 'slug': priority.slug}), content_type="application/json")
+        return HttpResponse(json.dumps(
+            {'error': False, 'color': priority.color, 'name': priority.name, 'proj_id': priority.id,
+             'slug': priority.slug}), content_type="application/json")
     else:
         return HttpResponse(json.dumps({'error': True, 'errors': form.errors}), content_type="application/json")
 
@@ -144,7 +150,7 @@ def priority_edit(request, slug, priority_slug):
 @login_required
 def priority_delete(request, slug, priority_slug):
     Priority.objects.get(
-        slug=priority_slug, project=Project.objects.get(slug=slug,organization=request.user.organization)).delete()
+        slug=priority_slug, project=Project.objects.get(slug=slug, organization=request.user.organization)).delete()
     return HttpResponse(json.dumps({'error': False}), content_type="application/json")
 
 
@@ -159,21 +165,25 @@ def severities(request, slug):
 def severity_create(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     form = SeverityForm(request.POST, project=project)
-    if(form.is_valid()):
+    if (form.is_valid()):
         severity = form.save()
-        return HttpResponse(json.dumps({'error': False, 'color': severity.color, 'name': severity.name, 'proj_id': severity.id, 'slug': severity.slug}), content_type="application/json")
+        return HttpResponse(json.dumps(
+            {'error': False, 'color': severity.color, 'name': severity.name, 'proj_id': severity.id,
+             'slug': severity.slug}), content_type="application/json")
     else:
         return HttpResponse(json.dumps({'error': True, 'errors': form.errors}), content_type="application/json")
 
 
 @login_required
 def severity_edit(request, slug, severity_slug):
-    project = Project.objects.get(slug=slug,organization=request.user.organization)
+    project = Project.objects.get(slug=slug, organization=request.user.organization)
     instance = Severity.objects.get(slug=severity_slug, project=project)
     form = SeverityForm(request.POST, instance=instance, project=project)
-    if(form.is_valid()):
+    if (form.is_valid()):
         severity = form.save()
-        return HttpResponse(json.dumps({'error': False, 'color': severity.color, 'name': severity.name, 'proj_id': severity.id, 'slug': severity.slug}), content_type="application/json")
+        return HttpResponse(json.dumps(
+            {'error': False, 'color': severity.color, 'name': severity.name, 'proj_id': severity.id,
+             'slug': severity.slug}), content_type="application/json")
     else:
         return HttpResponse(json.dumps({'error': True, 'errors': form.errors}), content_type="application/json")
 
@@ -196,21 +206,25 @@ def ticket_status(request, slug):
 def ticket_status_create(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     form = TicketStatusForm(request.POST, project=project)
-    if(form.is_valid()):
+    if (form.is_valid()):
         ticket_status = form.save()
-        return HttpResponse(json.dumps({'error': False, 'color': ticket_status.color, 'name': ticket_status.name, 'proj_id': ticket_status.id, 'slug': ticket_status.slug}), content_type="application/json")
+        return HttpResponse(json.dumps(
+            {'error': False, 'color': ticket_status.color, 'name': ticket_status.name, 'proj_id': ticket_status.id,
+             'slug': ticket_status.slug}), content_type="application/json")
     else:
         return HttpResponse(json.dumps({'error': True, 'errors': form.errors}), content_type="application/json")
 
 
 @login_required
 def ticket_status_edit(request, slug, ticket_slug):
-    project = Project.objects.get(slug=slug,organization=request.user.organization)
+    project = Project.objects.get(slug=slug, organization=request.user.organization)
     instance = TicketStatus.objects.get(slug=ticket_slug, project=project)
     form = TicketStatusForm(request.POST, instance=instance, project=project)
-    if(form.is_valid()):
+    if (form.is_valid()):
         ticket_status = form.save()
-        return HttpResponse(json.dumps({'error': False, 'color': ticket_status.color, 'name': ticket_status.name, 'proj_id': ticket_status.id, 'slug': ticket_status.slug}), content_type="application/json")
+        return HttpResponse(json.dumps(
+            {'error': False, 'color': ticket_status.color, 'name': ticket_status.name, 'proj_id': ticket_status.id,
+             'slug': ticket_status.slug}), content_type="application/json")
     else:
         return HttpResponse(json.dumps({'error': True, 'errors': form.errors}), content_type="application/json")
 
@@ -243,11 +257,12 @@ def password_reset(request, to_email):
 def project_team(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     mem_details = []
-    for member in project.members.exclude(email=request.user.email):
-        mem_details.append(
-            (member, Role.objects.get(users__email=member.email)))
-    dictionary = {'project_id': project.id,
-                  'mem_details': mem_details, 'slug': slug}
+    for member in project.members.all():
+        try:
+            mem_details.append((member, Role.objects.get(users__email=member.email, project=project)))
+        except:
+            pass
+    dictionary = {'project': project, 'mem_details': mem_details, 'slug': slug}
     return render(request, 'settings/team.html', dictionary)
 
 
@@ -262,12 +277,12 @@ def create_member(request, slug):
         description = request.POST.get('description')
         post_dict = {'description': description}
         post_tuple = zip(email_list, designation_list)
-        if len(email_list)==len(set(email_list)):
-            for email_iter, designation_iter in post_tuple:
-                post_dict['email'] = email_iter
-                post_dict['designation'] = designation_iter
-                create_member_form = CreateMemberForm(post_dict)
-                if create_member_form.is_valid():
+        for email_iter, designation_iter in post_tuple:
+            post_dict['email'] = email_iter
+            post_dict['designation'] = designation_iter
+            create_member_form = CreateMemberForm(post_dict,slug=slug,organization=request.user.organization)
+            if len(email_list)==len(set(email_list)) or email_list.count('')>0 :
+                if create_member_form.is_valid() and email_list.count('')==0 :
                     email = post_dict['email']
                     designation = post_dict['designation']
                     description = post_dict['description']
@@ -281,36 +296,45 @@ def create_member(request, slug):
                         new_user_obj = User.objects.create_user(
                             email=email, username=email, password=random_password, organization=organization_obj, pietrack_role='user')
                         password_reset(request, email_iter)
-                    project_obj = Project.objects.get(slug=slug)
+                    project_obj = Project.objects.get(slug=slug, organization=request.user.organization)
                     user_obj = User.objects.get(email=email)
                     project_obj.members.add(user_obj)
                     project_obj.organization = organization_obj
+                    role = Role.objects.get(slug=designation, project=project_obj)
+                    role.users.add(User.objects.get(email=email))
+                    role.save()
                     project_obj.save()
 
                     msg = " added "+user_obj.username+" as a team member"
                     create_timeline.send(sender=request.user,content_object=user_obj, namespace=msg, event_type="member added",project=project_obj)
-
-                    random_slug = ''.join(
-                        random.choice(string.ascii_letters + string.digits) for _ in xrange(10))
-                    role_obj = Role.objects.create(
-                        name=designation, slug=random_slug, project=project_obj)
-                    role_obj.users.add(user_obj)
-                    role_obj.save()
                 else:
                     error_count += 1
-                json_data[json_post_index] = create_member_form.errors
-                json_post_index += 1
-            if error_count == 0:
-                json_data['error'] = False
-            else:
-                json_data['error'] = True
+                    json_data[json_post_index] = create_member_form.errors
+                    json_post_index += 1
+            if len(email_list)!=len(set(email_list)) and email_list.count('')<2:
+                json_data['emails'] = True
+
+        if error_count == 0 and len(email_list)==len(set(email_list)):
+            json_data['error'] = False
         else:
-            json_data['emails'] = True
             json_data['error'] = True
         return HttpResponse(json.dumps(json_data), content_type='application/json')
     else:
-        return render(request, 'settings/create_member.html',{'slug':slug})
+        project_roles = Role.objects.filter(project__slug=slug, project__organization=request.user.organization)
+        return render(request, 'settings/create_member.html', {'slug': slug,'project_roles':project_roles})
 
+
+@login_required
+def delete_member(request,slug):
+    project = Project.objects.get(slug=slug, organization=request.user.organization)
+    result=False
+    if request.GET.get('id',False):
+        if request.user.pietrack_role != 'admin':
+            project.members.remove(project.members.get(id=request.GET.get('id')))
+        role = Role.objects.get(project=project)
+        role.users.remove(role.users.get(id=request.GET.get('id')))
+        result=True
+    return HttpResponse(json.dumps({'result':result}), content_type="application/json")
 
 @login_required
 def member_roles(request, slug):
@@ -324,9 +348,10 @@ def member_roles(request, slug):
 def member_role_create(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     form = RoleForm(request.POST, project=project)
-    if(form.is_valid()):
+    if form.is_valid():
         role = form.save()
-        return HttpResponse(json.dumps({'error': False, 'role_id': role.id, 'role_name': role.name, 'slug': role.slug}), content_type="application/json")
+        return HttpResponse(json.dumps({'error': False, 'role_id': role.id, 'role_name': role.name, 'slug': role.slug}),
+                            content_type="application/json")
     else:
         return HttpResponse(json.dumps({'error': True, 'errors': form.errors}), content_type="application/json")
 
@@ -337,9 +362,10 @@ def member_role_edit(request, slug, member_role_slug):
     instance = Role.objects.get(
         slug=member_role_slug, project=project)
     form = RoleForm(request.POST, instance=instance, project=project)
-    if(form.is_valid()):
+    if form.is_valid():
         role = form.save()
-        return HttpResponse(json.dumps({'error': False, 'role_id': role.id, 'role_name': role.name, 'slug': role.slug}), content_type="application/json")
+        return HttpResponse(json.dumps({'error': False, 'role_id': role.id, 'role_name': role.name, 'slug': role.slug}),
+                            content_type="application/json")
     else:
         return HttpResponse(json.dumps({'error': True, 'errors': form.errors}), content_type="application/json")
 
@@ -350,17 +376,20 @@ def member_role_delete(request, slug, member_role_slug):
     Role.objects.get(slug=member_role_slug, project=project).delete()
     return HttpResponse(json.dumps({'error': False}), content_type="application/json")
 
+
 @login_required
-def tickets(request,slug):
-    milestone_slug = Milestone.objects.filter(project__slug=slug,project__organization=request.user.organization)[0].slug
-    return HttpResponseRedirect(reverse('project:taskboard', kwargs={'slug': slug, 'milestone_slug':milestone_slug}))
+def tickets(request, slug):
+    milestone_slug = Milestone.objects.filter(project__slug=slug, project__organization=request.user.organization)[0].slug
+    return HttpResponseRedirect(reverse('project:taskboard', kwargs={'slug': slug, 'milestone_slug': milestone_slug}))
+
 
 @login_required
 def taskboard(request, slug, milestone_slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     milestone = Milestone.objects.get(slug=milestone_slug, project=project)
     ticket_status_list = TicketStatus.objects.filter(project=project)
-    return render(request, 'project/taskboard.html', {'ticket_status_list': ticket_status_list, 'slug': slug, 'milestone': milestone})
+    return render(request, 'project/taskboard.html',
+                  {'ticket_status_list': ticket_status_list, 'slug': slug, 'milestone': milestone})
 
 
 @login_required
@@ -396,7 +425,9 @@ def requirement_tasks(request, slug, milestone_slug, requirement_id):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     milestone = Milestone.objects.get(slug=milestone_slug, project=project)
     ticket_status_list = TicketStatus.objects.filter(project=project)
-    return render(request, 'project/partials/requirement_tasks.html', {'ticket_status_list': ticket_status_list, 'slug': slug, 'requirement_id': requirement_id, 'milestone': milestone})
+    return render(request, 'project/partials/requirement_tasks.html',
+                  {'ticket_status_list': ticket_status_list, 'slug': slug, 'requirement_id': requirement_id,
+                   'milestone': milestone})
 
 
 @login_required
@@ -418,7 +449,8 @@ def requirement_tasks_more(request, slug, milestone_slug, status_slug, requireme
 
 @login_required
 def task_details(request, slug, milestone_slug, task_id):
-    task = Ticket.objects.get(id=task_id, milestone__slug=milestone_slug, project__organization=request.user.organization)
+    task = Ticket.objects.get(id=task_id, milestone__slug=milestone_slug,
+                              project__organization=request.user.organization)
     return render(request, 'task/Task_detail.html', {'task': task, 'slug': slug})
 
 
@@ -439,18 +471,20 @@ def task_comment(request, slug, task_id):
                 uploaded_by=request.user, attached_file=request.FILES.get('file'), project=project)
             comment.attachments.add(attachment)
         comment.save()
-        msg = "commented on "+task.name
+        msg = "commented on " + task.name
         if request.GET.get('parent_id', False):
-            msg="gave reply to "+comment.parent.commented_by.username+"  on "+task.name
-        create_timeline.send(sender=request.user,content_object=comment, namespace=msg, event_type="commented",project=project)
-        return HttpResponse(render_to_response('task/partials/comment_add.html', {'comment': comment, 'slug': slug,'task':task}))
+            msg = "gave reply to " + comment.parent.commented_by.username + "  on " + task.name
+        create_timeline.send(sender=request.user, content_object=comment, namespace=msg, event_type="commented",
+                             project=project)
+        return HttpResponse(
+            render_to_response('task/partials/comment_add.html', {'comment': comment, 'slug': slug, 'task': task}))
     else:
         return HttpResponse(json.dumps({'error': True, 'errors': form.errors}), content_type="json/application")
 
 
 @login_required
 def delete_attachment(request, slug, task_id, attachment_id):
-    project = Project.objects.get(slug=slug,organization=request.user.organization)
+    project = Project.objects.get(slug=slug, organization=request.user.organization)
     attach = Attachment.objects.get(id=attachment_id, project=project)
     task = Ticket.objects.get(id=task_id)
 
@@ -458,18 +492,21 @@ def delete_attachment(request, slug, task_id, attachment_id):
         shutil.rmtree(
             os.path.abspath(os.path.join(attach.attached_file.path, os.pardir)))
         attach.delete()
-        msg=" deleted attachment of "+task.name
-        create_timeline.send(sender=request.user,content_object=task, namespace=msg, event_type="deleted",project=project)
+        msg = " deleted attachment of " + task.name
+        create_timeline.send(sender=request.user, content_object=task, namespace=msg, event_type="deleted",
+                             project=project)
     except OSError as e:
         pass
     return HttpResponse(json.dumps({'result': True}), content_type="json/application")
 
 
 @login_required
-def milestone_display(request,slug):
+def milestone_display(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     milestones_list = Milestone.objects.filter(project=project)
-    return render(request,'project/milestones_list.html',{'slug':slug,'milestones_list':milestones_list,'project':project})
+    return render(request, 'project/milestones_list.html',
+                  {'slug': slug, 'milestones_list': milestones_list, 'project': project})
+
 
 @login_required
 def milestone_create(request, slug):
@@ -482,8 +519,9 @@ def milestone_create(request, slug):
         milestone_form = MilestoneForm(request.user, milestone_dict)
         if milestone_form.is_valid():
             milestone = milestone_form.save()
-            msg = " created milestone "+milestone.name
-            create_timeline.send(sender=request.user,content_object=milestone, namespace=msg, event_type="milestone created",project=project)
+            msg = " created milestone " + milestone.name
+            create_timeline.send(sender=request.user, content_object=milestone, namespace=msg,
+                                 event_type="milestone created", project=project)
             json_data['error'] = False
             return HttpResponse(json.dumps(json_data), content_type='application/json')
         else:
@@ -491,12 +529,13 @@ def milestone_create(request, slug):
             json_data['form_errors'] = milestone_form.errors
             return HttpResponse(json.dumps(json_data), content_type='application/json')
     else:
-        return render(request, 'project/milestone.html',{'slug':slug})
+        return render(request, 'project/milestone.html', {'slug': slug})
 
 
 @login_required
 def milestone_edit(request, slug, milestone_slug):
-    milestone_obj = Milestone.objects.get(project__slug=slug,slug=milestone_slug,project__organization=request.user.organization)
+    milestone_obj = Milestone.objects.get(project__slug=slug, slug=milestone_slug,
+                                          project__organization=request.user.organization)
     if request.method == 'POST':
         json_data = {}
         milestone_dict = request.POST.copy()
@@ -513,13 +552,14 @@ def milestone_edit(request, slug, milestone_slug):
             json_data['form_errors'] = milestone_form.errors
             return HttpResponse(json.dumps(json_data), content_type='application/json')
     else:
-        return render(request, 'project/milestone.html', {'milestone_obj': milestone_obj,'slug':slug})
+        return render(request, 'project/milestone.html', {'milestone_obj': milestone_obj, 'slug': slug})
 
 
 @login_required
 def milestone_delete(request, slug, milestone_slug):
-    Milestone.objects.get(project__slug=slug, slug=milestone_slug, project__organization=request.user.organization).delete()
-    return HttpResponse(json.dumps({'result':True}),content_type='application/json')
+    Milestone.objects.get(project__slug=slug, slug=milestone_slug,
+                          project__organization=request.user.organization).delete()
+    return HttpResponse(json.dumps({'result': True}), content_type='application/json')
 
 
 @login_required
@@ -530,12 +570,13 @@ def project_edit(request, slug):
     for member_iter in project_obj.members.all():
         member_dict[member_iter.email] = [
             role.name for role in member_iter.user_roles.all()]
-    return render(request, 'project/project_edit.html', {'milestone_list': milestone_list, 'member_dict': member_dict, 'project_slug': slug})
+    return render(request, 'project/project_edit.html',
+                  {'milestone_list': milestone_list, 'member_dict': member_dict, 'project_slug': slug})
 
 
 @login_required
 def requirement_create(request, slug):
-    project_obj = Project.objects.get(slug=slug,organization=request.user.organization)
+    project_obj = Project.objects.get(slug=slug, organization=request.user.organization)
     if request.POST:
         json_data = {}
         requirement_form = RequirementForm(request.POST)
@@ -546,8 +587,9 @@ def requirement_create(request, slug):
             requirement = Requirement.objects.create(name=name, slug=name, description=request.POST.get(
                 'description'), project=project_obj, milestone=milestone_obj)
 
-            msg = " created requirement "+requirement.name
-            create_timeline.send(sender=request.user,content_object=requirement, namespace=msg, event_type="requirement_form",project=project_obj)
+            msg = " created requirement " + requirement.name
+            create_timeline.send(sender=request.user, content_object=requirement, namespace=msg,
+                                 event_type="requirement_form", project=project_obj)
 
             json_data['error'] = False
             return HttpResponse(json.dumps(json_data), content_type='application/json')
@@ -557,4 +599,4 @@ def requirement_create(request, slug):
             return HttpResponse(json.dumps(json_data), content_type='application/json')
     else:
         milestone = project_obj.milestones.all()
-        return render(request, 'project/requirement.html', {'milestone': milestone,'slug':slug})
+        return render(request, 'project/requirement.html', {'milestone': milestone, 'slug': slug})
