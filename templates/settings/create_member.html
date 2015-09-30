@@ -2,9 +2,20 @@
 {% load compress %}
 {% block content %}
   <section id='base_content' class='create_project'>
+
     <div class="content_box">
+
+
+        <div class="role-alert col-md-5 pull-right">
+            <div class="alert alert-warning alert-dismissible" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <strong><span class="fa fa-warning"> Alert!</span></strong> Please create a role to add a member !
+            </div>
+        </div>
+        <br clear="clearfixall" />
         <div class="title">
             <h4>New Member</h4>
+
         </div>
         <form id='id_form_append'>
             <div id='id_div_append'>
@@ -108,5 +119,16 @@
             }
         });
     });
+
+
+        // Your application has indicated there's an error
+        window.setTimeout(function(){
+
+            // Move to a new location or you can do something else
+            window.location.href = "/project/{{ slug }}/settings/member_roles/";
+
+        }, 5000);
+
+
     </script>
 {% endblock %}

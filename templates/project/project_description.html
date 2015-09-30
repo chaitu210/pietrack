@@ -29,31 +29,33 @@
             </div>
             <div class="clearfix"></div>
             <!-- tickets -->
-            <h4> Activity </h4>
-        {% for event in project_object.timeline_set.all reversed %}    
-            <span class='ticket blue'>
-                {%if event.user.profile_pic %}
-                    <img src="{{ event.user.profile_pic.url }}">
-                {% else %}
-                    <img src="{% static 'img/user-pic.jpg' %}">
-                {% endif%}
-
-              <span class='description'>
-                <span class='name'>{{event.user.username}}</span> 
-                {{event.namespace}}
-                <!-- <span class='project_name'>#xyz test</span> --> in <span class='project_name'>{{event.project}}</span>
-                <span class='designation_time'>
-                    {{event.created|timesince}} &nbsp;
-                    {% if event.created|timesince == 0  %}
-                        just now
+            {% if project_object.timeline_set.all %}
+              <h4> Activity </h4>
+              {% for event in project_object.timeline_set.all reversed %}
+                <span class='ticket blue'>
+                    {%if event.user.profile_pic %}
+                        <img src="{{ event.user.profile_pic.url }}">
                     {% else %}
-                        ago
-                    {% endif %}
-                </span>
-              </span>
-            </span>
+                        <img src="{% static 'img/user-pic.jpg' %}">
+                    {% endif%}
 
-        {% endfor %}
+                  <span class='description'>
+                    <span class='name'>{{event.user.username}}</span>
+                    {{event.namespace}}
+                    <!-- <span class='project_name'>#xyz test</span> --> in <span class='project_name'>{{event.project}}</span>
+                    <span class='designation_time'>
+                        {{event.created|timesince}} &nbsp;
+                        {% if event.created|timesince == 0  %}
+                            just now
+                        {% else %}
+                            ago
+                        {% endif %}
+                    </span>
+                  </span>
+                </span>
+
+              {% endfor %}
+            {% endif %}
             <!--/ tickets -->
         </div>
         <!--/ about project -->

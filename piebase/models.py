@@ -37,8 +37,10 @@ def url(self, filename):
         return "%s/%s/%s" % (self.slug, rand_str(6), filename)
     return "%s/%s/%s" % (self.project.slug, rand_str(6), filename)
 
+
 def logo(self, filename):
-    return "%s/%s/%s" % (self.slug, 'logo', filename)
+    return "projects/%s/%s/%s" % (self.slug, 'logo', filename)
+
 
 class Organization(models.Model):
     name = models.CharField(
@@ -63,8 +65,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     organization = models.ForeignKey(Organization)
     pietrack_role = models.CharField(
         _('pietrack_role'), max_length=30, choices=PIETRACK_ROLES)
-    profile_pic = models.FileField(
-        upload_to=profile_path, null=True, blank=True)
+    profile_pic = models.FileField(upload_to=profile_path, null=True, blank=True)
     biography = models.TextField(_('biography'), blank=True, max_length=5000)
 
     USERNAME_FIELD = 'email'
@@ -316,7 +317,7 @@ class Timeline(models.Model):
     namespace = models.CharField(
         max_length=250, default="default", db_index=True)
     # explination
-    event_type = models.CharField(max_length=250, db_index=True)#created,updated,commented,movedfrom(task),
+    event_type = models.CharField(max_length=250, db_index=True)  # created,updated,commented,movedfrom(task),
     project = models.ForeignKey(Project, null=True)
     data = models.TextField(
         null=True, blank=True, verbose_name=_("data"))  # left as blank
