@@ -1,22 +1,19 @@
 from django.shortcuts import render, redirect, render_to_response
-from piebase.models import Project, Priority, Severity, TicketStatus, Ticket, Requirement, Attachment
-from forms import CreateProjectForm, PriorityForm, SeverityForm, TicketStatusForm, RoleForm, CommentForm
+from piebase.models import User,Project, Priority, Severity, TicketStatus, Ticket, Requirement, Attachment, Role, Milestone
+from forms import CreateProjectForm, PriorityForm, SeverityForm, TicketStatusForm, RoleForm, CommentForm,CreateMemberForm, PasswordResetForm, MilestoneForm, RequirementForm
 import json
 import random
 import string
 import os
 import shutil
-import imghdr
+from PIL import Image
 from django.utils import timezone
 from django.template.defaultfilters import slugify
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.tokens import default_token_generator
 from django.core.urlresolvers import reverse
-from piebase.models import User, Project, Organization, Role, Milestone, Requirement
-from forms import CreateProjectForm, CreateMemberForm, PasswordResetForm, MilestoneForm, RequirementForm
 from .tasks import send_mail_old_user
-from django.core import serializers
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from signals import create_timeline
 
@@ -27,8 +24,11 @@ def create_project(request):
         img = False
         if (request.FILES.get('logo', False)):
             img = True
-            if (imghdr.what(request.FILES.get('logo'))):
+            try:
+                Image.open(request.FILES.get('logo'))
                 img = False
+            except:
+                pass
         organization = request.user.organization
         form = CreateProjectForm(
             request.POST, organization=organization, user=request.user)
@@ -72,12 +72,19 @@ def project_details(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     dictionary = {'project': project, 'slug': slug}
     template_name = 'project/project_project_details.html'
-
     if request.method == 'POST':
+        img = False
+        if(request.FILES.get('logo',False)):
+            img = True
+            try:
+                Image.open(request.FILES.get('logo'))
+                img = False
+            except:
+                pass
         organization = request.user.organization
         form = CreateProjectForm(request.POST, organization=organization, instance=project)
 
-        if form.is_valid():
+        if form.is_valid() and not img:
             slug = slugify(request.POST['name'])
             project = Project.objects.get(
                 slug=request.POST['oldname'], organization=organization)
@@ -85,17 +92,24 @@ def project_details(request, slug):
             project.slug = slug
             project.description = request.POST['description']
             project.modified_date = timezone.now()
+            if(request.FILES.get('logo',False)):
+                if(project.logo):
+                    os.remove(project.logo.path)
+                project.logo = request.FILES.get('logo')
             project.save()
             return HttpResponse(json.dumps({'error': False, 'slug': slug}), content_type="application/json")
         else:
-            return HttpResponse(json.dumps({'error': True, 'errors': form.errors}), content_type="application/json")
+            return HttpResponse(json.dumps({'error': True, 'errors': form.errors, 'logo':img}), content_type="application/json")
 
     return render(request, template_name, dictionary)
 
 
 @login_required
 def delete_project(request, id):
-    Project.objects.get(id=id, organization=request.user.organization).delete()
+    try:
+        Project.objects.get(id=id, organization=request.user.organization).delete()
+    except OSError as e:
+        pass
     return redirect("project:list_of_projects")
 
 

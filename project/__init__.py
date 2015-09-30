@@ -1,1 +1,1 @@
-import receivers
+from . import receivers
