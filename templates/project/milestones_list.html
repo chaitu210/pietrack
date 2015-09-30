@@ -62,9 +62,24 @@
               <!--/ milestone -->
               <div class="clearfix"></div>
             {% else %}
-              <span class="ticket blue">
-                 <h1 align="center"> No milestones were added </h1>
-              </span>
+
+              <br clear="clearfixall" />
+              <div class="panel panel-primary">
+                  <div class="panel-heading">
+                      <h3 class="panel-title"> Create a new Milestone </h3>
+                  </div>
+                  <div class="panel-body">
+                      <center>No milestones were added here.<br />
+                          Kindly click here to create a new milestone for this project : <span class="badge"> {{ project.name }} </span>
+                          <br />
+                          <a href="{% url 'project:milestone_create' slug %}">
+                              <button class="btn btn-default">
+                                  <span class="fa fa-plus"></span> Create Milestone
+                              </button>
+                          </a>
+                      </center>
+                  </div>
+              </div>
             {% endif %}
           </div>
           <!--/ mile stones -->

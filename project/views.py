@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect, render_to_response
-from piebase.models import User,Project, Priority, Severity, TicketStatus, Ticket, Requirement, Attachment, Role, Milestone
-from forms import CreateProjectForm, PriorityForm, SeverityForm, TicketStatusForm, RoleForm, CommentForm,CreateMemberForm, PasswordResetForm, MilestoneForm, RequirementForm
+from piebase.models import User, Project, Priority, Severity, TicketStatus, Ticket, Requirement, Attachment, Role, \
+    Milestone
+from forms import CreateProjectForm, PriorityForm, SeverityForm, TicketStatusForm, RoleForm, CommentForm, \
+    CreateMemberForm, PasswordResetForm, MilestoneForm, RequirementForm
 import json
 import random
 import string
@@ -17,6 +19,9 @@ from .tasks import send_mail_old_user
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from signals import create_timeline
 
+# for messages in views and templates
+from django.contrib import messages
+
 
 @login_required
 def create_project(request):
@@ -32,7 +37,7 @@ def create_project(request):
         organization = request.user.organization
         form = CreateProjectForm(
             request.POST, organization=organization, user=request.user)
-        if (form.is_valid() and not img):
+        if form.is_valid() and not img:
             slug = slugify(request.POST['name'])
             project_obj = form.save()
             if (request.FILES.get('logo', False)):
@@ -40,6 +45,7 @@ def create_project(request):
             project_obj.members.add(request.user)
             project_obj.save()
             json_data = {'error': False, 'errors': form.errors, 'slug': slug}
+            messages.success(request, 'Successfully created your project - '+str(request.POST['name'])+ ' !')
             return HttpResponse(json.dumps(json_data), content_type="application/json")
         else:
             return HttpResponse(json.dumps({'error': True, 'errors': form.errors, 'logo': img}),
@@ -74,7 +80,7 @@ def project_details(request, slug):
     template_name = 'project/project_project_details.html'
     if request.method == 'POST':
         img = False
-        if(request.FILES.get('logo',False)):
+        if (request.FILES.get('logo', False)):
             img = True
             try:
                 Image.open(request.FILES.get('logo'))
@@ -92,14 +98,16 @@ def project_details(request, slug):
             project.slug = slug
             project.description = request.POST['description']
             project.modified_date = timezone.now()
-            if(request.FILES.get('logo',False)):
-                if(project.logo):
+            if (request.FILES.get('logo', False)):
+                if (project.logo):
                     os.remove(project.logo.path)
                 project.logo = request.FILES.get('logo')
             project.save()
+            messages.success(request, 'Successfully updated your project - '+str(project.name)+'')
             return HttpResponse(json.dumps({'error': False, 'slug': slug}), content_type="application/json")
         else:
-            return HttpResponse(json.dumps({'error': True, 'errors': form.errors, 'logo':img}), content_type="application/json")
+            return HttpResponse(json.dumps({'error': True, 'errors': form.errors, 'logo': img}),
+                                content_type="application/json")
 
     return render(request, template_name, dictionary)
 
@@ -107,9 +115,11 @@ def project_details(request, slug):
 @login_required
 def delete_project(request, id):
     try:
-        Project.objects.get(id=id, organization=request.user.organization).delete()
+        project = Project.objects.get(id=id, organization=request.user.organization)
+        project.delete()
     except OSError as e:
         pass
+    messages.success(request, 'Successfully deleted Project - '+str(project)+' !')
     return redirect("project:list_of_projects")
 
 
@@ -231,8 +241,10 @@ def ticket_status_edit(request, slug, ticket_slug):
 
 @login_required
 def ticket_status_delete(request, slug, ticket_slug):
-    TicketStatus.objects.get(
-        slug=ticket_slug, project=Project.objects.get(slug=slug, organization=request.user.organization)).delete()
+    ticket = TicketStatus.objects.get(
+        slug=ticket_slug, project=Project.objects.get(slug=slug, organization=request.user.organization))
+    ticket.delete()
+    messages.success(request, 'Successfully deleted Ticket - '+str(ticket)+' !')
     return HttpResponse(json.dumps({'error': False}), content_type="application/json")
 
 
@@ -316,6 +328,7 @@ def create_member(request, slug):
             json_data['error'] = False
         else:
             json_data['error'] = True
+        messages.success(request, 'Successfully added project members !')
         return HttpResponse(json.dumps(json_data), content_type='application/json')
     else:
         return render(request, 'settings/create_member.html', {'slug': slug})
@@ -364,8 +377,14 @@ def member_role_delete(request, slug, member_role_slug):
 
 @login_required
 def tickets(request, slug):
-    milestone_slug = Milestone.objects.filter(project__slug=slug, project__organization=request.user.organization)[0].slug
-    return HttpResponseRedirect(reverse('project:taskboard', kwargs={'slug': slug, 'milestone_slug': milestone_slug}))
+    if Milestone.objects.filter(project__slug=slug, project__organization=request.user.organization).exists():
+        milestone_slug = Milestone.objects.filter(project__slug=slug, project__organization=request.user.organization)[
+            0].slug
+        return HttpResponseRedirect(
+            reverse('project:taskboard', kwargs={'slug': slug, 'milestone_slug': milestone_slug}))
+    else:
+        messages.warning(request, 'Please create a mile-stone to view tickets')
+        return HttpResponseRedirect(reverse('project:milestone_display', kwargs={'slug': slug}))
 
 
 @login_required
@@ -508,6 +527,7 @@ def milestone_create(request, slug):
             create_timeline.send(sender=request.user, content_object=milestone, namespace=msg,
                                  event_type="milestone created", project=project)
             json_data['error'] = False
+            messages.success(request, 'Successfully created Milestone - '+str(milestone.name)+' !')
             return HttpResponse(json.dumps(json_data), content_type='application/json')
         else:
             json_data['error'] = True
@@ -531,6 +551,7 @@ def milestone_edit(request, slug, milestone_slug):
         if milestone_form.is_valid():
             milestone_form.save()
             json_data['error'] = False
+            messages.success(request, 'Successfully updated Milestone - '+str(milestone_obj.name)+' !')
             return HttpResponse(json.dumps(json_data), content_type='application/json')
         else:
             json_data['error'] = True
@@ -542,8 +563,10 @@ def milestone_edit(request, slug, milestone_slug):
 
 @login_required
 def milestone_delete(request, slug, milestone_slug):
-    Milestone.objects.get(project__slug=slug, slug=milestone_slug,
-                          project__organization=request.user.organization).delete()
+    milestone = Milestone.objects.get(project__slug=slug, slug=milestone_slug,
+                          project__organization=request.user.organization)
+    milestone.delete()
+    messages.success(request, 'Successfully deleted Milestone - '+str(milestone)+' !')
     return HttpResponse(json.dumps({'result': True}), content_type='application/json')
 
 
@@ -555,6 +578,7 @@ def project_edit(request, slug):
     for member_iter in project_obj.members.all():
         member_dict[member_iter.email] = [
             role.name for role in member_iter.user_roles.all()]
+    messages.success(request, 'Successfully updated project - '+str(project_obj.name)+' !')
     return render(request, 'project/project_edit.html',
                   {'milestone_list': milestone_list, 'member_dict': member_dict, 'project_slug': slug})
 
@@ -577,6 +601,7 @@ def requirement_create(request, slug):
                                  event_type="requirement_form", project=project_obj)
 
             json_data['error'] = False
+            messages.success(request, 'Successfully added requirement - '+str(requirement.name)+ ' !')
             return HttpResponse(json.dumps(json_data), content_type='application/json')
         else:
             json_data['error'] = True
