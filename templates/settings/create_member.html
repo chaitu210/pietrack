@@ -100,9 +100,7 @@
 {% block extra_js %}
     <script>
 {% if edit_project %}
-    $('#edit_desig').val("{{mrole.name}}")
-    $('#edit_desig').trigger("chosen:updated");
-
+    $('#edit_desig option[value="{{ mrole.slug }}"]').attr("selected", "selected").trigger("chosen:updated")
     $('#editmember').submit(function(e){
         $.post('',$('#editmember').serialize(),function(response){
             if(response){

@@ -31,9 +31,9 @@ def Team_mem(task):
 
 
 @register.filter
-def get_user_Role(user):
+def get_user_Role(user,organization):
     try:
-        return Role.objects.get(users=user)
+        return Role.objects.get(users=user, project__organization=organization)
     except Exception, e:
         return user.pietrack_role
 

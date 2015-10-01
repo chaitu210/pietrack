@@ -378,7 +378,7 @@ def delete_member(request, slug):
         member = project.members.get(id=request.GET.get('id'))
         if member.pietrack_role != 'admin':
             project.members.remove(member)
-        role = Role.objects.get(project=project)
+        role = Role.objects.get(project=project,users__email=member.email)
         role.users.remove(member)
         result = True
     return HttpResponse(json.dumps({'result': result}), content_type="application/json")
@@ -421,7 +421,9 @@ def member_role_edit(request, slug, member_role_slug):
 @active_user_required
 def member_role_delete(request, slug, member_role_slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
-    Role.objects.get(slug=member_role_slug, project=project).delete()
+    role=Role.objects.get(slug=member_role_slug, project=project)
+    project.members.remove(*role.users.all())
+    role.delete()
     return HttpResponse(json.dumps({'error': False}), content_type="application/json")
 
 
