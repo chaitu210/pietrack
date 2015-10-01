@@ -1,0 +1,22 @@
+{% extends 'base.html' %} 
+{% load compress %}
+{% load static %}
+{% compress css %}
+    {% block extra_css_links %}
+        <link rel="stylesheet" type="text/css" href="{% static 'less/bs_leftnavi1.css' %}">
+    {% endblock %} {% endcompress %}
+{% block content %}
+  <section id="box-content">
+    <!-- nav left starts here-->
+    {% include "settings/left_menu.html" %}
+    <!-- right container starts here-->
+      {% block settings_content %}
+      {% endblock %}
+  <!-- right container ends here-->
+  </section>
+{% endblock %}
+{% block extra_js_links %}
+    <script type="text/javascript" src="{% static 'js/bs_leftnavi.js' %}"></script>
+    <script src="{% static 'js/bootstrap-colorpicker.min.js' %}"></script>
+    <script src="{% static 'js/docs.js' %}"></script>
+{% endblock extra_js_links %}

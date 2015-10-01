@@ -389,7 +389,6 @@ def member_role_create(request, slug):
     else:
         return HttpResponse(json.dumps({'error': True, 'errors': form.errors}), content_type="application/json")
 
-
 @login_required
 def member_role_edit(request, slug, member_role_slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)

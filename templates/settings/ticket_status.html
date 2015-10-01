@@ -1,19 +1,10 @@
-{% extends 'base.html' %}
-{% load compress %}
+{% extends 'settings/base.html' %}
+
 {% load static %}
 {% load staticfiles %}
-{% compress css %}
-    {% block extra_css_links %}
-        <link rel="stylesheet" type="text/css" href="{%static 'less/bs_leftnavi.less' %}">
-        <link rel="stylesheet" type="text/css" href="{%static 'less/docs.less' %}">
-    {% endblock %} 
-{% endcompress %}
-{% block content %}
-  <section id="box-content">
-    <!-- nav left starts here-->
-    <!-- nav left starts here-->
-    {% include "settings/left_menu.html" %}
-    <!-- right container starts here-->
+
+{% block settings_content %}
+
     <div class="right-container">
         <div class="panel panel-default content-panel">
             <div class="panel-body">
@@ -98,116 +89,120 @@
             </div>
         </div>
     </div>
-    <!-- right container ends here-->
-</section>
-{%endblock content%} {%block extra_js %}
-<script type="text/javascript" src="{%static 'js/bs_leftnavi.js' %}"></script>
-<script src="{%static 'js/docs.js' %}"></script>
-<script>
-function hexToRgb(hex) {
-    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result ? {
-        r: parseInt(result[1], 16),
-        g: parseInt(result[2], 16),
-        b: parseInt(result[3], 16)
-    } : null;
-}
 
-function clear_form() {
-    var form = $('form');
-    form.css('display', 'none');
-    form.find('input[name="name"]').val('');
-    $('form span[name="error"]').text('')
-    $('#slug').val("")
-    $('#status').val("true")
-}
+{% endblock settings_content %}
 
-function edit_ticket_status(color, name, slug) {
-    var r = hexToRgb(color).r
-    var g = hexToRgb(color).g
-    var b = hexToRgb(color).b
-    var color_box = '<i style="background-color: rgb(' + r + ',' + g + ',' + b + ');"></i>'
+{%block extra_js %}
 
-    $('#add_form').css('display', 'block');
-    $('#add_form').find("input[name='color']").val(color)
-    $('#add_form').find("input[name='name']").val(name)
-    $('#status').val("false");
-    $('#slug').val(slug)
-    $('#add_form span').html(color_box)
-    $('.demo').colorpicker();
-
-}
-
-function delete_ticket_status(slug, id) {
-    $.get('/project/{{slug}}/settings/ticket_status/' + slug + '/delete/', function(response) {
-        if (!response.error) {
-            $('#' + id).remove();
+    <script>
+        function hexToRgb(hex) {
+            var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : null;
         }
-    });
-}
 
-$('#add_new').on('click', function() {
-    clear_form();
-    $('form').css('display', 'block');
-});
+        function clear_form() {
+            var form = $('form');
+            form.css('display', 'none');
+            form.find('input[name="name"]').val('');
+            $('form span[name="error"]').text('')
+            $('#slug').val("")
+            $('#status').val("true")
+        }
 
-$('#id_reset').on('click', function() {
-    clear_form();
+        function edit_ticket_status(color, name, slug) {
+            var r = hexToRgb(color).r
+            var g = hexToRgb(color).g
+            var b = hexToRgb(color).b
+            var color_box = '<i style="background-color: rgb(' + r + ',' + g + ',' + b + ');"></i>'
 
-});
+            $('#add_form').css('display', 'block');
+            $('#add_form').find("input[name='color']").val(color)
+            $('#add_form').find("input[name='name']").val(name)
+            $('#status').val("false");
+            $('#slug').val(slug)
+            $('#add_form span').html(color_box)
+            $('.demo').colorpicker();
 
-$('#add_form').on('submit', function(e) {
-    e.preventDefault();
-    if ($('#status').val() == "true") {
-        $.post('{% url "project:ticket_status_create" slug %}', $('#add_form').serialize(), function(response) {
-            if (response.error) {
-                if (response.errors['name']) {
-                    $("span[name='error']").text(response.errors['name']);
+        }
+
+        function delete_ticket_status(slug, id) {
+            $.get('/project/{{slug}}/settings/ticket_status/' + slug + '/delete/', function(response) {
+                if (!response.error) {
+                    $('#' + id).remove();
                 }
-            } else {
+            });
+        }
 
-                var name = response['name'];
-                var color = response['color'];
-                var row_id = response['proj_id']
-                var slug = response['slug']
-
-                data_row = "<tr id=\"" + row_id + "\"><td scope=\"row\"><div class=\"input-group colorpicker-component demo demo-auto\"><input type=\"text\" value=\"" + color + "\" class=\"form-control\"/><span class=\"input-group-addon\"><i></i></span></div></td><td>" + name + "</td><td class=\"actions\"><a href=\"#\" class=\"edit\" onclick=\"edit_ticket_status('" + color + "','" + name + "','" + slug + "')\"><i class=\"fa fa-edit\"></i></a>&nbsp;<a href=\"#\" class=\"delete\" onclick=\"delete_ticket_status('" + slug + "','" + row_id + "')\"><i class=\"fa fa-trash\"></i></a></td></tr>"
-                $('#ticket_status tbody').append(data_row);
-                $('.demo').colorpicker();
-                clear_form();
-            }
-
+        $('#add_new').on('click', function() {
+            clear_form();
+            $('form').css('display', 'block');
         });
-    } else {
-        var myslug = $('#slug').val();
-        $.post('/project/{{slug}}/settings/ticket_status/' + myslug + '/edit/', $('#add_form').serialize(), function(response) {
-            if (response.error) {
-                if (response.errors['name']) {
-                    $("span[name='error']").text(response.errors['name']);
-                }
-            } else {
 
-                var name = response['name'];
-                var color = response['color'];
-                var row_id = response['proj_id']
-                var slug = response['slug']
-
-                $('#' + row_id + ' a.edit').attr('onclick', "edit_ticket_status('" + color + "','" + name + "','" + slug + "')")
-                $('#' + row_id + ' a.delete').attr("onclick", "delete_ticket_status('" + slug + "','" + row_id + "')")
-                $('#' + row_id + ' td:nth-child(2)').text(name)
-                $('#' + row_id + ' input').val(color)
-                var r = hexToRgb(color).r
-                var g = hexToRgb(color).g
-                var b = hexToRgb(color).b
-                var color_box = '<i style="background-color: rgb(' + r + ',' + g + ',' + b + ');"></i>'
-                $('#' + row_id + " span").html(color_box)
-                $('.demo').colorpicker();
-                clear_form();
-            }
+        $('#id_reset').on('click', function() {
+            clear_form();
 
         });
 
-    }
-});
-</script>
+        $('#add_form').on('submit', function(e) {
+            e.preventDefault();
+            if ($('#status').val() == "true") {
+                $.post('{% url "project:ticket_status_create" slug %}', $('#add_form').serialize(), function(response) {
+                    if (response.error) {
+                        if (response.errors['name']) {
+                            $("span[name='error']").text(response.errors['name']);
+                        }
+                    } else {
+
+                        var name = response['name'];
+                        var color = response['color'];
+                        var row_id = response['proj_id']
+                        var slug = response['slug']
+
+                        data_row = "<tr id=\"" + row_id + "\"><td scope=\"row\"><div class=\"input-group colorpicker-component demo demo-auto\"><input type=\"text\" value=\"" + color + "\" class=\"form-control\"/><span class=\"input-group-addon\"><i></i></span></div></td><td>" + name + "</td><td class=\"actions\"><a href=\"#\" class=\"edit\" onclick=\"edit_ticket_status('" + color + "','" + name + "','" + slug + "')\"><i class=\"fa fa-edit\"></i></a>&nbsp;<a href=\"#\" class=\"delete\" onclick=\"delete_ticket_status('" + slug + "','" + row_id + "')\"><i class=\"fa fa-trash\"></i></a></td></tr>"
+                        $('#ticket_status tbody').append(data_row);
+                        $('.demo').colorpicker();
+                        clear_form();
+                    }
+
+                });
+            } else {
+                var myslug = $('#slug').val();
+                $.post('/project/{{slug}}/settings/ticket_status/' + myslug + '/edit/', $('#add_form').serialize(), function(response) {
+                    if (response.error) {
+                        if (response.errors['name']) {
+                            $("span[name='error']").text(response.errors['name']);
+                        }
+                    } else {
+
+                        var name = response['name'];
+                        var color = response['color'];
+                        var row_id = response['proj_id']
+                        var slug = response['slug']
+
+                        $('#' + row_id + ' a.edit').attr('onclick', "edit_ticket_status('" + color + "','" + name + "','" + slug + "')")
+                        $('#' + row_id + ' a.delete').attr("onclick", "delete_ticket_status('" + slug + "','" + row_id + "')")
+                        $('#' + row_id + ' td:nth-child(2)').text(name)
+                        $('#' + row_id + ' input').val(color)
+                        var r = hexToRgb(color).r
+                        var g = hexToRgb(color).g
+                        var b = hexToRgb(color).b
+                        var color_box = '<i style="background-color: rgb(' + r + ',' + g + ',' + b + ');"></i>'
+                        $('#' + row_id + " span").html(color_box)
+                        $('.demo').colorpicker();
+                        clear_form();
+                    }
+
+                });
+
+            }
+        });
+    </script>
+    <script type="text/javascript">
+        $('#project_submenu').attr('class', 'arrow-up active');
+        $('#project_submenu ul').show().children('li#project_status').addClass('active');
+    </script>
 {%endblock%}
