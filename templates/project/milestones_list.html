@@ -96,7 +96,7 @@
                 {% endif%}
                 <span class='description'>
                     <span class='name'>{{team_member.username}}</span>
-                    <span class='designation_time'>{{team_member|get_user_Role}}</span>
+                    <span class='designation_time'>{{team_member|get_user_Role:request.user.organization}}</span>
                 </span>
             </span>
             {% endfor %}
