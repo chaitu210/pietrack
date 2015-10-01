@@ -22,19 +22,28 @@
                 <h3>Refine your search</h3>
                 <div class="row filter_row">
                     <div class="col-md-2">
-                        <select class='select2 input' placeholder='Assigned to' multiple='multiple'>
-                            <option>naz</option>
-                            <option>Shirisha</option>
+                        <select class='select2 input select2_assigned_to' multiple>
+                            {% for member in project_members %}
+                                <option value="{{ member.id }}">{{ member.first_name }}</option>
+                            {% endfor %}
                         </select>
                     </div>
                     <div class="col-md-2">
-                        <select class='select2 input' placeholder='Requirement' multiple='multiple'>
-                            <option>naz</option>
-                            <option>Shirisha</option>
+                        <select class='select2 input select2_requirement' multiple>
+                            {% for requirement in milestone|milestone_requirements %}
+                                <option value="{{ requirement.id }}">{{ requirement.name }}</option>
+                            {% endfor %}
                         </select>
                     </div>
-                    <div class="col-md-2">
-                        <input type="text" class='input' placeholder='Task title'>
+                    <div class="col-md-3">
+                        <select class='select2 input select2_task' multiple>
+                            {% for requirement in milestone|milestone_requirements %}
+                                {% for task in requirement.tasks.all %}
+                                    <option value="{{ task.id }}">{{ task.name }}</option>
+                                {% endfor %}
+                            {% endfor %}
+                        </select>
+
                     </div>
                     <div class="col-md-2">
                         <input type="text" class='input' id='sdate' placeholder='Start Date'>
@@ -42,7 +51,7 @@
                     <div class="col-md-2">
                         <input type="text" class='input' id='edate' placeholder='End Date'>
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-1">
                         <button class='submit_btn'><i class='fa fa-search'></i>Go</button>
                     </div>
                 </div>
@@ -58,7 +67,7 @@
                         </div>
                         <div class="scroll">
                             <ul>
-                                {%for requirement in milestone.project.requirements.all %}
+                                {%for requirement in milestone|milestone_requirements %}
                                     <li>
                                         <div class='ticket_wrap'>
                                             <a class='name_div_wrap'>
@@ -137,6 +146,8 @@
     <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 {% endblock %}
 {% block extra_js %}
+
+
   <script type="text/javascript">
     $(function() {
         $('.scroll').slimscroll({
@@ -154,8 +165,22 @@
     <script type="text/javascript">
     $(function() {
         $("#sdate, #edate").datepicker();
-        $('.select2').select2();
+       /* $('.select2').select2();*/
     });
+    </script>
+    <script type="text/javascript">
+        $('.select2_assigned_to').select2({
+            tags:"true",
+            placeholder: 'Assigned members'
+        });
+        $(".select2_requirement").select2({
+          tags: "true",
+          placeholder: "Requirements"
+        });
+        $(".select2_task").select2({
+          tags: "true",
+          placeholder: "Task Title"
+        });
     </script>
     <!-- horizontal scroll -->
     <script type="text/javascript">
@@ -179,7 +204,8 @@
             connectWith: ".connectedSortable",
             receive: function(event, ui) {
                 var status = this.id;
-                var task = ui.item.attr('id')
+                var task = ui.item.attr('id');
+                alert(task);
                 $.get('/project/{{slug}}/update_taskboard/' + status + '/' + task + '/');
             }
         }).disableSelection();
