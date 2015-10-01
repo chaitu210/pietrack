@@ -1,16 +1,10 @@
-{% extends 'base.html' %}
-{% load compress %}
-{% block content %}
+{% extends 'settings/base.html' %}
+
+{% load static %}
 {% load staticfiles %}
-{% compress css %}
-    {% block extra_css_links %}
-        <link rel="stylesheet" type="text/css" href="{%static 'less/bs_leftnavi.less' %}">
-    {% endblock %}
-{% endcompress %}
-<section id="box-content">
-    <!-- nav left starts here-->
-    {% include "settings/left_menu.html" %}
-    <!-- right container starts here-->
+
+{% block settings_content %}
+
     <div class="right-container">
         <div class="panel panel-default content-panel content-panel-extra">
             <div class="panel-body">
@@ -90,11 +84,11 @@
             </div>
         </div>
     </div>
-    <!-- right container ends here-->
-  </section>
-{% endblock %}
+
+{% endblock settings_content %}
+
 {% block extra_js %}
-    <script type="text/javascript" src="{%static 'js/bs_leftnavi.js' %}"></script>
+
     <script>
         function delete_member(id){
             $.get("{% url 'project:delete_member' slug%}"+"?id="+id, function(response){
@@ -104,5 +98,8 @@
                 }
             });
         }
+    </script>
+    <script type="text/javascript">
+        $('#project_members').addClass('active');
     </script>
 {% endblock %}
