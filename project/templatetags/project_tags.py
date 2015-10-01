@@ -53,3 +53,8 @@ def sub_comments(sub_comment):
 @register.filter
 def level1comments(task):
     return Comment.objects.filter(ticket=task, parent=None)[::-1]
+
+
+@register.filter
+def milestone_requirements(milestone):
+    return Requirement.objects.filter(milestone=milestone)
