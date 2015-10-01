@@ -338,6 +338,26 @@ def create_member(request, slug):
 
 
 @login_required
+def edit_member(request, slug):
+    if(request.POST):
+        email = request.POST.get('email',False)
+        role_slug = request.POST.get('designation',False)
+        project = Project.objects.get(slug=slug, organization=request.user.organization)
+        role = Role.objects.get(project=project,users__email=email)
+        member = role.users.get(email=email)
+        role.users.remove(member)
+        new_role = Role.objects.get(slug=role_slug, project=project)
+        new_role.users.add(member)
+        return HttpResponse(True)
+    elif(request.GET.get('id',False)):
+        project_roles = Role.objects.filter(project__slug=slug, project__organization=request.user.organization )
+        role = project_roles.get(users__id=request.GET.get('id'))
+        member = role.users.get(id=request.GET.get('id'))
+        return render(request, 'settings/create_member.html', {'slug': slug, 'edit_project':True, 'project_roles':project_roles, 'mrole':role,'member':member })
+    return HttpResponse("Invalid Request")
+
+
+@login_required
 def delete_member(request,slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     result=False
