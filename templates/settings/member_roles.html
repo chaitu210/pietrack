@@ -1,15 +1,10 @@
-{% extends 'base.html' %} 
-{% load compress %}
+{% extends 'settings/base.html' %}
+
 {% load static %}
-{% compress css %}
-    {% block extra_css_links %}
-        <link rel="stylesheet" type="text/less" href="{% static 'less/bs_leftnavi.less' %}">
-    {% endblock %} {% endcompress %}
-{% block content %}
-  <section id="box-content">
-    <!-- nav left starts here-->
-    {% include "settings/left_menu.html" %}
-    <!-- right container starts here-->
+{% load staticfiles %}
+
+{% block settings_content %}
+
     <div class="right-container">
         <div class="panel panel-default content-panel content-panel-extra">
             <div class="panel-body">
@@ -117,12 +112,9 @@
             </div>
         </div>
     </div>
-    <!-- right container ends here-->
-  </section>
-{% endblock %}
-{% block extra_js_links %}
-  <script type="text/javascript" src="{% static 'js/bs_leftnavi.js' %}"></script>
-{% endblock %}
+
+{% endblock settings_content %}
+
 {% block extra_js %}
   <script>
   function edit_role(id, name, slug) {
@@ -166,7 +158,7 @@
       $.post('/project/{{slug}}/settings/member_role/' + slug + '/edit/', data, function(response) {
           if (response['error']) {
               $('#edit_role_error').text(response['errors'].name)
-          } else {)
+          } else {
               var role_id = response['role_id'];
               var role_name = response['role_name'];
               var slug = response['slug'];
@@ -188,4 +180,8 @@
       $('button.close').click()
   });
   </script>
+  <script type="text/javascript">
+      $('#project_member_roles').addClass('active');
+  </script>
+
 {% endblock %}

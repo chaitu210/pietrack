@@ -21,11 +21,9 @@
                     </div>
                 </div>
                 <div class="col-md-3 logo">
-                    {% if project_object.logo %}
-                        <img src='{{project_object.logo.url}}' class="img-circle">
-                    {% else %}
-                        <img src='http://www.livecollision.com/wp-content/uploads/Project-logo.jpg' class="img-circle">
-                    {% endif %}
+
+                        <img src='{% if project_object.logo %}{{project_object.logo.url}}{% else %}http://www.livecollision.com/wp-content/uploads/Project-logo.jpg{% endif %}' class="img-circle img-responsive">
+
                 </div>
                 <div class="clearfix"></div>
             </div>
@@ -38,11 +36,8 @@
                 <p>{% show_pageitems %}</p>
               {% for event in project_list reversed %}
                 <span class='ticket blue'>
-                    {%if event.user.profile_pic %}
-                        <img src="{{ event.user.profile_pic.url }}">
-                    {% else %}
-                        <img src="{% static 'img/user-pic.jpg' %}">
-                    {% endif%}
+
+                  <img src="{%if event.user.profile_pic %}{{ event.user.profile_pic.url }}{% else %}{% static 'img/user-pic.jpg' %}{% endif%}">
 
                   <span class='description'>
                     <span class='name'>{{event.user.username}}</span>
@@ -81,14 +76,12 @@
             <!-- ticket -->
             {% for team_member in project_members %}
             <span class='ticket orange'>
-                {%if team_member.profile_pic %}
-                    <img src="{{ team_member.profile_pic.url }}">
-                {% else %}
-                    <img src="{% static 'img/user-pic.jpg' %}">
-                {% endif%}
+
+                <img src="{%if team_member.profile_pic %}{{ team_member.profile_pic.url }}{% else %}{% static 'img/user-pic.jpg' %}{% endif%}">
+
                 <span class='description'>
                     <span class='name'>{{team_member.username}}</span>
-                    <span class='designation_time'>{{team_member|get_user_Role}}</span>
+                    <span class='designation_time'>{% if team_member|get_user_Role == 'admin' %}<span class="fa fa-user-secret"></span>{% endif %} {{team_member|get_user_Role}}</span>
                 </span>
             </span>
             {% endfor %}
