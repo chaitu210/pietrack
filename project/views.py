@@ -360,7 +360,7 @@ def edit_member(request, slug):
         new_role = Role.objects.get(slug=role_slug, project=project)
         new_role.users.add(member)
         return HttpResponse(True)
-    elif (request.GET.get('id', False)):
+    elif request.GET.get('id', False):
         project_roles = Role.objects.filter(project__slug=slug, project__organization=request.user.organization)
         role = project_roles.get(users__id=request.GET.get('id'))
         member = role.users.get(id=request.GET.get('id'))
@@ -378,7 +378,7 @@ def delete_member(request, slug):
         member = project.members.get(id=request.GET.get('id'))
         if member.pietrack_role != 'admin':
             project.members.remove(member)
-        role = Role.objects.get(project=project)
+        role = Role.objects.get(project=project, users__email=member.email)
         role.users.remove(member)
         result = True
     return HttpResponse(json.dumps({'result': result}), content_type="application/json")
