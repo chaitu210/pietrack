@@ -342,10 +342,11 @@ def delete_member(request,slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     result=False
     if request.GET.get('id',False):
-        if request.user.pietrack_role != 'admin':
-            project.members.remove(project.members.get(id=request.GET.get('id')))
+        member = project.members.get(id=request.GET.get('id'))
+        if member.pietrack_role != 'admin':
+            project.members.remove(member)
         role = Role.objects.get(project=project)
-        role.users.remove(role.users.get(id=request.GET.get('id')))
+        role.users.remove(member)
         result=True
     return HttpResponse(json.dumps({'result':result}), content_type="application/json")
 

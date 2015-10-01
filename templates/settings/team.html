@@ -16,6 +16,15 @@
             <div class="panel-body">
                 <!-- content box starts here -->
                 <div class="content_box ">
+                    {% if mem_details|length == 0 %}
+                        <div class="role-alert pull-right">
+                            <div class="alert alert-warning alert-dismissible" role="alert">
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <strong><span class="fa fa-warning"></span></strong> You haven't added members yet !
+                            </div>
+                        </div>
+                    {% endif %}
+
                     <div class="title">
                         <h4>{{ project.name }} - <span class="status">MANAGE MEMBERS</span></h4>
                         <div class="tag">
