@@ -14,6 +14,7 @@ urlpatterns = [
     # team
     url(r'^(?P<slug>[-\w]+)/team/$', project_team, name='project_team'),
     url(r'^(?P<slug>[-\w]+)/create_member/$', create_member, name='create_member'),
+    url(r'^(?P<slug>[-\w]+)/edit_member/$', edit_member, name='edit_member'),
     url(r'^(?P<slug>[-\w]+)/delete_member/$', delete_member, name='delete_member'),
 
 

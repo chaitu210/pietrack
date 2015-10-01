@@ -3,6 +3,37 @@
 {% block content %}
   <section id='base_content' class='create_project'>
     <div class="content_box">
+    {% if edit_project %}
+        <br clear="clearfixall" />
+        <div class="title">
+            <h4>Edit Member</h4>
+
+        </div>
+        <form id='editmember' action="#">
+            <div id='id_div_append'>
+                <div id='id_div_add0' class="panel_box">
+                    <div class="form_group">
+                        <label>Email Address</label>
+                        <input name='email' type="text" class='input' value="{{ member.email }}" readonly="readonly">
+                        <span id='email_err' ></span>
+                    </div>
+                    <div class="form_group">
+                        <label>Member Designation</label>
+                        <select name='designation' type="text" class='input' id="edit_desig">
+                            {% for role in project_roles %}
+                            <option value="{{ role.slug }}">{{ role.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <span></span>
+                    </div>
+                </div>
+                <div id='id_div_create_member' class="panel_box">
+                    <button id='id_button_create_member'>Edit memeber</button>
+                </div>
+            </div>
+            {% csrf_token %}
+        </form>
+    {% else %}
         {% if project_roles|length == 0 %}
             <div class="role-alert pull-right">
                 <div class="alert alert-warning alert-dismissible" role="alert">
@@ -61,11 +92,27 @@
                 The user will get an invite soon.
             </div>
         </div>
+    {% endif %}
     </div>
   </section>
 {% endblock %}
+
 {% block extra_js %}
     <script>
+{% if edit_project %}
+    $('#edit_desig').val("{{mrole.name}}")
+    $('#edit_desig').trigger("chosen:updated");
+
+    $('#editmember').submit(function(e){
+        $.post('',$('#editmember').serialize(),function(response){
+            if(response){
+              window.location.href = "{% url 'project:project_team' slug %}"
+            }
+
+        });
+        e.preventDefault()
+    });
+{% else %}
     var id_members_array = ['id_form_add0']
     var id_form_count = 0
     var i = 0;
@@ -139,6 +186,7 @@
             window.location.href = "{% url 'project:member_roles' slug %}";
         }, 3000);
     {% endif %}
-
+  {% endif %}
     </script>
+
 {% endblock %}

@@ -69,6 +69,7 @@
                                         </span>
                                     </td>
                                     <td class="actions">
+                                        <a href="{% url 'project:edit_member' slug %}?id={{member.id}}" class="edit"><i class="fa fa-edit"></i></a>
                                         <a href="#" class="delete" onclick="delete_member('{{member.id}}')">
                                             <i class="fa fa-trash"></i>
                                         </a>
