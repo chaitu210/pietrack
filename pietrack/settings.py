@@ -169,14 +169,11 @@ COMPRESS_OFFLINE_CONTEXT = {
 COMPRESS_CSS_FILTERS = ['compressor.filters.css_default.CssAbsoluteFilter', 'compressor.filters.cssmin.CSSMinFilter']
 COMPRESS_JS_FILTERS = ['compressor.filters.jsmin.JSMinFilter']
 
+EMAIL_HOST = 'smtp.sendgrid.net'
+EMAIL_HOST_USER = 'micropyramid'
+EMAIL_HOST_PASSWORD = 'wiej4djs3o5s'
+EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 25 
-EMAIL_HOST_USER = ''
-EMAIL_HOST_PASSWORD = ''
- 
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
-SERVER_EMAIL = EMAIL_HOST_USER
 
 try:
     from local_settings import *

@@ -11,9 +11,8 @@ def add():
 
 
 @task()
-def send_mail_old_user(email):
-    send_mail('invitation for project', 'time to code',
-              'dineshmcmf@gmail.com', [email])
+def send_mail_old_user(subject, message, from_email, to_email):
+    send_mail(subject, message, from_email, [to_email])
 
 
 @task()
