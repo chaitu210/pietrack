@@ -194,7 +194,7 @@
 
         receive: function(event, ui) {
             var status = this.id;
-            var task = ui.item.attr('id')
+            var task = ui.item.find('li').attr('id')
             $.get('/project/{{slug}}/update_taskboard/' + status + '/' + task + '/');
         }
     }
@@ -204,8 +204,7 @@
             connectWith: ".connectedSortable",
             receive: function(event, ui) {
                 var status = this.id;
-                var task = ui.item.attr('id');
-                alert(task);
+                var task = ui.item.find('li').attr('id');
                 $.get('/project/{{slug}}/update_taskboard/' + status + '/' + task + '/');
             }
         }).disableSelection();
