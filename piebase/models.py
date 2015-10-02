@@ -68,7 +68,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     pietrack_role = models.CharField(
         _('pietrack_role'), max_length=30, choices=PIETRACK_ROLES)
     profile_pic = models.FileField(upload_to=profile_path, null=True, blank=True)
-    biography = models.CharField(_('biography'), blank=True, max_length=5000)
+    biography = models.CharField(_('biography'), blank=True, max_length=500)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
