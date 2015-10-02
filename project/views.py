@@ -360,7 +360,7 @@ def edit_member(request, slug):
         new_role = Role.objects.get(slug=role_slug, project=project)
         new_role.users.add(member)
         return HttpResponse(True)
-    elif (request.GET.get('id', False)):
+    elif request.GET.get('id', False):
         project_roles = Role.objects.filter(project__slug=slug, project__organization=request.user.organization)
         role = project_roles.get(users__id=request.GET.get('id'))
         member = role.users.get(id=request.GET.get('id'))
@@ -378,7 +378,7 @@ def delete_member(request, slug):
         member = project.members.get(id=request.GET.get('id'))
         if member.pietrack_role != 'admin':
             project.members.remove(member)
-        role = Role.objects.get(project=project,users__email=member.email)
+        role = Role.objects.get(project=project, users__email=member.email)
         role.users.remove(member)
         result = True
     return HttpResponse(json.dumps({'result': result}), content_type="application/json")
@@ -652,7 +652,7 @@ def requirement_create(request, slug):
             name = request.POST.get('name')
             milestone_obj = Milestone.objects.get(
                 id=request.POST.get('milestone'))
-            requirement = Requirement.objects.create(name=name, slug=name, description=request.POST.get(
+            requirement = Requirement.objects.create(name=name, slug=slugify(name), description=request.POST.get(
                 'description'), project=project_obj, milestone=milestone_obj)
 
             msg = " created requirement " + requirement.name
@@ -669,3 +669,28 @@ def requirement_create(request, slug):
     else:
         milestone = project_obj.milestones.all()
         return render(request, 'project/requirement.html', {'milestone': milestone, 'slug': slug})
+
+
+@active_user_required
+def requirement_edit(request, slug, milestone_slug, requirement_slug):
+    project_obj = Project.objects.get(slug=slug, organization=request.user.organization)
+    milestone = Milestone.objects.get(id=milestone_slug, project=project_obj)
+    requirement_obj = Requirement.objects.get(slug=requirement_slug, milestone=milestone)
+    if request.POST:
+        json_data = {}
+        requirement_form = RequirementForm(request.POST, instance=requirement_obj)
+        if requirement_form.is_valid():
+            requirement_form.save()
+
+            json_data['error'] = False
+            messages.success(request, 'Successfully updated your requirement - '+str(requirement_obj.name)+ ' !')
+            return HttpResponse(json.dumps(json_data), content_type='application/json')
+        else:
+            json_data['error'] = True
+            json_data['form_errors'] = requirement_form.errors
+            return HttpResponse(json.dumps(json_data), content_type='application/json')
+    else:
+        milestone = project_obj.milestones.all()
+        context = {'milestone': milestone, 'requirement_obj': requirement_obj, 'slug': slug}
+        return render(request, 'project/requirement.html', context)
+
