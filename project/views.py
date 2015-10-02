@@ -258,7 +258,7 @@ def ticket_status_delete(request, slug, ticket_slug):
 
 
 def password_reset(request, to_email):
-    from_email = 'dineshmcmf@gmail.com'
+    from_email = request.user.organization.slug+"@pietrack.com"
     to_email_dict = {'email': to_email}
     token_generator = default_token_generator
     email_template_name = 'email/reset_email.html'
@@ -308,8 +308,12 @@ def create_member(request, slug):
                     designation = post_dict['designation']
                     description = post_dict['description']
                     organization_obj = request.user.organization
+                    project_obj = Project.objects.get(slug=slug, organization=request.user.organization)
+                    subject = ' Invitation to join in the project "'+project_obj.name+'"'
+                    message = 'Dear User,\n Please login to your account in http://pietrack.com to know more details.\n'
+                    from_email =  project_obj.organization.slug+"@pietrack.com"
                     if User.objects.filter(email=email).exists():
-                        send_mail_old_user.delay(email)
+                        send_mail_old_user.delay(subject, message, from_email, email)
                         pass
                     else:
                         random_password = ''.join(
@@ -318,7 +322,7 @@ def create_member(request, slug):
                             email=email, username=email, password=random_password, organization=organization_obj,
                             pietrack_role='user')
                         password_reset(request, email_iter)
-                    project_obj = Project.objects.get(slug=slug, organization=request.user.organization)
+                    
                     user_obj = User.objects.get(email=email)
                     project_obj.members.add(user_obj)
                     project_obj.organization = organization_obj
@@ -326,6 +330,11 @@ def create_member(request, slug):
                     role.users.add(User.objects.get(email=email))
                     role.save()
                     project_obj.save()
+
+
+
+
+
 
                     msg = " added " + user_obj.username + " as a team member"
                     create_timeline.send(sender=request.user, content_object=user_obj, namespace=msg,
