@@ -421,7 +421,9 @@ def member_role_edit(request, slug, member_role_slug):
 @active_user_required
 def member_role_delete(request, slug, member_role_slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
-    Role.objects.get(slug=member_role_slug, project=project).delete()
+    role=Role.objects.get(slug=member_role_slug, project=project)
+    project.members.remove(*role.users.all())
+    role.delete()
     return HttpResponse(json.dumps({'error': False}), content_type="application/json")
 
 
@@ -650,7 +652,7 @@ def requirement_create(request, slug):
             name = request.POST.get('name')
             milestone_obj = Milestone.objects.get(
                 id=request.POST.get('milestone'))
-            requirement = Requirement.objects.create(name=name, slug=name, description=request.POST.get(
+            requirement = Requirement.objects.create(name=name, slug=slugify(name), description=request.POST.get(
                 'description'), project=project_obj, milestone=milestone_obj)
 
             msg = " created requirement " + requirement.name
@@ -667,3 +669,28 @@ def requirement_create(request, slug):
     else:
         milestone = project_obj.milestones.all()
         return render(request, 'project/requirement.html', {'milestone': milestone, 'slug': slug})
+
+
+@active_user_required
+def requirement_edit(request, slug, milestone_slug, requirement_slug):
+    project_obj = Project.objects.get(slug=slug, organization=request.user.organization)
+    milestone = Milestone.objects.get(id=milestone_slug, project=project_obj)
+    requirement_obj = Requirement.objects.get(slug=requirement_slug, milestone=milestone)
+    if request.POST:
+        json_data = {}
+        requirement_form = RequirementForm(request.POST, instance=requirement_obj)
+        if requirement_form.is_valid():
+            requirement_form.save()
+
+            json_data['error'] = False
+            messages.success(request, 'Successfully updated your requirement - '+str(requirement_obj.name)+ ' !')
+            return HttpResponse(json.dumps(json_data), content_type='application/json')
+        else:
+            json_data['error'] = True
+            json_data['form_errors'] = requirement_form.errors
+            return HttpResponse(json.dumps(json_data), content_type='application/json')
+    else:
+        milestone = project_obj.milestones.all()
+        context = {'milestone': milestone, 'requirement_obj': requirement_obj, 'slug': slug}
+        return render(request, 'project/requirement.html', context)
+
