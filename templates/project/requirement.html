@@ -5,7 +5,7 @@
         <div class="title">
             <h4>Requirement</h4>
             <div class="tag">
-              Compellingly reintermediate premier materials for client-centered markets.for client-centered markets.
+               a requirement is a singular documented physical and functional need that a particular design, product or process must be able to perform.
             </div>
         </div>
         <div class="panel_box">
@@ -18,11 +18,10 @@
                 </div>
                 <div class="form_group">
                     <label for="requirement_milestone">Milestone</label>
-                    <select id="requirement_milestone" name='milestone' class='input'>
-                        {% for milestone_iter in milestone %}
-                           <option value='{{ milestone_iter.id }}' {% ifequal milestone_iter.id requirement_obj.milestone.id %}selected{% endifequal %}>{{ milestone_iter.name }}</option>
-                        {% endfor %}
+                    <select id="requirement_milestone" name='milestone' class='input' disabled>
+                           <option value='{{ milestone.id }}'>{{ milestone.name }}</option>
                     </select>
+                    <input type="hidden" name="milestone" value="{{ milestone.id }}"/>
                     <span id='requirement_milestone_error'></span>
                 </div>
                 <div class="form_group">

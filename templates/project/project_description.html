@@ -45,11 +45,11 @@
                     <!-- <span class='project_name'>#xyz test</span> --> in <span class='project_name'>{{event.project}}</span>
                     <span class='designation_time'>
                         {{event.created|timesince}} &nbsp;
-                        {% if event.created|timesince == 0  %}
+                        {% ifequal event.created|timesince '0 minutes'  %}
                             just now
                         {% else %}
                             ago
-                        {% endif %}
+                        {% endifequal %}
                     </span>
                   </span>
                 </span>

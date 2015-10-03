@@ -1,13 +1,14 @@
+import json
+import random
+import string
+import shutil
+
+import os
 from django.shortcuts import render, redirect, render_to_response
 from piebase.models import User, Project, Priority, Severity, TicketStatus, Ticket, Requirement, Attachment, Role, \
     Milestone
 from forms import CreateProjectForm, PriorityForm, SeverityForm, TicketStatusForm, RoleForm, CommentForm, \
     CreateMemberForm, PasswordResetForm, MilestoneForm, RequirementForm
-import json
-import random
-import string
-import os
-import shutil
 from PIL import Image
 from django.utils import timezone
 from django.template.defaultfilters import slugify
@@ -18,8 +19,6 @@ from django.core.urlresolvers import reverse
 from .tasks import send_mail_old_user
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from signals import create_timeline
-
-# for messages in views and templates
 from django.contrib import messages
 
 user_login_required = user_passes_test(
@@ -414,7 +413,7 @@ def member_role_create(request, slug):
     form = RoleForm(request.POST, project=project)
     if form.is_valid():
         role = form.save()
-        msg = "created role" + role.name + " in the project "
+        msg = "created role " + role.name + " in the project "
         create_timeline.send(sender=request.user, content_object=role, namespace=msg,
                                          event_type="role created", project=project)
         return HttpResponse(json.dumps({'error': False, 'role_id': role.id, 'role_name': role.name, 'slug': role.slug}),
@@ -646,7 +645,6 @@ def milestone_edit(request, slug, milestone_slug):
                 msg = "renamed milestone "+old_name+" to " + milestone.name
             else:
                 msg = "milestone "+milestone.name+" details updated"
-            print msg
             create_timeline.send(sender=request.user, content_object=milestone, namespace=msg,
                                  event_type="milestone edited", project=milestone.project)
 
@@ -686,7 +684,7 @@ def project_edit(request, slug):
 
 
 @active_user_required
-def requirement_create(request, slug):
+def requirement_create(request, slug, milestone_slug):
     project_obj = Project.objects.get(slug=slug, organization=request.user.organization)
     if request.POST:
         json_data = {}
@@ -710,7 +708,7 @@ def requirement_create(request, slug):
             json_data['form_errors'] = requirement_form.errors
             return HttpResponse(json.dumps(json_data), content_type='application/json')
     else:
-        milestone = project_obj.milestones.all()
+        milestone = project_obj.milestones.get(slug=milestone_slug)
         return render(request, 'project/requirement.html', {'milestone': milestone, 'slug': slug})
 
 

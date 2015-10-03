@@ -2,11 +2,21 @@
 {% block content %}
 <section id='base_content' class='create_project'>
     <div class="content_box">
+        {% if requirement_list|length == 0 or ticket_status_list|length == 0 %}
+            <div class="role-alert pull-right" style="width:23em;">
+                <div class="alert alert-warning alert-dismissible" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <strong><span class="fa fa-warning"></span></strong>
+                    Please add {% if requirement_list|length == 0 %}Requirement{% endif %}
+                    {% if requirement_list|length == 0 and ticket_status_list|length == 0 %}and {% endif %}
+                    {% if ticket_status_list|length == 0 %} Ticket status{% endif %} to create Task !
+                </div>
+            </div>
+        {% endif %}
         <div class="title">
             <h4>Add Task</h4>
             <div class="tag">
-              Compellingly reintermediate premier materials for client-centered markets.for client-centered markets.
-            </div>
+a task is an activity that needs to be accomplished within a defined period of time or by a deadline to work towards work-related goals            </div>
         </div>
         <div class="panel_box">
             <form id='task_form'>
@@ -61,8 +71,15 @@
 {% endblock %}
 {% block extra_js_links %}
   <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
-{% endblock %} {% block extra_js %}
+{% endblock %}
+{% block extra_js %}
 <script>
+    {% if requirement_list|length == 0 %}
+        setTimeout(function(){ window.location = "{% url 'project:requirement_create' slug milestone.slug %}"; }, 2500);
+    {% elif ticket_status_list|length == 0 %}
+        setTimeout(function(){ window.location = "{% url 'project:ticket_status' slug  %}"; }, 2500);
+    {% endif %}
+
 $(function() {
     $("#task_finished_date").datepicker();
 });
@@ -93,7 +110,7 @@ $('#task_save').click(function(event) {
                 $('#task_' + key + '_error').text('').append(data['form_errors'][key])
             }
         } else {
-            alert('added')
+            window.location = "{% url 'project:taskboard' slug milestone.slug %}"
         }
     });
 });
