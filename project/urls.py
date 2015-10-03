@@ -79,7 +79,7 @@ urlpatterns = [
         name='milestone_delete'),
 
     # requirement
-    url(r'^(?P<slug>[a-zA-Z0-9-]+)/requirement/create/$', requirement_create, name='requirement_create'),
+    url(r'^(?P<slug>[a-zA-Z0-9-]+)/(?P<milestone_slug>[a-zA-Z0-9-]+)/requirement/create/$', requirement_create, name='requirement_create'),
     url(r'^(?P<slug>[a-zA-Z0-9-]+)/(?P<milestone_slug>[a-zA-Z0-9-]+)/(?P<requirement_slug>[a-zA-Z0-9-]+)/requirement/edit/$', requirement_edit, name='requirement_edit'),
 
 ]
