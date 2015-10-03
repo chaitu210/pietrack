@@ -2,6 +2,14 @@
 {% block content %}
 <section id='base_content' class='create_project'>
     <div class="content_box">
+        {% if requirement_list|length == 0 %}
+            <div class="role-alert pull-right member-warning-alert">
+                <div class="alert alert-warning alert-dismissible" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <strong><span class="fa fa-warning"></span></strong> Please create a requirement to add a task !
+                </div>
+            </div>
+        {% endif %}
         <div class="title">
             <h4>Add Task</h4>
             <div class="tag">
@@ -52,7 +60,8 @@
                     <textarea id='task_description' name='description' class="form-control textarea"></textarea>
                     <span id='task_description_error'></span>
                 </div>
-                <button id='task_save'>Save</button>
+                <br clear="clearfixall" />
+                <button id='task_save'><i class="fa fa-save"></i> Save</button>
                 {% csrf_token %}
             </form>
         </div>
@@ -97,5 +106,12 @@ $('#task_save').click(function(event) {
         }
     });
 });
+
+    {% if requirement_list|length == 0 %}
+        window.setTimeout(function(){
+            window.location.href = "{% url 'project:requirement_create' slug %}";
+        }, 3000);
+    {% endif %}
+
 </script>
 {% endblock %}
