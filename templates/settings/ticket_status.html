@@ -79,16 +79,13 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <input name="name" value="" type="text" style="width: 100px; padding: 2px; border:1px solid #929292;" placeholder="Name" />
+                                            <input name="name" value="" type="text" style="width: 100px; padding: 2px; border:1px solid #929292;" placeholder="Ticket Status" />
+                                            <span class="input-empty-error" name="error"></span>
+
                                         </td>
-                                        <td class="actions">
+                                        <td class="actions" clear="clearfixall">
                                             <button type="submit" class="edit" style=" border:0px solid transparent;"><i class="fa fa-plus"></i></button>
                                             <a class="delete" id="id_reset"><span class="glyphicon glyphicon-remove"></span></a>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td colspan="3">
-                                            <center><span name="error"></span></center>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -166,7 +163,7 @@
                 $.post('{% url "project:ticket_status_create" slug %}', $('#add_form').serialize(), function(response) {
                     if (response.error) {
                         if (response.errors['name']) {
-                            $("span[name='error']").text(response.errors['name']);
+                            $("span[name='error']").text(' * '+response.errors['name']);
                         }
                     } else {
 
@@ -187,7 +184,7 @@
                 $.post('/project/{{slug}}/settings/ticket_status/' + myslug + '/edit/', $('#add_form').serialize(), function(response) {
                     if (response.error) {
                         if (response.errors['name']) {
-                            $("span[name='error']").text(response.errors['name']);
+                            $("span[name='error']").text(' * '+response.errors['name']);
                         }
                     } else {
 

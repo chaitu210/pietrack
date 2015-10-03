@@ -30,8 +30,8 @@
                     <textarea id='requirement_desc' name='description' class="form-control textarea">{{ requirement_obj.description }}</textarea>
                     <span id='requirement_description_error'></span>
                 </div>
-                <br>
-                <button id='requirement_save'>Save</button>
+                <br clear="clearfixall">
+                <button id='requirement_save'><i class="fa fa-save"></i> Save</button>
              </form>
         </div>
     </div>
@@ -45,7 +45,7 @@
             if (data['error'] === true) {
                 $('span.span_error').remove();
                 for (var key in data.form_errors) {
-                    $('#requirement_' + key + '_error').after("<span class = 'span_error'>" + data.form_errors[key] + "</span>")
+                    $('#requirement_' + key + '_error').after("<span class = 'span_error'> * " + data.form_errors[key] + "</span>")
                 }
             } else {
                 /*alert('Successfully added requirement !');*/

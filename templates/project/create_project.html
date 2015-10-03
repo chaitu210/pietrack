@@ -26,8 +26,8 @@
                     <input class="form-control" name="logo" type="file" value=""/>
                     <span  id="logo" ></span>
                 </div>
-
-                <button id="id_submit_cproject">create project</button>
+                <br clear="clearfixall" />
+                <button id="id_submit_cproject">Create project</button>
             </div>
         </form>
         <!-- create project form end -->
@@ -50,7 +50,7 @@
               if (response['error']) {
                 $(".error").text("");
                 for (key in response['errors']) {
-                    $("#" + key).text(response['errors'][key]);
+                    $("#" + key).text(' * '+response['errors'][key]);
                 }
                 if(response['logo'])
                 {
