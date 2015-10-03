@@ -29,12 +29,12 @@
             </div>
             <div class="clearfix"></div>
             <!-- tickets -->
-            {% if project_object.timeline_set.all %}
-            {% paginate 5 project_object.timeline_set.all as project_list %}
+            {% if events_list %}
+            {% paginate 5 events_list%}
 
               <h4> Activity </h4>
                 <p>{% show_pageitems %}</p>
-              {% for event in project_list reversed %}
+              {% for event in events_list %}
                 <span class='ticket blue'>
 
                   <img src="{%if event.user.profile_pic %}{{ event.user.profile_pic.url }}{% else %}{% static 'img/user-pic.jpg' %}{% endif%}">
@@ -80,7 +80,7 @@
                 <img src="{%if team_member.profile_pic %}{{ team_member.profile_pic.url }}{% else %}{% static 'img/user-pic.jpg' %}{% endif%}">
 
                 <span class='description'>
-                    <span class='name'>{{team_member.username}}</span>{% if team_member.pietrack_role == 'admin' %} (<i class="fa fa-user"></i> admin){% endif %}
+                    <span class='name'>{{team_member.username}}</span>{% if team_member.pietrack_role == 'admin' and team_member.organization == request.user.organization %} (<i class="fa fa-user"></i> admin){% endif %}
                     <span class='designation_time'>{{team_member|get_user_Role:request.user.organization}}</span>
                 </span>
             </span>

@@ -38,8 +38,13 @@
       </div>
       <div class="form_group">
         <label for="organization">organization</label>
-        <input type="text" class='input' id="organization" name="organization" placeholder="Enter your organization name here" value="{{ user.organization.name }}">
+        <input type="text" class='input' id="organization" name="organization" placeholder="Enter your organization name here" value="{{ user.organization.name }}" {% if not user.pietrack_role == 'admin' %}disabled{% endif %}>
         <span name="organization"></span>
+      </div>
+      <div class="form_group">
+        <label for="domain">Domain</label>
+        <input type="text" class='input' id="domain" name="domain" placeholder="Enter your domain name here" value="{{ user.organization.domain }}" {% if not user.pietrack_role == 'admin' %}disabled{% endif %}>
+        <span name="domain"></span>
       </div>
       <div class="form_group">
         <label for="biography">About You</label>

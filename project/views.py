@@ -74,10 +74,11 @@ def list_of_projects(request):
 def project_detail(request, slug):
     template_name = 'project/project_description.html'
     project_object = Project.objects.get(slug=slug, organization=request.user.organization)
+    events_list = project_object.timeline_set.all().order_by('-created')
     project_members = project_object.members.all()
     dict_items = {'project_object': project_object,
                   'project_members': project_members,
-                  'slug': slug
+                  'slug': slug, 'events_list': events_list
                   }
     return render(request, template_name, dict_items)
 
@@ -322,7 +323,7 @@ def create_member(request, slug):
                             email=email, username=email, password=random_password, organization=organization_obj,
                             pietrack_role='user')
                         password_reset(request, email_iter)
-                    
+
                     user_obj = User.objects.get(email=email)
                     project_obj.members.add(user_obj)
                     project_obj.organization = organization_obj

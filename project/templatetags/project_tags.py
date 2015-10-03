@@ -2,6 +2,7 @@ import os
 from django import template
 from piebase.models import Ticket, Comment, Requirement, Role
 from django.core.paginator import Paginator
+
 register = template.Library()
 
 
@@ -31,7 +32,7 @@ def Team_mem(task):
 
 
 @register.filter
-def get_user_Role(user,organization):
+def get_user_Role(user, organization):
     try:
         return Role.objects.get(users=user, project__organization=organization)
     except Exception, e:
@@ -42,7 +43,7 @@ def get_user_Role(user,organization):
 def sub_comments(sub_comment):
     l = []
     reply = sub_comment.comment_parent.all()
-    if(reply):
+    if (reply):
         l.append(sub_comment)
         for sc in reply:
             l.extend(sub_comments(sc))

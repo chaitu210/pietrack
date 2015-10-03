@@ -15,6 +15,7 @@ class EditUserModelForm(forms.ModelForm):
 class RegisterForm(forms.ModelForm):
     confirm_password = forms.CharField(widget=forms.PasswordInput)
     organization = forms.CharField()
+    domain = forms.CharField()
 
     class Meta:
         model = User
