@@ -23,7 +23,6 @@ def add_task(request, slug, milestone_slug):
         requirement_list = project_obj.requirements.filter(milestone__slug=milestone_slug)
         ticket_status_list = TicketStatus.objects.filter(project=project_obj)
         assigned_to_list = []
-        # print [x for member in assigned_to_list Role.objects.get(users__email=member.email, project=project)]
         for member in project_obj.members.all():
             try:
                 Role.objects.get(users__email=member.email, project=project_obj)
