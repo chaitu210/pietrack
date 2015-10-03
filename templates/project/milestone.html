@@ -28,12 +28,13 @@
                 <div class="form_group">
                     <label for="milestone_status">Status</label>
                     <select id='milestone_status' name='status' value='{{ milestone_obj.status }}' class='input'>
-                        <option value='planned'>planned</option>
-                        <option value='started'>started</option>
-                        <option value='finished'>finished</option>
+                        <option value='planned'>Planned</option>
+                        <option value='started'>Started</option>
+                        <option value='finished'>Finished</option>
                     </select>
                 </div>
-                <button id='milestone_save'>Save</button>
+                <br clear="clearfixall" />
+                <button id='milestone_save'><i class="fa fa-save"></i> Save</button>
             </div>
             {% csrf_token %}
         </form>
@@ -55,7 +56,7 @@
             if (data['error'] === true) {
                 $('span.span_error').remove()
                 for (var key in data.form_errors) {
-                    $('#milestone_' + key + '_error').after("<span class = 'span_error'>" + data.form_errors[key] + "</span>")
+                    $('#milestone_' + key + '_error').after("<span class = 'span_error'> * " + data.form_errors[key] + "</span>")
                 }
             } else {
                 /*alert('Successfully created your mile-stone !');*/

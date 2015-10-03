@@ -72,6 +72,7 @@ def register(request):
         confirm_password = request.POST.get('confirm_password')
         username = request.POST.get('username')
         organization_name = request.POST.get('organization')
+        domain_name = request.POST.get('domain')
         if password == confirm_password:
             if Organization.objects.filter(name=organization_name):
                 pietrack_role = 'user'
@@ -80,7 +81,7 @@ def register(request):
             else:
                 pietrack_role = 'admin'
                 organization_obj = Organization.objects.create(
-                    name=organization_name, slug=organization_name)
+                    name=organization_name, slug=organization_name, domain=domain_name.lower())
             json_data = {'error': False}
             new_user = User.objects.create_user(username=username, email=email, password=password,
                                                 first_name=first_name, organization=organization_obj,
@@ -153,6 +154,7 @@ def user_profile(request):
                 return HttpResponse(json.dumps(response_data))
             organization = Organization.objects.get(id=request.user.organization.id)
             organization.name = request.POST.get('organization')
+            organization.domain = request.POST.get('domain').lower()
             organization.save()
 
             if 'profile_pic' in request.FILES:

@@ -62,7 +62,8 @@ a task is an activity that needs to be accomplished within a defined period of t
                     <textarea id='task_description' name='description' class="form-control textarea"></textarea>
                     <span id='task_description_error'></span>
                 </div>
-                <button id='task_save'>Save</button>
+                <br clear="clearfixall" />
+                <button id='task_save'><i class="fa fa-save"></i> Save</button>
                 {% csrf_token %}
             </form>
         </div>
@@ -114,5 +115,12 @@ $('#task_save').click(function(event) {
         }
     });
 });
+
+    {% if requirement_list|length == 0 %}
+        window.setTimeout(function(){
+            window.location.href = "{% url 'project:requirement_create' slug %}";
+        }, 3000);
+    {% endif %}
+
 </script>
 {% endblock %}

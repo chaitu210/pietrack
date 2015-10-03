@@ -49,6 +49,7 @@ class Organization(models.Model):
         max_length=250, verbose_name=_("name"), unique=True)
     slug = models.SlugField(
         max_length=250, unique=True, null=False, blank=True, verbose_name=_("slug"))
+    domain = models.CharField(max_length=100, verbose_name=_("domain"), unique=True)
 
 
 def profile_path(instance, filename):
@@ -68,7 +69,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     pietrack_role = models.CharField(
         _('pietrack_role'), max_length=30, choices=PIETRACK_ROLES)
     profile_pic = models.FileField(upload_to=profile_path, null=True, blank=True)
-    biography = models.CharField(_('biography'), blank=True, max_length=500)
+    biography = models.CharField(_('biography'), blank=True, max_length=5000)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
