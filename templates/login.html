@@ -171,6 +171,10 @@
               <input id='organization_id' name='organization' type="text" class="form-control"><span id='error_organization_id'></span>
             </div>
             <div class="form-group">
+              <label>Domain</label>
+              <input id='domain_id' name='domain' type="text" class="form-control"><span id='error_domain_id'></span>
+            </div>
+            <div class="form-group">
               <button id='create_account_button_id' type='submit' class='button'>Sign up for free</button>
             </div>
 
@@ -274,6 +278,7 @@
                   $('#error_password_id').text(disp_error(result['response'].password));
                   $('#error_confirm_password_id').text(disp_error(result['response'].confirm_password));
                   $('#error_organization_id').text(disp_error(result['response'].organization));
+                  $('#error_domain_id').text(disp_error(result['response'].domain));
               } else if (result['error_password']) {
                   $('#error_confirm_password_id').text(result['error_password']);
               } else {

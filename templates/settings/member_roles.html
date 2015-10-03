@@ -11,13 +11,14 @@
                 <!-- content box starts here -->
                 <div class="content_box ">
                     {% if list_of_roles|length == 0 %}
-                        <div class="role-alert pull-right">
+                        <div class="role-alert pull-right member-warning-alert">
                             <div class="alert alert-warning alert-dismissible" role="alert">
                                 <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                                 <strong><span class="fa fa-warning"></span></strong> Please create a role to add a member !
                             </div>
                         </div>
                     {% endif %}
+                    <br clear="clearfixall" />
                     <div class="title">
                         <h4><span class="status">MANAGE Roles</span></h4>
                         <div class="tag">
