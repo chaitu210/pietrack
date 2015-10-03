@@ -390,6 +390,9 @@ def delete_member(request, slug):
         role = Role.objects.get(project=project, users__email=member.email)
         role.users.remove(member)
         result = True
+        msg = "Removed " + member.email + " from the project "
+        create_timeline.send(sender=request.user, content_object=member, namespace=msg,
+                                         event_type="member removed", project=project)
     return HttpResponse(json.dumps({'result': result}), content_type="application/json")
 
 
@@ -433,6 +436,9 @@ def member_role_delete(request, slug, member_role_slug):
     role=Role.objects.get(slug=member_role_slug, project=project)
     project.members.remove(*role.users.all())
     role.delete()
+    msg = "Removed " + role.name  + " from the project "
+    create_timeline.send(sender=request.user, content_object=project, namespace=msg,
+                                         event_type="role deleted", project=project)
     return HttpResponse(json.dumps({'error': False}), content_type="application/json")
 
 
@@ -446,7 +452,6 @@ def tickets(request, slug):
     else:
         messages.warning(request, 'Please create a mile-stone to view tickets')
         return HttpResponseRedirect(reverse('project:milestone_display', kwargs={'slug': slug}))
-
 
 @active_user_required
 def taskboard(request, slug, milestone_slug):
@@ -466,11 +471,16 @@ def taskboard(request, slug, milestone_slug):
 
 @active_user_required
 def update_taskboard_status(request, slug, status_slug, task_id):
+    project=Project.objects.get(slug=slug, organization=request.user.organization)
     task = Ticket.objects.get(id=task_id)
+    old_status = task.status
     ticket_status = TicketStatus.objects.get(
-        slug=status_slug, project=Project.objects.get(slug=slug, organization=request.user.organization))
+        slug=status_slug, project=project)
     task.status = ticket_status
     task.save()
+    msg = "moved " + task.name + " from "+old_status+" to "+task.status
+    create_timeline.send(sender=request.user, content_object=task, namespace=msg,
+                                         event_type="task moved", project=project)
     return HttpResponse("")
 
 
@@ -617,9 +627,13 @@ def milestone_edit(request, slug, milestone_slug):
         milestone_form = MilestoneForm(
             request.user, milestone_dict, instance=milestone_obj)
         if milestone_form.is_valid():
-            milestone_form.save()
+            milestone = milestone_form.save()
             json_data['error'] = False
             messages.success(request, 'Successfully updated Milestone - ' + str(milestone_obj.name) + ' !')
+            msg = " edited milestone " + milestone.name
+            create_timeline.send(sender=request.user, content_object=milestone, namespace=msg,
+                                 event_type="milestone edited", project=milestone.project)
+
             return HttpResponse(json.dumps(json_data), content_type='application/json')
         else:
             json_data['error'] = True
@@ -634,18 +648,24 @@ def milestone_delete(request, slug, milestone_slug):
     milestone = Milestone.objects.get(project__slug=slug, slug=milestone_slug,
                                       project__organization=request.user.organization)
     milestone.delete()
+    msg = " deleted milestone " + milestone.name
+    create_timeline.send(sender=request.user, content_object=milestone.project, namespace=msg,
+                                 event_type="milestone deleted", project=milestone.project)
     messages.success(request, 'Successfully deleted Milestone - ' + str(milestone) + ' !')
     return HttpResponse(json.dumps({'result': True}), content_type='application/json')
 
 
 @active_user_required
 def project_edit(request, slug):
-    milestone_list = Milestone.objects.all()
-    project_obj = Project.objects.get(slug=slug)
+    project_obj = Project.objects.get(slug=slug, organization=request.user.organization)
+    milestone_list = Milestone.objects.filter(project=project_obj)
     member_dict = {}
     for member_iter in project_obj.members.all():
         member_dict[member_iter.email] = [
             role.name for role in member_iter.user_roles.all()]
+    msg = " edited project "
+    create_timeline.send(sender=request.user, content_object=project_obj, namespace=msg,
+                                 event_type="project deleted", project=project_obj)
     messages.success(request, 'Successfully updated project - ' + str(project_obj.name) + ' !')
     return render(request, 'project/project_edit.html',
                   {'milestone_list': milestone_list, 'member_dict': member_dict, 'project_slug': slug})
