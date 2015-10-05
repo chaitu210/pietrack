@@ -1,4 +1,4 @@
-from piebase.models import User
+from piebase.models import User, Organization
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 from django.core.files.images import get_image_dimensions
@@ -17,10 +17,20 @@ class RegisterForm(forms.ModelForm):
     organization = forms.CharField()
     domain = forms.CharField()
 
+    def __init__(self, *args, **kwargs):
+        self.email = kwargs.pop('email', None)
+        super(RegisterForm,self).__init__(*args, **kwargs)
+
     class Meta:
         model = User
         fields = ['email', 'first_name', 'password', 'username']
 
+    def clean_domain(self):
+        if self.email.split('@')[1] != self.cleaned_data['domain'] :
+            raise forms.ValidationError('Domain name must be same as your email domain.')
+        elif Organization.objects.filter(domain=self.cleaned_data['domain']):
+            raise forms.ValidationError('Domain used by other organization. Please choose other. or If you are a member contact your organization admin.')
+        return self.cleaned_data['domain']
 
 class ChangePasswordForm(forms.Form):
     password = forms.CharField(

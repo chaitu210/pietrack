@@ -165,6 +165,7 @@ class CreateMemberForm(forms.Form):
         email = self.cleaned_data['email']
         if Role.objects.filter(users__email=email,project__slug=self.slug,project__organization=self.organization):
             raise ValidationError("This user is assigned to the project.")
+        # if()
         return email
 
 class PasswordResetForm(forms.Form):
