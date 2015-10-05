@@ -135,7 +135,7 @@ def delete_project(request, id):
 @active_user_required
 def priorities(request, slug):
     priority_list = Priority.objects.filter(
-        project=Project.objects.get(slug=slug, organization=request.user.organization))
+        project=Project.objects.get(slug=slug, organization=request.user.organization)).order_by('id')
     return render(request, 'settings/priorities.html', {'slug': slug, 'priority_list': priority_list})
 
 
@@ -190,7 +190,7 @@ def priority_delete(request, slug, priority_slug):
 @active_user_required
 def severities(request, slug):
     severity_list = Severity.objects.filter(
-        project=Project.objects.get(slug=slug, organization=request.user.organization))
+        project=Project.objects.get(slug=slug, organization=request.user.organization)).order_by('id')
     return render(request, 'settings/severities.html', {'slug': slug, 'severity_list': severity_list})
 
 
@@ -241,7 +241,7 @@ def severity_delete(request, slug, severity_slug):
 @active_user_required
 def ticket_status(request, slug):
     ticket_status_list = TicketStatus.objects.filter(
-        project=Project.objects.get(slug=slug, organization=request.user.organization))
+        project=Project.objects.get(slug=slug, organization=request.user.organization)).order_by('id')
     return render(request, 'settings/ticket_status.html', {'slug': slug, 'ticket_status_list': ticket_status_list})
 
 
@@ -249,13 +249,13 @@ def ticket_status(request, slug):
 def ticket_status_default(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     TicketStatus.objects.bulk_create([TicketStatus(name='New', slug=slugify('New'), color='#999999', project=project),
-                                 TicketStatus(name='In progress', slug=slugify('In progress'), color='#729fcf',
-                                              project=project),
-                                 TicketStatus(name='Ready for test', slug=slugify('Ready for test'), color='#4e9a06',
-                                              project=project),
-                                 TicketStatus(name='Done', slug=slugify('Done'), color='#cc0000', project=project),
-                                 TicketStatus(name='Archived', slug=slugify('Archived'), color='#5c3566',
-                                              project=project)])
+                                      TicketStatus(name='In progress', slug=slugify('In progress'), color='#729fcf',
+                                                   project=project),
+                                      TicketStatus(name='Ready for test', slug=slugify('Ready for test'),
+                                                   color='#4e9a06', project=project),
+                                      TicketStatus(name='Done', slug=slugify('Done'), color='#cc0000', project=project),
+                                      TicketStatus(name='Archived', slug=slugify('Archived'), color='#5c3566',
+                                                   project=project)])
     messages.success(request, 'Default status are added to the ticket status page !')
     return HttpResponse(json.dumps({'error': False}), content_type="application/json")
 
@@ -501,7 +501,7 @@ def tickets(request, slug):
 def taskboard(request, slug, milestone_slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     milestone = Milestone.objects.get(slug=milestone_slug, project=project)
-    ticket_status_list = TicketStatus.objects.filter(project=project)
+    ticket_status_list = TicketStatus.objects.filter(project=project).order_by('id')
     mem_details = []
     for member in project.members.all():
         try:
@@ -550,7 +550,7 @@ def load_tasks(request, slug, milestone_slug, status_slug):
 def requirement_tasks(request, slug, milestone_slug, requirement_id):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     milestone = Milestone.objects.get(slug=milestone_slug, project=project)
-    ticket_status_list = TicketStatus.objects.filter(project=project)
+    ticket_status_list = TicketStatus.objects.filter(project=project).order_by('id')
     return render(request, 'project/partials/requirement_tasks.html',
                   {'ticket_status_list': ticket_status_list, 'slug': slug, 'requirement_id': requirement_id,
                    'milestone': milestone})
@@ -766,6 +766,15 @@ def requirement_edit(request, slug, milestone_slug, requirement_slug):
             json_data['form_errors'] = requirement_form.errors
             return HttpResponse(json.dumps(json_data), content_type='application/json')
     else:
-        milestone = project_obj.milestones.all()
+
         context = {'milestone': milestone, 'requirement_obj': requirement_obj, 'slug': slug}
         return render(request, 'project/requirement.html', context)
+
+
+@active_user_required
+def requirement_delete(request, slug, milestone_slug, requirement_slug):
+    project_object = Project.objects.get(slug=slug, organization=request.user.organization)
+    milestone = Milestone.objects.get(slug=milestone_slug, project=project_object)
+    requirement_object = Requirement.objects.get(slug=requirement_slug, milestone=milestone)
+    requirement_object.delete()
+    return HttpResponseRedirect(reverse('project:taskboard', kwargs={'milestone_slug': milestone_slug, 'slug': slug}))

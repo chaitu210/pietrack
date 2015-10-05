@@ -17,7 +17,6 @@ urlpatterns = [
     url(r'^(?P<slug>[-\w]+)/edit_member/$', edit_member, name='edit_member'),
     url(r'^(?P<slug>[-\w]+)/delete_member/$', delete_member, name='delete_member'),
 
-
     # ticket status
     url(r'^(?P<slug>[-\w]+)/settings/ticket_status/$', ticket_status, name='ticket_status'),
     url(r'^(?P<slug>[-\w]+)/settings/ticket_status/default/$', ticket_status_default, name='ticket_status_default'),
@@ -82,7 +81,13 @@ urlpatterns = [
         name='milestone_delete'),
 
     # requirement
-    url(r'^(?P<slug>[a-zA-Z0-9-]+)/(?P<milestone_slug>[a-zA-Z0-9-]+)/requirement/create/$', requirement_create, name='requirement_create'),
-    url(r'^(?P<slug>[a-zA-Z0-9-]+)/(?P<milestone_slug>[a-zA-Z0-9-]+)/(?P<requirement_slug>[a-zA-Z0-9-]+)/requirement/edit/$', requirement_edit, name='requirement_edit'),
+    url(r'^(?P<slug>[a-zA-Z0-9-]+)/(?P<milestone_slug>[a-zA-Z0-9-]+)/requirement/create/$', requirement_create,
+        name='requirement_create'),
+    url(
+        r'^(?P<slug>[a-zA-Z0-9-]+)/(?P<milestone_slug>[a-zA-Z0-9-]+)/(?P<requirement_slug>[a-zA-Z0-9-]+)/requirement/edit/$',
+        requirement_edit, name='requirement_edit'),
+    url(
+        r'^(?P<slug>[a-zA-Z0-9-]+)/(?P<milestone_slug>[a-zA-Z0-9-]+)/(?P<requirement_slug>[a-zA-Z0-9-]+)/requirement/delete/$',
+        requirement_delete, name='requirement_delete'),
 
 ]
