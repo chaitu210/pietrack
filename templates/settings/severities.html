@@ -10,14 +10,6 @@
             <div class="panel-body">
                 <!-- content box starts here -->
                 <div class="content_box">
-                {% if severity_list|length == 0 %}
-                    <div class="role-alert member-warning-alert">
-                        <div class="alert alert-warning alert-dismissible" role="alert">
-                            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
-                            <strong><span class="fa fa-warning"></span></strong> Please add some severities here !
-                        </div>
-                    </div>
-                {% endif %}
                     <div class="title">
                         <h4><span class="status"> ISSUE SEVERITIES</span></h4>
                         <div class="tag">
@@ -27,40 +19,53 @@
                     </div>
                     <!-- status table starts here -->
                     <div class="table-responsive color-box">
-                        <table class="table table-striped" id="priority">
-                            <thead>
-                                <tr>
-                                    <th width="40%">Color</th>
-                                    <th>Name</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            {% for severity in severity_list%}
-                                <tr id="{{severity.id}}">
-                                    <td scope="row">
-                                        <div class="input-group colorpicker-component demo demo-auto">
-                                            <input type="text" value="{{severity.color}}" class="form-control" />
-                                            <span class="input-group-addon">
-                                                <i style="cursor: default;"></i>
-                                            </span>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        {{severity.name}}
-                                    </td>
-                                    <td class="actions">
-                                        <a href="#" class="edit" onclick="edit_severity('{{severity.color}}','{{severity.name}}','{{severity.slug}}')">
-                                            <i class="fa fa-edit"></i>
-                                        </a>
-                                        <a href="#" class="delete" onclick="delete_severity('{{severity.slug}}','{{severity.id}}')">
-                                            <i class="fa fa-trash"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                                {% endfor%}
-                            </tbody>
-                        </table>
+                        {% if severity_list %}
+                            <table class="table table-striped" id="priority">
+                                <thead>
+                                    <tr>
+                                        <th width="40%">Color</th>
+                                        <th>Name</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                {% for severity in severity_list%}
+                                    <tr id="{{severity.id}}">
+                                        <td scope="row">
+                                            <div class="input-group colorpicker-component demo demo-auto">
+                                                <input type="text" value="{{severity.color}}" class="form-control" />
+                                                <span class="input-group-addon">
+                                                    <i style="cursor: default;"></i>
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            {{severity.name}}
+                                        </td>
+                                        <td class="actions">
+                                            <a href="#" class="edit" onclick="edit_severity('{{severity.color}}','{{severity.name}}','{{severity.slug}}')">
+                                                <i class="fa fa-edit"></i>
+                                            </a>
+                                            <a href="#" class="delete" onclick="delete_severity('{{severity.slug}}','{{severity.id}}')">
+                                                <i class="fa fa-trash"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor%}
+                                </tbody>
+                            </table>
+
+                       {% else %}
+                            <div>
+                                <hr />
+                                <center>
+                                Please create a new severity or use
+                                    <span class="badge" id="create_default">
+                                        <a href="{% url 'project:severity_default' slug %}">default</a>
+                                    </span> severity list !
+                                </center>
+                            </div>
+                        {% endif %}
                         <!-- add form start -->
                         <form action="" method="post" style="display:none;" id="add_form">
                             {% csrf_token %}
@@ -83,7 +88,7 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <input name="name" value="" type="text" style="width: 100px; padding: 2px; border:1px solid #929292;" placeholder="Severity name" />
+                                            <input name="name" value="" type="text" style="width: 100px; padding: 2px; border:1px solid #929292;" placeholder="Severity name" autofocus/>
                                             <span class="input-empty-error" name="error"></span>
                                         </td>
                                         <td class="actions">
@@ -145,6 +150,7 @@
         $.get('/project/{{slug}}/settings/severity/' + slug + '/delete/', function(response) {
             if (!response.error) {
                 $('#' + id).remove();
+                window.location="/project/{{slug}}/settings/severities/";
             }
         });
     }
@@ -212,6 +218,16 @@
 
         }
     });
+
+    $('#create_default').on('click', function(event){
+        event.preventDefault();
+        $.get("{% url 'project:severity_default' slug %}", function(response){
+           if(response){
+               window.location="/project/{{slug}}/settings/severities/";
+           }
+        });
+    });
+
     </script>
     <script type="text/javascript">
         $('#project_submenu').attr('class', 'arrow-up active');

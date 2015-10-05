@@ -140,6 +140,20 @@ def priorities(request, slug):
 
 
 @active_user_required
+def priority_default(request, slug):
+    project = Project.objects.get(slug=slug, organization=request.user.organization)
+    Priority.objects.bulk_create([Priority(name='Wishlist', slug=slugify('Wishlist'), color='#999999', project=project),
+                                  Priority(name='Minor', slug=slugify('Minor'), color='#729fcf', project=project),
+                                  Priority(name='Normal', slug=slugify('Normal'), color='#4e9a06', project=project),
+                                  Priority(name='Important', slug=slugify('Important'), color='#f57900',
+                                           project=project),
+                                  Priority(name='Critical', slug=slugify('Critical'), color='#CC0000',
+                                           project=project)])
+    messages.success(request, 'Default priorities are added to the Priority page !')
+    return HttpResponse(json.dumps({'error': False}), content_type="application/json")
+
+
+@active_user_required
 def priority_create(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     form = PriorityForm(request.POST, project=project)
@@ -178,6 +192,16 @@ def severities(request, slug):
     severity_list = Severity.objects.filter(
         project=Project.objects.get(slug=slug, organization=request.user.organization))
     return render(request, 'settings/severities.html', {'slug': slug, 'severity_list': severity_list})
+
+
+@active_user_required
+def severity_default(request, slug):
+    project = Project.objects.get(slug=slug, organization=request.user.organization)
+    Severity.objects.bulk_create([Severity(name='Low', slug=slugify('Low'), color='#999999', project=project),
+                                  Severity(name='Normal', slug=slugify('Normal'), color='#4e9a06', project=project),
+                                  Severity(name='High', slug=slugify('High'), color='#cc0000', project=project)])
+    messages.success(request, 'Default severities are added to the Severity page !')
+    return HttpResponse(json.dumps({'error': False}), content_type="application/json")
 
 
 @active_user_required
@@ -222,6 +246,21 @@ def ticket_status(request, slug):
 
 
 @active_user_required
+def ticket_status_default(request, slug):
+    project = Project.objects.get(slug=slug, organization=request.user.organization)
+    TicketStatus.objects.create([TicketStatus(name='New', slug=slugify('New'), color='#999999', project=project),
+                                 TicketStatus(name='In progress', slug=slugify('In progress'), color='#729fcf',
+                                              project=project),
+                                 TicketStatus(name='Ready for test', slug=slugify('Ready for test'), color='#4e9a06',
+                                              project=project),
+                                 TicketStatus(name='Done', slug=slugify('Done'), color='#cc0000', project=project),
+                                 TicketStatus(name='Archived', slug=slugify('Archived'), color='#5c3566',
+                                              project=project)])
+    messages.success(request, 'Default status are added to the ticket status page !')
+    return HttpResponse(json.dumps({'error': False}), content_type="application/json")
+
+
+@active_user_required
 def ticket_status_create(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     form = TicketStatusForm(request.POST, project=project)
@@ -258,7 +297,7 @@ def ticket_status_delete(request, slug, ticket_slug):
 
 
 def password_reset(request, to_email):
-    from_email = request.user.organization.slug+"@pietrack.com"
+    from_email = request.user.organization.slug + "@pietrack.com"
     to_email_dict = {'email': to_email}
     token_generator = default_token_generator
     email_template_name = 'email/reset_email.html'
@@ -309,9 +348,9 @@ def create_member(request, slug):
                     description = post_dict['description']
                     organization_obj = request.user.organization
                     project_obj = Project.objects.get(slug=slug, organization=request.user.organization)
-                    subject = ' Invitation to join in the project "'+project_obj.name+'"'
+                    subject = ' Invitation to join in the project "' + project_obj.name + '"'
                     message = 'Dear User,\n Please login to your account in http://pietrack.com to know more details.\n'
-                    from_email =  project_obj.organization.slug+"@pietrack.com"
+                    from_email = project_obj.organization.slug + "@pietrack.com"
                     if User.objects.filter(email=email).exists():
                         send_mail_old_user.delay(subject, message, from_email, email)
                         pass
@@ -330,11 +369,6 @@ def create_member(request, slug):
                     role.users.add(User.objects.get(email=email))
                     role.save()
                     project_obj.save()
-
-
-
-
-
 
                     msg = " added " + user_obj.username + " as a team member"
                     create_timeline.send(sender=request.user, content_object=user_obj, namespace=msg,
@@ -368,10 +402,10 @@ def edit_member(request, slug):
         role.users.remove(member)
         new_role = Role.objects.get(slug=role_slug, project=project)
         new_role.users.add(member)
-        if(role!=new_role):
-            msg = " edited " + member.username + "'s role as "+str(new_role)
+        if (role != new_role):
+            msg = " edited " + member.username + "'s role as " + str(new_role)
             create_timeline.send(sender=request.user, content_object=member, namespace=msg,
-                                         event_type="member edited", project=project)
+                                 event_type="member edited", project=project)
         return HttpResponse(True)
     elif request.GET.get('id', False):
         project_roles = Role.objects.filter(project__slug=slug, project__organization=request.user.organization)
@@ -396,7 +430,7 @@ def delete_member(request, slug):
         result = True
         msg = "removed " + member.email + " from the project "
         create_timeline.send(sender=request.user, content_object=member, namespace=msg,
-                                         event_type="member removed", project=project)
+                             event_type="member removed", project=project)
     return HttpResponse(json.dumps({'result': result}), content_type="application/json")
 
 
@@ -416,7 +450,7 @@ def member_role_create(request, slug):
         role = form.save()
         msg = "created role " + role.name + " in the project "
         create_timeline.send(sender=request.user, content_object=role, namespace=msg,
-                                         event_type="role created", project=project)
+                             event_type="role created", project=project)
         return HttpResponse(json.dumps({'error': False, 'role_id': role.id, 'role_name': role.name, 'slug': role.slug}),
                             content_type="application/json")
     else:
@@ -431,9 +465,9 @@ def member_role_edit(request, slug, member_role_slug):
     form = RoleForm(request.POST, instance=instance, project=project)
     if form.is_valid():
         role = form.save()
-        msg = "renamed current role " + instance.name + " to "+role.name
+        msg = "renamed current role " + instance.name + " to " + role.name
         create_timeline.send(sender=request.user, content_object=role, namespace=msg,
-                                         event_type="role renamed", project=project)
+                             event_type="role renamed", project=project)
         return HttpResponse(json.dumps({'error': False, 'role_id': role.id, 'role_name': role.name, 'slug': role.slug}),
                             content_type="application/json")
     else:
@@ -443,12 +477,12 @@ def member_role_edit(request, slug, member_role_slug):
 @active_user_required
 def member_role_delete(request, slug, member_role_slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
-    role=Role.objects.get(slug=member_role_slug, project=project)
+    role = Role.objects.get(slug=member_role_slug, project=project)
     project.members.remove(*role.users.all())
     role.delete()
-    msg = "removed " + role.name  + " from this project "
+    msg = "removed " + role.name + " from this project "
     create_timeline.send(sender=request.user, content_object=project, namespace=msg,
-                                         event_type="role deleted", project=project)
+                         event_type="role deleted", project=project)
     return HttpResponse(json.dumps({'error': False}), content_type="application/json")
 
 
@@ -462,6 +496,7 @@ def tickets(request, slug):
     else:
         messages.warning(request, 'Please create a mile-stone to view tickets')
         return HttpResponseRedirect(reverse('project:milestone_display', kwargs={'slug': slug}))
+
 
 @active_user_required
 def taskboard(request, slug, milestone_slug):
@@ -481,16 +516,16 @@ def taskboard(request, slug, milestone_slug):
 
 @active_user_required
 def update_taskboard_status(request, slug, status_slug, task_id):
-    project=Project.objects.get(slug=slug, organization=request.user.organization)
+    project = Project.objects.get(slug=slug, organization=request.user.organization)
     task = Ticket.objects.get(id=task_id)
     old_status = task.status
     ticket_status = TicketStatus.objects.get(
         slug=status_slug, project=project)
     task.status = ticket_status
     task.save()
-    msg = "moved " + task.name + " from "+old_status+" to "+task.status
+    msg = "moved " + task.name + " from " + old_status + " to " + task.status
     create_timeline.send(sender=request.user, content_object=task, namespace=msg,
-                                         event_type="task moved", project=project)
+                         event_type="task moved", project=project)
     return HttpResponse("")
 
 
@@ -643,9 +678,9 @@ def milestone_edit(request, slug, milestone_slug):
             json_data['error'] = False
             messages.success(request, 'Successfully updated Milestone - ' + str(milestone_obj.name) + ' !')
             if old_name != milestone.name:
-                msg = "renamed milestone "+old_name+" to " + milestone.name
+                msg = "renamed milestone " + old_name + " to " + milestone.name
             else:
-                msg = "milestone "+milestone.name+" details updated"
+                msg = "milestone " + milestone.name + " details updated"
             create_timeline.send(sender=request.user, content_object=milestone, namespace=msg,
                                  event_type="milestone edited", project=milestone.project)
 
@@ -665,7 +700,7 @@ def milestone_delete(request, slug, milestone_slug):
     milestone.delete()
     msg = " deleted milestone " + milestone.name
     create_timeline.send(sender=request.user, content_object=milestone.project, namespace=msg,
-                                 event_type="milestone deleted", project=milestone.project)
+                         event_type="milestone deleted", project=milestone.project)
     messages.success(request, 'Successfully deleted Milestone - ' + str(milestone) + ' !')
     return HttpResponse(json.dumps({'result': True}), content_type='application/json')
 
@@ -725,7 +760,7 @@ def requirement_edit(request, slug, milestone_slug, requirement_slug):
             requirement_form.save()
 
             json_data['error'] = False
-            messages.success(request, 'Successfully updated your requirement - '+str(requirement_obj.name)+ ' !')
+            messages.success(request, 'Successfully updated your requirement - ' + str(requirement_obj.name) + ' !')
             return HttpResponse(json.dumps(json_data), content_type='application/json')
         else:
             json_data['error'] = True
@@ -735,4 +770,3 @@ def requirement_edit(request, slug, milestone_slug, requirement_slug):
         milestone = project_obj.milestones.all()
         context = {'milestone': milestone, 'requirement_obj': requirement_obj, 'slug': slug}
         return render(request, 'project/requirement.html', context)
-
