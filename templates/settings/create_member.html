@@ -52,7 +52,12 @@
                 <div id='id_div_add0' class="panel_box">
                     <div class="form_group">
                         <label>Email Address</label>
-                        <input name='email' type="text" class='input' value="">
+                        <div class="form-group form-inline">
+                            <div class="input-group" style="width: 100%;">
+                              <input name="email" type="text" class="form-control" placeholder="e-mail" >
+                              <div class="input-group-addon">@{{ request.user.organization.domain }}</div>
+                            </div>
+                         </div>
                         <span id='id_span_error_email0' class='class_span0'></span>
                     </div>
                     <div class="form_group">
@@ -156,6 +161,7 @@
             'description': description
         }), function(response) {
             if (response['error'] === true) {
+                $('form span').text('')
                 var span_id_array = []
                 $('#id_form_append').find('span').each(function() {
                     var span_id = this.id

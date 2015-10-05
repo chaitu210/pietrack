@@ -6,7 +6,7 @@ import shutil
 import os
 from django.shortcuts import render, redirect, render_to_response
 from piebase.models import User, Project, Priority, Severity, TicketStatus, Ticket, Requirement, Attachment, Role, \
-    Milestone
+    Milestone, Timeline
 from forms import CreateProjectForm, PriorityForm, SeverityForm, TicketStatusForm, RoleForm, CommentForm, \
     CreateMemberForm, PasswordResetForm, MilestoneForm, RequirementForm
 from PIL import Image
@@ -18,8 +18,9 @@ from django.contrib.auth.tokens import default_token_generator
 from django.core.urlresolvers import reverse
 from .tasks import send_mail_old_user
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-from signals import create_timeline
+from .signals import create_timeline
 from django.contrib import messages
+from django.contrib.contenttypes.models import ContentType
 
 user_login_required = user_passes_test(
     lambda user: user.is_active, login_url='/')
@@ -315,13 +316,7 @@ def password_reset(request, to_email):
 @active_user_required
 def project_team(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
-    mem_details = []
-    for member in project.members.all():
-        try:
-            mem_details.append((member, Role.objects.get(users__email=member.email, project=project)))
-        except:
-            pass
-    dictionary = {'project': project, 'mem_details': mem_details, 'slug': slug}
+    dictionary = {'project': project, 'slug': slug}
     return render(request, 'settings/team.html', dictionary)
 
 
@@ -336,50 +331,53 @@ def create_member(request, slug):
         description = request.POST.get('description')
         post_dict = {'description': description}
         post_tuple = zip(email_list, designation_list)
+        team_members = []
+        project_obj = Project.objects.get(slug=slug, organization=request.user.organization)
         for email_iter, designation_iter in post_tuple:
+            if email_iter!='':
+                email_iter+='@'+request.user.organization.domain
             post_dict['email'] = email_iter
             post_dict['designation'] = designation_iter
             create_member_form = CreateMemberForm(post_dict, slug=slug, organization=request.user.organization)
             if len(email_list) == len(set(email_list)) or email_list.count('') > 0:
-                if create_member_form.is_valid() and email_list.count('') == 0:
-                    email = post_dict['email']
-                    designation = post_dict['designation']
-                    description = post_dict['description']
-                    organization_obj = request.user.organization
-                    project_obj = Project.objects.get(slug=slug, organization=request.user.organization)
-                    subject = ' Invitation to join in the project "' + project_obj.name + '"'
-                    message = 'Dear User,\n Please login to your account in http://pietrack.com to know more details.\n'
-                    from_email = project_obj.organization.slug + "@pietrack.com"
-                    if User.objects.filter(email=email).exists():
-                        send_mail_old_user.delay(subject, message, from_email, email)
-                        pass
-                    else:
-                        random_password = ''.join(
-                            random.choice(string.digits) for _ in xrange(8))
-                        new_user_obj = User.objects.create_user(
-                            email=email, username=email, password=random_password, organization=organization_obj,
-                            pietrack_role='user')
-                        password_reset(request, email_iter)
-
-                    user_obj = User.objects.get(email=email)
-                    project_obj.members.add(user_obj)
-                    project_obj.organization = organization_obj
-                    role = Role.objects.get(slug=designation, project=project_obj)
-                    role.users.add(User.objects.get(email=email))
-                    role.save()
-                    project_obj.save()
-
-                    msg = " added " + user_obj.username + " as a team member"
-                    create_timeline.send(sender=request.user, content_object=user_obj, namespace=msg,
-                                         event_type="member added", project=project_obj)
+                if create_member_form.is_valid():
+                    random_password = ''.join(
+                        random.choice(string.digits) for _ in xrange(8))
+                    new_user_obj = User(
+                        email=post_dict['email'], username=post_dict['email'], password=random_password, organization=request.user.organization,
+                        pietrack_role='user')
+                    team_members.append((new_user_obj, post_dict['designation']))
+                    json_post_index += 1
                 else:
                     error_count += 1
                     json_data[json_post_index] = create_member_form.errors
                     json_post_index += 1
-            if len(email_list) != len(set(email_list)) and email_list.count('') < 2:
-                json_data['emails'] = True
+            if len(email_list) != len(set(email_list)):
+                    json_data['emails'] = True
 
         if error_count == 0 and len(email_list) == len(set(email_list)):
+            for user,designation in team_members:
+                email = user.email
+                subject = ' Invitation to join in the project "' + project_obj.name + '"'
+                message = 'Dear User,\n Please login to your account in http://pietrack.com to know more details.\n'+\
+                          request.POST.get('description')
+                from_email = project_obj.organization.slug + "@pietrack.com"
+                if User.objects.filter(email=user.email):
+                    send_mail_old_user.delay(subject, message, from_email, email)
+                    pass
+                else:
+                    user.save()
+                    password_reset(request, email)
+                user_obj = User.objects.get(email=email)
+                project_obj.members.add(user_obj)
+                project_obj.organization = request.user.organization
+                role = Role.objects.get(slug=designation, project=project_obj)
+                role.users.add(User.objects.get(email=email))
+                role.save()
+                project_obj.save()
+                msg = " added " + user_obj.username + " as a team member"
+                create_timeline.send(sender=request.user, content_object=user_obj, namespace=msg,
+                                     event_type="member added", project=project_obj)
             json_data['error'] = False
         else:
             json_data['error'] = True
@@ -517,12 +515,12 @@ def taskboard(request, slug, milestone_slug):
 def update_taskboard_status(request, slug, status_slug, task_id):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     task = Ticket.objects.get(id=task_id)
-    old_status = task.status
+    old_status = task.status.name
     ticket_status = TicketStatus.objects.get(
         slug=status_slug, project=project)
     task.status = ticket_status
     task.save()
-    msg = "moved " + task.name + " from " + old_status + " to " + task.status
+    msg = "moved " + task.name + " from " + old_status + " to " + task.status.name
     create_timeline.send(sender=request.user, content_object=task, namespace=msg,
                          event_type="task moved", project=project)
     return HttpResponse("")
@@ -696,10 +694,17 @@ def milestone_edit(request, slug, milestone_slug):
 def milestone_delete(request, slug, milestone_slug):
     milestone = Milestone.objects.get(project__slug=slug, slug=milestone_slug,
                                       project__organization=request.user.organization)
+    content_type = ContentType.objects.get_for_model(milestone)
+    # print milestone.id
+    # print content_type.id
+    # tl =  Timeline.objects.filter(content_type__pk=content_type.id, object_id=milestone.id)
+    # print tl
+    # # print tl.delete()
     milestone.delete()
     msg = " deleted milestone " + milestone.name
     create_timeline.send(sender=request.user, content_object=milestone.project, namespace=msg,
                          event_type="milestone deleted", project=milestone.project)
+
     messages.success(request, 'Successfully deleted Milestone - ' + str(milestone) + ' !')
     return HttpResponse(json.dumps({'result': True}), content_type='application/json')
 

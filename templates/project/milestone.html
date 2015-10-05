@@ -3,7 +3,7 @@
   <section id='base_content' class='create_project'>
     <div class="content_box">
         <div class="title">
-            <h4>{% if milestone_obj %}Edit{% else %}Add{% endif %} new milestone</h4>
+            <h4>{% if milestone_obj %}Edit{% else %}Add new {% endif %} milestone</h4>
             <div class="tag">
                 Milestones are tools used in project management to mark specific points along a project timeline
             </div>
@@ -27,10 +27,10 @@
                 </div>
                 <div class="form_group">
                     <label for="milestone_status">Status</label>
-                    <select id='milestone_status' name='status' value='{{ milestone_obj.status }}' class='input'>
-                        <option value='planned'>Planned</option>
-                        <option value='started'>Started</option>
-                        <option value='finished'>Finished</option>
+                    <select id='milestone_status' name='status'  class='input'>
+                        <option value='planned' {% if  milestone_obj.status == 'planned' %} selected{% endif %} >Planned</option>
+                        <option value='started' {% if  milestone_obj.status == 'started' %} selected{% endif %} >Started</option>
+                        <option value='finished' {% if  milestone_obj.status == 'finished' %} selected{% endif %} >Finished</option>
                     </select>
                 </div>
                 <br clear="clearfixall" />

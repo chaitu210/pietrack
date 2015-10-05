@@ -70,13 +70,11 @@ def merge_two_dicts(x, y):
 
 
 def register(request):
-    register_form = RegisterForm(request.POST)
-
+    register_form = RegisterForm(request.POST,email=request.POST.get('email'))
     errors = {}
     if request.POST.get('organization'):
         if User.objects.filter(organization__name__exact=request.POST.get('organization')).exists():
             errors = {'organization': 'Please contact the admin to register for this organization'}
-
     if register_form.is_valid() and not errors:
         first_name = request.POST.get('first_name')
         email = request.POST.get('email')

@@ -2,6 +2,7 @@ import json
 from django.shortcuts import render, HttpResponse
 from task.forms import TaskForm
 from piebase.models import TicketStatus, Project, Role
+from project.signals import create_timeline
 
 
 def add_task(request, slug, milestone_slug):
@@ -13,7 +14,10 @@ def add_task(request, slug, milestone_slug):
         add_task_form = TaskForm(add_task_dict, user=request.user)
         if add_task_form.is_valid():
             json_data['error'] = False
-            add_task_form.save()
+            task = add_task_form.save()
+            msg = "created " + task.name + " in requirement " + task.requirement.name + " of milestone " + task.milestone.name
+            create_timeline.send(sender=request.user, content_object=task, namespace=msg,
+                         event_type="task created", project=project_obj)
             return HttpResponse(json.dumps(json_data), content_type='application/json')
         else:
             json_data['error'] = True

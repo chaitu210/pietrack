@@ -1,5 +1,5 @@
 {% extends 'settings/base.html' %}
-
+{% load project_tags %}
 {% load static %}
 {% load staticfiles %}
 
@@ -10,7 +10,7 @@
             <div class="panel-body">
                 <!-- content box starts here -->
                 <div class="content_box ">
-                    {% if mem_details|length == 0 %}
+                    {% if project.members.all|length == 0 %}
                         <div class="role-alert pull-right member-warning-alert">
                             <div class="alert alert-warning alert-dismissible" role="alert">
                                 <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -42,7 +42,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                            {% for member,role in mem_details %}
+                            {% for member in project.members.all %}
                                 <tr id="{{ member.id }}">
                                     <th scope="row">
                                         <div class="img-text">
@@ -60,7 +60,7 @@
                                         </div>
                                     </th>
                                     <td>
-                                        <p>{{ role.name|title }}</p>
+                                        <p>{{ member|get_user_Role:request.user.organization|title }}</p>
                                     </td>
                                     <td>
                                         <span class="active-1 status">
