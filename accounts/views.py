@@ -51,13 +51,13 @@ def login(request):
             if user.is_active:
                 auth.login(request, user)
                 json_data = {'error': False}
+                messages.success(request, 'Successfully logged in !')
             else:
                 json_data = {
                     'error': True, 'error_msg': 'User account is disabled'}
         else:
-            json_data = {'error': True, 'error_msg':
-                         'Authenticating user failed, wrong email or password'}
-        messages.success(request, 'Successfully logged in !')
+            json_data = {'error': True, 'error_msg': 'Authenticating user failed, wrong email or password'}
+
         return HttpResponse(json.dumps(json_data), content_type='application/json')
     else:
         return render(request, 'login.html')
@@ -90,10 +90,11 @@ def register(request):
             if user:
                 if user.is_active:
                     auth.login(request, user)
+                    messages.success(request, 'You are successfully registered !')
 
         else:
             json_data = {'error': True, 'error_password': 'password mismatch'}
-        messages.success(request, 'You are successfully registered !')
+
         return HttpResponse(json.dumps(json_data), content_type='application/json')
     else:
         json_data = {'error': True, 'response': register_form.errors}
@@ -117,10 +118,10 @@ def forgot_password(request):
                         'request': request}
                     form.save(**opts)
                 json_data = {'error': False}
+                messages.success(request, 'Password recovery mail has been sent to your account !')
             else:
-                json_data = {
-                    'error': True, 'error_msg': 'email not registered'}
-        messages.success(request, 'Password recovery mail has been sent to your account !')
+                json_data = {'error': True, 'error_msg': 'email not registered'}
+
         return HttpResponse(json.dumps(json_data), content_type='application/json')
 
 
@@ -132,9 +133,8 @@ def change_password(request):
         if form.is_valid():
             user.set_password(request.POST['password1'])
             user.save()
-            response_data = {
-                'error': False, "response": 'Your password is updated !'}
-
+            response_data = {'error': False, "response": 'Your password is updated !'}
+            messages.success(request, 'Your password updated successfully!')
         else:
             response_data = {'error': True, 'response': form.errors}
 

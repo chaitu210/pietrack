@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load paginate %}
 
 {% block content %}
   <section id='base_content'>
@@ -17,6 +18,8 @@
             </div>
         </div>
         {% if projects_list %}
+        {% paginate 5 projects_list %}
+
             <div class="table_div">
                 <table class='table table-hover'>
                     <tbody>
@@ -43,6 +46,15 @@
                     </tbody>
                 </table>
             </div>
+
+            <!-- pagination -->
+              <div class="pagination_wrap">
+                  <center>
+                      {% show_pages %}
+                  </center>
+              </div>
+            <!--/ pagination -->
+
         {% else %}
             <br clear="clearfixall" />
             <div class="panel panel-primary">
