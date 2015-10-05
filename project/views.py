@@ -6,7 +6,7 @@ import shutil
 import os
 from django.shortcuts import render, redirect, render_to_response
 from piebase.models import User, Project, Priority, Severity, TicketStatus, Ticket, Requirement, Attachment, Role, \
-    Milestone
+    Milestone, Timeline
 from forms import CreateProjectForm, PriorityForm, SeverityForm, TicketStatusForm, RoleForm, CommentForm, \
     CreateMemberForm, PasswordResetForm, MilestoneForm, RequirementForm
 from PIL import Image
@@ -18,8 +18,9 @@ from django.contrib.auth.tokens import default_token_generator
 from django.core.urlresolvers import reverse
 from .tasks import send_mail_old_user
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-from signals import create_timeline
+from .signals import create_timeline
 from django.contrib import messages
+from django.contrib.contenttypes.models import ContentType
 
 user_login_required = user_passes_test(
     lambda user: user.is_active, login_url='/')
@@ -515,12 +516,12 @@ def taskboard(request, slug, milestone_slug):
 def update_taskboard_status(request, slug, status_slug, task_id):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     task = Ticket.objects.get(id=task_id)
-    old_status = task.status
+    old_status = task.status.name
     ticket_status = TicketStatus.objects.get(
         slug=status_slug, project=project)
     task.status = ticket_status
     task.save()
-    msg = "moved " + task.name + " from " + old_status + " to " + task.status
+    msg = "moved " + task.name + " from " + old_status + " to " + task.status.name
     create_timeline.send(sender=request.user, content_object=task, namespace=msg,
                          event_type="task moved", project=project)
     return HttpResponse("")
@@ -694,10 +695,17 @@ def milestone_edit(request, slug, milestone_slug):
 def milestone_delete(request, slug, milestone_slug):
     milestone = Milestone.objects.get(project__slug=slug, slug=milestone_slug,
                                       project__organization=request.user.organization)
+    content_type = ContentType.objects.get_for_model(milestone)
+    # print milestone.id
+    # print content_type.id
+    # tl =  Timeline.objects.filter(content_type__pk=content_type.id, object_id=milestone.id)
+    # print tl
+    # # print tl.delete()
     milestone.delete()
     msg = " deleted milestone " + milestone.name
     create_timeline.send(sender=request.user, content_object=milestone.project, namespace=msg,
                          event_type="milestone deleted", project=milestone.project)
+
     messages.success(request, 'Successfully deleted Milestone - ' + str(milestone) + ' !')
     return HttpResponse(json.dumps({'result': True}), content_type='application/json')
 
