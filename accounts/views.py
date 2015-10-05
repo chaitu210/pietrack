@@ -63,9 +63,19 @@ def login(request):
         return render(request, 'login.html')
 
 
+def merge_two_dicts(x, y):
+    z = x.copy()
+    z.update(y)
+    return z
+
+
 def register(request):
     register_form = RegisterForm(request.POST,email=request.POST.get('email'))
-    if register_form.is_valid():
+    errors = {}
+    if request.POST.get('organization'):
+        if User.objects.filter(organization__name__exact=request.POST.get('organization')).exists():
+            errors = {'organization': 'Please contact the admin to register for this organization'}
+    if register_form.is_valid() and not errors:
         first_name = request.POST.get('first_name')
         email = request.POST.get('email')
         password = request.POST.get('password')
@@ -76,8 +86,7 @@ def register(request):
         if password == confirm_password:
             if Organization.objects.filter(name=organization_name):
                 pietrack_role = 'user'
-                organization_obj = Organization.objects.get(
-                    name=organization_name)
+                organization_obj = Organization.objects.get(name=organization_name)
             else:
                 pietrack_role = 'admin'
                 organization_obj = Organization.objects.create(
@@ -97,7 +106,10 @@ def register(request):
 
         return HttpResponse(json.dumps(json_data), content_type='application/json')
     else:
-        json_data = {'error': True, 'response': register_form.errors}
+        response = dict(register_form.errors.items())
+        if errors:
+            response = merge_two_dicts(dict(register_form.errors.items()), errors)
+        json_data = {'error': True, 'response': response}
         return HttpResponse(json.dumps(json_data), content_type='application/json')
 
 

@@ -149,7 +149,6 @@
             $.get('/project/{{slug}}/settings/ticket_status/' + slug + '/delete/', function(response) {
                 if (!response.error) {
                     $('#' + id).remove();
-                    window.location = '/project/{{ slug }}/settings/ticket_status/';
                 }
             });
         }
