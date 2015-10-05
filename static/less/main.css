@@ -1246,7 +1246,8 @@ header .text .tag {
 #header_base .right_header .name_img_wrap img {
   width: auto;
   vertical-align: top;
-  height: 45px;
+  height: 42px;
+  /* changed the value from 45 to 42 */
 }
 .active_li_drop .each_wrap {
   background: #777777 !important;
@@ -2456,9 +2457,12 @@ header .text .tag {
   vertical-align: middle;
 }
 #box-content .right-container .content-panel-extra .member-box .img-text .user-pic img {
-  width: 30px;
-  height: 30px;
-  border: 1px solid #eee;
+  width: 40px;
+  height: 40px;
+  border: 2px solid #eee;
+  -webkit-border-radius: 20px;
+  -moz-border-radius: 20px;
+  border-radius: 20px;
 }
 #box-content .right-container .content-panel-extra .member-box .img-text .title-email {
   display: table-cell;
@@ -2994,6 +2998,7 @@ header .text .tag {
 .member-warning-alert {
   position: fixed;
   right: 20px;
+  min-width: 400px;
 }
 .input-empty-error {
   position: fixed;

@@ -811,7 +811,7 @@ header{
 			img{
 				width: auto;
 				vertical-align: top;
-				height:45px
+				height:42px; /* changed the value from 45 to 42 */
 			}
 		}
 	}
@@ -1648,9 +1648,12 @@ header{
 							width:45px;
 							vertical-align:middle;
 							img{
-								width:30px;
-								height:30px;
-								border:1px solid #eee;
+								width:40px;
+								height:40px;
+								border:2px solid #eee;
+							  	-webkit-border-radius: 20px;
+							  	-moz-border-radius: 20px;
+							  	border-radius: 20px;
 							}
 						}
 						.title-email{
@@ -2171,6 +2174,7 @@ header{
 .member-warning-alert {
   position: fixed;
   right: 20px;
+  min-width: 400px;
 }
 
 .input-empty-error {

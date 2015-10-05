@@ -20,6 +20,7 @@ urlpatterns = [
 
     # ticket status
     url(r'^(?P<slug>[-\w]+)/settings/ticket_status/$', ticket_status, name='ticket_status'),
+    url(r'^(?P<slug>[-\w]+)/settings/ticket_status/default/$', ticket_status_default, name='ticket_status_default'),
     url(r'^(?P<slug>[-\w]+)/settings/ticket_status/create/$', ticket_status_create, name='ticket_status_create'),
     url(r'^(?P<slug>[-\w]+)/settings/ticket_status/(?P<ticket_slug>[a-zA-Z0-9-]+)/edit/$',
         ticket_status_edit, name='ticket_status_edit'),
@@ -28,6 +29,7 @@ urlpatterns = [
 
     # priority
     url(r'^(?P<slug>[-\w]+)/settings/priorities/$', priorities, name='priorities'),
+    url(r'^(?P<slug>[-\w]+)/settings/priority/default/$', priority_default, name='priority_default'),
     url(r'^(?P<slug>[-\w]+)/settings/priority/create/$', priority_create, name='priority_create'),
     url(r'^(?P<slug>[-\w]+)/settings/priority/(?P<priority_slug>[a-zA-Z0-9-]+)/edit/$',
         priority_edit, name='priority_edit'),
@@ -36,6 +38,7 @@ urlpatterns = [
 
     # severity
     url(r'^(?P<slug>[-\w]+)/settings/severities/$', severities, name='severities'),
+    url(r'^(?P<slug>[-\w]+)/settings/severity/default/$', severity_default, name='severity_default'),
     url(r'^(?P<slug>[-\w]+)/settings/severity/create/$', severity_create, name='severity_create'),
     url(r'^(?P<slug>[-\w]+)/settings/severity/(?P<severity_slug>[a-zA-Z0-9-]+)/edit/$',
         severity_edit, name='severity_edit'),

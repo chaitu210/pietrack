@@ -10,14 +10,6 @@
             <div class="panel-body">
                 <!-- content box starts here -->
                 <div class="content_box">
-                {% if priority_list|length == 0 %}
-                    <div class="role-alert member-warning-alert">
-                        <div class="alert alert-warning alert-dismissible" role="alert">
-                            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
-                            <strong><span class="fa fa-warning"></span></strong> Please add some priorities here !
-                        </div>
-                    </div>
-                {% endif %}
                     <div class="title">
                         <h4><span class="status">Issues Priorities</span></h4>
                         <div class="tag">
@@ -27,38 +19,51 @@
                     </div>
                     <!-- status table starts here -->
                     <div class="table-responsive color-box">
-                        <table class="table table-striped" id="priority">
-                            <thead>
-                                <tr>
-                                    <th width="40%">Color</th>
-                                    <th>Name</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            {% for priority in priority_list%}
-                                <tr id="{{priority.id}}">
-                                    <td scope="row">
-                                        <div class="input-group colorpicker-component demo demo-auto">
-                                            <input type="text" value="{{priority.color}}" class="form-control" />
-                                            <span class="input-group-addon">
-                                                <i style="cursor: default;"></i>
-                                            </span>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        {{priority.name}}
-                                    </td>
-                                    <td class="actions">
-                                        <a href="#" class="edit" onclick="edit_priority('{{priority.color}}','{{priority.name}}','{{priority.slug}}')">
-                                            <i class="fa fa-edit"></i>
-                                        </a>
-                                        <a href="#" class="delete" onclick="delete_priority('{{priority.slug}}','{{priority.id}}')"><i class="fa fa-trash"></i></a>
-                                    </td>
-                                </tr>
-                            {% endfor%}
-                            </tbody>
-                        </table>
+                        {% if priority_list %}
+                            <table class="table table-striped" id="priority">
+                                <thead>
+                                    <tr>
+                                        <th width="40%">Color</th>
+                                        <th>Name</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                {% for priority in priority_list%}
+                                    <tr id="{{priority.id}}">
+                                        <td scope="row">
+                                            <div class="input-group colorpicker-component demo demo-auto">
+                                                <input type="text" value="{{priority.color}}" class="form-control" />
+                                                <span class="input-group-addon">
+                                                    <i style="cursor: default;"></i>
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            {{priority.name}}
+                                        </td>
+                                        <td class="actions">
+                                            <a href="#" class="edit" onclick="edit_priority('{{priority.color}}','{{priority.name}}','{{priority.slug}}')">
+                                                <i class="fa fa-edit"></i>
+                                            </a>
+                                            <a href="#" class="delete" onclick="delete_priority('{{priority.slug}}','{{priority.id}}')"><i class="fa fa-trash"></i></a>
+                                        </td>
+                                    </tr>
+                                {% endfor%}
+                                </tbody>
+                            </table>
+
+                       {% else %}
+                            <div>
+                                <hr />
+                                <center>
+                                Please create a new priority or use
+                                    <span class="badge" id="create_default">
+                                        <a href="{% url 'project:priority_default' slug %}">default</a>
+                                    </span> priorities list !
+                                </center>
+                            </div>
+                        {% endif %}
                         <!-- form start -->
                         <form action="" method="post" style="display:none;" id="add_form">
                             {% csrf_token %}
@@ -81,7 +86,7 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <input name="name" value="" type="text" style="width: 100px; padding: 2px; border:1px solid #929292;" placeholder="Priority name" />
+                                            <input name="name" value="" type="text" style="width: 100px; padding: 2px; border:1px solid #929292;" placeholder="Priority name" autofocus/>
                                             <span class="input-empty-error" name="error"></span>
                                         </td>
                                         <td class="actions">
@@ -143,6 +148,7 @@
         $.get('/project/{{slug}}/settings/priority/' + slug + '/delete/', function(response) {
             if (!response.error) {
                 $('#' + id).remove();
+                window.location="/project/{{slug}}/settings/priorities/";
             }
         });
     }
@@ -210,6 +216,16 @@
 
         }
     });
+
+    $('#create_default').on('click', function(event){
+        event.preventDefault();
+        $.get("{% url 'project:priority_default' slug %}", function(response){
+           if(response){
+               window.location="/project/{{slug}}/settings/priorities/";
+           }
+        });
+    });
+
     </script>
     <script type="text/javascript">
         $('#project_submenu').attr('class', 'arrow-up active');

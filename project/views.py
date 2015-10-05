@@ -140,6 +140,20 @@ def priorities(request, slug):
 
 
 @active_user_required
+def priority_default(request, slug):
+    project = Project.objects.get(slug=slug, organization=request.user.organization)
+    Priority.objects.bulk_create([Priority(name='Wishlist', slug=slugify('Wishlist'), color='#999999', project=project),
+                                  Priority(name='Minor', slug=slugify('Minor'), color='#729fcf', project=project),
+                                  Priority(name='Normal', slug=slugify('Normal'), color='#4e9a06', project=project),
+                                  Priority(name='Important', slug=slugify('Important'), color='#f57900',
+                                           project=project),
+                                  Priority(name='Critical', slug=slugify('Critical'), color='#CC0000',
+                                           project=project)])
+    messages.success(request, 'Default priorities are added to the Priority page !')
+    return HttpResponse(json.dumps({'error': False}), content_type="application/json")
+
+
+@active_user_required
 def priority_create(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     form = PriorityForm(request.POST, project=project)
@@ -181,6 +195,16 @@ def severities(request, slug):
 
 
 @active_user_required
+def severity_default(request, slug):
+    project = Project.objects.get(slug=slug, organization=request.user.organization)
+    Severity.objects.bulk_create([Severity(name='Low', slug=slugify('Low'), color='#999999', project=project),
+                                  Severity(name='Normal', slug=slugify('Normal'), color='#4e9a06', project=project),
+                                  Severity(name='High', slug=slugify('High'), color='#cc0000', project=project)])
+    messages.success(request, 'Default severities are added to the Severity page !')
+    return HttpResponse(json.dumps({'error': False}), content_type="application/json")
+
+
+@active_user_required
 def severity_create(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     form = SeverityForm(request.POST, project=project)
@@ -219,6 +243,21 @@ def ticket_status(request, slug):
     ticket_status_list = TicketStatus.objects.filter(
         project=Project.objects.get(slug=slug, organization=request.user.organization))
     return render(request, 'settings/ticket_status.html', {'slug': slug, 'ticket_status_list': ticket_status_list})
+
+
+@active_user_required
+def ticket_status_default(request, slug):
+    project = Project.objects.get(slug=slug, organization=request.user.organization)
+    TicketStatus.objects.bulk_create([TicketStatus(name='New', slug=slugify('New'), color='#999999', project=project),
+                                 TicketStatus(name='In progress', slug=slugify('In progress'), color='#729fcf',
+                                              project=project),
+                                 TicketStatus(name='Ready for test', slug=slugify('Ready for test'), color='#4e9a06',
+                                              project=project),
+                                 TicketStatus(name='Done', slug=slugify('Done'), color='#cc0000', project=project),
+                                 TicketStatus(name='Archived', slug=slugify('Archived'), color='#5c3566',
+                                              project=project)])
+    messages.success(request, 'Default status are added to the ticket status page !')
+    return HttpResponse(json.dumps({'error': False}), content_type="application/json")
 
 
 @active_user_required
