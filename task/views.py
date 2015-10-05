@@ -25,7 +25,7 @@ def add_task(request, slug, milestone_slug):
             return HttpResponse(json.dumps(json_data), content_type='application/json')
     else:
         requirement_list = project_obj.requirements.filter(milestone__slug=milestone_slug)
-        ticket_status_list = TicketStatus.objects.filter(project=project_obj)
+        ticket_status_list = TicketStatus.objects.filter(project=project_obj).order_by('id')
         assigned_to_list = []
         for member in project_obj.members.all():
             try:
@@ -34,4 +34,6 @@ def add_task(request, slug, milestone_slug):
             except:
                 pass
         milestone = project_obj.milestones.get(slug=milestone_slug)
-        return render(request, 'task/add_task.html', {'requirement_list': requirement_list, 'ticket_status_list': ticket_status_list, 'assigned_to_list': assigned_to_list, 'slug':slug, 'milestone':milestone})
+        return render(request, 'task/add_task.html',
+                      {'requirement_list': requirement_list, 'ticket_status_list': ticket_status_list,
+                       'assigned_to_list': assigned_to_list, 'slug': slug, 'milestone': milestone})
