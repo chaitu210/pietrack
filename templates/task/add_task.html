@@ -3,7 +3,7 @@
 <section id='base_content' class='create_project'>
     <div class="content_box">
         {% if requirement_list|length == 0 or ticket_status_list|length == 0 %}
-            <div class="role-alert pull-right" style="width:23em;">
+            <div class="role-alert member-warning-alert" style="width:23em;">
                 <div class="alert alert-warning alert-dismissible" role="alert">
                     <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                     <strong><span class="fa fa-warning"></span></strong>
@@ -118,7 +118,7 @@ $('#task_save').click(function(event) {
 
     {% if requirement_list|length == 0 %}
         window.setTimeout(function(){
-            window.location.href = "{% url 'project:requirement_create' slug %}";
+            window.location.href = "{% url 'project:requirement_create' slug milestone.slug %}";
         }, 3000);
     {% endif %}
 
