@@ -292,7 +292,6 @@ def ticket_status_delete(request, slug, ticket_slug):
     ticket = TicketStatus.objects.get(
         slug=ticket_slug, project=Project.objects.get(slug=slug, organization=request.user.organization))
     ticket.delete()
-    messages.success(request, 'Successfully deleted Ticket - ' + str(ticket) + ' !')
     return HttpResponse(json.dumps({'error': False}), content_type="application/json")
 
 

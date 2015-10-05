@@ -148,7 +148,6 @@
         $.get('/project/{{slug}}/settings/priority/' + slug + '/delete/', function(response) {
             if (!response.error) {
                 $('#' + id).remove();
-                window.location="/project/{{slug}}/settings/priorities/";
             }
         });
     }

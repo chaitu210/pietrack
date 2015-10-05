@@ -150,7 +150,6 @@
         $.get('/project/{{slug}}/settings/severity/' + slug + '/delete/', function(response) {
             if (!response.error) {
                 $('#' + id).remove();
-                window.location="/project/{{slug}}/settings/severities/";
             }
         });
     }
