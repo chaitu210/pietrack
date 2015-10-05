@@ -248,7 +248,7 @@ def ticket_status(request, slug):
 @active_user_required
 def ticket_status_default(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
-    TicketStatus.objects.create([TicketStatus(name='New', slug=slugify('New'), color='#999999', project=project),
+    TicketStatus.objects.bulk_create([TicketStatus(name='New', slug=slugify('New'), color='#999999', project=project),
                                  TicketStatus(name='In progress', slug=slugify('In progress'), color='#729fcf',
                                               project=project),
                                  TicketStatus(name='Ready for test', slug=slugify('Ready for test'), color='#4e9a06',
