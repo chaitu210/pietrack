@@ -64,7 +64,7 @@ def login(request):
 
 
 def register(request):
-    register_form = RegisterForm(request.POST)
+    register_form = RegisterForm(request.POST,email=request.POST.get('email'))
     if register_form.is_valid():
         first_name = request.POST.get('first_name')
         email = request.POST.get('email')
