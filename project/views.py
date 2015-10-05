@@ -316,13 +316,7 @@ def password_reset(request, to_email):
 @active_user_required
 def project_team(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
-    mem_details = []
-    for member in project.members.all():
-        try:
-            mem_details.append((member, Role.objects.get(users__email=member.email, project=project)))
-        except:
-            pass
-    dictionary = {'project': project, 'mem_details': mem_details, 'slug': slug}
+    dictionary = {'project': project, 'slug': slug}
     return render(request, 'settings/team.html', dictionary)
 
 
