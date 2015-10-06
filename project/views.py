@@ -439,24 +439,14 @@ def delete_member(request, slug):
             project.members.remove(member)
             pass
         try:
-            timeline_list = []
             role = Role.objects.get(project=project, users__email=member.email)
-            ticket_list  =  project.project_tickets.all()
-            timeline_list.extend(ticket_list.filter(created_by=member))
-            for ticket in ticket_list:
-                timeline_list.extend(ticket.ticket_comments.filter(commented_by=member))
-
-            for timeline in timeline_list:
-                content_type = ContentType.objects.get_for_model(timeline)
-                Timeline.objects.filter(content_type__id=content_type.id, object_id=timeline.id).delete()
-
+            Timeline.objects.filter(user=member,project=project).delete()
             role.users.remove(member)
             result = True
             msg = "removed " + member.email + " from the project "
             create_timeline.send(sender=request.user, content_object=member, namespace=msg,
                              event_type="member removed", project=project)
         except Exception as e:
-            print "error", e
             pass
     return HttpResponse(json.dumps({'result': result}), content_type="application/json")
 
@@ -507,12 +497,10 @@ def member_role_delete(request, slug, member_role_slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     role = Role.objects.get(slug=member_role_slug, project=project)
     for member in role.users.all():
-        request.GET = request.GET.copy()
-        request.GET['id'] = member.id
-        delete_member(request,slug)
-    # project.members.remove(*role.users.all())
+        Timeline.objects.filter(user=member,project=project).delete()
+    project.members.remove(*role.users.all())
     role.delete()
-    msg = "removed " + role.name + " from this project "
+    msg = "removed role " + role.name + " from this project "
     create_timeline.send(sender=request.user, content_object=project, namespace=msg,
                          event_type="role deleted", project=project)
     return HttpResponse(json.dumps({'error': False}), content_type="application/json")
@@ -739,7 +727,6 @@ def milestone_delete(request, slug, milestone_slug):
     for timeline in timeline_list:
         content_type = ContentType.objects.get_for_model(timeline)
         Timeline.objects.filter(content_type__id=content_type.id, object_id=timeline.id).delete()
-
     msg = " deleted milestone " + milestone.name
     create_timeline.send(sender=request.user, content_object=milestone.project, namespace=msg,
                          event_type="milestone deleted", project=milestone.project)
@@ -820,5 +807,13 @@ def requirement_delete(request, slug, milestone_slug, requirement_slug):
     project_object = Project.objects.get(slug=slug, organization=request.user.organization)
     milestone = Milestone.objects.get(slug=milestone_slug, project=project_object)
     requirement_object = Requirement.objects.get(slug=requirement_slug, milestone=milestone)
-    requirement_object.delete()
+    timeline_list = [requirement_object]
+    task_list = requirement_object.tasks.all()
+    timeline_list.extend(task_list)
+    for task in task_list:
+        timeline_list.extend(task.ticket_comments.all())
+    for timeline in timeline_list:
+        content_type = ContentType.objects.get_for_model(timeline)
+        Timeline.objects.filter(content_type__pk=content_type.id, object_id=timeline.id).delete()
+    # requirement_object.delete()
     return HttpResponseRedirect(reverse('project:taskboard', kwargs={'milestone_slug': milestone_slug, 'slug': slug}))
