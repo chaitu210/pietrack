@@ -343,3 +343,5 @@ class Timeline(models.Model):
 
     class Meta:
         index_together = [('content_type', 'object_id', 'namespace'), ]
+    def __str__(self):
+        return self.namespace
