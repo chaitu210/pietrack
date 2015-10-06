@@ -6,7 +6,7 @@ import shutil
 import os
 from django.shortcuts import render, redirect, render_to_response
 from piebase.models import User, Project, Priority, Severity, TicketStatus, Ticket, Requirement, Attachment, Role, \
-    Milestone, Timeline
+    Milestone, Timeline, Comment
 from forms import CreateProjectForm, PriorityForm, SeverityForm, TicketStatusForm, RoleForm, CommentForm, \
     CreateMemberForm, PasswordResetForm, MilestoneForm, RequirementForm
 from PIL import Image
@@ -126,6 +126,20 @@ def project_details(request, slug):
 def delete_project(request, id):
     try:
         project = Project.objects.get(id=id, organization=request.user.organization)
+        timeline_list = [project]
+        milestone_list = project.milestones.all()
+        timeline_list.extend(milestone_list)
+        for milestone in milestone_list:
+            requirement_list = milestone.requirements.all()
+            timeline_list.extend(requirement_list)
+            for requirement in requirement_list:
+                task_list = requirement.tasks.all()
+                timeline_list.extend(task_list)
+                for task in task_list:
+                    timeline_list.extend(task.ticket_comments.all())
+        for timeline in timeline_list:
+            content_type = ContentType.objects.get_for_model(timeline)
+            Timeline.objects.filter(content_type__pk=content_type.id, object_id=timeline.id).delete()
         project.delete()
     except OSError as e:
         pass
@@ -395,12 +409,13 @@ def edit_member(request, slug):
         role_slug = request.POST.get('designation', False)
         project = Project.objects.get(slug=slug, organization=request.user.organization)
         role = Role.objects.get(project=project, users__email=email)
+        old_role = role.name
         member = role.users.get(email=email)
         role.users.remove(member)
         new_role = Role.objects.get(slug=role_slug, project=project)
         new_role.users.add(member)
         if (role != new_role):
-            msg = " edited " + member.username + "'s role as " + str(new_role)
+            msg = " changed role of " + member.username + "'s  from "+old_role+" to " + str(new_role)
             create_timeline.send(sender=request.user, content_object=member, namespace=msg,
                                  event_type="member edited", project=project)
         return HttpResponse(True)
@@ -422,12 +437,27 @@ def delete_member(request, slug):
         member = project.members.get(id=request.GET.get('id'))
         if member.pietrack_role != 'admin':
             project.members.remove(member)
-        role = Role.objects.get(project=project, users__email=member.email)
-        role.users.remove(member)
-        result = True
-        msg = "removed " + member.email + " from the project "
-        create_timeline.send(sender=request.user, content_object=member, namespace=msg,
+            pass
+        try:
+            timeline_list = []
+            role = Role.objects.get(project=project, users__email=member.email)
+            ticket_list  =  project.project_tickets.all()
+            timeline_list.extend(ticket_list.filter(created_by=member))
+            for ticket in ticket_list:
+                timeline_list.extend(ticket.ticket_comments.filter(commented_by=member))
+
+            for timeline in timeline_list:
+                content_type = ContentType.objects.get_for_model(timeline)
+                Timeline.objects.filter(content_type__id=content_type.id, object_id=timeline.id).delete()
+
+            role.users.remove(member)
+            result = True
+            msg = "removed " + member.email + " from the project "
+            create_timeline.send(sender=request.user, content_object=member, namespace=msg,
                              event_type="member removed", project=project)
+        except Exception as e:
+            print "error", e
+            pass
     return HttpResponse(json.dumps({'result': result}), content_type="application/json")
 
 
@@ -459,10 +489,11 @@ def member_role_edit(request, slug, member_role_slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     instance = Role.objects.get(
         slug=member_role_slug, project=project)
+    old_role = instance.name
     form = RoleForm(request.POST, instance=instance, project=project)
     if form.is_valid():
         role = form.save()
-        msg = "renamed current role " + instance.name + " to " + role.name
+        msg = "renamed current role " + old_role + " to " + role.name
         create_timeline.send(sender=request.user, content_object=role, namespace=msg,
                              event_type="role renamed", project=project)
         return HttpResponse(json.dumps({'error': False, 'role_id': role.id, 'role_name': role.name, 'slug': role.slug}),
@@ -475,7 +506,11 @@ def member_role_edit(request, slug, member_role_slug):
 def member_role_delete(request, slug, member_role_slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     role = Role.objects.get(slug=member_role_slug, project=project)
-    project.members.remove(*role.users.all())
+    for member in role.users.all():
+        request.GET = request.GET.copy()
+        request.GET['id'] = member.id
+        delete_member(request,slug)
+    # project.members.remove(*role.users.all())
     role.delete()
     msg = "removed " + role.name + " from this project "
     create_timeline.send(sender=request.user, content_object=project, namespace=msg,
@@ -694,17 +729,21 @@ def milestone_edit(request, slug, milestone_slug):
 def milestone_delete(request, slug, milestone_slug):
     milestone = Milestone.objects.get(project__slug=slug, slug=milestone_slug,
                                       project__organization=request.user.organization)
-    content_type = ContentType.objects.get_for_model(milestone)
-    # print milestone.id
-    # print content_type.id
-    # tl =  Timeline.objects.filter(content_type__pk=content_type.id, object_id=milestone.id)
-    # print tl
-    # # print tl.delete()
-    milestone.delete()
+    timeline_list = [milestone]
+    timeline_list.extend(milestone.requirements.all())
+    task_list = milestone.tasks.all()
+    timeline_list.extend(task_list)
+    for task in task_list:
+        timeline_list.extend(task.ticket_comments.all())
+
+    for timeline in timeline_list:
+        content_type = ContentType.objects.get_for_model(timeline)
+        Timeline.objects.filter(content_type__id=content_type.id, object_id=timeline.id).delete()
+
     msg = " deleted milestone " + milestone.name
     create_timeline.send(sender=request.user, content_object=milestone.project, namespace=msg,
                          event_type="milestone deleted", project=milestone.project)
-
+    milestone.delete()
     messages.success(request, 'Successfully deleted Milestone - ' + str(milestone) + ' !')
     return HttpResponse(json.dumps({'result': True}), content_type='application/json')
 
