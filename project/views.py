@@ -6,7 +6,7 @@ import shutil
 import os
 from django.shortcuts import render, redirect, render_to_response
 from piebase.models import User, Project, Priority, Severity, TicketStatus, Ticket, Requirement, Attachment, Role, \
-    Milestone, Timeline
+    Milestone, Timeline, Comment
 from forms import CreateProjectForm, PriorityForm, SeverityForm, TicketStatusForm, RoleForm, CommentForm, \
     CreateMemberForm, PasswordResetForm, MilestoneForm, RequirementForm
 from PIL import Image
@@ -21,6 +21,7 @@ from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from .signals import create_timeline
 from django.contrib import messages
 from django.contrib.contenttypes.models import ContentType
+from django.template import *
 
 user_login_required = user_passes_test(
     lambda user: user.is_active, login_url='/')
@@ -334,8 +335,8 @@ def create_member(request, slug):
         team_members = []
         project_obj = Project.objects.get(slug=slug, organization=request.user.organization)
         for email_iter, designation_iter in post_tuple:
-            if email_iter!='':
-                email_iter+='@'+request.user.organization.domain
+            if email_iter != '':
+                email_iter += '@' + request.user.organization.domain
             post_dict['email'] = email_iter
             post_dict['designation'] = designation_iter
             create_member_form = CreateMemberForm(post_dict, slug=slug, organization=request.user.organization)
@@ -344,7 +345,8 @@ def create_member(request, slug):
                     random_password = ''.join(
                         random.choice(string.digits) for _ in xrange(8))
                     new_user_obj = User(
-                        email=post_dict['email'], username=post_dict['email'], password=random_password, organization=request.user.organization,
+                        email=post_dict['email'], username=post_dict['email'], password=random_password,
+                        organization=request.user.organization,
                         pietrack_role='user')
                     team_members.append((new_user_obj, post_dict['designation']))
                     json_post_index += 1
@@ -353,13 +355,13 @@ def create_member(request, slug):
                     json_data[json_post_index] = create_member_form.errors
                     json_post_index += 1
             if len(email_list) != len(set(email_list)):
-                    json_data['emails'] = True
+                json_data['emails'] = True
 
         if error_count == 0 and len(email_list) == len(set(email_list)):
-            for user,designation in team_members:
+            for user, designation in team_members:
                 email = user.email
                 subject = ' Invitation to join in the project "' + project_obj.name + '"'
-                message = 'Dear User,\n Please login to your account in http://pietrack.com to know more details.\n'+\
+                message = 'Dear User,\n Please login to your account in http://pietrack.com to know more details.\n' + \
                           request.POST.get('description')
                 from_email = project_obj.organization.slug + "@pietrack.com"
                 if User.objects.filter(email=user.email):
@@ -573,9 +575,10 @@ def requirement_tasks_more(request, slug, milestone_slug, status_slug, requireme
 
 @active_user_required
 def task_details(request, slug, milestone_slug, task_id):
+    project = Project.objects.get(slug=slug)
     task = Ticket.objects.get(id=task_id, milestone__slug=milestone_slug,
                               project__organization=request.user.organization)
-    return render(request, 'task/Task_detail.html', {'task': task, 'slug': slug})
+    return render(request, 'task/Task_detail.html', {'task': task, 'slug': slug, 'project': project})
 
 
 @active_user_required
@@ -601,7 +604,8 @@ def task_comment(request, slug, task_id):
         create_timeline.send(sender=request.user, content_object=comment, namespace=msg, event_type="commented",
                              project=project)
         return HttpResponse(
-            render_to_response('task/partials/comment_add.html', {'comment': comment, 'slug': slug, 'task': task}))
+            render(request, 'task/partials/comment_add.html',
+                               {'comment': comment, 'slug': slug, 'task': task, 'project': project}))
     else:
         return HttpResponse(json.dumps({'error': True, 'errors': form.errors}), content_type="json/application")
 
@@ -611,17 +615,33 @@ def delete_attachment(request, slug, task_id, attachment_id):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     attach = Attachment.objects.get(id=attachment_id, project=project)
     task = Ticket.objects.get(id=task_id)
-
     try:
         shutil.rmtree(
-            os.path.abspath(os.path.join(attach.attached_file.path, os.pardir)))
+                os.path.abspath(os.path.join(attach.attached_file.path, os.pardir)))
         attach.delete()
         msg = " deleted attachment of " + task.name
         create_timeline.send(sender=request.user, content_object=task, namespace=msg, event_type="deleted",
                              project=project)
     except OSError as e:
         pass
+
     return HttpResponse(json.dumps({'result': True}), content_type="json/application")
+
+
+@active_user_required
+def delete_task_comment(request, comment_id):
+    comment = Comment.objects.get(id=comment_id)
+    if comment.commented_by == request.user:
+        task = comment.ticket
+        project = comment.ticket.project
+        for attachment in comment.attachments.all():
+            comment.attachments.remove(attachment)
+            attachment.delete()
+        comment.delete()
+        msg = " deleted comment of " + comment.ticket.name
+        create_timeline.send(sender=request.user, content_object=task, namespace=msg, event_type="deleted", project=project)
+
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
 @active_user_required

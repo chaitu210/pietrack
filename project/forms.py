@@ -9,10 +9,12 @@ from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.utils.translation import ugettext, ugettext_lazy as _
 from .tasks import celery_send_mail
-from piebase.models import Project, Priority, Severity, Organization, User, TicketStatus, Role, Milestone, Requirement, Comment, Timeline
+from piebase.models import Project, Priority, Severity, Organization, User, TicketStatus, Role, Milestone, Requirement, \
+    Comment, Timeline
 from django.template.defaultfilters import slugify
 from django.utils import timezone
 from django.core.exceptions import ValidationError
+
 
 # def CreateTimeline(content_object, event_type, project, user):
 #     Timeline.objects.create(content_object=content_object, event_type=event_type, project=project)
@@ -52,7 +54,6 @@ class CreateProjectForm(forms.ModelForm):
 
 
 class PriorityForm(forms.ModelForm):
-
     class Meta:
         model = Priority
         fields = ['name', 'color']
@@ -66,7 +67,7 @@ class PriorityForm(forms.ModelForm):
         existing_slug = ""
         if self.instance:
             existing_slug = self.instance.slug
-        if(Priority.objects.filter(slug=name_slug, project=self.project) and name_slug != existing_slug):
+        if (Priority.objects.filter(slug=name_slug, project=self.project) and name_slug != existing_slug):
             raise forms.ValidationError(
                 'Priority with this name already exists')
         elif len(name_slug) == 0:
@@ -85,7 +86,6 @@ class PriorityForm(forms.ModelForm):
 
 
 class SeverityForm(forms.ModelForm):
-
     class Meta:
         model = Severity
         fields = ['name', 'color']
@@ -99,7 +99,7 @@ class SeverityForm(forms.ModelForm):
         existing_slug = ""
         if self.instance:
             existing_slug = self.instance.slug
-        if(Severity.objects.filter(slug=name_slug, project=self.project) and name_slug != existing_slug):
+        if (Severity.objects.filter(slug=name_slug, project=self.project) and name_slug != existing_slug):
             raise forms.ValidationError(
                 'Severity with this name already exists')
         elif len(name_slug) == 0:
@@ -118,7 +118,6 @@ class SeverityForm(forms.ModelForm):
 
 
 class TicketStatusForm(forms.ModelForm):
-
     class Meta:
         model = TicketStatus
         fields = ['name', 'color']
@@ -132,7 +131,7 @@ class TicketStatusForm(forms.ModelForm):
         existing_slug = ""
         if self.instance:
             existing_slug = self.instance.slug
-        if(TicketStatus.objects.filter(slug=name_slug, project=self.project) and name_slug != existing_slug):
+        if (TicketStatus.objects.filter(slug=name_slug, project=self.project) and name_slug != existing_slug):
             raise forms.ValidationError(
                 'Ticket Status with this name already exists')
         elif len(name_slug) == 0:
@@ -156,17 +155,18 @@ class CreateMemberForm(forms.Form):
     designation = forms.CharField()
     description = forms.Textarea()
 
-    def __init__(self,*args,**kwargs):
-        self.slug = kwargs.pop('slug',None)
-        self.organization = kwargs.pop('organization',None)
-        super(CreateMemberForm,self).__init__(*args, **kwargs)
+    def __init__(self, *args, **kwargs):
+        self.slug = kwargs.pop('slug', None)
+        self.organization = kwargs.pop('organization', None)
+        super(CreateMemberForm, self).__init__(*args, **kwargs)
 
     def clean_email(self):
         email = self.cleaned_data['email']
-        if Role.objects.filter(users__email=email,project__slug=self.slug,project__organization=self.organization):
+        if Role.objects.filter(users__email=email, project__slug=self.slug, project__organization=self.organization):
             raise ValidationError("This user is assigned to the project.")
         # if()
         return email
+
 
 class PasswordResetForm(forms.Form):
     email = forms.EmailField(label=_("Email"), max_length=254)
@@ -234,7 +234,6 @@ class PasswordResetForm(forms.Form):
 
 
 class RoleForm(forms.ModelForm):
-
     def __init__(self, *args, **kwargs):
         self.project = kwargs.pop('project', None)
         super(RoleForm, self).__init__(*args, **kwargs)
@@ -265,7 +264,6 @@ class RoleForm(forms.ModelForm):
 
 
 class MilestoneForm(forms.ModelForm):
-
     def __init__(self, user, *args, **kwargs):
         self.user = user
         super(MilestoneForm, self).__init__(*args, **kwargs)
@@ -286,14 +284,12 @@ class MilestoneForm(forms.ModelForm):
 
 
 class RequirementForm(forms.ModelForm):
-
     class Meta:
         model = Requirement
         fields = ['name', 'milestone', 'description']
 
 
 class CommentForm(forms.ModelForm):
-
     def __init__(self, *args, **kwargs):
         self.task = kwargs.pop('task', None)
         self.user = kwargs.pop('user', None)

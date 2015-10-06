@@ -63,8 +63,10 @@
           <i class='fa fa-paperclip'></i>
           Attach a file
         </span>
-        <!-- <span  name="file_choosen" > selected file here</span> -->
+      <span class="attachment_file"></span>
+         <!--<span  name="file_choosen" > selected file here</span>-->
         <input name="file" type="file" value="" class="comment_file" style="display:none;" />
+
         <button class='comment_btn' type="submit">Comment</button>
       </div>
     </form>
@@ -82,7 +84,7 @@
         </div>
         <div class="name" id="{{comment.id}}">
           {{comment.commented_by}}
-          <div class="designation">({{ comment.commented_by|get_user_Role:request.user.organization }} )</div>
+          <div class="designation">( {{ comment.commented_by|get_user_Role:project }} )</div>
           <div class="posted_details">{{comment.created|date:"d F,Y \a\t P"}}</div>
         </div>
       </div>
@@ -116,6 +118,12 @@
         {% endfor %}
         <div class="reply_button">
           <button class="reply"><i class='fa fa-reply'></i>Reply</button>
+
+          {% if comment.commented_by == request.user %}
+              <a href="{% url 'project:delete_task_comment' comment.id %}">
+                  <button class="delete">Delete</button>
+              </a>
+          {% endif %}
         </div>
       </div>
     </div>
@@ -134,12 +142,13 @@
               </div>
               <div class="name" id="{{comment.id}}">
                 {{comment.commented_by}}
-                <div class="designation">({{ comment.commented_by|get_user_Role:request.user.organization }} )</div>
+                <div class="designation">( {{ comment.commented_by|get_user_Role:project }} )</div>
                 <div class="posted_details">{{comment.created|date:"d F,Y \a\t P"}}</div>
               </div>
             </div>
             <div class="comment_text">
               {{comment.comment}}
+
               {% for attachment in comment.attachments.all %}
                   <div class="attachments_wrap">
                     <div class="attachment_each">
@@ -161,9 +170,15 @@
                     </div>
                   </div>
               {% endfor %}
-              <div class="reply_button">
-                <button class="reply"><i class='fa fa-reply'></i>Reply</button>
-              </div>
+                <div class="reply_button">
+                  <button class="reply"><i class='fa fa-reply'></i>Reply</button>
+
+                  {% if comment.commented_by == request.user %}
+                      <a href="{% url 'project:delete_task_comment' comment.id %}">
+                          <button class="delete">Delete</button>
+                      </a>
+                  {% endif %}
+                </div>
             </div>
           </div>
         </div>
@@ -191,8 +206,8 @@
     <img src="{% static 'img/user-pic.jpg' %}">
     {% endif%}
     <span class='description'>
-    <span class='name'>{{team_member.username}}</span>
-    <span class='designation_time'>{{team_member|get_user_Role:request.user.organization}}</span>
+    <span class='name'>{{team_member.username}}</span>{% if team_member.pietrack_role == 'admin' %} (<i class="fa fa-user"></i> admin){% endif %}
+    <span class='designation_time'>{{team_member|get_user_Role:project}}</span>
     </span>
     </span>
     {% endfor %}
@@ -203,6 +218,8 @@
 {%endblock%}
 {% block extra_js %}
 <script type="text/javascript">
+
+
   $('form#comment_form').submit(function(e) {
       var formData = new FormData($(this)[0]);
       var form = this
@@ -220,14 +237,17 @@
                   $(form).find('textarea').val("")
                   $(form).find('input[name="file"]').val("")
                   $('.your_comment').parent().after(response)
+
+                  console.log($('.attachment_file').text());
+                  $('.attachment_file').text(' ');
               }
+
           }
       });
       e.preventDefault()
   });
   
-  $('body').on('click', ".reply_button button", function(e) {
-  
+  $('body').on('click', ".reply_button button.reply", function(e) {
       if ($(this).parent().parent().parent().next().find('form').length == 0) {
           var form_data = $('form#comment_form').html()
           var form = '<form method="post" action="." enctype="multipart/form-data" class="comment_reply">' + form_data + '</form>'
@@ -236,6 +256,11 @@
           html.attr('id', 'reply_to_parent')
           $(html).find('span[name="error"]').text("")
           $(this).parent().parent().parent().after(html)
+          html.find('.attachment_file').text(' ');
+          $('.comment_file').on("change", function(){
+                var file_name = $(this).val();
+                $(this).prev('.attachment_file').append(" <i class='fa fa-photo'></i> "+file_name.substring(file_name.lastIndexOf('\\')+1));
+            });
       }
   });
   
@@ -246,7 +271,7 @@
   
   $('body').on('submit', 'form.comment_reply', function(e) {
       var id = $(this).parent().prev().find('div.name').attr('id');
-      var form = this
+      var form = this;
       var formData = new FormData($(this)[0]);
       $.ajax({
           url: "/project/{{slug}}/task/{{task.id}}/comment/?parent_id=" + id,
@@ -275,8 +300,8 @@
   });
   
   $('body').on('click', '.delete_link a', function(e) {
-      url = $(this).attr('href')
-      parent = this
+      url = $(this).attr('href');
+      parent = this;
       $.get(url, function(response) {
           if (response) {
               $(parent).closest('.attachment_each').remove();
@@ -284,5 +309,11 @@
       });
       e.preventDefault()
   });
+
+/* for displaying the input element file */
+    $('.comment_file').on("change", function(){
+        var file_name = $(this).val();
+        $('.attachment_file').append("<i class='fa fa-photo'></i> "+file_name.substring(file_name.lastIndexOf('\\')+1));
+    });
 </script>
 {% endblock %}

@@ -37,6 +37,8 @@ def rand_str(number):
 def url(self, filename):
     if self.__class__ == "Project":
         return "%s/%s/%s/%s" % (self.organization.slug, self.slug, rand_str(6), filename)
+    elif self.__class__.__name__ == 'Attachment':
+        return "%s/%s/%s" % (self.project.organization.slug, rand_str(6), filename)
     return "%s/%s/%s/%s" % (self.organization.slug, self.project.slug, rand_str(6), filename)
 
 
@@ -319,9 +321,9 @@ class Comment(models.Model):
     def __str__(self):
         return self.comment
 
-    def delete(self, *args, **kwargs):
-        super(Comment, self).delete(*args, **kwargs)
-        self.attachments.all().delete()
+    # def delete(self, *args, **kwargs):
+    #     super(Comment, self).delete(*args, **kwargs)
+    #     self.attachments.all().delete()
 
 
 class Timeline(models.Model):
