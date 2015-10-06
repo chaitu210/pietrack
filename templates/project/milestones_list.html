@@ -95,8 +95,8 @@
                     <img src="{% static 'img/user-pic.jpg' %}">
                 {% endif%}
                 <span class='description'>
-                    <span class='name'>{{team_member.username}}</span>
-                    <span class='designation_time'>{% if team_member|get_user_Role:request.user.organization == 'admin' %}<span class="fa fa-user-secret"></span>{% endif %} {{team_member|get_user_Role:request.user.organization}}</span>
+                    <span class='name'>{{team_member.username}}</span>{% if team_member.pietrack_role == 'admin' %} (<i class="fa fa-user"></i> admin){% endif %}
+                    <span class='designation_time'>{{team_member|get_user_Role:project}}</span>
                 </span>
             </span>
             {% endfor %}

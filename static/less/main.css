@@ -2939,8 +2939,13 @@ header .text .tag {
 }
 .comments_wrap_div .comment_each .comment_text .reply_button {
   padding: 10px 0px;
+  /* edited this button name to class reply */
+  /* -- //  -- */
+  /* added this class delete for display the button to delete the comment */
+  /* -- // -- */
 }
-.comments_wrap_div .comment_each .comment_text .reply_button button {
+.comments_wrap_div .comment_each .comment_text .reply_button .reply {
+  float: left;
   padding: 3px 10px;
   font-size: 11px;
   font-weight: 600;
@@ -2951,11 +2956,29 @@ header .text .tag {
   border-radius: 2px;
   text-transform: uppercase;
 }
-.comments_wrap_div .comment_each .comment_text .reply_button button i {
+.comments_wrap_div .comment_each .comment_text .reply_button .reply i {
+  padding-right: 8px;
+}
+.comments_wrap_div .comment_each .comment_text .reply_button .delete {
+  margin-left: 10px;
+  float: left;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+  box-shadow: none;
+  border: 1px solid #00a88e;
+  background: #00c1a4;
+  border-radius: 2px;
+  text-transform: uppercase;
+}
+.comments_wrap_div .comment_each .comment_text .reply_button .delete i {
   padding-right: 8px;
 }
 .comments_wrap_div .your_comment {
   padding: 20px 0px 35px 0px;
+  /* for attachment file display */
+  /* --// -- */
 }
 .comments_wrap_div .your_comment textarea {
   width: 100%;
@@ -2975,6 +2998,12 @@ header .text .tag {
 }
 .comments_wrap_div .your_comment .attachment i {
   padding-right: 5px;
+}
+.comments_wrap_div .your_comment .attachment_file {
+  margin-left: 10px;
+  display: inline-block;
+  color: #262626;
+  font-size: 12px;
 }
 .comments_wrap_div .your_comment .comment_btn {
   float: right;

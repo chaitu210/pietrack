@@ -42,7 +42,7 @@
                   <span class='description'>
                     <span class='name'>{{event.user.username}}</span>
                     {{event.namespace}}
-                    <!-- <span class='project_name'>#xyz test</span> --> in <span class='project_name'>{{event.project}}</span>
+                    <!-- <span class='project_name'>#xyz test</span> --> in <span class='project_name'>{{event.project.name}}</span>
                     <span class='designation_time'>
                         {{event.created|timesince}} &nbsp;
                         {% ifequal event.created|timesince '0 minutes'  %}
@@ -80,8 +80,8 @@
                 <img src="{%if team_member.profile_pic %}{{ team_member.profile_pic.url }}{% else %}{% static 'img/user-pic.jpg' %}{% endif%}">
 
                 <span class='description'>
-                    <span class='name'>{{team_member.username}}</span>{% if team_member.pietrack_role == 'admin' and team_member.organization == request.user.organization %} (<i class="fa fa-user"></i> admin){% endif %}
-                    <span class='designation_time'>{{team_member|get_user_Role:request.user.organization}}</span>
+                    <span class='name'>{{team_member.username}}</span>{% if team_member.pietrack_role == 'admin' %} (<i class="fa fa-user"></i> admin){% endif %}
+                    <span class='designation_time'>{{team_member|get_user_Role:project_object}}</span>
                 </span>
             </span>
             {% endfor %}

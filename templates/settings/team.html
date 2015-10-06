@@ -36,6 +36,7 @@
                             <thead>
                                 <tr>
                                     <th>Member</th>
+                                    <th>Admin</th>
                                     <th>Role</th>
                                     <th>Status</th>
                                     <th>Action</th>
@@ -60,7 +61,17 @@
                                         </div>
                                     </th>
                                     <td>
-                                        <p>{{ member|get_user_Role:request.user.organization|title }}</p>
+                                        <p>
+                                            {% if member.pietrack_role == 'admin' %}
+                                            Yes
+                                            {% else %}
+                                            No
+                                            {% endif %}
+
+                                        </p>
+                                    </td>
+                                    <td>
+                                        <p>{{ member|get_user_Role:project|title }}</p>
                                     </td>
                                     <td>
                                         <span class="active-1 status">

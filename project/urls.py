@@ -52,6 +52,13 @@ urlpatterns = [
     url(r'^(?P<slug>[-\w]+)/settings/member_role/(?P<member_role_slug>([a-zA-Z0-9-]+))/delete/$',
         member_role_delete, name='member_role_delete'),
 
+
+    # comments
+    url(r'^comment/delete/(?P<comment_id>[0-9]+)/$',
+        delete_task_comment, name="delete_task_comment"),
+    url(r'^(?P<slug>[-\w]+)/task/(?P<task_id>[0-9]+)/comment/$', task_comment, name="task_comment"),
+
+
     # taskboard
     url(r'^(?P<slug>[-\w]+)/tickets/$', tickets, name="tickets"),
     url(r'^(?P<slug>[-\w]+)/(?P<milestone_slug>[-\w]+)/taskboard/$', taskboard, name="taskboard"),
@@ -64,9 +71,6 @@ urlpatterns = [
     url(r'^(?P<slug>[-\w]+)/(?P<milestone_slug>[-\w]+)/(?P<status_slug>[-\w]+)/(?P<requirement_id>[0-9]+)/load_tasks/$',
         requirement_tasks_more, name="requirement_tasks_more"),
     url(r'^(?P<slug>[-\w]+)/(?P<milestone_slug>[-\w]+)/task/(?P<task_id>[0-9]+)/$', task_details, name="task_details"),
-
-    # comments
-    url(r'^(?P<slug>[-\w]+)/task/(?P<task_id>[0-9]+)/comment/$', task_comment, name="task_comment"),
 
     # attachment
     url(r'^(?P<slug>[-\w]+)/task/(?P<task_id>[0-9]+)/attachment/delete/(?P<attachment_id>[0-9]+)/$',

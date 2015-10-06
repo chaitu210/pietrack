@@ -11,7 +11,7 @@
     </div>
     <div class="name" id="{{comment.id}}">
       {{comment.commented_by}}
-      <div class="designation">({{ comment.commented_by|get_user_Role }} )</div>
+      <div class="designation">( {{ comment.commented_by|get_user_Role:project }} )</div>
       <div class="posted_details">{{comment.created|date:"d F,Y \a\t P"}}</div>
     </div>
   </div>
@@ -42,8 +42,13 @@
         </div>
       </div>
     {% endfor %}
-    <div class="reply_button">
-      <button class="reply"><i class='fa fa-reply'></i>Reply</button>
-    </div>
+        <div class="reply_button">
+          <button class="reply"><i class='fa fa-reply'></i>Reply</button>
+          {% if comment.commented_by == request.user %}
+          <a href="{% url 'project:delete_task_comment' comment.id %}">
+              <button class="delete">Delete</button>
+          </a>
+          {% endif %}
+        </div>
   </div>
 </div>

@@ -2106,7 +2106,27 @@ header{
 			}
 			.reply_button{
 				padding: 10px 0px;
-				button{
+			  /* edited this button name to class reply */
+				.reply {
+				  float: left;
+				  padding: 3px 10px;
+				  font-size: 11px;
+				  font-weight: 600;
+				  color: #fff;
+				  box-shadow: none;
+				  border: 1px solid darken(@green, 5%);
+				  background: @green;
+				  border-radius: 2px;
+				  text-transform: uppercase;
+				  i {
+					padding-right: 8px;
+				  }
+				}
+			  /* -- //  -- */
+			  /* added this class delete for display the button to delete the comment */
+				.delete {
+				  	margin-left: 10px;
+				  	float: left;
 					padding: 3px 10px;
 					font-size: 11px;
 					font-weight: 600;
@@ -2120,6 +2140,7 @@ header{
 						padding-right: 8px;
 					}
 				}
+			  /* -- // -- */
 			}
 		}
 
@@ -2145,6 +2166,14 @@ header{
 				padding-right: 5px;
 			}
 		}
+		/* for attachment file display */
+	  	.attachment_file {
+		  	margin-left: 10px;
+			display: inline-block;
+		  	color: #262626;
+		  	font-size: 12px;
+		}
+	  	/* --// -- */
 		.comment_btn{
 			float: right;
 			background: @green;
