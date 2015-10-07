@@ -13,10 +13,12 @@ class TaskForm(forms.ModelForm):
     class Meta:
         model = Ticket
         fields = ['name', 'requirement', 'status', 'finished_date',
-                  'assigned_to', 'description', 'project', 'ticket_type']
+                  'assigned_to', 'description', 'ticket_type']
 
     def save(self, commit=True):
         task = super(TaskForm, self).save(commit=False)
+        if self.instance:
+            task = self.instance
         task.slug = slugify(self.cleaned_data.get('name'))
         task.requirement = self.cleaned_data.get('requirement')
         task.milestone = self.cleaned_data.get('requirement').milestone

@@ -1,21 +1,26 @@
 {% load project_tags %}
 {% for task in tasks %}
-  <a href="{% url 'project:task_details' slug milestone.slug task.id %}">
     <li id="{{task.id}}">
-        <span class="task_wrap">
-            <span class='heading'>
-               {{ task.name }}
+        <a href="{% url 'project:task_details' slug milestone.slug task.id %}">
+            <span class="task_wrap">
+
+                <span class='heading'>
+                    <span>{{ task.name }}</span>
+                </span>
+                <span class='desc'>
+                    {{ task.description }}<span>&nbsp;</span>
+                </span>
+                <span class='count'>
+                    {{task|count_comments}}
+                </span>
             </span>
-            <span class='desc'>
-               {{ task.description }}
-            </span>
-            <span class='count'>
-            {{task|count_comments}}
-            </span>
+        </a>
+        <span class="actions_div">
+                    <a href="{% url 'project:task_edit' slug milestone.slug task.id %}" ><i class="fa fa-pencil"></i></a>
+                    <a href="{% url 'project:task_delete' slug milestone.slug task.id %}" onclick="return false;" class="task_delete"><i class="fa fa-trash"></i></a>
         </span>
     </li>
-  </a>
 {% endfor %}
 {% if tasks.has_next %}
-  <input type="hidden" name="page_num" value="{{tasks.next_page_number}}">
+  <input type="hidden" name="page_num" value="{{ tasks.next_page_number }}">
 {% endif %}

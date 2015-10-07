@@ -14,7 +14,7 @@
             </div>
         {% endif %}
         <div class="title">
-            <h4>Add Task</h4>
+            <h4>{% if task %}Edit {% else %}Add{% endif %} Task</h4>
             <div class="tag">
 a task is an activity that needs to be accomplished within a defined period of time or by a deadline to work towards work-related goals            </div>
         </div>
@@ -22,14 +22,14 @@ a task is an activity that needs to be accomplished within a defined period of t
             <form id='task_form'>
                 <div class="form_group">
                     <label>Title</label>
-                    <input id='task_name' name='name' type="text" class='input'>
-                    <span id='task_name_error'></span>
+                    <input id='task_name' name='name' type="text" class='input' value="{% if task %}{{ task.name }}{% endif %}">
+                    <span id='task_name_error' class='task_err'></span>
                 </div>
                 <div class="form_group">
                     <label>Requirement</label>
                     <select name='requirement' class='input'>
                         {% for requirement_iter in requirement_list %}
-                          <option value='{{ requirement_iter.id }}'>{{ requirement_iter.name }}</option>
+                          <option value='{{ requirement_iter.id }}' {% if task %}{% if requirement_iter.id == task.requirement.id %} selected{% endif %}{% endif %}>{{ requirement_iter.name }}</option>
                         {% endfor %}
                     </select>
                     <span id='task_requirement_error'></span>
@@ -45,8 +45,8 @@ a task is an activity that needs to be accomplished within a defined period of t
                 </div>
                 <div class="form_group">
                     <label>Finished Date</label>
-                    <input id='task_finished_date' name='estimated_finish' type="text" class='input'>
-                    <span id='task_finished_date_error'></span>
+                    <input id='task_finished_date' name='finished_date' type="text" class='input' value="{{ task.finished_date|date:"Y-m-d" }}">
+                    <span id='task_finished_date_error' class='task_err'></span>
                 </div>
                 <div class="form_group">
                     <label>Assign to</label>
@@ -106,6 +106,7 @@ display_datepicker()
 $('#task_save').click(function(event) {
     event.preventDefault()
     $.post('', $('#task_form').serialize(), function(data) {
+        $('.task_err').text('')
         if (data['error'] === true) {
             for (var key in data['form_errors']) {
                 $('#task_' + key + '_error').text('').append(data['form_errors'][key])
