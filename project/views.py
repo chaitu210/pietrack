@@ -22,7 +22,7 @@ from .signals import create_timeline
 from django.contrib import messages
 from django.contrib.contenttypes.models import ContentType
 from django.template import *
-
+from task.forms import TaskForm
 user_login_required = user_passes_test(
     lambda user: user.is_active, login_url='/')
 
@@ -539,7 +539,7 @@ def taskboard(request, slug, milestone_slug):
 @active_user_required
 def update_taskboard_status(request, slug, status_slug, task_id):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
-    task = Ticket.objects.get(id=task_id)
+    task = Ticket.objects.get(id=task_id,project=project)
     old_status = task.status.name
     ticket_status = TicketStatus.objects.get(
         slug=status_slug, project=project)
@@ -632,6 +632,49 @@ def task_comment(request, slug, task_id):
     else:
         return HttpResponse(json.dumps({'error': True, 'errors': form.errors}), content_type="json/application")
 
+@active_user_required
+def task_edit(request, slug, milestone_slug, task_id):
+    project_obj = Project.objects.get(slug=slug, organization=request.user.organization)
+    task = Ticket.objects.get(id=task_id, project = project_obj, milestone__slug=milestone_slug)
+    old_name = task.name
+    if request.POST:
+        form = TaskForm(request.POST, user=request.user, project=task.project, instance=task)
+        json_data = {}
+        if form.is_valid():
+            json_data['error'] = False
+            new_task = form.save()
+            msg = "updated task " + task.name + " details "
+            if old_name != new_task.name:
+                msg = "renamed task " + old_name + " to "+new_task.name +" "
+            create_timeline.send(sender=request.user, content_object=new_task, namespace=msg, event_type="task renamed",
+                             project=project_obj)
+        else:
+            json_data['error'] = True
+            json_data['form_errors'] = form.errors
+        return HttpResponse(json.dumps(json_data), content_type='application/json')
+    else:
+        requirement_list = project_obj.requirements.filter(milestone__slug=milestone_slug)
+        ticket_status_list = TicketStatus.objects.filter(project=project_obj).order_by('id')
+        assigned_to_list = []
+        for member in project_obj.members.all():
+            try:
+                Role.objects.get(users__email=member.email, project=project_obj)
+                assigned_to_list.append(member)
+            except:
+                pass
+        return render(request, 'task/add_task.html',{'requirement_list': requirement_list,
+                        'ticket_status_list': ticket_status_list,'assigned_to_list': assigned_to_list,'slug':slug,
+                        'task':task, 'milestone':task.milestone}
+                      )
+@active_user_required
+def task_delete(request, slug, milestone_slug, task_id):
+    marker=False
+    try:
+        Ticket.objects.get(id=task_id, project__slug=slug, project__organization=request.user.organization, milestone__slug=milestone_slug).delete()
+        marker = True
+    finally:
+        pass
+    return HttpResponse(marker)
 
 @active_user_required
 def delete_attachment(request, slug, task_id, attachment_id):
