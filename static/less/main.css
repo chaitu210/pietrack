@@ -2661,6 +2661,36 @@ header .text .tag {
   list-style: none;
   padding: 0px;
   margin: 0px;
+  position: relative;
+}
+.lists_div .task_category_wrap ul li:hover {
+  transition: 0.4s;
+}
+.lists_div .task_category_wrap ul li:hover .actions_div {
+  display: block;
+  transition: 0.4s;
+}
+.lists_div .task_category_wrap ul li a {
+  display: block;
+}
+.lists_div .task_category_wrap ul li .actions_div {
+  display: none;
+  transition: 0.4s;
+  float: right;
+  position: absolute;
+  right: 0px;
+  top: 0px;
+}
+.lists_div .task_category_wrap ul li .actions_div a {
+  transition: 0.4s;
+  display: inline-block !important;
+  color: #fff;
+}
+.lists_div .task_category_wrap ul li .actions_div a i {
+  transition: 0.4s;
+  padding: 5px;
+  background: #fea683;
+  font-size: 10px;
 }
 .lists_div .task_category_wrap ul li .task_wrap {
   /*width: 98%;*/
