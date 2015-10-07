@@ -19,6 +19,7 @@ class TaskForm(forms.ModelForm):
         task = super(TaskForm, self).save(commit=False)
         if self.instance:
             task = self.instance
+        task.project = self.project
         task.slug = slugify(self.cleaned_data.get('name'))
         task.requirement = self.cleaned_data.get('requirement')
         task.milestone = self.cleaned_data.get('requirement').milestone

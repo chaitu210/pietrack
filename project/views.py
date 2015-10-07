@@ -643,7 +643,7 @@ def task_edit(request, slug, milestone_slug, task_id):
         if form.is_valid():
             json_data['error'] = False
             new_task = form.save()
-            msg = "updated task " + task + " details "
+            msg = "updated task " + task.name + " details "
             if old_name != new_task.name:
                 msg = "renamed task " + old_name + " to "+new_task.name +" "
             create_timeline.send(sender=request.user, content_object=new_task, namespace=msg, event_type="task renamed",
