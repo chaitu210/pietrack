@@ -133,7 +133,7 @@
             $(clone).find('span').text("")
             document.getElementById('id_form_append').appendChild(clone);
             $('#id_i_fa_add').on('click', duplicate);
-            $('.fa.fa-trash').on('click', duplicate_trash)
+            $('.fa.fa-trash').on('click', duplicate_trash);
         });
     });
 
@@ -155,7 +155,8 @@
         $("#id_div_append").find("span").each(function() {
             id_span_array.push(this.id);
         });
-        event.preventDefault()
+        event.preventDefault();
+
         var description = $('#id_textarea_description').val()
         $.post('', $('#id_form_append').serialize() + '&' + $.param({
             'description': description

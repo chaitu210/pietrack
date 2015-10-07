@@ -166,6 +166,7 @@ class Role(models.Model):
         Project, null=True, blank=False, related_name="roles", verbose_name=_("project"))
     users = models.ManyToManyField(
         settings.AUTH_USER_MODEL, related_name="user_roles")
+    is_project_admin = models.BooleanField(default=False)
 
     class Meta:
         unique_together = [("slug", "project")]

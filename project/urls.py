@@ -46,18 +46,17 @@ urlpatterns = [
 
     # member roles
     url(r'^(?P<slug>[-\w]+)/settings/member_roles/$', member_roles, name='member_roles'),
+    url(r'^(?P<slug>[-\w]+)/settings/member_roles/default/$', member_roles_default, name='member_roles_default'),
     url(r'^(?P<slug>[-\w]+)/settings/member_role/create/$', member_role_create, name='member_role_create'),
     url(r'^(?P<slug>[-\w]+)/settings/member_role/(?P<member_role_slug>([a-zA-Z0-9-]+))/edit/$',
         member_role_edit, name='member_role_edit'),
     url(r'^(?P<slug>[-\w]+)/settings/member_role/(?P<member_role_slug>([a-zA-Z0-9-]+))/delete/$',
         member_role_delete, name='member_role_delete'),
 
-
     # comments
     url(r'^comment/delete/(?P<comment_id>[0-9]+)/$',
         delete_task_comment, name="delete_task_comment"),
     url(r'^(?P<slug>[-\w]+)/task/(?P<task_id>[0-9]+)/comment/$', task_comment, name="task_comment"),
-
 
     # taskboard
     url(r'^(?P<slug>[-\w]+)/tickets/$', tickets, name="tickets"),
