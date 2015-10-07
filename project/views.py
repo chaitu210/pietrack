@@ -662,7 +662,6 @@ def task_edit(request, slug, milestone_slug, task_id):
                 assigned_to_list.append(member)
             except:
                 pass
-        print assigned_to_list
         return render(request, 'task/add_task.html',{'requirement_list': requirement_list,
                         'ticket_status_list': ticket_status_list,'assigned_to_list': assigned_to_list,'slug':slug,
                         'task':task, 'milestone':task.milestone}
