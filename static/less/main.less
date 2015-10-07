@@ -1854,6 +1854,37 @@ header{
 				list-style: none;
 				padding: 0px;
 				margin: 0px;
+			  	position:relative;
+
+			  &:hover{
+				transition: 0.4s;
+				.actions_div{
+				  display:block;
+				  transition: 0.4s;
+				}
+			  }
+			  a{
+				display:block;
+			  }
+			   .actions_div{
+				 		display:none;
+						 transition: 0.4s;
+						float:right;
+				 		 position:absolute;
+						 right:0px;
+				         top:0px;
+						a{
+						  transition: 0.4s;
+						  display:inline-block!important;
+						  color:#fff;
+						  i{
+							transition: 0.4s;
+							padding:5px;
+							background:lighten(@orange,15%);
+							font-size:10px;
+						  }
+						}
+					  }
 				.task_wrap{
 					/*width: 98%;*/
 					display: block;
@@ -1866,6 +1897,7 @@ header{
 						color: @heading_color;
 						font-weight: 600;
 						display: block;
+
 					}
 					.desc{
 						display: block;

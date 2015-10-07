@@ -226,7 +226,7 @@ class TicketStatus(models.Model):
     project = models.ForeignKey(
         Project, related_name="task_statuses", verbose_name=_("project"))
     order = models.IntegerField(default=1, blank=True)
-
+    # is_final = models.BooleanField(default=False)
     class Meta:
         unique_together = (("project", "name"), ("project", "slug"))
 
@@ -285,7 +285,7 @@ class Ticket(models.Model):
     modified_date = models.DateTimeField(
         verbose_name=_("modified date"), auto_now_add=True)
     finished_date = models.DateTimeField(
-        null=True, blank=True, verbose_name=_("finished date"))
+        verbose_name=_("finished date"))
     order = models.IntegerField(default=1)
     description = models.TextField(
         null=False, blank=True, verbose_name=_("description"))
