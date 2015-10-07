@@ -17,7 +17,7 @@
                 </div>
                 <div class="form_group">
                     <label>Description</label>
-                    <textarea name='description' class='textarea'></textarea>
+                    <textarea id="description" name='description' class='textarea'></textarea>
                     <span name="pdescription_error" id="description" class="error"></span>
                     <!--Error here -->
                 </div>
@@ -36,7 +36,12 @@
 {% endblock content %}
 {% block extra_js %}
     <script type="text/javascript">
+		CKEDITOR.replace('description');
+	</script>
+    <script type="text/javascript">
+
     $('#id_form_cproject').on('submit', function(e) {
+      $('#description').val(CKEDITOR.instances.description.getData());
       var form = this
       var formData = new FormData($(this)[0]);
       $.ajax({
@@ -50,7 +55,7 @@
               if (response['error']) {
                 $(".error").text("");
                 for (key in response['errors']) {
-                    $("#" + key).text(' * '+response['errors'][key]);
+                    $(".error#" + key).text(' * '+response['errors'][key]);
                 }
                 if(response['logo'])
                 {
@@ -63,6 +68,7 @@
           }
       });
         e.preventDefault();
+
     });
     </script>
 {% endblock %}

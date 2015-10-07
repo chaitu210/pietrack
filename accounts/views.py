@@ -16,6 +16,9 @@ from pietrack.settings import EMAIL_HOST_USER
 # for messages in views and templates
 from django.contrib import messages
 
+# for removing non-empty directory
+import shutil
+
 # for authentication and login required
 from django.contrib.auth.decorators import user_passes_test, login_required
 
@@ -161,6 +164,7 @@ def user_profile(request):
         form = EditUserModelForm(request.POST, request.FILES, instance=user)
 
         if form.is_valid():
+            print request.POST
             if not request.POST.get('organization'):
                 response_data = {'error': True, "response": {"organization": 'Please provide organization name'}}
                 return HttpResponse(json.dumps(response_data))
@@ -173,8 +177,7 @@ def user_profile(request):
 
                 user.profile_pic = request.FILES['profile_pic']
                 try:
-                    os.remove(settings.MEDIA_ROOT + 'profile/' +
-                              user.username + '/' + user.username + '.jpg')
+                    shutil.rmtree(settings.MEDIA_ROOT + 'profile/' +user.username)
                 except:
                     pass
 

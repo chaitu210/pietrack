@@ -35,9 +35,9 @@ def active_user_required(view_func):
 
 @active_user_required
 def create_project(request):
-    if (request.method == "POST"):
+    if request.method == "POST":
         img = False
-        if (request.FILES.get('logo', False)):
+        if request.FILES.get('logo', False):
             img = True
             try:
                 Image.open(request.FILES.get('logo'))
@@ -49,11 +49,14 @@ def create_project(request):
             request.POST, organization=organization, user=request.user)
         if form.is_valid() and not img:
             slug = slugify(request.POST['name'])
-            project_obj = form.save()
-            if (request.FILES.get('logo', False)):
+
+            project_obj = form.save(commit=False)
+            if request.FILES.get('logo', False):
                 project_obj.logo = request.FILES.get('logo')
-            project_obj.members.add(request.user)
+
+            project_obj.created_by = request.user
             project_obj.save()
+            project_obj.members.add(request.user)
             json_data = {'error': False, 'errors': form.errors, 'slug': slug}
             messages.success(request, 'Successfully created your project - ' + str(request.POST['name']) + ' !')
             return HttpResponse(json.dumps(json_data), content_type="application/json")
@@ -353,6 +356,7 @@ def create_member(request, slug):
                 email_iter += '@' + request.user.organization.domain
             post_dict['email'] = email_iter
             post_dict['designation'] = designation_iter
+
             create_member_form = CreateMemberForm(post_dict, slug=slug, organization=request.user.organization)
             if len(email_list) == len(set(email_list)) or email_list.count('') > 0:
                 if create_member_form.is_valid():
@@ -417,7 +421,7 @@ def edit_member(request, slug):
         new_role = Role.objects.get(slug=role_slug, project=project)
         new_role.users.add(member)
         if (role != new_role):
-            msg = " changed role of " + member.username + "'s  from "+old_role+" to " + str(new_role)
+            msg = " changed role of " + member.username + "'s  from " + old_role + " to " + str(new_role)
             create_timeline.send(sender=request.user, content_object=member, namespace=msg,
                                  event_type="member edited", project=project)
         return HttpResponse(True)
@@ -442,12 +446,12 @@ def delete_member(request, slug):
             pass
         try:
             role = Role.objects.get(project=project, users__email=member.email)
-            Timeline.objects.filter(user=member,project=project).delete()
+            Timeline.objects.filter(user=member, project=project).delete()
             role.users.remove(member)
             result = True
             msg = "removed " + member.email + " from the project "
             create_timeline.send(sender=request.user, content_object=member, namespace=msg,
-                             event_type="member removed", project=project)
+                                 event_type="member removed", project=project)
         except Exception as e:
             pass
     return HttpResponse(json.dumps({'result': result}), content_type="application/json")
@@ -459,6 +463,17 @@ def member_roles(request, slug):
     list_of_roles = Role.objects.filter(project=project)
     dictionary = {'list_of_roles': list_of_roles, 'slug': slug}
     return render(request, 'settings/member_roles.html', dictionary)
+
+
+@active_user_required
+def member_roles_default(request, slug):
+    project = Project.objects.get(slug=slug, organization=request.user.organization)
+    Role.objects.bulk_create([Role(name='UX Developer', slug=slugify('UX Developer'), project=project),
+                              Role(name='Web Designer', slug=slugify('Web Designer'), project=project),
+                              Role(name='Front-end Developer', slug=slugify('Front-end Developer'), project=project),
+                              Role(name='Back-end Developer', slug=slugify('Back-end Developer'), project=project)])
+    messages.success(request, 'Default user roles are added to the User roles page !')
+    return HttpResponse(json.dumps({'error': False}), content_type="application/json")
 
 
 @active_user_required
@@ -499,7 +514,7 @@ def member_role_delete(request, slug, member_role_slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     role = Role.objects.get(slug=member_role_slug, project=project)
     for member in role.users.all():
-        Timeline.objects.filter(user=member,project=project).delete()
+        Timeline.objects.filter(user=member, project=project).delete()
     project.members.remove(*role.users.all())
     role.delete()
     msg = "removed role " + role.name + " from this project "
@@ -628,7 +643,7 @@ def task_comment(request, slug, task_id):
                              project=project)
         return HttpResponse(
             render(request, 'task/partials/comment_add.html',
-                               {'comment': comment, 'slug': slug, 'task': task, 'project': project}))
+                   {'comment': comment, 'slug': slug, 'task': task, 'project': project}))
     else:
         return HttpResponse(json.dumps({'error': True, 'errors': form.errors}), content_type="json/application")
 
@@ -683,7 +698,7 @@ def delete_attachment(request, slug, task_id, attachment_id):
     task = Ticket.objects.get(id=task_id)
     try:
         shutil.rmtree(
-                os.path.abspath(os.path.join(attach.attached_file.path, os.pardir)))
+            os.path.abspath(os.path.join(attach.attached_file.path, os.pardir)))
         attach.delete()
         msg = " deleted attachment of " + task.name
         create_timeline.send(sender=request.user, content_object=task, namespace=msg, event_type="deleted",
@@ -705,7 +720,8 @@ def delete_task_comment(request, comment_id):
             attachment.delete()
         comment.delete()
         msg = " deleted comment of " + comment.ticket.name
-        create_timeline.send(sender=request.user, content_object=task, namespace=msg, event_type="deleted", project=project)
+        create_timeline.send(sender=request.user, content_object=task, namespace=msg, event_type="deleted",
+                             project=project)
 
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
@@ -880,3 +896,4 @@ def requirement_delete(request, slug, milestone_slug, requirement_slug):
         Timeline.objects.filter(content_type__pk=content_type.id, object_id=timeline.id).delete()
     # requirement_object.delete()
     return HttpResponseRedirect(reverse('project:taskboard', kwargs={'milestone_slug': milestone_slug, 'slug': slug}))
+

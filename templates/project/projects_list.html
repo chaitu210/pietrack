@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load paginate %}
+{% load staticfiles %}
 
 {% block content %}
   <section id='base_content'>
@@ -11,9 +12,11 @@
                 </span>
                 <div class="left">my projects</div>
                 <div class="right">
+                    {% if request.user.pietrack_role == 'admin' %}
                     <a href="{% url 'project:create_project' %}">
                         <button> create Project</button>
                     </a>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -29,17 +32,17 @@
                                 {% if project.logo %}
                                     <img src='{{project.logo.url}}' width="50%" height="50%">
                                 {% else %}
-                                    <img src='http://www.livecollision.com/wp-content/uploads/Project-logo.jpg'>
+                                    <img src="{% static 'img/Project-logo.jpg' %}">
                                 {% endif %}
                                 </td>
                                 <td>
-                                    <h2>{{project.name}}</h2>
-                                    <p>{{project.description|truncatewords:5}}</p>
+                                    <h2>{{ project.name }}</h2>
+                                    <p>{{ project.description|truncatewords:30|safe }}</p>
                                     <p align="right">Continue reading ...</p>
                                 </td>
                                 <td width="15%">
                                     <p>{{project.created_date}}</p>
-                                    <p>Author: <span class="badge"> {{request.user.username}} </span></p>
+                                    <p>Author: <span class="badge"> {{project.created_by.username}} </span></p>
                                 </td>
                             </tr>
                         {% endfor %}
