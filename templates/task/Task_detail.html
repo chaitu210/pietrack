@@ -3,158 +3,116 @@
 {% load static %}
 {% block content %}
 <section id='base_content'>
-<div class="project_description">
-<!-- about project -->
-<div class="col-md-9 about_project_wrap">
-  <div class="title">
-    <span>{{task.name}}</span>
-  </div>
-  <div class="profile-pic-count">
-    <div class="col-md-12 content">
-      <div class="profile-content">
-        <div class="task_details">
-          <b>Created By : </b>
-          {{task.created_by.username}} ,
-          <em> {{task.created_date|date:"d F,Y \a\t P"}}</em>
-        </div>
-        <span class="desc">
-        {{task.description}}
-        </span>
-        <div class="attachments_wrap">
-          {% for attachment in task.attachments.all %}
-          <div class="attachment_each">
-            <i class='fa fa-paperclip'></i>
-            {{attachment.attached_file}}
-            <a href="{{attachment.attached_file.url}}" target="_blank">
-              <span class='view_link' data-toggle="modal" >
-              <i class='fa fa-eye'></i>
-              View
-              </span>
-            </a>
-            <a href="{{attachment.attached_file.url}}" download>
-              <span class='download_link'>
-              <i class='fa fa-download'></i>
-              Download
-              </span>
-            </a>
-            <span class='delete_link'>
-              <a href="/project/{{slug}}/task/{{task.id}}/attachment/delete/{{attachment.id}}/">
-                <i class='fa fa-trash'></i>
-                Delete
-              </a>
-            </span>
+    <div class="project_description">
+        <!-- about project -->
+        <div class="col-md-9 about_project_wrap">
+          <div class="title">
+            <span>{{task.name}}</span>
           </div>
-          {% endfor %}
-        </div>
-      </div>
-    </div>
-    <div class="clearfix"></div>
-  </div>
-  <div class="clearfix"></div>
-  <!-- comments -->
-  <div class="comments_wrap_div">
-    <!-- your comment -->
-    <form action="" method="post" enctype='multipart/form-data' id="comment_form">
-      {% csrf_token %}
-      <div class="your_comment">
-        <textarea name="comment"></textarea>
-        <p><span name="error"></span></p>
-        <span class="comment_attachment attachment">
-          <i class='fa fa-paperclip'></i>
-          Attach a file
-        </span>
-      <span class="attachment_file"></span>
-         <!--<span  name="file_choosen" > selected file here</span>-->
-        <input name="file" type="file" value="" class="comment_file" style="display:none;" />
-
-        <button class='comment_btn' type="submit">Comment</button>
-      </div>
-    </form>
-    <!--/ your comment -->
-    <!--/ main comment -->
-  {% for comment in task|level1comments %}
-    <div class="comment_each">
-      <div class="img_div">
-        <div class="img_wrap">
-          {% if comment.commented_by.profile_pic%}
-            <img src='{{comment.commented_by.profile_pic.url}}'>
-          {% else %}
-            <img src='{% static "img/user-pic.jpg" %}'>
-          {% endif %}
-        </div>
-        <div class="name" id="{{comment.id}}">
-          {{comment.commented_by}}
-          <div class="designation">( {{ comment.commented_by|get_user_Role:project }} )</div>
-          <div class="posted_details">{{comment.created|date:"d F,Y \a\t P"}}</div>
-        </div>
-      </div>
-      <div class="comment_text">
-        {{comment.comment}}
-        {% for attachment in comment.attachments.all %}
-          <div class="attachments_wrap">
-            <div class="attachment_each">
-              <i class='fa fa-paperclip'></i>
-              {{attachment.filename}}
-              <a href="{{attachment.attached_file.url}}" target="_blank">
-                <span class='view_link' data-toggle="modal" >
-                  <i class='fa fa-eye'></i>
-                  View
+          <div class="profile-pic-count">
+            <div class="col-md-12 content">
+              <div class="profile-content">
+                <div class="task_details">
+                  <b>Created By : </b>
+                  {{task.created_by.username}} ,
+                  <em> {{task.created_date|date:"d F,Y \a\t P"}}</em>
+                </div>
+                <span class="desc">
+                {{task.description}}
                 </span>
-              </a>
-              <a href="{{attachment.attached_file.url}}" download>
-                <span class='download_link'>
-                  <i class='fa fa-download'></i>
-                  Download
-                </span>
-              </a>
-              <span class='delete_link'>
-                <a href="/project/{{slug}}/task/{{task.id}}/attachment/delete/{{attachment.id}}/">
-                  <i class='fa fa-trash'></i>
-                  Delete
-                </a>
-              </span>
-            </div>
-          </div>
-        {% endfor %}
-        <div class="reply_button">
-          <button class="reply"><i class='fa fa-reply'></i>Reply</button>
-
-          {% if comment.commented_by == request.user %}
-              <a href="{% url 'project:delete_task_comment' comment.id %}">
-                  <button class="delete">Delete</button>
-              </a>
-          {% endif %}
-        </div>
-      </div>
-    </div>
-    {% for sub_comment in comment.comment_parent.all %}
-      {% for comment in sub_comment|sub_comments %}
-    <!-- sub comment -->
-        <div class="sub_comment">
-          <div class="comment_each">
-            <div class="img_div">
-              <div class="img_wrap">
-                {% if comment.commented_by.profile_pic%}
-                  <img src='{{comment.commented_by.profile_pic.url}}'> 
-                {% else %}
-                  <img src='{% static "img/user-pic.jpg" %}'>
-                {% endif %}
-              </div>
-              <div class="name" id="{{comment.id}}">
-                {{comment.commented_by}}
-                <div class="designation">( {{ comment.commented_by|get_user_Role:project }} )</div>
-                <div class="posted_details">{{comment.created|date:"d F,Y \a\t P"}}</div>
+                <div class="attachments_wrap">
+                  {% for attachment in task.attachments.all %}
+                  <div class="attachment_each">
+                    <i class='fa fa-paperclip'></i>
+                    {{attachment.attached_file}}
+                    <a href="{{attachment.attached_file.url}}" target="_blank">
+                      <span class='view_link' data-toggle="modal" >
+                      <i class='fa fa-eye'></i>
+                      View
+                      </span>
+                    </a>
+                    <a href="{{attachment.attached_file.url}}" download>
+                      <span class='download_link'>
+                      <i class='fa fa-download'></i>
+                      Download
+                      </span>
+                    </a>
+                    <span class='delete_link'>
+                      <a href="/project/{{slug}}/task/{{task.id}}/attachment/delete/{{attachment.id}}/">
+                        <i class='fa fa-trash'></i>
+                        Delete
+                      </a>
+                    </span>
+                  </div>
+                  {% endfor %}
+                </div>
               </div>
             </div>
-            <div class="comment_text">
-              {{comment.comment}}
+            <div class="clearfix"></div>
+          </div>
+          <div class="clearfix"></div>
+          <!-- comments -->
+          <div class="comments_wrap_div">
+            <!-- your comment -->
+            <form action="" method="post" enctype='multipart/form-data' id="comment_form">
+              {% csrf_token %}
+              <div class="your_comment">
+                <textarea name="comment"></textarea>
+                <p><span name="error"></span></p>
+                <span class="comment_attachment attachment">
+                  <i class='fa fa-paperclip'></i>
+                  Attach a file
+                </span>
+              <span class="attachment_file"></span>
+                 <!--<span  name="file_choosen" > selected file here</span>-->
+                <input name="file" type="file" value="" class="comment_file" style="display:none;" />
 
-              {% for attachment in comment.attachments.all %}
+                <button class='comment_btn' type="submit">Comment</button>
+              </div>
+            </form>
+            <!--/ your comment -->
+            <!--/ main comment -->
+          {% for comment in task|level1comments %}
+            <div class="comment_each">
+              <div class="img_div">
+                <div class="img_wrap">
+                  {% if comment.commented_by.profile_pic%}
+                    <img src='{{comment.commented_by.profile_pic.url}}'>
+                  {% else %}
+                    <img src='{% static "img/user-pic.jpg" %}'>
+                  {% endif %}
+                </div>
+                <div class="name" id="{{comment.id}}">
+                  {{comment.commented_by}}
+                  <div class="designation">( {{ comment.commented_by|get_user_Role:project }} )</div>
+                  <div class="posted_details">{{comment.created|date:"d F,Y \a\t P"}}</div>
+                </div>
+              </div>
+              <div class="comment_text">
+                      <p class="your_comment">{{comment.comment|safe}}</p>
+                           <div class="edit_comment_text">
+                               <form action="{% url 'project:task_comment_edit' %}" method="post">
+                                   {% csrf_token %}
+                                   <input type="hidden" name="slug" value="{{ slug }}">
+                                   <input type="hidden" name="task_id" value="{{ task.id }}">
+                                   <input type="hidden" name="comment_id" value="{{ comment.id }}">
+                                   <textarea name="comment">{{comment.comment}}</textarea>
+                                   <button class="save_comment"><i class="fa fa-floppy-o"></i>Save</button>
+                               </form>
+                               <div class="clearfix"></div>
+                           </div>
+
+                {% for attachment in comment.attachments.all %}
                   <div class="attachments_wrap">
                     <div class="attachment_each">
                       <i class='fa fa-paperclip'></i>
-                      {{attachment}}
-                      <a href="{{attachment.attached_file.url}}" target="_blank"><span class='view_link' data-toggle="modal" ><i class='fa fa-eye'></i>View</span></a>
+                      {{attachment.filename}}
+                      <a href="{{attachment.attached_file.url}}" target="_blank">
+                        <span class='view_link' data-toggle="modal" >
+                          <i class='fa fa-eye'></i>
+                          View
+                        </span>
+                      </a>
                       <a href="{{attachment.attached_file.url}}" download>
                         <span class='download_link'>
                           <i class='fa fa-download'></i>
@@ -169,54 +127,150 @@
                       </span>
                     </div>
                   </div>
-              {% endfor %}
+                {% endfor %}
                 <div class="reply_button">
                   <button class="reply"><i class='fa fa-reply'></i>Reply</button>
 
                   {% if comment.commented_by == request.user %}
+                      <a href="#">
+                          <button class="edit"><i class="fa fa-edit"></i>Edit</button>
+                      </a>
                       <a href="{% url 'project:delete_task_comment' comment.id %}">
-                          <button class="delete">Delete</button>
+                          <button class="delete"><i class="fa fa-trash"></i>Delete</button>
                       </a>
                   {% endif %}
+
                 </div>
+              </div>
             </div>
+            {% for sub_comment in comment.comment_parent.all %}
+              {% for comment in sub_comment|sub_comments %}
+            <!-- sub comment -->
+                <div class="sub_comment">
+                  <div class="comment_each">
+                    <div class="img_div">
+                      <div class="img_wrap">
+                        {% if comment.commented_by.profile_pic%}
+                          <img src='{{comment.commented_by.profile_pic.url}}'>
+                        {% else %}
+                          <img src='{% static "img/user-pic.jpg" %}'>
+                        {% endif %}
+                      </div>
+                      <div class="name" id="{{comment.id}}">
+                        {{comment.commented_by}}
+                        <div class="designation">( {{ comment.commented_by|get_user_Role:project }} )</div>
+                        <div class="posted_details">{{comment.created|date:"d F,Y \a\t P"}}</div>
+                      </div>
+                    </div>
+                    <div class="comment_text">
+                      <p class="your_comment">{{comment.comment|safe}}</p>
+                           <div class="edit_comment_text">
+                               <form action="{% url 'project:task_comment_edit' %}" method="post">
+                                   {% csrf_token %}
+                                   <input type="hidden" name="slug" value="{{ slug }}">
+                                   <input type="hidden" name="task_id" value="{{ task.id }}">
+                                   <input type="hidden" name="comment_id" value="{{ comment.id }}">
+                                   <textarea name="comment">{{comment.comment}}</textarea>
+                                   <button class="save_comment"><i class="fa fa-floppy-o"></i>Save</button>
+                               </form>
+                               <div class="clearfix"></div>
+                           </div>
+
+                      {% for attachment in comment.attachments.all %}
+                          <div class="attachments_wrap">
+                            <div class="attachment_each">
+                              <i class='fa fa-paperclip'></i>
+                              {{attachment}}
+                              <a href="{{attachment.attached_file.url}}" target="_blank"><span class='view_link' data-toggle="modal" ><i class='fa fa-eye'></i>View</span></a>
+                              <a href="{{attachment.attached_file.url}}" download>
+                                <span class='download_link'>
+                                  <i class='fa fa-download'></i>
+                                  Download
+                                </span>
+                              </a>
+                              <span class='delete_link'>
+                                <a href="/project/{{slug}}/task/{{task.id}}/attachment/delete/{{attachment.id}}/">
+                                  <i class='fa fa-trash'></i>
+                                  Delete
+                                </a>
+                              </span>
+                            </div>
+                          </div>
+                      {% endfor %}
+                        <div class="reply_button">
+                          <button class="reply"><i class='fa fa-reply'></i>Reply</button>
+
+                          {% if comment.commented_by == request.user %}
+                              <a href="#">
+                                  <button class="edit"><i class="fa fa-edit"></i>Edit</button>
+                              </a>
+                              <a href="{% url 'project:delete_task_comment' comment.id %}">
+                                  <button class="delete"><i class="fa fa-trash"></i>Delete</button>
+                              </a>
+                          {% endif %}
+
+                        </div>
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            {% endfor %}
+            <!--/ sub comment -->
+          {% endfor %}
+            <!-- main comment -->
           </div>
+          <!--/ comments -->
         </div>
-      {% endfor %}
-    {% endfor %}
-    <!--/ sub comment -->
-  {% endfor %}
-    <!-- main comment -->
-  </div>
-  <!--/ comments -->
-</div>
-<!--/ about project -->
-<!-- team -->
-<div class="col-md-3 team">
-  <div class="title">
-    <span>team members</span>
-  </div>
-  <!-- ticket -->
-  <div class="height_wrap">
-    {% for team_member in task|Team_mem %}
-    <span class='ticket orange'>
-    {%if team_member.profile_pic %}
-    <img src="{{ team_member.profile_pic.url }}">
-    {% else %}
-    <img src="{% static 'img/user-pic.jpg' %}">
-    {% endif%}
-    <span class='description'>
-    <span class='name'>{{team_member.username}}</span>{% if team_member.pietrack_role == 'admin' %} (<i class="fa fa-user"></i> admin){% endif %}
-    <span class='designation_time'>{{team_member|get_user_Role:project}}</span>
-    </span>
-    </span>
-    {% endfor %}
-    <!--/ ticket -->
-  </div>
-  <!--/ team -->
- </div>
+        <!--/ about project -->
+        <!-- team -->
+        <div class="col-md-3 team">
+          <div class="title">
+            <span>team members</span>
+          </div>
+          <!-- ticket -->
+          <div class="height_wrap">
+            {% for team_member in task|Team_mem %}
+            <span class='ticket orange'>
+                {%if team_member.profile_pic %}
+                    <img src="{{ team_member.profile_pic.url }}">
+                {% else %}
+                    <img src="{% static 'img/user-pic.jpg' %}">
+                {% endif%}
+                <span class='description'>
+                    <span class='name'>
+                        {% if team_member.first_name %}{{ team_member.first_name }}{% else %}{{ team_member.username }}{% endif %}
+                    </span>
+                    {% if team_member.pietrack_role == 'admin' %} (<i class="fa fa-user"></i> admin){% endif %}
+                    <span class='designation_time'>{{team_member|get_user_Role:project}}</span>
+                </span>
+                <!-- for active user indication -->
+                {% if team_member.username == request.user.username %}
+                    <span class="active-user"><i class="fa fa-check-circle"></i></span>
+                {% endif %}
+                <!-- // -->
+            </span>
+            {% endfor %}
+          </div>
+            <!--/ ticket -->
+        </div>
+          <!--/ team -->
+     </div>
+</section>
 {%endblock%}
 {% block extra_js %}
+    <script type="text/javascript">
+        $('.comment_text .edit').click(function(e){
+            e.preventDefault();
+            var comment=$(this).closest('div').siblings('p');
+            comment.hide().siblings('.edit_comment_text').show().children('textarea').text(comment.text());
+        });
+        $('.save_comment').click(function(e){
+            e.preventDefault();
+            $(this).parent().submit();
+            /*var textarea_comment=$(this).parent('.edit_comment_text');
+            textarea_comment.hide().siblings('.your_comment').show().text(textarea_comment.children('textarea').val());*/
+        })
+    </script>
 <script type="text/javascript">
 
 
@@ -238,7 +292,6 @@
                   $(form).find('input[name="file"]').val("")
                   $('.your_comment').parent().after(response)
 
-                  console.log($('.attachment_file').text());
                   $('.attachment_file').text(' ');
               }
 

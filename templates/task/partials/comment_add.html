@@ -16,7 +16,18 @@
     </div>
   </div>
   <div class="comment_text">
-    {{comment.comment}}
+    <p class="your_comment">{{comment.comment|safe}}</p>
+         <div class="edit_comment_text">
+               <form action="{% url 'project:task_comment_edit' %}" method="post">
+                   {% csrf_token %}
+                   <input type="hidden" name="slug" value="{{ slug }}">
+                   <input type="hidden" name="task_id" value="{{ task.id }}">
+                   <input type="hidden" name="comment_id" value="{{ comment.id }}">
+                   <textarea name="comment">{{comment.comment}}</textarea>
+                   <button class="save_comment"><i class="fa fa-floppy-o"></i>Save</button>
+               </form>
+             <div class="clearfix"></div>
+         </div>
     {% for attachment in comment.attachments.all %}
       <div class="attachments_wrap">
         <div class="attachment_each">
@@ -44,11 +55,16 @@
     {% endfor %}
         <div class="reply_button">
           <button class="reply"><i class='fa fa-reply'></i>Reply</button>
+
           {% if comment.commented_by == request.user %}
-          <a href="{% url 'project:delete_task_comment' comment.id %}">
-              <button class="delete">Delete</button>
-          </a>
+              <a href="#">
+                  <button class="edit"><i class="fa fa-edit"></i>Edit</button>
+              </a>
+              <a href="{% url 'project:delete_task_comment' comment.id %}">
+                  <button class="delete"><i class="fa fa-trash"></i>Delete</button>
+              </a>
           {% endif %}
+
         </div>
   </div>
 </div>

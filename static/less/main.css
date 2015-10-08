@@ -1856,6 +1856,11 @@ header .text .tag {
   border-radius: 50%;
   margin-right: 15px;
 }
+.project_description .about_project_wrap .ticket .active-user {
+  display: table-cell;
+  width: 10px;
+  color: green;
+}
 .project_description .about_project_wrap .ticket .description {
   display: table-cell;
   text-align: left;
@@ -2242,6 +2247,11 @@ header .text .tag {
   border-radius: 50%;
   margin-right: 15px;
 }
+.project_description .team .ticket .active-user {
+  display: table-cell;
+  width: 10px;
+  color: green;
+}
 .project_description .team .ticket .description {
   display: table-cell;
   text-align: left;
@@ -2359,7 +2369,8 @@ header .text .tag {
   font-weight: bold;
   margin-top: 0px;
   margin-bottom: 10px;
-  text-transform: uppercase;
+  text-transform: capitalize;
+  /* changed from uppercase to capitalize */
   text-align: center;
 }
 #box-content .right-container .content-panel .content_box .title .new a {
@@ -2453,6 +2464,7 @@ header .text .tag {
   display: inline-block;
   padding: 4px 7px;
   font-size: 13px;
+  margin: 2px 0px;
 }
 #box-content .right-container .content-panel-extra .member-box .user-assign i {
   display: inline-block;
@@ -2981,6 +2993,8 @@ header .text .tag {
   padding: 10px 0px;
   /* edited this button name to class reply */
   /* -- //  -- */
+  /* added this class edit for display the button to edit the comment */
+  /* -- // -- */
   /* added this class delete for display the button to delete the comment */
   /* -- // -- */
 }
@@ -2999,6 +3013,22 @@ header .text .tag {
 .comments_wrap_div .comment_each .comment_text .reply_button .reply i {
   padding-right: 8px;
 }
+.comments_wrap_div .comment_each .comment_text .reply_button .edit {
+  margin-left: 10px;
+  float: left;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+  box-shadow: none;
+  border: 1px solid #0088cf;
+  background: #0099e8;
+  border-radius: 2px;
+  text-transform: uppercase;
+}
+.comments_wrap_div .comment_each .comment_text .reply_button .edit i {
+  padding-right: 8px;
+}
 .comments_wrap_div .comment_each .comment_text .reply_button .delete {
   margin-left: 10px;
   float: left;
@@ -3007,8 +3037,8 @@ header .text .tag {
   font-weight: 600;
   color: #fff;
   box-shadow: none;
-  border: 1px solid #00a88e;
-  background: #00c1a4;
+  border: 1px solid #ff484b;
+  background: #ff6264;
   border-radius: 2px;
   text-transform: uppercase;
 }
@@ -3291,3 +3321,29 @@ input[readonly] {
   background-color: white !important;
   cursor: text !important;
 }
+/* edit_comment_text */
+.edit_comment_text {
+  display: none;
+}
+.edit_comment_text textarea {
+  width: 100%;
+  border: 1px solid #e1e1e1;
+  height: 80px;
+}
+.edit_comment_text .save_comment {
+  cursor: pointer;
+  float: left;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+  box-shadow: none;
+  border: 1px solid #00a88e;
+  background: #00c1a4;
+  border-radius: 2px;
+  text-transform: uppercase;
+}
+.edit_comment_text .save_comment i {
+  padding-right: 8px;
+}
+/* edit_comment_text */
