@@ -12,7 +12,7 @@ from piebase.models import User, Organization
 from accounts.forms import EditUserModelForm, RegisterForm, ChangePasswordForm
 from project.forms import PasswordResetForm
 from pietrack.settings import EMAIL_HOST_USER
-
+from project.views import get_notification_list
 # for messages in views and templates
 from django.contrib import messages
 
@@ -151,7 +151,7 @@ def change_password(request):
             response_data = {'error': True, 'response': form.errors}
 
         return HttpResponse(json.dumps(response_data))
-    return render(request, 'user/change_password.html')
+    return render(request, 'user/change_password.html', {'notification_list':get_notification_list(request.user)})
 
 
 @active_user_required
@@ -185,7 +185,7 @@ def user_profile(request):
             response_data = {'error': True, 'response': form.errors}
 
         return HttpResponse(json.dumps(response_data))
-    return render(request, 'user/user_profile.html')
+    return render(request, 'user/user_profile.html',{'notification_list':get_notification_list(request.user)})
 
 
 def reset_confirm(request, uidb64=None, token=None):

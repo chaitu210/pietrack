@@ -225,7 +225,7 @@ class TicketStatus(models.Model):
     project = models.ForeignKey(
         Project, related_name="task_statuses", verbose_name=_("project"))
     order = models.IntegerField(default=1, blank=True)
-    # is_final = models.BooleanField(default=False)
+    is_final = models.BooleanField(default=False)
     class Meta:
         unique_together = (("project", "name"), ("project", "slug"))
 
