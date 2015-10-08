@@ -134,49 +134,18 @@
             </li>
             <li class='parent_list'>
               {% block project_notifications %}
-              <span class='each_wrap notification'>
-              <i class='fa fa-bell'></i>
-              <span class='name'>Notifications</span>
-                <span class='number count'>25</span>
-                </span>
-                <ul class='sub_list'>
-                  <div class='scroll'>
-
-                    <li>
-                      <span class='ticket'>
-                      <img src='http://i.stack.imgur.com/8sNfT.jpg'>
-                      <span class='description'>
-                      <span class='name'>Nazneen</span> added you to project
-                      <span class='project'>Pie Track</span>
-                      <span class='time'>12 min ago</span>
-                      </span>
-                      </span>
-                    </li>
-
-                    <li>
-                      <span class='ticket'>
-                      <img src='http://i.stack.imgur.com/8sNfT.jpg'>
-                      <span class='description'>
-                      <span class='name'>Nazneen</span> added you to project
-                      <span class='project'>Pie Track</span>
-                      <span class='time'>12 min ago</span>
-                      </span>
-                      </span>
-                    </li>
-
-                    <li>
-                      <span class='ticket'>
-                      <img src='http://i.stack.imgur.com/8sNfT.jpg'>
-                      <span class='description'>
-                      <span class='name'>Nazneen</span> added you to project
-                      <span class='project'>Pie Track</span>
-                      <span class='time'>12 min ago</span>
-                      </span>
-                      </span>
-                    </li>
-
-                  </div>
-                </ul>
+                  <span class='each_wrap notification'>
+                  <i class='fa fa-bell'></i>
+                  <span class='name'>Notifications</span>
+                    <span class='number count'>{% if notification_list %}{{ notification_list.1 }}{% else %}0{% endif %}</span>
+                    </span>
+                    <ul class='sub_list'>
+                      <div class='scroll'>
+                        {% if notification_list %}
+                          {% include "user/partials/notification.html" with notification_list=notification_list.0 %}
+                        {% endif %}
+                      </div>
+                    </ul>
              {% endblock %}
             </li>
             <li>
@@ -273,6 +242,26 @@
             $('.pagination li:nth-last-child(2)').find('a span').text('Next');
         }
 
+        /* notification */
+        $notification = $('.notification').parent();
+        $notification.mouseenter(function(e){
+            $.get("{% url 'user:read_notifications' %}", function(response){
+               if(response=="True"){
+                    $notification.find(".count").text('0')
+               }
+            });
+            e.preventDefault();
+        });
+
+        setInterval(function() {
+            $.get("{% url 'user:get_notifications' %}",function(response){
+
+                $notification.find(".count").text(response['count'])
+                $notification.find('div.scroll').html(response['notification_list'])
+            });
+        }, 60000);
+
+        /*notification end */
     </script>
 
     {% block extra_js %}
