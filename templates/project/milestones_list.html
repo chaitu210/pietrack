@@ -95,9 +95,17 @@
                     <img src="{% static 'img/user-pic.jpg' %}">
                 {% endif%}
                 <span class='description'>
-                    <span class='name'>{{team_member.username}}</span>{% if team_member.pietrack_role == 'admin' %} (<i class="fa fa-user"></i> admin){% endif %}
+                    <span class='name'>
+                        {% if team_member.first_name %}{{ team_member.first_name }}{% else %}{{ team_member.username }}{% endif %}
+                    </span>
+                    {% if team_member.pietrack_role == 'admin' %} (<i class="fa fa-user"></i> admin){% endif %}
                     <span class='designation_time'>{{team_member|get_user_Role:project}}</span>
                 </span>
+                <!-- for active user indication -->
+                {% if team_member.username == request.user.username %}
+                    <span class="active-user"><i class="fa fa-check-circle"></i></span>
+                {% endif %}
+                <!-- // -->
             </span>
             {% endfor %}
             <!--/ ticket -->

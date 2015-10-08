@@ -1413,6 +1413,11 @@ header{
 				border-radius: 50%;
 				margin-right: 15px;
 			}
+		  	.active-user{
+			  	display: table-cell;
+			  	width: 10px;
+			  	color: green;
+			}
 			.description{
 				display: table-cell;
 				text-align: left;
@@ -1547,7 +1552,7 @@ header{
 						  font-weight: bold;
 						  margin-top: 0px;
 						  margin-bottom: 10px;
-						  text-transform: uppercase;
+						  text-transform: capitalize; /* changed from uppercase to capitalize */
 						  text-align:center;
 						  .new{
 						  	a{
@@ -1641,6 +1646,7 @@ header{
 						  display: inline-block;
 						  padding: 4px 7px;
 						  font-size: 13px;
+					      margin: 2px 0px;
 						  i{
 						  	display:inline-block;
 							margin:0px 5px;
@@ -2160,6 +2166,24 @@ header{
 				  }
 				}
 			  /* -- //  -- */
+			  /* added this class edit for display the button to edit the comment */
+				.edit {
+				  	margin-left: 10px;
+				  	float: left;
+					padding: 3px 10px;
+					font-size: 11px;
+					font-weight: 600;
+					color: #fff;
+					box-shadow: none;
+					border:1px solid darken(@blue,5%);
+					background: @blue;
+					border-radius: 2px;
+					text-transform: uppercase;
+					i{
+						padding-right: 8px;
+					}
+				}
+			  /* -- // -- */
 			  /* added this class delete for display the button to delete the comment */
 				.delete {
 				  	margin-left: 10px;
@@ -2169,8 +2193,8 @@ header{
 					font-weight: 600;
 					color: #fff;
 					box-shadow: none;
-					border:1px solid darken(@green,5%);
-					background: @green;
+					border:1px solid darken(@red,5%);
+					background: @red;
 					border-radius: 2px;
 					text-transform: uppercase;
 					i{
@@ -2492,3 +2516,20 @@ input[readonly] {
   background-color: white !important;
   cursor: text !important;
 }
+/* edit_comment_text */
+	.edit_comment_text{
+	  display: none;
+	  textarea{
+		width:100%;
+		border:1px solid @stroke_color;
+		height:80px;
+	  }
+	  .save_comment{
+		cursor: pointer;
+		.comments_wrap_div .comment_each .comment_text .reply_button .reply;
+	  }
+	}
+
+
+
+/* edit_comment_text */

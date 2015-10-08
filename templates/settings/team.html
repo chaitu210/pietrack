@@ -55,7 +55,9 @@
                                              {%endif%}
                                              </span>
                                             <span class="title-email">
-                                                <span class="title">{{ member.username }}</span>
+                                                <span class="title">
+                                                    {% if member.first_name %}{{ member.first_name }}{% else %}{{ member.username }}{% endif %}
+                                                </span>
                                                 <span class="email">{{member.email}}</span>
                                             </span>
                                         </div>

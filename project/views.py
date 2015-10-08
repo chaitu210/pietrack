@@ -647,6 +647,18 @@ def task_comment(request, slug, task_id):
     else:
         return HttpResponse(json.dumps({'error': True, 'errors': form.errors}), content_type="json/application")
 
+
+@active_user_required
+def task_comment_edit(request):
+    project = Project.objects.get(slug=request.POST.get('slug'), organization=request.user.organization)
+    task = Ticket.objects.get(id=request.POST.get('task_id'), project=project)
+    comment = Comment.objects.get(id=request.POST.get('comment_id'))
+    form = CommentForm(request.POST, task=task, user=request.user, project=project, instance=comment)
+    if form.is_valid():
+        form.save()
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+
 @active_user_required
 def task_edit(request, slug, milestone_slug, task_id):
     project_obj = Project.objects.get(slug=slug, organization=request.user.organization)
