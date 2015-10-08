@@ -640,7 +640,7 @@ def task_comment(request, slug, task_id):
         if request.GET.get('parent_id', False):
             comment.parent_id = request.GET.get('parent_id')
         else:
-            comment.parent_id = comment.id
+            comment.parent_id = comment.created_by.id
         if request.FILES.get('file'):
             attachment = Attachment.objects.create(
                 uploaded_by=request.user, attached_file=request.FILES.get('file'), project=project)
