@@ -38,13 +38,13 @@
                             </div>
                             <div class="form_group">
                                 <label>Description</label>
-                                <textarea name='description' class="textarea">{{project.description}}</textarea>
+                                <textarea id="description" name='description' class="textarea">{{project.description}}</textarea>
                                 <span name="pdescription_error" class="help"></span>
                             </div>
                             <div class="form_group">
                                 <label>Logo</label>
 
-                                   <img id="logo" src="{% if project.logo %}{{project.logo.url}}{% else %}http://www.livecollision.com/wp-content/uploads/Project-logo.jpg{% endif %}" class="img-responsive img-thumbnail" style="width:100px;height:100px;margin-left:20px;margin-bottom:10px;" />
+                                   <img id="logo" src="{% if project.logo %}{{project.logo.url}}{% else %}{% static 'img/Project-logo.jpg' %}{% endif %}" class="img-responsive img-thumbnail" style="width:100px;height:100px;margin-left:20px;margin-bottom:10px;" />
 
                                     <input id="file" name="logo" type="file" value="" style="display:none;"/>
                                     <br>
@@ -71,6 +71,11 @@
 {%endblock extra_js_links %}
 
 {%block extra_js %}
+
+    <script type="text/javascript">
+        CKEDITOR.replace('description');
+    </script>
+
   <script type="text/javascript">
         $("#logo").click(function(e){
             $("#file").click()
@@ -88,6 +93,7 @@
               return "";
           }
         $('#id_form_cproject').on('submit',function(e){
+          $('#description').val(CKEDITOR.instances.description.getData());
           var form = this
           var formData = new FormData($(this)[0]);
           $.ajax({

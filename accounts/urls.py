@@ -16,4 +16,6 @@ urlpatterns = [
     url(r'^logout/$', 'accounts.views.logout', name='logout'),
     url(r'^reset_confirm/(?P<uidb64>[0-9A-Za-z]+)-(?P<token>.+)/$',
         'accounts.views.reset_confirm', name='reset_confirm'),
+    url(r'^read_notifications/$', 'accounts.views.read_notifications', name='read_notifications'),
+    url(r'^get_notifications/$', 'accounts.views.get_notifications', name='get_notifications'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -8,13 +8,16 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.conf import settings
 from django.contrib.auth.views import password_reset_confirm
 from django.contrib.auth.tokens import default_token_generator
-from piebase.models import User, Organization
+from piebase.models import User, Organization, Timeline
 from accounts.forms import EditUserModelForm, RegisterForm, ChangePasswordForm
 from project.forms import PasswordResetForm
 from pietrack.settings import EMAIL_HOST_USER
 from project.views import get_notification_list
 # for messages in views and templates
 from django.contrib import messages
+from django.contrib.contenttypes.models import ContentType
+# for removing non-empty directory
+import shutil
 
 # for authentication and login required
 from django.contrib.auth.decorators import user_passes_test, login_required
@@ -161,6 +164,7 @@ def user_profile(request):
         form = EditUserModelForm(request.POST, request.FILES, instance=user)
 
         if form.is_valid():
+            print request.POST
             if not request.POST.get('organization'):
                 response_data = {'error': True, "response": {"organization": 'Please provide organization name'}}
                 return HttpResponse(json.dumps(response_data))
@@ -173,8 +177,7 @@ def user_profile(request):
 
                 user.profile_pic = request.FILES['profile_pic']
                 try:
-                    os.remove(settings.MEDIA_ROOT + 'profile/' +
-                              user.username + '/' + user.username + '.jpg')
+                    shutil.rmtree(settings.MEDIA_ROOT + 'profile/' +user.username)
                 except:
                     pass
 
@@ -191,3 +194,20 @@ def user_profile(request):
 def reset_confirm(request, uidb64=None, token=None):
     return password_reset_confirm(request, template_name='email/reset_confirm.html', uidb64=uidb64, token=token,
                                   post_reset_redirect=reverse('user:login'))
+
+@active_user_required
+def read_notifications(request):
+    content_type = ContentType.objects.get_for_model(request.user)
+    for notification in Timeline.objects.filter(content_type__pk=content_type.id, object_id=request.user.id, is_read=False):
+        notification.is_read = True
+        notification.save()
+    return HttpResponse("True")
+
+@active_user_required
+def get_notifications(request):
+    content_type = ContentType.objects.get_for_model(request.user)
+    notification_list = Timeline.objects.filter(content_type__pk=content_type.id, object_id=request.user.id).exclude(user=request.user)
+    count = notification_list.filter(is_read=False).count()
+    response = render(request,'user/partials/notification.html',{'notification_list':notification_list})
+    print notification_list
+    return HttpResponse(json.dumps({'notification_list':response.content, 'count':count}),content_type="application/json")

@@ -60,30 +60,42 @@
                     </div>
                     <!-- status table starts here -->
                     <div class="table-responsive member-box">
-                        <table class="table table-hover" id="role_permissions">
-                            <thead>
-                                <tr>
-                                    <th>Role</th>
-                                    <th>Users</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                              {% for role in list_of_roles %}
-                                <tr id="{{role.id}}">
-                                    <td>{{role.name}} </td>
-                                    <td>
-                                        {% for user in role.users.all %}
-                                          <span class="user-assign">
-                                            <a href="#"><i class="fa fa-user"></i> {{user}}</a>
-                                          </span>
-                                        {% endfor %}
-                                    </td>
-                                    <td class="actions"><a href="#" class="edit" data-toggle="modal" data-target="#myModal1" onclick="edit_role('{{role.id}}','{{role.name}}','{{role.slug}}')"><i class="fa fa-edit"></i></a> <a onclick="delete_role('{{role.slug}}','{{role.id}}')" href="#" class="delete"><i class="fa fa-trash"></i></a> </td>
-                                </tr>
-                              {% endfor %}
-                            </tbody>
-                        </table>
+                        {% if list_of_roles %}
+                            <table class="table table-hover" id="role_permissions">
+                                <thead>
+                                    <tr>
+                                        <th>Role</th>
+                                        <th>Users</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                  {% for role in list_of_roles %}
+                                    <tr id="{{role.id}}">
+                                        <td>{{role.name}} </td>
+                                        <td>
+                                            {% for user in role.users.all %}
+                                              <span class="user-assign">
+                                                <a href="#"><i class="fa fa-user"></i> {{user}}</a>
+                                              </span>
+                                            {% endfor %}
+                                        </td>
+                                        <td class="actions"><a href="#" class="edit" data-toggle="modal" data-target="#myModal1" onclick="edit_role('{{role.id}}','{{role.name}}','{{role.slug}}')"><i class="fa fa-edit"></i></a> <a onclick="delete_role('{{role.slug}}','{{role.id}}')" href="#" class="delete"><i class="fa fa-trash"></i></a> </td>
+                                    </tr>
+                                  {% endfor %}
+                                </tbody>
+                            </table>
+                        {% else %}
+                            <div>
+                                <hr />
+                                <center>
+                                Please create a new status or use
+                                    <span class="badge" id="create_default">
+                                        <a href="{% url 'project:member_roles_default' slug %}">default</a>
+                                    </span> status list !
+                                </center>
+                            </div>
+                        {% endif %}
                     </div>
                     <form action="" method="post" id="id_edit_role">
                         {% csrf_token %}
@@ -192,5 +204,16 @@
   <script type="text/javascript">
       $('#project_member_roles').addClass('active');
   </script>
+
+    <script type="text/javascript">
+        $('#create_default').on('click', function(event){
+            event.preventDefault();
+            $.get("{% url 'project:member_roles_default' slug %}", function(response){
+               if(response){
+                   window.location="/project/{{slug}}/settings/member_roles/";
+               }
+            });
+        });
+    </script>
 
 {% endblock %}

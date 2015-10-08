@@ -1,0 +1,13 @@
+{% load static %}
+{% for notification in notification_list reversed %}
+<li>
+  <span class='ticket'>
+  <img src="{% if notification.user.profile_pic %}{{ notification.user.profile_pic.url }}{% else %}{% static 'img/user-pic.jpg' %}{% endif %}">
+  <span class='description'>
+  <span class='name'>{% if notification.user.get_full_name %}{{ notification.user.get_full_name }}{% else %}{{ notification.user.email }}{% endif %}</span> {{ notification.namespace }}
+  <span class='project'>{{ notification.project }}</span>
+  <span class='time'>{{ notification.created|timesince }} ago</span>
+  </span>
+  </span>
+</li>
+{% endfor %}

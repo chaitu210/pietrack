@@ -61,14 +61,16 @@
                                         </div>
                                     </th>
                                     <td>
-                                        <p>
+                                        <div class="toggle_user_admin">
+                                            <a href="#">
                                             {% if member.pietrack_role == 'admin' %}
-                                            Yes
-                                            {% else %}
-                                            No
-                                            {% endif %}
+                                                <i class="fa fa-toggle-on"></i> Yes
+                                                {% else %}
+                                                <i class="fa fa-toggle-off"></i> No
+                                                {% endif %}
+                                            </a>
 
-                                        </p>
+                                        </div>
                                     </td>
                                     <td>
                                         <p>{{ member|get_user_Role:project|title }}</p>
@@ -114,4 +116,5 @@
     <script type="text/javascript">
         $('#project_members').addClass('active');
     </script>
+
 {% endblock %}

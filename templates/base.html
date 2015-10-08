@@ -137,24 +137,13 @@
                   <span class='each_wrap notification'>
                   <i class='fa fa-bell'></i>
                   <span class='name'>Notifications</span>
-                    <span class='number count'>{% if notification_list %}{{ notification_list.count }}{% else %}0{% endif %}</span>
+                    <span class='number count'>{% if notification_list %}{{ notification_list.1 }}{% else %}0{% endif %}</span>
                     </span>
                     <ul class='sub_list'>
                       <div class='scroll'>
-                    {% if notification_list %}
-                      {% for notification in notification_list reversed %}
-                        <li>
-                          <span class='ticket'>
-                          <img src="{% if notification.user.profile_pic %}{{ notification.user.profile_pic.url }}{% else %}{% static 'img/user-pic.jpg' %}{% endif %}">
-                          <span class='description'>
-                          <span class='name'>{% if notification.user.get_full_name %}{{ notification.user.get_full_name }}{% else %}{{ notification.user.email }}{% endif %}</span> {{ notification.namespace }}
-                          <span class='project'>{{ notification.project }}</span>
-                          <span class='time'>{{ notification.created|timesince }} ago</span>
-                          </span>
-                          </span>
-                        </li>
-                      {% endfor %}
-                    {% endif %}
+                        {% if notification_list %}
+                          {% include "user/partials/notification.html" with notification_list=notification_list.0 %}
+                        {% endif %}
                       </div>
                     </ul>
              {% endblock %}
@@ -193,6 +182,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-colorpicker/2.3.0/js/bootstrap-colorpicker.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jQuery-slimScroll/1.3.6/jquery.slimscroll.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/js/select2.min.js"></script>
+    <!-- for ckeditor -->
+    <script src="https://cdn.ckeditor.com/4.5.3/standard/ckeditor.js"></script>
+    <script src="http://malsup.github.com/jquery.form.js"></script>
 
     {%block extra_js_links %}
     {%endblock extra_js_links %}
@@ -250,6 +242,26 @@
             $('.pagination li:nth-last-child(2)').find('a span').text('Next');
         }
 
+        /* notification */
+        $notification = $('.notification').parent();
+        $notification.mouseenter(function(e){
+            $.get("{% url 'user:read_notifications' %}", function(response){
+               if(response=="True"){
+                    $notification.find(".count").text('0')
+               }
+            });
+            e.preventDefault();
+        });
+
+        setInterval(function() {
+            $.get("{% url 'user:get_notifications' %}",function(response){
+
+                $notification.find(".count").text(response['count'])
+                $notification.find('div.scroll').html(response['notification_list'])
+            });
+        }, 60000);
+
+        /*notification end */
     </script>
 
     {% block extra_js %}

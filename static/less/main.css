@@ -1806,6 +1806,8 @@ header .text .tag {
   line-height: 22px;
   margin-top: 15px;
   text-align: justify;
+  /* added this anchor style to display the description links */
+  /* --//-- */
 }
 .project_description .about_project_wrap .profile-pic-count .content .desc img {
   display: block;
@@ -1819,6 +1821,9 @@ header .text .tag {
   height: 75px;
   margin: 20px 0px;
   border: 2px solid #0099e8;
+}
+.project_description .about_project_wrap .profile-pic-count .content .desc a {
+  text-decoration: underline;
 }
 .project_description .about_project_wrap .profile-pic-count .content .attachement-gallery {
   margin-top: 15px;
@@ -2187,6 +2192,8 @@ header .text .tag {
   line-height: 22px;
   margin-top: 15px;
   text-align: justify;
+  /* added this anchor style to display the description links */
+  /* --//-- */
 }
 .project_description .team .profile-pic-count .content .desc img {
   display: block;
@@ -2200,6 +2207,9 @@ header .text .tag {
   height: 75px;
   margin: 20px 0px;
   border: 2px solid #0099e8;
+}
+.project_description .team .profile-pic-count .content .desc a {
+  text-decoration: underline;
 }
 .project_description .team .profile-pic-count .content .attachement-gallery {
   margin-top: 15px;
