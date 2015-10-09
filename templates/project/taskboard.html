@@ -10,7 +10,7 @@
                 <span>{{milestone.name}}</span>
                 <span class='header_button_wrap'>
                     <a href="{% url 'task:add_task' slug milestone.slug %}">
-                        <span class='header_button'>New Task</span>
+                        <span class='header_button'><i class="fa fa-plus-circle"></i> New Task</span>
                     </a>
                     <a href="{% url 'project:requirement_create' slug milestone.slug %}">
                         <span class='header_button'>New Requirement</span>

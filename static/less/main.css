@@ -3372,3 +3372,13 @@ input[readonly] {
   border-radius: 25px;
 }
 /* edit_comment_text */
+/* Activity title */
+.activity_title {
+  border-left: 4px solid green;
+  padding: 12px;
+  display: block;
+  background: black;
+  color: white;
+  width: 10%;
+}
+/* -- // -- */

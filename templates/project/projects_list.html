@@ -14,7 +14,7 @@
                 <div class="right">
                     {% if request.user.pietrack_role == 'admin' %}
                     <a href="{% url 'project:create_project' %}">
-                        <button> create Project</button>
+                        <button><i class="fa fa-plus"></i> create Project</button>
                     </a>
                     {% endif %}
                 </div>
