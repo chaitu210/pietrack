@@ -2893,7 +2893,7 @@ header .text .tag {
   width: 100%;
   background: #fff;
   padding: 15px;
-  margin-bottom: 15px;
+  margin-top: 15px;
 }
 .comments_wrap_div .comment_each .img_div {
   text-align: left;
@@ -3046,7 +3046,7 @@ header .text .tag {
   padding-right: 8px;
 }
 .comments_wrap_div .your_comment {
-  padding: 20px 0px 35px 0px;
+  padding: 10px 0px;
   /* for attachment file display */
   /* --// -- */
 }

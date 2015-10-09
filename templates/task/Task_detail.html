@@ -264,7 +264,7 @@
         $('.comment_text .edit').click(function(e){
             e.preventDefault();
             var comment=$(this).closest('div').siblings('p');
-            $(this).parent().parent().hide();
+            $(this).closest('div').hide();
             comment.hide().siblings('.edit_comment_text').show().children('textarea').text(comment.text());
         });
         $('.save_comment').click(function(e){
@@ -276,8 +276,7 @@
         $('.cancel_comment').click(function(e){
             e.preventDefault();
             var comment=$(this).closest('div').siblings('p');
-            comment.show().siblings('.edit_comment_text').hide().children('textarea').text(comment.text());
-            $(this).parent().parent().next().next().show();
+            comment.show().siblings('.edit_comment_text').hide().siblings('div').show();
 
         });
     </script>

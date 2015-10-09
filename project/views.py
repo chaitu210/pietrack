@@ -31,7 +31,6 @@ user_login_required = user_passes_test(
 def get_notification_list(user):
     notification_list = Timeline.objects.filter(object_id=user.id)
     count = notification_list.filter(is_read=False).exclude(user=user).count()
-    print count
     return (notification_list, count)
 
 
