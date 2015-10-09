@@ -98,6 +98,7 @@
                                    <input type="hidden" name="comment_id" value="{{ comment.id }}">
                                    <textarea name="comment">{{comment.comment}}</textarea>
                                    <button class="save_comment"><i class="fa fa-floppy-o"></i>Save</button>
+                                   <button class="cancel_comment"><i class="fa fa-close"></i>Cancel</button>
                                </form>
                                <div class="clearfix"></div>
                            </div>
@@ -172,6 +173,7 @@
                                    <input type="hidden" name="comment_id" value="{{ comment.id }}">
                                    <textarea name="comment">{{comment.comment}}</textarea>
                                    <button class="save_comment"><i class="fa fa-floppy-o"></i>Save</button>
+                                   <button class="cancel_comment"><i class="fa fa-close"></i>Cancel</button>
                                </form>
                                <div class="clearfix"></div>
                            </div>
@@ -262,6 +264,7 @@
         $('.comment_text .edit').click(function(e){
             e.preventDefault();
             var comment=$(this).closest('div').siblings('p');
+            $(this).parent().parent().hide();
             comment.hide().siblings('.edit_comment_text').show().children('textarea').text(comment.text());
         });
         $('.save_comment').click(function(e){
@@ -270,6 +273,13 @@
             /*var textarea_comment=$(this).parent('.edit_comment_text');
             textarea_comment.hide().siblings('.your_comment').show().text(textarea_comment.children('textarea').val());*/
         })
+        $('.cancel_comment').click(function(e){
+            e.preventDefault();
+            var comment=$(this).closest('div').siblings('p');
+            comment.show().siblings('.edit_comment_text').hide().children('textarea').text(comment.text());
+            $(this).parent().parent().next().next().show();
+
+        });
     </script>
 <script type="text/javascript">
 
@@ -304,7 +314,7 @@
       if ($(this).parent().parent().parent().next().find('form.comment_reply').length == 0) {
           var form_data = $('form#comment_form').html()
           var form = '<form method="post" action="." enctype="multipart/form-data" class="comment_reply">' + form_data + '</form>'
-          var reply = $($.parseHTML('<div class="sub_comment"></div>'))
+          var reply = $($.parseHTML('<div class="sub_comment"><div class="pull-right"><a href="#" class="comment_close"><span class="close_comment"><i class="fa fa-close"></i></span></a></div></div>'))
           var html = reply.append(form)
           html.attr('id', 'reply_to_parent')
           $(html).find('span[name="error"]').text("")
@@ -314,8 +324,14 @@
                 var file_name = $(this).val();
                 $(this).prev('.attachment_file').append(" <i class='fa fa-photo'></i> "+file_name.substring(file_name.lastIndexOf('\\')+1));
             });
+           $('.sub_comment .comment_close').on('click', function(e){
+              e.preventDefault();
+              $(this).parent().parent().remove();
+          });
       }
   });
+
+
   
   
   $('body').on('click', '.comment_attachment', function() {
@@ -350,7 +366,13 @@
       });
   
       e.preventDefault();
+
   });
+
+
+
+
+
   
   $('body').on('click', '.delete_link a', function(e) {
       url = $(this).attr('href');
