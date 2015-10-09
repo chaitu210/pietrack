@@ -1,3 +1,5 @@
+{% load project_tags %}
+
 <div class="nav-left">
     <!-- left menu starts here -->
     <div class="nano-content">
@@ -5,6 +7,7 @@
             <li class="init-un-active">
                 <a href="{% url 'project:project_detail' slug %}"> <span class="gw-menu-text"> <i class="fa fa-area-chart"></i> Project Details</span> </a>
             </li>
+            {% if request.user.pietrack_role == 'admin' or request.user|is_project_admin:slug %}
             <li class="edit-project">
                 <a href="{% url 'project:project_details' slug %}"> <span class="gw-menu-text"> <i class="fa fa-edit"></i> Edit Project Details</span> </a>
             </li>
@@ -16,6 +19,7 @@
                     <li id="project_severities"> <a href='{% url "project:severities" slug %}'>Severities</a> </li>
                 </ul>
             </li>
+            {% endif %}
             <li id="project_members">
                 <a href="{% url 'project:project_team' slug %}"> <span class="gw-menu-text"><i class="fa fa-users"></i> Members</span> </a>
             </li>
