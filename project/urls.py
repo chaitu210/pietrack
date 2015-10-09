@@ -5,7 +5,7 @@ urlpatterns = [
     url(r'^create/$', create_project, name='create_project'),
     url(r'^list/$', list_of_projects, name='list_of_projects'),
     url(r'^(?P<slug>[-\w]+)/$', project_detail, name='project_detail'),
-    url(r'^delete/(?P<id>[0-9]+)/$', delete_project, name='delete_project'),
+    url(r'^(?P<slug>[-\w]+)/delete/(?P<id>[0-9]+)/$', delete_project, name='delete_project'),
 
     # project settings
     url(r'^(?P<slug>[-\w]+)/settings/$', project_details, name='project_details'),

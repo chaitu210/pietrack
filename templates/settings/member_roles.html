@@ -1,5 +1,5 @@
 {% extends 'settings/base.html' %}
-
+{% load project_tags %}
 {% load static %}
 {% load staticfiles %}
 
@@ -20,7 +20,8 @@
                     {% endif %}
                     <br clear="clearfixall" />
                     <div class="title">
-                        <h4><span class="status">MANAGE Roles</span></h4>
+                        <h4><span class="status">{{ project.name }} - USER ROLE'S</span></h4>
+                     {% if request.user.pietrack_role == 'admin' or request.user|is_project_admin:slug %}
                         <div class="tag">
                             Specify the roles of your projects here.
                         </div>
@@ -29,6 +30,7 @@
                                 Add New Role
                             </a>
                         </span>
+                    {% endif %}
                         <!-- new role add modal starts here -->
                         <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
                             <div class="modal-dialog" role="document">
@@ -39,20 +41,28 @@
                                         </button>
                                         <h4 class="modal-title" id="myModalLabel">Add New Role</h4>
                                     </div>
+                            {% if request.user.pietrack_role == 'admin' or request.user|is_project_admin:slug %}
                                     <form action="" method="post" id="id_add_role">
                                         {% csrf_token %}
                                         <div class="modal-body">
                                             <div class="form_group">
                                                 <label>Role Name</label>
                                                 <input name="name" type="text" class="form-control">
-                                                <span id="id_role_error" class="help error"></span>
                                                 <div class="help">add new class role for your project</div>
+                                                <span id="id_role_error" class="help error"></span>
+                                            </div>
+                                            <div class="form_group">
+                                                <label>Do you make this role as Admin?
+                                                    <input type="checkbox" name="is_project_admin" value="True"/>
+                                                </label>
+
                                             </div>
                                         </div>
                                         <div class="modal-footer">
                                             <button type="submit" class="btn btn-primary">Submit</button>
                                         </div>
                                     </form>
+                            {% endif %}
                                 </div>
                             </div>
                         </div>
@@ -66,7 +76,9 @@
                                     <tr>
                                         <th>Role</th>
                                         <th>Users</th>
+                                    {% if request.user.pietrack_role == 'admin' or request.user|is_project_admin:slug %}
                                         <th>Action</th>
+                                    {% endif %}
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -80,7 +92,9 @@
                                               </span>
                                             {% endfor %}
                                         </td>
+                                    {% if request.user.pietrack_role == 'admin' or request.user|is_project_admin:slug %}
                                         <td class="actions"><a href="#" class="edit" data-toggle="modal" data-target="#myModal1" onclick="edit_role('{{role.id}}','{{role.name}}','{{role.slug}}')"><i class="fa fa-edit"></i></a> <a onclick="delete_role('{{role.slug}}','{{role.id}}')" href="#" class="delete"><i class="fa fa-trash"></i></a> </td>
+                                    {% endif %}
                                     </tr>
                                   {% endfor %}
                                 </tbody>
@@ -97,6 +111,7 @@
                             </div>
                         {% endif %}
                     </div>
+                {% if request.user.pietrack_role == 'admin' or request.user|is_project_admin:slug %}
                     <form action="" method="post" id="id_edit_role">
                         {% csrf_token %}
                         <!-- edit role add modal starts here -->
@@ -129,6 +144,7 @@
                     </form>
                     <!-- status table ends here -->
                     <!-- content box starts here -->
+                {% endif %}
                 </div>
             </div>
         </div>
@@ -162,8 +178,8 @@
               var role_id = response['role_id'];
               var role_name = response['role_name'];
               var slug = response['slug'];
-
-              var row = '<tr id="' + role_id + '"><td>' + role_name + ' </td><td></td><td class="actions"><a href="#" class="edit" data-toggle="modal" data-target="#myModal1" onclick="edit_role(\'' + role_id + '\',\'' + role_name + '\',\'' + slug + '\')"><i class="fa fa-edit"></i></a> <a href="#" class="delete" onclick="delete_role(\'' + slug + '\',\'' + role_id + '\')"><i class="fa fa-trash"></i></a> </td></tr>'
+              var email =  response['email']
+              var row = '<tr id="' + role_id + '"><td>' + role_name + ' </td><td>'+'<span class="user-assign"><a href="#"><i class="fa fa-user"></i>'+email+'</a></span>'+'</td><td class="actions"><a href="#" class="edit" data-toggle="modal" data-target="#myModal1" onclick="edit_role(\'' + role_id + '\',\'' + role_name + '\',\'' + slug + '\')"><i class="fa fa-edit"></i></a> <a href="#" class="delete" onclick="delete_role(\'' + slug + '\',\'' + role_id + '\')"><i class="fa fa-trash"></i></a> </td></tr>'
               $("#role_permissions tbody").append(row);
               $("#id_add_role input[name='name']").val("");
               $('button.close').click();

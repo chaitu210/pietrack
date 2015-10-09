@@ -9,11 +9,13 @@
         <div class="col-md-9 about_project_wrap">
           <div class="title">
             <span>{{project.name}}</span>
+          {% if request.user.pietrack_role == 'admin' or request.user|is_project_admin:slug %}
             <span class='header_button_wrap'>
             <!-- <span class='header_button'>New Task</span>
             <span class='header_button'>New Requirement</span> -->
             <a href="{% url 'project:milestone_create' slug %}"><span class='header_button'>New MileStone</span></a>
             </span>
+          {% endif %}
           </div>
           <!-- mile stones -->
           <div class="mile_stone_wrap">
@@ -23,10 +25,12 @@
 
               <span class="col-md-4 mile_stone_each">
                 <span class="milestone_container">
+              {% if request.user.pietrack_role == 'admin' or request.user|is_project_admin:slug %}
                 <span class='actions_row'>
                 <a href="{% url 'project:milestone_edit' slug milestone.slug %}"><i class='fa fa-pencil'></i></a>
                 <a href="{% url 'project:milestone_delete' slug milestone.slug %}"><i class='fa fa-times'></i></a>
                 </span>
+              {% endif %}
                 <a href="{% url 'project:taskboard' slug milestone.slug %}">
                   <span class='title'>
                     {{milestone.name}}
@@ -117,17 +121,19 @@
     </section>
 {% endblock %}
 {% block extra_js %}
-<script>
-  $('body').on('click','a .fa-times', function(e){
-    var url = $(this).parent().attr('href');
-    var milestone = this;
-    $.get(url,function(response){
-      if(response['result']){
-        $(milestone).closest('.mile_stone_each').remove();
-        window.location = window.location.pathname;
-      }
-    });
-    e.preventDefault();
-  });
-</script>
+{% if request.user.pietrack_role == 'admin' or request.user|is_project_admin:slug %}
+    <script>
+      $('body').on('click','a .fa-times', function(e){
+        var url = $(this).parent().attr('href');
+        var milestone = this;
+        $.get(url,function(response){
+          if(response['result']){
+            $(milestone).closest('.mile_stone_each').remove();
+            window.location = window.location.pathname;
+          }
+        });
+        e.preventDefault();
+      });
+    </script>
+{% endif %}
 {% endblock%}

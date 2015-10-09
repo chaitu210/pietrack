@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 {% load compress %}
 {% load staticfiles %}
+{% load project_tags %}
+
 <html>
   <head>
     <title>Pie Track</title>
@@ -91,6 +93,7 @@
                   </span>
               </a>
             </li>
+            {% if request.user.pietrack_role == 'admin' or request.user|is_project_admin:slug %}
             <li>
               <a href="{% url 'project:project_details' slug %}">
                   <span class='each_wrap child_six'>
@@ -100,6 +103,7 @@
               </a>
             </li>
             {% endif %}
+        {% endif %}
           </ul>
         </div>
       </div>
@@ -211,11 +215,6 @@
                       }, 3000);
 
         });
-        //window.setTimeout(function() {
-        //    $(".alert-message").fadeTo(500, 0).slideUp(500, function(){
-        //        $(this).remove();
-        //    });
-        //}, 5000);
     </script>
 
     <script type="text/javascript">

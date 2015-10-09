@@ -2,9 +2,8 @@ import json
 import random
 import string
 import shutil
-
 import os
-from django.shortcuts import render, redirect, render_to_response
+from django.shortcuts import render, redirect, render_to_response, get_object_or_404
 from piebase.models import User, Project, Priority, Severity, TicketStatus, Ticket, Requirement, Attachment, Role, \
     Milestone, Timeline, Comment
 from forms import CreateProjectForm, PriorityForm, SeverityForm, TicketStatusForm, RoleForm, CommentForm, \
@@ -13,7 +12,7 @@ from PIL import Image
 from django.utils import timezone
 from django.template.defaultfilters import slugify
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden
 from django.contrib.auth.tokens import default_token_generator
 from django.core.urlresolvers import reverse
 from .tasks import send_mail_old_user
@@ -23,12 +22,35 @@ from django.contrib import messages
 from django.contrib.contenttypes.models import ContentType
 from django.template import *
 from task.forms import TaskForm
+from django.utils.functional import wraps
+
+def check_project_admin(view):
+    @wraps(view)
+    def inner(request, slug, *args, **kwargs):
+        try:
+            role = get_object_or_404(Role.objects.get(users=request.user, project__slug=slug, project__organization=request.user.organization))
+            if role.is_project_admin:
+                return view(request, slug, *args, **kwargs)
+        except:
+            if request.user.pietrack_role == 'admin':
+                return view(request, slug, *args, **kwargs)
+        return HttpResponseForbidden()
+    return inner
+
+def check_organization_admin(view):
+    def inner(request, *args, **kwargs):
+        if request.user.pietrack_role == 'admin':
+            return view(request, *args, **kwargs)
+        return HttpResponseForbidden()
+    return inner
+
+
 user_login_required = user_passes_test(
     lambda user: user.is_active, login_url='/')
 
 def get_notification_list(user):
     notification_list = Timeline.objects.filter(object_id=user.id)
-    count = notification_list.filter(is_read=False).count
+    count = notification_list.filter(is_read=False).exclude(user=user).count
     return (notification_list,count)
 
 def active_user_required(view_func):
@@ -37,7 +59,9 @@ def active_user_required(view_func):
     return decorated_view_func
 
 
+
 @active_user_required
+@check_organization_admin
 def create_project(request):
     if request.method == "POST":
         img = False
@@ -93,6 +117,7 @@ def project_detail(request, slug):
 
 
 @active_user_required
+@check_project_admin
 def project_details(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     dictionary = {'project': project, 'slug': slug, 'notification_list':get_notification_list(request.user)}
@@ -132,7 +157,8 @@ def project_details(request, slug):
 
 
 @active_user_required
-def delete_project(request, id):
+@check_project_admin
+def delete_project(request, slug, id):
     try:
         project = Project.objects.get(id=id, organization=request.user.organization)
         timeline_list = [project]
@@ -157,6 +183,7 @@ def delete_project(request, id):
 
 
 @active_user_required
+@check_project_admin
 def priorities(request, slug):
     priority_list = Priority.objects.filter(
         project=Project.objects.get(slug=slug, organization=request.user.organization)).order_by('id')
@@ -164,6 +191,7 @@ def priorities(request, slug):
 
 
 @active_user_required
+@check_project_admin
 def priority_default(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     Priority.objects.bulk_create([Priority(name='Wishlist', slug=slugify('Wishlist'), color='#999999', project=project),
@@ -178,6 +206,7 @@ def priority_default(request, slug):
 
 
 @active_user_required
+@check_project_admin
 def priority_create(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     form = PriorityForm(request.POST, project=project)
@@ -191,6 +220,7 @@ def priority_create(request, slug):
 
 
 @active_user_required
+@check_project_admin
 def priority_edit(request, slug, priority_slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     instance = Priority.objects.get(slug=priority_slug, project=project)
@@ -205,6 +235,7 @@ def priority_edit(request, slug, priority_slug):
 
 
 @active_user_required
+@check_project_admin
 def priority_delete(request, slug, priority_slug):
     Priority.objects.get(
         slug=priority_slug, project=Project.objects.get(slug=slug, organization=request.user.organization)).delete()
@@ -212,6 +243,7 @@ def priority_delete(request, slug, priority_slug):
 
 
 @active_user_required
+@check_project_admin
 def severities(request, slug):
     severity_list = Severity.objects.filter(
         project=Project.objects.get(slug=slug, organization=request.user.organization)).order_by('id')
@@ -219,6 +251,7 @@ def severities(request, slug):
 
 
 @active_user_required
+@check_project_admin
 def severity_default(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     Severity.objects.bulk_create([Severity(name='Low', slug=slugify('Low'), color='#999999', project=project),
@@ -229,6 +262,7 @@ def severity_default(request, slug):
 
 
 @active_user_required
+@check_project_admin
 def severity_create(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     form = SeverityForm(request.POST, project=project)
@@ -242,6 +276,7 @@ def severity_create(request, slug):
 
 
 @active_user_required
+@check_project_admin
 def severity_edit(request, slug, severity_slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     instance = Severity.objects.get(slug=severity_slug, project=project)
@@ -256,6 +291,7 @@ def severity_edit(request, slug, severity_slug):
 
 
 @active_user_required
+@check_project_admin
 def severity_delete(request, slug, severity_slug):
     Severity.objects.get(
         slug=severity_slug, project=Project.objects.get(slug=slug, organization=request.user.organization)).delete()
@@ -263,13 +299,15 @@ def severity_delete(request, slug, severity_slug):
 
 
 @active_user_required
+@check_project_admin
 def ticket_status(request, slug):
     ticket_status_list = TicketStatus.objects.filter(
-        project=Project.objects.get(slug=slug, organization=request.user.organization)).order_by('id')
+        project=Project.objects.get(slug=slug, organization=request.user.organization)).order_by('order')
     return render(request, 'settings/ticket_status.html', {'slug': slug, 'ticket_status_list': ticket_status_list, 'notification_list':get_notification_list(request.user)})
 
 
 @active_user_required
+@check_project_admin
 def ticket_status_default(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     TicketStatus.objects.bulk_create([TicketStatus(name='New', slug=slugify('New'), color='#999999', project=project),
@@ -279,12 +317,13 @@ def ticket_status_default(request, slug):
                                                    color='#4e9a06', project=project),
                                       TicketStatus(name='Done', slug=slugify('Done'), color='#cc0000', project=project),
                                       TicketStatus(name='Archived', slug=slugify('Archived'), color='#5c3566',
-                                                   project=project)])
+                                                   project=project, is_final=True)])
     messages.success(request, 'Default status are added to the ticket status page !')
     return HttpResponse(json.dumps({'error': False}), content_type="application/json")
 
 
 @active_user_required
+@check_project_admin
 def ticket_status_create(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     form = TicketStatusForm(request.POST, project=project)
@@ -298,6 +337,7 @@ def ticket_status_create(request, slug):
 
 
 @active_user_required
+@check_project_admin
 def ticket_status_edit(request, slug, ticket_slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     instance = TicketStatus.objects.get(slug=ticket_slug, project=project)
@@ -312,6 +352,7 @@ def ticket_status_edit(request, slug, ticket_slug):
 
 
 @active_user_required
+@check_project_admin
 def ticket_status_delete(request, slug, ticket_slug):
     ticket = TicketStatus.objects.get(
         slug=ticket_slug, project=Project.objects.get(slug=slug, organization=request.user.organization))
@@ -344,6 +385,7 @@ def project_team(request, slug):
 
 
 @active_user_required
+@check_project_admin
 def create_member(request, slug):
     if request.method == 'POST':
         error_count = 0
@@ -414,6 +456,7 @@ def create_member(request, slug):
 
 
 @active_user_required
+@check_project_admin
 def edit_member(request, slug):
     if request.POST:
         email = request.POST.get('email', False)
@@ -441,6 +484,7 @@ def edit_member(request, slug):
 
 
 @active_user_required
+@check_project_admin
 def delete_member(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     result = False
@@ -466,11 +510,12 @@ def delete_member(request, slug):
 def member_roles(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     list_of_roles = Role.objects.filter(project=project)
-    dictionary = {'list_of_roles': list_of_roles, 'slug': slug, 'notification_list':get_notification_list(request.user)}
+    dictionary = {'list_of_roles': list_of_roles, 'slug': slug, 'project':project, 'notification_list':get_notification_list(request.user)}
     return render(request, 'settings/member_roles.html', dictionary)
 
 
 @active_user_required
+@check_project_admin
 def member_roles_default(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     Role.objects.bulk_create([Role(name='UX Developer', slug=slugify('UX Developer'), project=project),
@@ -482,21 +527,27 @@ def member_roles_default(request, slug):
 
 
 @active_user_required
+@check_project_admin
 def member_role_create(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     form = RoleForm(request.POST, project=project)
     if form.is_valid():
         role = form.save()
+        if request.POST.get('is_project_admin',False):
+            role.is_project_admin = True
+            role.users.add(request.user);
+            role.save()
         msg = "created role " + role.name + " in the project "
         create_timeline.send(sender=request.user, content_object=role, namespace=msg,
                              event_type="role created", project=project)
-        return HttpResponse(json.dumps({'error': False, 'role_id': role.id, 'role_name': role.name, 'slug': role.slug}),
-                            content_type="application/json")
+        return HttpResponse(json.dumps({'error': False, 'role_id': role.id, 'role_name': role.name, 'slug': role.slug,
+                                        'email':request.user.email}),content_type="application/json")
     else:
         return HttpResponse(json.dumps({'error': True, 'errors': form.errors}), content_type="application/json")
 
 
 @active_user_required
+@check_project_admin
 def member_role_edit(request, slug, member_role_slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     instance = Role.objects.get(
@@ -515,6 +566,7 @@ def member_role_edit(request, slug, member_role_slug):
 
 
 @active_user_required
+@check_project_admin
 def member_role_delete(request, slug, member_role_slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     role = Role.objects.get(slug=member_role_slug, project=project)
@@ -765,6 +817,7 @@ def milestone_display(request, slug):
 
 
 @active_user_required
+@check_project_admin
 def milestone_create(request, slug):
     if request.method == 'POST':
         json_data = {}
@@ -790,6 +843,7 @@ def milestone_create(request, slug):
 
 
 @active_user_required
+@check_project_admin
 def milestone_edit(request, slug, milestone_slug):
     milestone_obj = Milestone.objects.get(project__slug=slug, slug=milestone_slug,
                                           project__organization=request.user.organization)
@@ -823,6 +877,7 @@ def milestone_edit(request, slug, milestone_slug):
 
 
 @active_user_required
+@check_project_admin
 def milestone_delete(request, slug, milestone_slug):
     milestone = Milestone.objects.get(project__slug=slug, slug=milestone_slug,
                                       project__organization=request.user.organization)
@@ -845,6 +900,7 @@ def milestone_delete(request, slug, milestone_slug):
 
 
 @active_user_required
+@check_project_admin
 def project_edit(request, slug):
     project_obj = Project.objects.get(slug=slug, organization=request.user.organization)
     milestone_list = Milestone.objects.filter(project=project_obj)
@@ -861,6 +917,7 @@ def project_edit(request, slug):
 
 
 @active_user_required
+@check_project_admin
 def requirement_create(request, slug, milestone_slug):
     project_obj = Project.objects.get(slug=slug, organization=request.user.organization)
     if request.POST:
@@ -890,6 +947,7 @@ def requirement_create(request, slug, milestone_slug):
 
 
 @active_user_required
+@check_project_admin
 def requirement_edit(request, slug, milestone_slug, requirement_slug):
     project_obj = Project.objects.get(slug=slug, organization=request.user.organization)
     milestone = Milestone.objects.get(id=milestone_slug, project=project_obj)
@@ -916,6 +974,7 @@ def requirement_edit(request, slug, milestone_slug, requirement_slug):
 
 
 @active_user_required
+@check_project_admin
 def requirement_delete(request, slug, milestone_slug, requirement_slug):
     project_object = Project.objects.get(slug=slug, organization=request.user.organization)
     milestone = Milestone.objects.get(slug=milestone_slug, project=project_object)
