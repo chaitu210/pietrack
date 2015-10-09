@@ -209,9 +209,8 @@ def read_notifications(request):
 @active_user_required
 def get_notifications(request):
     content_type = ContentType.objects.get_for_model(request.user)
-    notification_list = Timeline.objects.filter(content_type__pk=content_type.id, object_id=request.user.id).exclude(
-        user=request.user)
-    count = notification_list.filter(is_read=False).count()
-    response = render(request, 'user/partials/notification.html', {'notification_list': notification_list})
-    return HttpResponse(json.dumps({'notification_list': response.content, 'count': count}),
-                        content_type="application/json")
+    notification_list = Timeline.objects.filter(content_type__pk=content_type.id,
+                                                object_id=request.user.id).exclude(user=request.user).order_by('created')
+    count = notification_list.filter(is_read=False).exclude(user=request.user).count()
+    response = render(request,'user/partials/notification.html',{'notification_list':notification_list})
+    return HttpResponse(json.dumps({'notification_list':response.content, 'count':count}),content_type="application/json")

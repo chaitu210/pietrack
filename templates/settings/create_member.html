@@ -24,7 +24,6 @@
                             <option value="{{ role.slug }}">{{ role.name }}</option>
                             {% endfor %}
                         </select>
-                        <span></span>
                     </div>
                 </div>
                 <div id='id_div_create_member' class="panel_box">
@@ -192,6 +191,11 @@
         }, 3000);
     {% endif %}
   {% endif %}
+    /* check member type*/
+
+    $('input[type="check"]')
+
+    /* end */
     </script>
 
 {% endblock %}

@@ -38,6 +38,12 @@ def get_user_Role(user, project):
     except Exception, e:
         return user.pietrack_role
 
+@register.filter
+def is_project_admin(user,slug):
+    try:
+        return Role.objects.get(users=user, project__slug=slug, project__organization=user.organization).is_project_admin
+    except:
+        return False
 
 @register.filter
 def sub_comments(sub_comment):

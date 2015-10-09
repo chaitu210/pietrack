@@ -20,7 +20,8 @@
                     {% endif %}
 
                     <div class="title">
-                        <h4>{{ project.name }} - <span class="status">MANAGE MEMBERS</span></h4>
+                        <h4>{{ project.name }} - <span class="status">PROJECT MEMBERS</span></h4>
+                    {% if request.user.pietrack_role == 'admin' or request.user|is_project_admin:slug %}
                         <div class="tag">
                             You can quickly add members to your team and re-order them at anytime
                         </div>
@@ -29,6 +30,7 @@
                                 Add New Member
                             </a>
                         </span>
+                    {% endif %}
                     </div>
                     <!-- status table starts here -->
                     <div class="table-responsive member-box">
@@ -39,7 +41,9 @@
                                     <th>Admin</th>
                                     <th>Role</th>
                                     <th>Status</th>
+                                {% if request.user.pietrack_role == 'admin' or request.user|is_project_admin:slug %}
                                     <th>Action</th>
+                                {% endif %}
                                 </tr>
                             </thead>
                             <tbody>
@@ -65,7 +69,7 @@
                                     <td>
                                         <div class="toggle_user_admin">
                                             <a href="#">
-                                            {% if member.pietrack_role == 'admin' %}
+                                            {% if member.pietrack_role == 'admin' or request.user|is_project_admin:slug %}
                                                 <i class="fa fa-toggle-on"></i> Yes
                                                 {% else %}
                                                 <i class="fa fa-toggle-off"></i> No
@@ -83,12 +87,14 @@
                                             <i class="fa fa-check"></i>
                                         </span>
                                     </td>
+                                {% if request.user.pietrack_role == 'admin' or request.user|is_project_admin:slug %}
                                     <td class="actions">
                                         <a href="{% url 'project:edit_member' slug %}?id={{member.id}}" class="edit"><i class="fa fa-edit"></i></a>
                                         <a href="#" class="delete" onclick="delete_member('{{member.id}}')">
                                             <i class="fa fa-trash"></i>
                                         </a>
                                     </td>
+                                {% endif %}
                                 </tr>
                             {% endfor %}
                             </tbody>
