@@ -22,6 +22,7 @@ from django.contrib import messages
 from django.contrib.contenttypes.models import ContentType
 from django.template import *
 from task.forms import TaskForm
+
 from django.utils.functional import wraps
 
 def check_project_admin(view):
@@ -48,10 +49,11 @@ def check_organization_admin(view):
 user_login_required = user_passes_test(
     lambda user: user.is_active, login_url='/')
 
+
 def get_notification_list(user):
     notification_list = Timeline.objects.filter(object_id=user.id)
-    count = notification_list.filter(is_read=False).exclude(user=user).count
-    return (notification_list,count)
+    count = notification_list.filter(is_read=False).exclude(user=user).count()
+    return (notification_list, count)
 
 def active_user_required(view_func):
     decorated_view_func = login_required(
@@ -98,7 +100,7 @@ def create_project(request):
 def list_of_projects(request):
     template_name = 'project/projects_list.html'
     projects_list = Project.objects.filter(members__email=request.user.email, organization=request.user.organization)
-    dict_items = {'projects_list': projects_list,'notification_list':get_notification_list(request.user)}
+    dict_items = {'projects_list': projects_list, 'notification_list': get_notification_list(request.user)}
     return render(request, template_name, dict_items)
 
 
@@ -111,7 +113,7 @@ def project_detail(request, slug):
     dict_items = {'project_object': project_object,
                   'project_members': project_members,
                   'slug': slug, 'events_list': events_list,
-                  'notification_list':get_notification_list(request.user)
+                  'notification_list': get_notification_list(request.user)
                   }
     return render(request, template_name, dict_items)
 
@@ -120,7 +122,7 @@ def project_detail(request, slug):
 @check_project_admin
 def project_details(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
-    dictionary = {'project': project, 'slug': slug, 'notification_list':get_notification_list(request.user)}
+    dictionary = {'project': project, 'slug': slug, 'notification_list': get_notification_list(request.user)}
     template_name = 'project/project_project_details.html'
     if request.method == 'POST':
         img = False
@@ -187,7 +189,8 @@ def delete_project(request, slug, id):
 def priorities(request, slug):
     priority_list = Priority.objects.filter(
         project=Project.objects.get(slug=slug, organization=request.user.organization)).order_by('id')
-    return render(request, 'settings/priorities.html', {'slug': slug, 'priority_list': priority_list, 'notification_list':get_notification_list(request.user)})
+    return render(request, 'settings/priorities.html', {'slug': slug, 'priority_list': priority_list,
+                                                        'notification_list': get_notification_list(request.user)})
 
 
 @active_user_required
@@ -247,7 +250,8 @@ def priority_delete(request, slug, priority_slug):
 def severities(request, slug):
     severity_list = Severity.objects.filter(
         project=Project.objects.get(slug=slug, organization=request.user.organization)).order_by('id')
-    return render(request, 'settings/severities.html', {'slug': slug, 'severity_list': severity_list,'notification_list':get_notification_list(request.user)})
+    return render(request, 'settings/severities.html', {'slug': slug, 'severity_list': severity_list,
+                                                        'notification_list': get_notification_list(request.user)})
 
 
 @active_user_required
@@ -380,7 +384,7 @@ def password_reset(request, to_email):
 @active_user_required
 def project_team(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
-    dictionary = {'project': project, 'slug': slug, 'notification_list':get_notification_list(request.user)}
+    dictionary = {'project': project, 'slug': slug, 'notification_list': get_notification_list(request.user)}
     return render(request, 'settings/team.html', dictionary)
 
 
@@ -452,7 +456,9 @@ def create_member(request, slug):
         return HttpResponse(json.dumps(json_data), content_type='application/json')
     else:
         project_roles = Role.objects.filter(project__slug=slug, project__organization=request.user.organization)
-        return render(request, 'settings/create_member.html', {'slug': slug, 'project_roles': project_roles, 'notification_list':get_notification_list(request.user)})
+        return render(request, 'settings/create_member.html', {'slug': slug, 'project_roles': project_roles,
+                                                               'notification_list': get_notification_list(
+                                                                   request.user)})
 
 
 @active_user_required
@@ -479,7 +485,7 @@ def edit_member(request, slug):
         member = role.users.get(id=request.GET.get('id'))
         return render(request, 'settings/create_member.html',
                       {'slug': slug, 'edit_project': True, 'project_roles': project_roles, 'mrole': role,
-                       'member': member, 'notification_list':get_notification_list(request.user)})
+                       'member': member, 'notification_list': get_notification_list(request.user)})
     return HttpResponse("Invalid Request")
 
 
@@ -510,7 +516,8 @@ def delete_member(request, slug):
 def member_roles(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     list_of_roles = Role.objects.filter(project=project)
-    dictionary = {'list_of_roles': list_of_roles, 'slug': slug, 'project':project, 'notification_list':get_notification_list(request.user)}
+    dictionary = {'list_of_roles': list_of_roles, 'slug': slug,
+                  'notification_list': get_notification_list(request.user)}
     return render(request, 'settings/member_roles.html', dictionary)
 
 
@@ -574,7 +581,7 @@ def member_role_delete(request, slug, member_role_slug):
         Timeline.objects.filter(user=member, project=project).delete()
         msg = "removed user " + str(member.username) + " from  project "
         create_timeline.send(sender=request.user, content_object=member, namespace=msg,
-                         event_type="user deleted", project=project)
+                             event_type="user deleted", project=project)
     project.members.remove(*role.users.all())
     role.delete()
     msg = "removed role " + role.name + " from this project "
@@ -608,13 +615,13 @@ def taskboard(request, slug, milestone_slug):
             pass
     return render(request, 'project/taskboard.html',
                   {'ticket_status_list': ticket_status_list, 'slug': slug, 'milestone': milestone,
-                   'project_members': mem_details, 'notification_list':get_notification_list(request.user)})
+                   'project_members': mem_details, 'notification_list': get_notification_list(request.user)})
 
 
 @active_user_required
 def update_taskboard_status(request, slug, status_slug, task_id):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
-    task = Ticket.objects.get(id=task_id,project=project)
+    task = Ticket.objects.get(id=task_id, project=project)
     old_status = task.status.name
     ticket_status = TicketStatus.objects.get(
         slug=status_slug, project=project)
@@ -641,7 +648,8 @@ def load_tasks(request, slug, milestone_slug, status_slug):
         pass
     except EmptyPage:
         pass
-    return render_to_response('project/partials/task.html', {'tasks': tasks, 'milestone': milestone, 'slug': slug, 'notification_list':get_notification_list(request.user)})
+    return render_to_response('project/partials/task.html', {'tasks': tasks, 'milestone': milestone, 'slug': slug,
+                                                             'notification_list': get_notification_list(request.user)})
 
 
 @active_user_required
@@ -651,7 +659,7 @@ def requirement_tasks(request, slug, milestone_slug, requirement_id):
     ticket_status_list = TicketStatus.objects.filter(project=project).order_by('id')
     return render(request, 'project/partials/requirement_tasks.html',
                   {'ticket_status_list': ticket_status_list, 'slug': slug, 'requirement_id': requirement_id,
-                   'milestone': milestone, 'notification_list':get_notification_list(request.user)})
+                   'milestone': milestone, 'notification_list': get_notification_list(request.user)})
 
 
 @active_user_required
@@ -668,7 +676,8 @@ def requirement_tasks_more(request, slug, milestone_slug, status_slug, requireme
         pass
     except EmptyPage:
         pass
-    return render_to_response('project/partials/task.html', {'tasks': tasks, 'milestone': milestone, 'slug': slug, 'notification_list':get_notification_list(request.user)})
+    return render_to_response('project/partials/task.html', {'tasks': tasks, 'milestone': milestone, 'slug': slug,
+                                                             'notification_list': get_notification_list(request.user)})
 
 
 @active_user_required
@@ -676,7 +685,8 @@ def task_details(request, slug, milestone_slug, task_id):
     project = Project.objects.get(slug=slug)
     task = Ticket.objects.get(id=task_id, milestone__slug=milestone_slug,
                               project__organization=request.user.organization)
-    return render(request, 'task/Task_detail.html', {'task': task, 'slug': slug, 'project': project, 'notification_list':get_notification_list(request.user)})
+    return render(request, 'task/Task_detail.html', {'task': task, 'slug': slug, 'project': project,
+                                                     'notification_list': get_notification_list(request.user)})
 
 
 @active_user_required
@@ -691,8 +701,7 @@ def task_comment(request, slug, task_id):
         comment = form.save()
         if request.GET.get('parent_id', False):
             comment.parent_id = request.GET.get('parent_id')
-        else:
-            comment.parent_id = comment.created_by.id
+
         if request.FILES.get('file'):
             attachment = Attachment.objects.create(
                 uploaded_by=request.user, attached_file=request.FILES.get('file'), project=project)
@@ -701,11 +710,16 @@ def task_comment(request, slug, task_id):
         msg = "commented on " + task.name
         if request.GET.get('parent_id', False):
             msg = "gave reply to " + comment.parent.commented_by.username + "  on " + task.name
-        create_timeline.send(sender=request.user, content_object=comment.parent.commented_by, namespace=msg, event_type="commented",
-                             project=project)
+            create_timeline.send(sender=request.user, content_object=comment.parent.commented_by, namespace=msg,
+                                 event_type="commented",
+                                 project=project)
+        else:
+            create_timeline.send(sender=request.user, content_object=comment, namespace=msg, event_type="commented",
+                                 project=project)
         return HttpResponse(
             render(request, 'task/partials/comment_add.html',
-                               {'comment': comment, 'slug': slug, 'task': task, 'project': project, 'notification_list':get_notification_list(request.user)}))
+                   {'comment': comment, 'slug': slug, 'task': task, 'project': project,
+                    'notification_list': get_notification_list(request.user)}))
     else:
         return HttpResponse(json.dumps({'error': True, 'errors': form.errors}), content_type="json/application")
 
@@ -724,7 +738,7 @@ def task_comment_edit(request):
 @active_user_required
 def task_edit(request, slug, milestone_slug, task_id):
     project_obj = Project.objects.get(slug=slug, organization=request.user.organization)
-    task = Ticket.objects.get(id=task_id, project = project_obj, milestone__slug=milestone_slug)
+    task = Ticket.objects.get(id=task_id, project=project_obj, milestone__slug=milestone_slug)
     old_name = task.name
     old_assigned_to = task.assigned_to
     if request.POST:
@@ -735,16 +749,19 @@ def task_edit(request, slug, milestone_slug, task_id):
             new_task = form.save()
             msg = "updated task " + task.name + " details "
             if old_name != new_task.name:
-                msg = "renamed task " + old_name + " to "+new_task.name +" "
-                create_timeline.send(sender=request.user, content_object=new_task, namespace=msg, event_type="task renamed",
-                             project=project_obj)
-            elif old_assigned_to != new_task.assigned_to :
-                msg = "removed user" + old_assigned_to.username + " from "+new_task.name +" "
-                create_timeline.send(sender=request.user, content_object=old_assigned_to, namespace=msg, event_type="user removed",
-                             project=project_obj)
-                msg = "task "+new_task.name+" assigned to user" + new_task.assigned_to.username
-                create_timeline.send(sender=request.user, content_object= new_task.assigned_to, namespace=msg, event_type="task assigned",
-                             project=project_obj)
+                msg = "renamed task " + old_name + " to " + new_task.name + " "
+                create_timeline.send(sender=request.user, content_object=new_task, namespace=msg,
+                                     event_type="task renamed",
+                                     project=project_obj)
+            elif old_assigned_to != new_task.assigned_to:
+                msg = "removed user" + old_assigned_to.username + " from " + new_task.name + " "
+                create_timeline.send(sender=request.user, content_object=old_assigned_to, namespace=msg,
+                                     event_type="user removed",
+                                     project=project_obj)
+                msg = "task " + new_task.name + " assigned to user" + new_task.assigned_to.username
+                create_timeline.send(sender=request.user, content_object=new_task.assigned_to, namespace=msg,
+                                     event_type="task assigned",
+                                     project=project_obj)
         else:
             json_data['error'] = True
             json_data['form_errors'] = form.errors
@@ -759,19 +776,24 @@ def task_edit(request, slug, milestone_slug, task_id):
                 assigned_to_list.append(member)
             except:
                 pass
-        return render(request, 'task/add_task.html',{'requirement_list': requirement_list,
-                        'ticket_status_list': ticket_status_list,'assigned_to_list': assigned_to_list,'slug':slug,
-                        'task':task, 'milestone':task.milestone}
+        return render(request, 'task/add_task.html', {'requirement_list': requirement_list,
+                                                      'ticket_status_list': ticket_status_list,
+                                                      'assigned_to_list': assigned_to_list, 'slug': slug,
+                                                      'task': task, 'milestone': task.milestone}
                       )
+
+
 @active_user_required
 def task_delete(request, slug, milestone_slug, task_id):
-    marker=False
+    marker = False
     try:
-        Ticket.objects.get(id=task_id, project__slug=slug, project__organization=request.user.organization, milestone__slug=milestone_slug).delete()
+        Ticket.objects.get(id=task_id, project__slug=slug, project__organization=request.user.organization,
+                           milestone__slug=milestone_slug).delete()
         marker = True
     finally:
         pass
     return HttpResponse(marker)
+
 
 @active_user_required
 def delete_attachment(request, slug, task_id, attachment_id):
@@ -813,7 +835,8 @@ def milestone_display(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     milestones_list = Milestone.objects.filter(project=project)
     return render(request, 'project/milestones_list.html',
-                  {'slug': slug, 'milestones_list': milestones_list, 'project': project, 'notification_list':get_notification_list(request.user)})
+                  {'slug': slug, 'milestones_list': milestones_list, 'project': project,
+                   'notification_list': get_notification_list(request.user)})
 
 
 @active_user_required
@@ -839,7 +862,8 @@ def milestone_create(request, slug):
             json_data['form_errors'] = milestone_form.errors
             return HttpResponse(json.dumps(json_data), content_type='application/json')
     else:
-        return render(request, 'project/milestone.html', {'slug': slug, 'notification_list':get_notification_list(request.user)})
+        return render(request, 'project/milestone.html',
+                      {'slug': slug, 'notification_list': get_notification_list(request.user)})
 
 
 @active_user_required
@@ -873,7 +897,8 @@ def milestone_edit(request, slug, milestone_slug):
             json_data['form_errors'] = milestone_form.errors
             return HttpResponse(json.dumps(json_data), content_type='application/json')
     else:
-        return render(request, 'project/milestone.html', {'milestone_obj': milestone_obj, 'slug': slug, 'notification_list':get_notification_list(request.user)})
+        return render(request, 'project/milestone.html', {'milestone_obj': milestone_obj, 'slug': slug,
+                                                          'notification_list': get_notification_list(request.user)})
 
 
 @active_user_required
@@ -943,7 +968,8 @@ def requirement_create(request, slug, milestone_slug):
             return HttpResponse(json.dumps(json_data), content_type='application/json')
     else:
         milestone = project_obj.milestones.get(slug=milestone_slug)
-        return render(request, 'project/requirement.html', {'milestone': milestone, 'slug': slug, 'notification_list':get_notification_list(request.user)})
+        return render(request, 'project/requirement.html',
+                      {'milestone': milestone, 'slug': slug, 'notification_list': get_notification_list(request.user)})
 
 
 @active_user_required
@@ -957,7 +983,7 @@ def requirement_edit(request, slug, milestone_slug, requirement_slug):
         requirement_form = RequirementForm(request.POST, instance=requirement_obj)
         if requirement_form.is_valid():
             requirement_form.save()
-            msg = " requirement " + requirement_obj.name +" was updated "
+            msg = " requirement " + requirement_obj.name + " was updated "
             create_timeline.send(sender=request.user, content_object=requirement_obj, namespace=msg,
                                  event_type="requirement_form", project=project_obj)
             json_data['error'] = False
@@ -969,7 +995,8 @@ def requirement_edit(request, slug, milestone_slug, requirement_slug):
             return HttpResponse(json.dumps(json_data), content_type='application/json')
     else:
 
-        context = {'milestone': milestone, 'requirement_obj': requirement_obj, 'slug': slug, 'notification_list':get_notification_list(request.user)}
+        context = {'milestone': milestone, 'requirement_obj': requirement_obj, 'slug': slug,
+                   'notification_list': get_notification_list(request.user)}
         return render(request, 'project/requirement.html', context)
 
 
@@ -990,6 +1017,5 @@ def requirement_delete(request, slug, milestone_slug, requirement_slug):
     requirement_object.delete()
     msg = " deleted requirement " + requirement_object.name
     create_timeline.send(sender=request.user, content_object=requirement_object, namespace=msg,
-                                 event_type="requirement_form", project=project_object)
+                         event_type="requirement_form", project=project_object)
     return HttpResponseRedirect(reverse('project:taskboard', kwargs={'milestone_slug': milestone_slug, 'slug': slug}))
-

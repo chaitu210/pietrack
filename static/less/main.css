@@ -2893,7 +2893,7 @@ header .text .tag {
   width: 100%;
   background: #fff;
   padding: 15px;
-  margin-bottom: 15px;
+  margin-top: 15px;
 }
 .comments_wrap_div .comment_each .img_div {
   text-align: left;
@@ -3046,7 +3046,7 @@ header .text .tag {
   padding-right: 8px;
 }
 .comments_wrap_div .your_comment {
-  padding: 20px 0px 35px 0px;
+  padding: 10px 0px;
   /* for attachment file display */
   /* --// -- */
 }
@@ -3345,5 +3345,30 @@ input[readonly] {
 }
 .edit_comment_text .save_comment i {
   padding-right: 8px;
+}
+.edit_comment_text .cancel_comment {
+  margin-left: 2px;
+  cursor: pointer;
+  float: left;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+  box-shadow: none;
+  border: 1px solid #00a88e;
+  background: #00c1a4;
+  border-radius: 2px;
+  text-transform: uppercase;
+}
+.edit_comment_text .cancel_comment i {
+  padding-right: 8px;
+}
+.sub_comment .close_comment {
+  top: 15px;
+  right: -10px;
+  position: relative;
+  padding: 5px;
+  background: #aaaaaa;
+  border-radius: 25px;
 }
 /* edit_comment_text */

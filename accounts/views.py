@@ -73,7 +73,7 @@ def merge_two_dicts(x, y):
 
 
 def register(request):
-    register_form = RegisterForm(request.POST,email=request.POST.get('email'))
+    register_form = RegisterForm(request.POST, email=request.POST.get('email'))
     errors = {}
     if request.POST.get('organization'):
         if User.objects.filter(organization__name__exact=request.POST.get('organization')).exists():
@@ -154,7 +154,7 @@ def change_password(request):
             response_data = {'error': True, 'response': form.errors}
 
         return HttpResponse(json.dumps(response_data))
-    return render(request, 'user/change_password.html', {'notification_list':get_notification_list(request.user)})
+    return render(request, 'user/change_password.html', {'notification_list': get_notification_list(request.user)})
 
 
 @active_user_required
@@ -177,7 +177,7 @@ def user_profile(request):
 
                 user.profile_pic = request.FILES['profile_pic']
                 try:
-                    shutil.rmtree(settings.MEDIA_ROOT + 'profile/' +user.username)
+                    shutil.rmtree(settings.MEDIA_ROOT + 'profile/' + user.username)
                 except:
                     pass
 
@@ -188,20 +188,23 @@ def user_profile(request):
             response_data = {'error': True, 'response': form.errors}
 
         return HttpResponse(json.dumps(response_data))
-    return render(request, 'user/user_profile.html',{'notification_list':get_notification_list(request.user)})
+    return render(request, 'user/user_profile.html', {'notification_list': get_notification_list(request.user)})
 
 
 def reset_confirm(request, uidb64=None, token=None):
     return password_reset_confirm(request, template_name='email/reset_confirm.html', uidb64=uidb64, token=token,
                                   post_reset_redirect=reverse('user:login'))
 
+
 @active_user_required
 def read_notifications(request):
     content_type = ContentType.objects.get_for_model(request.user)
-    for notification in Timeline.objects.filter(content_type__pk=content_type.id, object_id=request.user.id, is_read=False):
+    for notification in Timeline.objects.filter(content_type__pk=content_type.id, object_id=request.user.id,
+                                                is_read=False):
         notification.is_read = True
         notification.save()
     return HttpResponse("True")
+
 
 @active_user_required
 def get_notifications(request):
@@ -210,5 +213,4 @@ def get_notifications(request):
                                                 object_id=request.user.id).exclude(user=request.user).order_by('created')
     count = notification_list.filter(is_read=False).exclude(user=request.user).count()
     response = render(request,'user/partials/notification.html',{'notification_list':notification_list})
-    return HttpResponse(json.dumps({'notification_list':response.content, 'count':count}),
-                        content_type="application/json")
+    return HttpResponse(json.dumps({'notification_list':response.content, 'count':count}),content_type="application/json")
