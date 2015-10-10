@@ -24,7 +24,7 @@ from django.template import *
 from task.forms import TaskForm
 from .templatetags.project_tags import is_project_admin
 from django.utils.functional import wraps
-
+from django.db.models import Q
 
 def check_project_admin(view):
     wraps(view)
@@ -36,7 +36,9 @@ def check_project_admin(view):
                                     project__organization=request.user.organization)
 
             if role.is_project_admin:
-                return wraps(view)(view(request, slug, *args, **kwargs))
+                return wraps(view) (view(request, slug, *args, **kwargs))
+            elif request.user.pietrack_role == 'admin':
+                return wraps(view) (view(request, slug, *args, **kwargs))
         except:
             if request.user.pietrack_role == 'admin':
                 return wraps(view)(view(request, slug, *args, **kwargs))
@@ -69,6 +71,16 @@ def active_user_required(view_func):
         user_login_required(view_func), login_url='/')
     return decorated_view_func
 
+def is_project_member(view):
+    def inner(request,slug, *args, **kwargs):
+        try:
+            project = Project.objects.get(slug=slug, organization=request.user.organization)
+            if project.members.filter(email=request.user.email):
+                return view(request,slug, *args, **kwargs)
+        except:
+            pass
+        return HttpResponseForbidden()
+    return inner
 
 @active_user_required
 @check_organization_admin
@@ -114,6 +126,7 @@ def list_of_projects(request):
 
 
 @active_user_required
+@is_project_member
 def project_detail(request, slug):
     template_name = 'project/project_description.html'
     project_object = Project.objects.get(slug=slug, organization=request.user.organization)
@@ -401,6 +414,7 @@ def password_reset(request, to_email):
 
 
 @active_user_required
+@is_project_member
 def project_team(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     dictionary = {'project': project, 'slug': slug, 'notification_list': get_notification_list(request.user)}
@@ -532,6 +546,7 @@ def delete_member(request, slug):
 
 
 @active_user_required
+@is_project_member
 def member_roles(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     list_of_roles = Role.objects.filter(project=project)
@@ -611,7 +626,7 @@ def member_role_delete(request, slug, member_role_slug):
         msg = "removed user " + str(member.username) + " from  project "
         create_timeline.send(sender=request.user, content_object=member, namespace=msg,
                              event_type="user deleted", project=project)
-    project.members.remove(*role.users.all())
+    project.members.remove(*role.users.filter(~Q(pietrack_role='admin')))
     role.delete()
     msg = "removed role " + role.name + " from this project "
     create_timeline.send(sender=request.user, content_object=project, namespace=msg,
@@ -620,6 +635,7 @@ def member_role_delete(request, slug, member_role_slug):
 
 
 @active_user_required
+@is_project_member
 def tickets(request, slug):
     if Milestone.objects.filter(project__slug=slug, project__organization=request.user.organization).exists():
         milestone_slug = Milestone.objects.filter(project__slug=slug, project__organization=request.user.organization)[
@@ -632,6 +648,7 @@ def tickets(request, slug):
 
 
 @active_user_required
+@is_project_member
 def taskboard(request, slug, milestone_slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     milestone = Milestone.objects.get(slug=milestone_slug, project=project)
@@ -648,6 +665,7 @@ def taskboard(request, slug, milestone_slug):
 
 
 @active_user_required
+@is_project_member
 def update_taskboard_status(request, slug, status_slug, task_id):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     task = Ticket.objects.get(id=task_id, project=project)
@@ -663,6 +681,7 @@ def update_taskboard_status(request, slug, status_slug, task_id):
 
 
 @active_user_required
+@is_project_member
 def load_tasks(request, slug, milestone_slug, status_slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     status = TicketStatus.objects.get(slug=status_slug, project=project)
@@ -682,6 +701,7 @@ def load_tasks(request, slug, milestone_slug, status_slug):
 
 
 @active_user_required
+@is_project_member
 def requirement_tasks(request, slug, milestone_slug, requirement_id):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     milestone = Milestone.objects.get(slug=milestone_slug, project=project)
@@ -692,6 +712,7 @@ def requirement_tasks(request, slug, milestone_slug, requirement_id):
 
 
 @active_user_required
+@is_project_member
 def requirement_tasks_more(request, slug, milestone_slug, status_slug, requirement_id):
     requirement = Requirement.objects.get(id=requirement_id)
     project = Project.objects.get(slug=slug, organization=request.user.organization)
@@ -710,6 +731,7 @@ def requirement_tasks_more(request, slug, milestone_slug, status_slug, requireme
 
 
 @active_user_required
+@is_project_member
 def task_details(request, slug, milestone_slug, task_id):
     project = Project.objects.get(slug=slug)
     task = Ticket.objects.get(id=task_id, milestone__slug=milestone_slug,
@@ -719,6 +741,7 @@ def task_details(request, slug, milestone_slug, task_id):
 
 
 @active_user_required
+@is_project_member
 def task_comment(request, slug, task_id):
     project = Project.objects.get(
         slug=slug, organization=request.user.organization)
@@ -754,6 +777,7 @@ def task_comment(request, slug, task_id):
 
 
 @active_user_required
+@is_project_member
 def task_comment_edit(request):
     project = Project.objects.get(slug=request.POST.get('slug'), organization=request.user.organization)
     task = Ticket.objects.get(id=request.POST.get('task_id'), project=project)
@@ -765,6 +789,7 @@ def task_comment_edit(request):
 
 
 @active_user_required
+@is_project_member
 def task_edit(request, slug, milestone_slug, task_id):
     project_obj = Project.objects.get(slug=slug, organization=request.user.organization)
     task = Ticket.objects.get(id=task_id, project=project_obj, milestone__slug=milestone_slug)
@@ -813,6 +838,7 @@ def task_edit(request, slug, milestone_slug, task_id):
 
 
 @active_user_required
+@is_project_member
 def task_delete(request, slug, milestone_slug, task_id):
     marker = False
     try:
@@ -825,6 +851,7 @@ def task_delete(request, slug, milestone_slug, task_id):
 
 
 @active_user_required
+@is_project_member
 def delete_attachment(request, slug, task_id, attachment_id):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     attach = Attachment.objects.get(id=attachment_id, project=project)
@@ -843,6 +870,7 @@ def delete_attachment(request, slug, task_id, attachment_id):
 
 
 @active_user_required
+@is_project_member
 def delete_task_comment(request, comment_id):
     comment = Comment.objects.get(id=comment_id)
     if comment.commented_by == request.user:
@@ -860,6 +888,7 @@ def delete_task_comment(request, comment_id):
 
 
 @active_user_required
+@is_project_member
 def milestone_display(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     milestones_list = Milestone.objects.filter(project=project)

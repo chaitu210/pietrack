@@ -88,12 +88,26 @@
                                         </span>
                                     </td>
                                 {% if request.user.pietrack_role == 'admin' or request.user|is_project_admin:slug %}
-                                    <td class="actions">
+                                    {% if request.user.pietrack_role == 'admin' %}
+                                        {% if request.user != member or member|get_user_Role:project != request.user.pietrack_role  %}
+                                        <td class="actions">
                                         <a href="{% url 'project:edit_member' slug %}?id={{member.id}}" class="edit"><i class="fa fa-edit"></i></a>
                                         <a href="#" class="delete" onclick="delete_member('{{member.id}}')">
                                             <i class="fa fa-trash"></i>
                                         </a>
-                                    </td>
+                                        </td>
+                                        {% endif  %}
+                                    {% else %}
+                                        {% if  member != request.user and member.pietrack_role != 'admin' %}
+                                        <td class="actions">
+                                        <a href="{% url 'project:edit_member' slug %}?id={{member.id}}" class="edit"><i class="fa fa-edit"></i></a>
+                                        <a href="#" class="delete" onclick="delete_member('{{member.id}}')">
+                                            <i class="fa fa-trash"></i>
+                                        </a>
+                                        </td>
+                                        {% endif  %}
+                                    {% endif %}
+
                                 {% endif %}
                                 </tr>
                             {% endfor %}
