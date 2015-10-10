@@ -14,7 +14,7 @@
               <div class="profile-content">
                 <div class="task_details">
                   <b>Created By : </b>
-                  {{task.created_by.username}} ,
+                  {{ task.created_by.username|title }} ,
                   <em> {{task.created_date|date:"d F,Y \a\t P"}}</em>
                 </div>
                 <span class="desc">
@@ -342,7 +342,7 @@
   
   $('body').on('submit', 'form.comment_reply', function(e) {
       var id = $(this).parent().prev().find('div.name').attr('id');
-      var form = this;
+      var form = $(this);
       var formData = new FormData($(this)[0]);
       $.ajax({
           url: "/project/{{slug}}/task/{{task.id}}/comment/?parent_id=" + id,
@@ -362,7 +362,8 @@
                       var reply = $($.parseHTML('<div class="sub_comment"></div>'))
                       $(form).parent().after(reply.append(response))
                   }
-                  $(form).remove()
+                  $(form).remove();
+                  $('.close_comment').remove();
               }
           }
       });

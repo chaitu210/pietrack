@@ -25,24 +25,29 @@ from task.forms import TaskForm
 
 from django.utils.functional import wraps
 
+
 def check_project_admin(view):
     @wraps(view)
     def inner(request, slug, *args, **kwargs):
         try:
-            role = get_object_or_404(Role.objects.get(users=request.user, project__slug=slug, project__organization=request.user.organization))
+            role = get_object_or_404(Role.objects.get(users=request.user, project__slug=slug,
+                                                      project__organization=request.user.organization))
             if role.is_project_admin:
                 return view(request, slug, *args, **kwargs)
         except:
             if request.user.pietrack_role == 'admin':
                 return view(request, slug, *args, **kwargs)
         return HttpResponseForbidden()
+
     return inner
+
 
 def check_organization_admin(view):
     def inner(request, *args, **kwargs):
         if request.user.pietrack_role == 'admin':
             return view(request, *args, **kwargs)
         return HttpResponseForbidden()
+
     return inner
 
 
@@ -55,11 +60,11 @@ def get_notification_list(user):
     count = notification_list.filter(is_read=False).exclude(user=user).count()
     return (notification_list, count)
 
+
 def active_user_required(view_func):
     decorated_view_func = login_required(
         user_login_required(view_func), login_url='/')
     return decorated_view_func
-
 
 
 @active_user_required
@@ -307,7 +312,8 @@ def severity_delete(request, slug, severity_slug):
 def ticket_status(request, slug):
     ticket_status_list = TicketStatus.objects.filter(
         project=Project.objects.get(slug=slug, organization=request.user.organization)).order_by('order')
-    return render(request, 'settings/ticket_status.html', {'slug': slug, 'ticket_status_list': ticket_status_list, 'notification_list':get_notification_list(request.user)})
+    return render(request, 'settings/ticket_status.html', {'slug': slug, 'ticket_status_list': ticket_status_list,
+                                                           'notification_list': get_notification_list(request.user)})
 
 
 @active_user_required
@@ -517,7 +523,7 @@ def member_roles(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     list_of_roles = Role.objects.filter(project=project)
     dictionary = {'list_of_roles': list_of_roles, 'slug': slug,
-                  'notification_list': get_notification_list(request.user)}
+                  'notification_list': get_notification_list(request.user), 'project': project}
     return render(request, 'settings/member_roles.html', dictionary)
 
 
@@ -540,7 +546,7 @@ def member_role_create(request, slug):
     form = RoleForm(request.POST, project=project)
     if form.is_valid():
         role = form.save()
-        if request.POST.get('is_project_admin',False):
+        if request.POST.get('is_project_admin', False):
             role.is_project_admin = True
             role.users.add(request.user);
             role.save()
@@ -548,7 +554,7 @@ def member_role_create(request, slug):
         create_timeline.send(sender=request.user, content_object=role, namespace=msg,
                              event_type="role created", project=project)
         return HttpResponse(json.dumps({'error': False, 'role_id': role.id, 'role_name': role.name, 'slug': role.slug,
-                                        'email':request.user.email}),content_type="application/json")
+                                        'email': request.user.email}), content_type="application/json")
     else:
         return HttpResponse(json.dumps({'error': True, 'errors': form.errors}), content_type="application/json")
 

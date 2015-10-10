@@ -3081,6 +3081,12 @@ header .text .tag {
   color: #fff;
   border: 1px solid #00a88e;
   padding: 4px 15px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+}
+.comments_wrap_div .your_comment .comment_btn i {
+  margin: 0px 5px;
 }
 /* comments_wrap_div */
 #post-form .form_group {

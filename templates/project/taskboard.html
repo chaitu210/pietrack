@@ -27,7 +27,7 @@
                     <div class="col-md-2">
                         <select class='select2 input select2_assigned_to' multiple>
                             {% for member in project_members %}
-                                <option value="{{ member.id }}">{{ member.first_name }}</option>
+                                <option value="{{ member.id }}">{% if member.first_name %}{{ member.first_name }}{% else %}{{ member.username }}{% endif %}</option>
                             {% endfor %}
                         </select>
                     </div>
