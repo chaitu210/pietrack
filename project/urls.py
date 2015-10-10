@@ -55,7 +55,7 @@ urlpatterns = [
 
     # comments
     url(r'^comment/comment_edit/$', task_comment_edit, name="task_comment_edit"),
-    url(r'^comment/delete/(?P<comment_id>[0-9]+)/$',
+    url(r'^task/comment/delete/(?P<comment_id>[0-9]+)/$',
         delete_task_comment, name="delete_task_comment"),
     url(r'^(?P<slug>[-\w]+)/task/(?P<task_id>[0-9]+)/comment/$', task_comment, name="task_comment"),
 
@@ -92,7 +92,7 @@ urlpatterns = [
         r'^(?P<slug>[a-zA-Z0-9-]+)/(?P<milestone_slug>[a-zA-Z0-9-]+)/(?P<requirement_slug>[a-zA-Z0-9-]+)/requirement/edit/$',
         requirement_edit, name='requirement_edit'),
     url(
-        r'^(?P<slug>[a-zA-Z0-9-]+)/(?P<milestone_slug>[a-zA-Z0-9-]+)/(?P<requirement_slug>[a-zA-Z0-9-]+)/requirement/delete/$',
+        r'^(?P<slug>[a-zA-Z0-9-]+)/(?P<milestone_slug>[a-zA-Z0-9-]+)/(?P<id>[0-9-]+)/requirement/delete/$',
         requirement_delete, name='requirement_delete'),
 
 ]

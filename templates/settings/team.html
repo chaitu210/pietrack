@@ -69,7 +69,7 @@
                                     <td>
                                         <div class="toggle_user_admin">
                                             <a href="#">
-                                            {% if member.pietrack_role == 'admin' or request.user|is_project_admin:slug %}
+                                            {% if member.pietrack_role == 'admin' or member|is_project_admin:slug %}
                                                 <i class="fa fa-toggle-on"></i> Yes
                                                 {% else %}
                                                 <i class="fa fa-toggle-off"></i> No

@@ -20,7 +20,7 @@
                     {% endif %}
                     <br clear="clearfixall" />
                     <div class="title">
-                        <h4><span class="status">{{ project.name }} - USER ROLE'S</span></h4>
+                        <h4><span class="status">{{ project.name }} - MEMBER ROLE'S</span></h4>
                      {% if request.user.pietrack_role == 'admin' or request.user|is_project_admin:slug %}
                         <div class="tag">
                             Specify the roles of your projects here.
@@ -70,7 +70,7 @@
                     </div>
                     <!-- status table starts here -->
                     <div class="table-responsive member-box">
-                        {% if list_of_roles %}
+
                             <table class="table table-hover" id="role_permissions">
                                 <thead>
                                     <tr>
@@ -99,7 +99,7 @@
                                   {% endfor %}
                                 </tbody>
                             </table>
-                        {% else %}
+                        {% if not list_of_roles %}
                             <div>
                                 <hr />
                                 <center>
@@ -178,8 +178,11 @@
               var role_id = response['role_id'];
               var role_name = response['role_name'];
               var slug = response['slug'];
-              var email =  response['email']
-              var row = '<tr id="' + role_id + '"><td>' + role_name + ' </td><td>'+'<span class="user-assign"><a href="#"><i class="fa fa-user"></i>'+email+'</a></span>'+'</td><td class="actions"><a href="#" class="edit" data-toggle="modal" data-target="#myModal1" onclick="edit_role(\'' + role_id + '\',\'' + role_name + '\',\'' + slug + '\')"><i class="fa fa-edit"></i></a> <a href="#" class="delete" onclick="delete_role(\'' + slug + '\',\'' + role_id + '\')"><i class="fa fa-trash"></i></a> </td></tr>'
+              var user = ""
+              if (response['email']){
+                  user = '<span class="user-assign">'+response['email']+'<a href="#"><i class="fa fa-user"></i>'
+              }
+              var row = '<tr id="' + role_id + '"><td>' + role_name + ' </td><td>'+user+'</a></span>'+'</td><td class="actions"><a href="#" class="edit" data-toggle="modal" data-target="#myModal1" onclick="edit_role(\'' + role_id + '\',\'' + role_name + '\',\'' + slug + '\')"><i class="fa fa-edit"></i></a> <a href="#" class="delete" onclick="delete_role(\'' + slug + '\',\'' + role_id + '\')"><i class="fa fa-trash"></i></a> </td></tr>'
               $("#role_permissions tbody").append(row);
               $("#id_add_role input[name='name']").val("");
               $('button.close').click();
