@@ -257,6 +257,11 @@
     $("#ticket_status tbody").sortable({
         helper: fixHelperModified,
         stop: updateIndex
+        update: function(event, ui) {
+        $('table tr').each(function() {
+            $(this).children('td:first-child').html($(this).index())
+            console.log($(this).index())
+        });
     }).disableSelection();
 </script>
     </script>
