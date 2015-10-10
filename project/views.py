@@ -28,10 +28,12 @@ from django.db.models import Q
 
 def check_project_admin(view):
     wraps(view)
+
     def inner(request, slug, *args, **kwargs):
         try:
 
-            role = Role.objects.get(users=request.user, project__slug=slug, project__organization=request.user.organization)
+            role = Role.objects.get(users=request.user, project__slug=slug,
+                                    project__organization=request.user.organization)
 
             if role.is_project_admin:
                 return wraps(view) (view(request, slug, *args, **kwargs))
@@ -39,11 +41,10 @@ def check_project_admin(view):
                 return wraps(view) (view(request, slug, *args, **kwargs))
         except:
             if request.user.pietrack_role == 'admin':
-                return wraps(view) (view(request, slug, *args, **kwargs))
+                return wraps(view)(view(request, slug, *args, **kwargs))
         return HttpResponseForbidden()
 
-    return wraps(view) (inner)
-
+    return wraps(view)(inner)
 
 
 def check_organization_admin(view):
@@ -106,6 +107,7 @@ def create_project(request):
             project_obj.created_by = request.user
             project_obj.save()
             project_obj.members.add(request.user)
+            project_obj.save()
             json_data = {'error': False, 'errors': form.errors, 'slug': slug}
             messages.success(request, 'Successfully created your project - ' + str(request.POST['name']) + ' !')
             return HttpResponse(json.dumps(json_data), content_type="application/json")
@@ -335,14 +337,15 @@ def ticket_status(request, slug):
 @check_project_admin
 def ticket_status_default(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
-    TicketStatus.objects.bulk_create([TicketStatus(name='New', slug=slugify('New'), color='#999999', project=project),
-                                      TicketStatus(name='In progress', slug=slugify('In progress'), color='#729fcf',
-                                                   project=project),
-                                      TicketStatus(name='Ready for test', slug=slugify('Ready for test'),
-                                                   color='#4e9a06', project=project),
-                                      TicketStatus(name='Done', slug=slugify('Done'), color='#cc0000', project=project),
-                                      TicketStatus(name='Archived', slug=slugify('Archived'), color='#5c3566',
-                                                   project=project, is_final=True)])
+    TicketStatus.objects.bulk_create(
+        [TicketStatus(name='New', slug=slugify('New'), color='#999999', project=project, order=1),
+         TicketStatus(name='In progress', slug=slugify('In progress'), color='#729fcf',
+                      project=project, order=2),
+         TicketStatus(name='Ready for test', slug=slugify('Ready for test'),
+                      color='#4e9a06', project=project, order=3),
+         TicketStatus(name='Done', slug=slugify('Done'), color='#cc0000', project=project, order=4),
+         TicketStatus(name='Archived', slug=slugify('Archived'), color='#5c3566',
+                      project=project, is_final=True, order=5)])
     messages.success(request, 'Default status are added to the ticket status page !')
     return HttpResponse(json.dumps({'error': False}), content_type="application/json")
 
@@ -383,6 +386,14 @@ def ticket_status_delete(request, slug, ticket_slug):
         slug=ticket_slug, project=Project.objects.get(slug=slug, organization=request.user.organization))
     ticket.delete()
     return HttpResponse(json.dumps({'error': False}), content_type="application/json")
+
+
+@active_user_required
+@check_project_admin
+def ticket_status_order(request, slug, ticket_slug):
+    ticket = TicketStatus.objects.get(id=ticket_slug, project=Project.objects.get(slug=slug, organization=request.user.organization))
+    json_data = {'ticket': ticket.id}
+    return HttpResponse(json.dumps(json_data))
 
 
 def password_reset(request, to_email):
@@ -549,10 +560,16 @@ def member_roles(request, slug):
 @check_project_admin
 def member_roles_default(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
-    Role.objects.bulk_create([Role(name='UX Developer', slug=slugify('UX Developer'), project=project),
-                              Role(name='Web Designer', slug=slugify('Web Designer'), project=project),
-                              Role(name='Front-end Developer', slug=slugify('Front-end Developer'), project=project),
-                              Role(name='Back-end Developer', slug=slugify('Back-end Developer'), project=project)])
+    Role.objects.bulk_create(
+        [Role(name='Project Admin', slug=slugify('Project Admin'), project=project, is_project_admin=True),
+         Role(name='UX Developer', slug=slugify('UX Developer'), project=project),
+         Role(name='Web Designer', slug=slugify('Web Designer'), project=project),
+         Role(name='Front-end Developer', slug=slugify('Front-end Developer'), project=project),
+         Role(name='Back-end Developer', slug=slugify('Back-end Developer'), project=project)])
+    roles = Role.objects.filter(is_project_admin=True)
+    for role in roles:
+        role.users.add(request.user)
+        role.save()
     messages.success(request, 'Default user roles are added to the User roles page !')
     return HttpResponse(json.dumps({'error': False}), content_type="application/json")
 
@@ -565,17 +582,16 @@ def member_role_create(request, slug):
     if form.is_valid():
         role = form.save()
         json_data = {}
-        if request.POST.get('is_project_admin',False):
-
+        if request.POST.get('is_project_admin', False):
             role.is_project_admin = True
             role.users.add(request.user)
             role.save()
-            json_data['email']=request.user.email
+            json_data['email'] = request.user.email
         msg = "created role " + role.name + " in the project "
         create_timeline.send(sender=request.user, content_object=role, namespace=msg,
                              event_type="role created", project=project)
         json_data.update({'error': False, 'role_id': role.id, 'role_name': role.name, 'slug': role.slug})
-        return HttpResponse(json.dumps(json_data),content_type="application/json")
+        return HttpResponse(json.dumps(json_data), content_type="application/json")
 
     else:
         return HttpResponse(json.dumps({'error': True, 'errors': form.errors}), content_type="application/json")

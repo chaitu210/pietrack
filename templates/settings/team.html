@@ -20,7 +20,7 @@
                     {% endif %}
 
                     <div class="title">
-                        <h4>{{ project.name }} - <span class="status">PROJECT MEMBERS</span></h4>
+                        <h4><span class="status">{{ project.name }} - PROJECT MEMBERS</span></h4>
                     {% if request.user.pietrack_role == 'admin' or request.user|is_project_admin:slug %}
                         <div class="tag">
                             You can quickly add members to your team and re-order them at anytime

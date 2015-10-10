@@ -145,6 +145,7 @@ class TicketStatusForm(forms.ModelForm):
         instance.slug = slugify(self.cleaned_data['name'])
         instance.name = self.cleaned_data['name']
         instance.color = self.cleaned_data['color']
+        instance.order = TicketStatus.objects.filter(project=self.project).count()+1
         if commit:
             instance.save()
         return instance

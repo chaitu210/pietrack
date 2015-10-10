@@ -33,7 +33,7 @@
                                 <tbody>
 
                                     {% for ticket_status in ticket_status_list%}
-                                        <tr id="{{ticket_status.id}}">
+                                        <tr id="{{ticket_status.id}}" order="{{forloop.counter}}">
                                             <td> <span class="glyphicon glyphicon-move"></span></td>
                                             <td scope="row">
                                                 <div class="input-group colorpicker-component demo demo-auto">
@@ -130,23 +130,23 @@
             var form = $('form');
             form.css('display', 'none');
             form.find('input[name="name"]').val('');
-            $('form span[name="error"]').text('')
-            $('#slug').val("")
-            $('#status').val("true")
+            $('form span[name="error"]').text('');
+            $('#slug').val("");
+            $('#status').val("true");
         }
 
         function edit_ticket_status(color, name, slug) {
-            var r = hexToRgb(color).r
-            var g = hexToRgb(color).g
-            var b = hexToRgb(color).b
+            var r = hexToRgb(color).r;
+            var g = hexToRgb(color).g;
+            var b = hexToRgb(color).b;
             var color_box = '<i style="background-color: rgb(' + r + ',' + g + ',' + b + ');"></i>'
 
             $('#add_form').css('display', 'block');
-            $('#add_form').find("input[name='color']").val(color)
-            $('#add_form').find("input[name='name']").val(name)
+            $('#add_form').find("input[name='color']").val(color);
+            $('#add_form').find("input[name='name']").val(name);
             $('#status').val("false");
-            $('#slug').val(slug)
-            $('#add_form span').html(color_box)
+            $('#slug').val(slug);
+            $('#add_form span').html(color_box);
             $('.demo').colorpicker();
 
         }
@@ -181,8 +181,8 @@
 
                         var name = response['name'];
                         var color = response['color'];
-                        var row_id = response['proj_id']
-                        var slug = response['slug']
+                        var row_id = response['proj_id'];
+                        var slug = response['slug'];
 
                         data_row = "<tr id=\"" + row_id + "\"><td scope=\"row\"><div class=\"input-group colorpicker-component demo demo-auto\"><input type=\"text\" value=\"" + color + "\" class=\"form-control\"/><span class=\"input-group-addon\"><i></i></span></div></td><td>" + name + "</td><td class=\"actions\"><a href=\"#\" class=\"edit\" onclick=\"edit_ticket_status('" + color + "','" + name + "','" + slug + "')\"><i class=\"fa fa-edit\"></i></a>&nbsp;<a href=\"#\" class=\"delete\" onclick=\"delete_ticket_status('" + slug + "','" + row_id + "')\"><i class=\"fa fa-trash\"></i></a></td></tr>"
                         $('#ticket_status tbody').append(data_row);
@@ -202,18 +202,18 @@
 
                         var name = response['name'];
                         var color = response['color'];
-                        var row_id = response['proj_id']
-                        var slug = response['slug']
+                        var row_id = response['proj_id'];
+                        var slug = response['slug'];
 
                         $('#' + row_id + ' a.edit').attr('onclick', "edit_ticket_status('" + color + "','" + name + "','" + slug + "')")
-                        $('#' + row_id + ' a.delete').attr("onclick", "delete_ticket_status('" + slug + "','" + row_id + "')")
-                        $('#' + row_id + ' td:nth-child(2)').text(name)
-                        $('#' + row_id + ' input').val(color)
-                        var r = hexToRgb(color).r
-                        var g = hexToRgb(color).g
-                        var b = hexToRgb(color).b
-                        var color_box = '<i style="background-color: rgb(' + r + ',' + g + ',' + b + ');"></i>'
-                        $('#' + row_id + " span").html(color_box)
+                        $('#' + row_id + ' a.delete').attr("onclick", "delete_ticket_status('" + slug + "','" + row_id + "')");
+                        $('#' + row_id + ' td:nth-child(2)').text(name);
+                        $('#' + row_id + ' input').val(color);
+                        var r = hexToRgb(color).r;
+                        var g = hexToRgb(color).g;
+                        var b = hexToRgb(color).b;
+                        var color_box = '<i style="background-color: rgb(' + r + ',' + g + ',' + b + ');"></i>';
+                        $('#' + row_id + " span").html(color_box);
                         $('.demo').colorpicker();
                         clear_form();
                     }
@@ -248,12 +248,25 @@
             return $helper;
         },
         updateIndex = function(e, ui) {
+            $.get("/project/{{slug}}/settings/ticket_status/"+ui.item.attr('id')+"/order/", function (response) {
+                if(response){
+                    console.log(response.ticket);
+                }
+            }, 'json');
+
             $('td.index', ui.item.parent()).each(function (i) {
                 $(this).html(i + 1);
             });
-            alert($(this).html());
+
+            alert(ui.item.attr('order'));
         };
 
+        $("#ticket_status tbody").sortable({
+            helper: fixHelperModified,
+            stop: updateIndex
+        }).disableSelection();
+
+/*
     $("#ticket_status tbody").sortable({
         helper: fixHelperModified,
         stop: updateIndex
@@ -263,6 +276,7 @@
             console.log($(this).index())
         });
     }).disableSelection();
+*/
 </script>
-    </script>
+
 {%endblock%}
