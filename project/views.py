@@ -3,7 +3,7 @@ import random
 import string
 import shutil
 import os
-from django.shortcuts import render, redirect, render_to_response, get_object_or_404
+from django.shortcuts import render, redirect, render_to_response
 from piebase.models import User, Project, Priority, Severity, TicketStatus, Ticket, Requirement, Attachment, Role, \
     Milestone, Timeline, Comment
 from forms import CreateProjectForm, PriorityForm, SeverityForm, TicketStatusForm, RoleForm, CommentForm, \
@@ -22,21 +22,21 @@ from django.contrib import messages
 from django.contrib.contenttypes.models import ContentType
 from django.template import *
 from task.forms import TaskForm
-
+from .templatetags.project_tags import is_project_admin
 from django.utils.functional import wraps
 
 def check_project_admin(view):
-    @wraps(view)
+    wraps(view)
     def inner(request, slug, *args, **kwargs):
         try:
-            role = get_object_or_404(Role.objects.get(users=request.user, project__slug=slug, project__organization=request.user.organization))
+            role = Role.objects.get(users=request.user, project__slug=slug, project__organization=request.user.organization)
             if role.is_project_admin:
-                return view(request, slug, *args, **kwargs)
+                return wraps(view) (view(request, slug, *args, **kwargs))
         except:
             if request.user.pietrack_role == 'admin':
-                return view(request, slug, *args, **kwargs)
+                return wraps(view) (view(request, slug, *args, **kwargs))
         return HttpResponseForbidden()
-    return inner
+    return wraps(view) (inner)
 
 def check_organization_admin(view):
     def inner(request, *args, **kwargs):
@@ -516,7 +516,7 @@ def delete_member(request, slug):
 def member_roles(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     list_of_roles = Role.objects.filter(project=project)
-    dictionary = {'list_of_roles': list_of_roles, 'slug': slug,
+    dictionary = {'list_of_roles': list_of_roles, 'slug': slug, 'project':project,
                   'notification_list': get_notification_list(request.user)}
     return render(request, 'settings/member_roles.html', dictionary)
 
@@ -540,15 +540,18 @@ def member_role_create(request, slug):
     form = RoleForm(request.POST, project=project)
     if form.is_valid():
         role = form.save()
+        json_data = {}
         if request.POST.get('is_project_admin',False):
             role.is_project_admin = True
-            role.users.add(request.user);
+            role.users.add(request.user)
             role.save()
+            json_data['email']=request.user.email
         msg = "created role " + role.name + " in the project "
         create_timeline.send(sender=request.user, content_object=role, namespace=msg,
                              event_type="role created", project=project)
-        return HttpResponse(json.dumps({'error': False, 'role_id': role.id, 'role_name': role.name, 'slug': role.slug,
-                                        'email':request.user.email}),content_type="application/json")
+
+        json_data.update({'error': False, 'role_id': role.id, 'role_name': role.name, 'slug': role.slug})
+        return HttpResponse(json.dumps(json_data),content_type="application/json")
     else:
         return HttpResponse(json.dumps({'error': True, 'errors': form.errors}), content_type="application/json")
 
@@ -1002,10 +1005,11 @@ def requirement_edit(request, slug, milestone_slug, requirement_slug):
 
 @active_user_required
 @check_project_admin
-def requirement_delete(request, slug, milestone_slug, requirement_slug):
+def requirement_delete(request, slug, milestone_slug, id):
     project_object = Project.objects.get(slug=slug, organization=request.user.organization)
     milestone = Milestone.objects.get(slug=milestone_slug, project=project_object)
-    requirement_object = Requirement.objects.get(slug=requirement_slug, milestone=milestone)
+    requirement_object = Requirement.objects.get(id=id, milestone=milestone)
+    requirement_name = requirement_object.name
     timeline_list = [requirement_object]
     task_list = requirement_object.tasks.all()
     timeline_list.extend(task_list)
@@ -1015,7 +1019,7 @@ def requirement_delete(request, slug, milestone_slug, requirement_slug):
         content_type = ContentType.objects.get_for_model(timeline)
         Timeline.objects.filter(content_type__pk=content_type.id, object_id=timeline.id).delete()
     requirement_object.delete()
-    msg = " deleted requirement " + requirement_object.name
-    create_timeline.send(sender=request.user, content_object=requirement_object, namespace=msg,
+    msg = " deleted requirement " + requirement_name
+    create_timeline.send(sender=request.user, content_object=milestone, namespace=msg,
                          event_type="requirement_form", project=project_object)
     return HttpResponseRedirect(reverse('project:taskboard', kwargs={'milestone_slug': milestone_slug, 'slug': slug}))
