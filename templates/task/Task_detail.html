@@ -14,11 +14,16 @@
               <div class="profile-content">
                 <div class="task_details">
                   <b>Created By : </b>
-                  {{task.created_by.username}} ,
+                  {{ task.created_by.username|title }} ,
                   <em> {{task.created_date|date:"d F,Y \a\t P"}}</em>
                 </div>
                 <span class="desc">
-                {{task.description}}
+                    {% if task.description %}
+                        <b>Description :</b><br />
+                        {{task.description}}
+                    {% else %}
+                        <center>There is no description was provided for this task.</center>
+                    {% endif %}
                 </span>
                 <div class="attachments_wrap">
                   {% for attachment in task.attachments.all %}
@@ -57,7 +62,7 @@
             <form action="" method="post" enctype='multipart/form-data' id="comment_form">
               {% csrf_token %}
               <div class="your_comment">
-                <textarea name="comment"></textarea>
+                <textarea name="comment" class="comment_text"></textarea>
                 <p><span name="error"></span></p>
                 <span class="comment_attachment attachment">
                   <i class='fa fa-paperclip'></i>
@@ -67,7 +72,8 @@
                  <!--<span  name="file_choosen" > selected file here</span>-->
                 <input name="file" type="file" value="" class="comment_file" style="display:none;" />
 
-                <button class='comment_btn' type="submit">Comment</button>
+                <button class='comment_btn' type="submit">Comment <i class="fa fa-comment"></i> </button>
+                  <p class="comment_preview"></p>
               </div>
             </form>
             <!--/ your comment -->
@@ -330,16 +336,13 @@
       }
   });
 
-
-  
-  
   $('body').on('click', '.comment_attachment', function() {
       $(this).parent().find('.comment_file').click();
   });
   
   $('body').on('submit', 'form.comment_reply', function(e) {
       var id = $(this).parent().prev().find('div.name').attr('id');
-      var form = this;
+      var form = $(this);
       var formData = new FormData($(this)[0]);
       $.ajax({
           url: "/project/{{slug}}/task/{{task.id}}/comment/?parent_id=" + id,
@@ -359,7 +362,8 @@
                       var reply = $($.parseHTML('<div class="sub_comment"></div>'))
                       $(form).parent().after(reply.append(response))
                   }
-                  $(form).remove()
+                  $(form).remove();
+                  $('.close_comment').remove();
               }
           }
       });
@@ -367,11 +371,6 @@
       e.preventDefault();
 
   });
-
-
-
-
-
   
   $('body').on('click', '.delete_link a', function(e) {
       url = $(this).attr('href');
@@ -389,5 +388,7 @@
         var file_name = $(this).val();
         $('.attachment_file').append("<i class='fa fa-photo'></i> "+file_name.substring(file_name.lastIndexOf('\\')+1));
     });
+
+
 </script>
 {% endblock %}

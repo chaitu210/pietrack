@@ -55,8 +55,8 @@ urlpatterns = [
 
     # comments
     url(r'^comment/comment_edit/$', task_comment_edit, name="task_comment_edit"),
-    url(r'^task/comment/delete/(?P<comment_id>[0-9]+)/$',
-        delete_task_comment, name="delete_task_comment"),
+
+    url(r'^task/comment/delete/(?P<comment_id>[0-9]+)/$', delete_task_comment, name="delete_task_comment"),
     url(r'^(?P<slug>[-\w]+)/task/(?P<task_id>[0-9]+)/comment/$', task_comment, name="task_comment"),
 
     # taskboard

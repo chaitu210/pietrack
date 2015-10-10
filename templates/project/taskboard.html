@@ -10,7 +10,7 @@
                 <span>{{milestone.name}}</span>
                 <span class='header_button_wrap'>
                     <a href="{% url 'task:add_task' slug milestone.slug %}">
-                        <span class='header_button'>New Task</span>
+                        <span class='header_button'><i class="fa fa-plus-circle"></i> New Task</span>
                     </a>
                 {% if request.user.pietrack_role == 'admin' or request.user|is_project_admin:slug %}
 
@@ -27,7 +27,7 @@
                     <div class="col-md-2">
                         <select class='select2 input select2_assigned_to' multiple>
                             {% for member in project_members %}
-                                <option value="{{ member.id }}">{{ member.first_name }}</option>
+                                <option value="{{ member.id }}">{% if member.first_name %}{{ member.first_name }}{% else %}{{ member.username }}{% endif %}</option>
                             {% endfor %}
                         </select>
                     </div>

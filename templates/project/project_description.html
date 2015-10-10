@@ -16,6 +16,7 @@
                 <div class="col-md-9 content">
                     <div class="profile-content">
                         <span class="desc">
+                            <b class="desc_title">Description :</b><br />
                             {{project_object.description|safe}}
                         </span>
                     </div>
@@ -32,7 +33,7 @@
             {% if events_list %}
             {% paginate 5 events_list%}
 
-              <h4> Activity </h4>
+              <h4 class="activity_title"> Activity </h4>
                 <p>{% show_pageitems %}</p>
               {% for event in events_list %}
                 <span class='ticket blue'>
