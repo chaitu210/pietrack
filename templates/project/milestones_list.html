@@ -70,13 +70,13 @@
               <br clear="clearfixall" />
               <div class="panel panel-primary">
                   <div class="panel-heading">
-                      <h3 class="panel-title"> Create a new Milestone </h3>
+                      <h3 class="panel-title"> Message </h3>
                   </div>
                   <div class="panel-body">
-                      <center>No milestones were added here.<br />
-                          Kindly create a new milestone for this project : <span class="badge"> {{ project.name }} </span>
-
-                      </center>
+                      No milestones were added yet.
+                      {% if request.user.pietrack_role == 'admin' or request.user|is_project_admin:slug %}
+                            Create a new milestone for this project
+                      {% endif %}
                   </div>
               </div>
             {% endif %}

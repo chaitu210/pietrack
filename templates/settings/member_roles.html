@@ -93,7 +93,7 @@
                                             {% endfor %}
                                         </td>
                                     {% if request.user.pietrack_role == 'admin' or request.user|is_project_admin:slug %}
-                                        <td class="actions"><a href="#" class="edit" data-toggle="modal" data-target="#myModal1" onclick="edit_role('{{role.id}}','{{role.name}}','{{role.slug}}')"><i class="fa fa-edit"></i></a> <a onclick="delete_role('{{role.slug}}','{{role.id}}')" href="#" class="delete"><i class="fa fa-trash"></i></a> </td>
+                                            <td class="actions"><a href="#" class="edit" data-toggle="modal" data-target="#myModal1" onclick="edit_role('{{role.id}}','{{role.name}}','{{role.slug}}')"><i class="fa fa-edit"></i></a> <a onclick="delete_role('{{role.slug}}','{{role.id}}')" href="#" class="delete"><i class="fa fa-trash"></i></a> </td>
                                     {% endif %}
                                     </tr>
                                   {% endfor %}
