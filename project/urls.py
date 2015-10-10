@@ -25,6 +25,8 @@ urlpatterns = [
         ticket_status_edit, name='ticket_status_edit'),
     url(r'^(?P<slug>[-\w]+)/settings/ticket_status/(?P<ticket_slug>[a-zA-Z0-9-]+)/delete/$',
         ticket_status_delete, name='ticket_status_delete'),
+    url(r'^(?P<slug>[-\w]+)/settings/ticket_status/(?P<ticket_slug>[a-zA-Z0-9-]+)/order/$',
+        ticket_status_order, name='ticket_status_order'),
 
     # priority
     url(r'^(?P<slug>[-\w]+)/settings/priorities/$', priorities, name='priorities'),

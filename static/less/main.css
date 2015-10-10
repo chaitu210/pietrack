@@ -1494,6 +1494,9 @@ header .text .tag {
   margin-top: 8px;
   margin-bottom: 12px;
 }
+.list_of_projects .table_div table tbody tr td pre {
+  width: 950px;
+}
 .list_of_projects .table_div table tbody tr td:first-child {
   text-align: center;
   width: 125px;
