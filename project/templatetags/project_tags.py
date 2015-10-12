@@ -1,6 +1,6 @@
 import os
 from django import template
-from piebase.models import Ticket, Comment, Requirement, Role
+from piebase.models import Ticket, Comment, Requirement, Role, Project
 from django.core.paginator import Paginator
 
 register = template.Library()

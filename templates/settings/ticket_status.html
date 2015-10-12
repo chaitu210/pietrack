@@ -115,7 +115,7 @@
 
 {% endblock settings_content %}
 {%block extra_js %}
-<script src="http://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+<script type="text/javascript" src="http://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
     <script>
         function hexToRgb(hex) {
             var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -139,7 +139,7 @@
             var r = hexToRgb(color).r;
             var g = hexToRgb(color).g;
             var b = hexToRgb(color).b;
-            var color_box = '<i style="background-color: rgb(' + r + ',' + g + ',' + b + ');"></i>'
+            var color_box = '<i style="background-color: rgb(' + r + ',' + g + ',' + b + ');"></i>';
 
             $('#add_form').css('display', 'block');
             $('#add_form').find("input[name='color']").val(color);
@@ -184,7 +184,7 @@
                         var row_id = response['proj_id'];
                         var slug = response['slug'];
 
-                        data_row = "<tr id=\"" + row_id + "\"><td scope=\"row\"><div class=\"input-group colorpicker-component demo demo-auto\"><input type=\"text\" value=\"" + color + "\" class=\"form-control\"/><span class=\"input-group-addon\"><i></i></span></div></td><td>" + name + "</td><td class=\"actions\"><a href=\"#\" class=\"edit\" onclick=\"edit_ticket_status('" + color + "','" + name + "','" + slug + "')\"><i class=\"fa fa-edit\"></i></a>&nbsp;<a href=\"#\" class=\"delete\" onclick=\"delete_ticket_status('" + slug + "','" + row_id + "')\"><i class=\"fa fa-trash\"></i></a></td></tr>"
+                        data_row = "<tr id=\"" + row_id + "\"><td scope=\"row\"><div class=\"input-group colorpicker-component demo demo-auto\"><input type=\"text\" value=\"" + color + "\" class=\"form-control\"/><span class=\"input-group-addon\"><i></i></span></div></td><td>" + name + "</td><td class=\"actions\"><a href=\"#\" class=\"edit\" onclick=\"edit_ticket_status('" + color + "','" + name + "','" + slug + "')\"><i class=\"fa fa-edit\"></i></a>&nbsp;<a href=\"#\" class=\"delete\" onclick=\"delete_ticket_status('" + slug + "','" + row_id + "')\"><i class=\"fa fa-trash\"></i></a></td></tr>";
                         $('#ticket_status tbody').append(data_row);
                         $('.demo').colorpicker();
                         clear_form();
@@ -205,7 +205,7 @@
                         var row_id = response['proj_id'];
                         var slug = response['slug'];
 
-                        $('#' + row_id + ' a.edit').attr('onclick', "edit_ticket_status('" + color + "','" + name + "','" + slug + "')")
+                        $('#' + row_id + ' a.edit').attr('onclick', "edit_ticket_status('" + color + "','" + name + "','" + slug + "')");
                         $('#' + row_id + ' a.delete').attr("onclick", "delete_ticket_status('" + slug + "','" + row_id + "')");
                         $('#' + row_id + ' td:nth-child(2)').text(name);
                         $('#' + row_id + ' input').val(color);
@@ -259,6 +259,9 @@
             });
 
             alert(ui.item.attr('order'));
+           /* $('td.index').attr('order').change(function(e){
+               console.log ($(this).attr('order'))
+            })*/
         };
 
         $("#ticket_status tbody").sortable({
@@ -266,8 +269,9 @@
             stop: updateIndex
         }).disableSelection();
 
+
 /*
-    $("#ticket_status tbody").sortable({
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                $("#ticket_status tbody").sortable({
         helper: fixHelperModified,
         stop: updateIndex
         update: function(event, ui) {
