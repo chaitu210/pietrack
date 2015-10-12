@@ -3,7 +3,7 @@ import random
 import string
 import shutil
 import os
-from django.shortcuts import render, redirect, render_to_response
+from django.shortcuts import render, redirect, render_to_response, get_object_or_404
 from piebase.models import User, Project, Priority, Severity, TicketStatus, Ticket, Requirement, Attachment, Role, \
     Milestone, Timeline, Comment
 from forms import CreateProjectForm, PriorityForm, SeverityForm, TicketStatusForm, RoleForm, CommentForm, \
@@ -323,7 +323,6 @@ def severity_delete(request, slug, severity_slug):
         slug=severity_slug, project=Project.objects.get(slug=slug, organization=request.user.organization)).delete()
     return HttpResponse(json.dumps({'error': False}), content_type="application/json")
 
-
 @active_user_required
 @check_project_admin
 def ticket_status(request, slug):
@@ -343,9 +342,11 @@ def ticket_status_default(request, slug):
                       project=project, order=2),
          TicketStatus(name='Ready for test', slug=slugify('Ready for test'),
                       color='#4e9a06', project=project, order=3),
-         TicketStatus(name='Done', slug=slugify('Done'), color='#cc0000', project=project, order=4),
-         TicketStatus(name='Archived', slug=slugify('Archived'), color='#5c3566',
-                      project=project, is_final=True, order=5)])
+         TicketStatus(name='Done', slug=slugify('Done'), color='#cc0000', project=project, order=4)]
+         )
+    if not project.task_statuses.filter(is_final=True):
+        TicketStatus.objects.create(name='Archived', slug=slugify('Archived'), color='#5c3566',
+                      project=project, is_final=True, order=5)
     messages.success(request, 'Default status are added to the ticket status page !')
     return HttpResponse(json.dumps({'error': False}), content_type="application/json")
 
@@ -355,23 +356,50 @@ def ticket_status_default(request, slug):
 def ticket_status_create(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     form = TicketStatusForm(request.POST, project=project)
+    is_final = request.POST.get('is_final',False)
     if (form.is_valid()):
         ticket_status = form.save()
+        if is_final:
+            if not project.task_statuses.filter(is_final=True):
+                ticket_status.is_final = True
+                ticket_status.save()
+            else:
+                ticket = project.task_statuses.get(is_final=True)
+                if ticket:
+                    ticket.is_final = False
+                    ticket.save()
+                ticket_status.is_final = True
+                ticket_status.save()
+        else:
+            ticket_statuses = project.task_statuses.all()
+            if ticket_statuses and not ticket_statuses.filter(is_final=True):
+                ticket_assign = ticket_statuses[len(ticket_statuses)-1]
+                ticket_assign.is_final = True
+                ticket_assign.save()
         return HttpResponse(json.dumps(
-            {'error': False, 'color': ticket_status.color, 'name': ticket_status.name, 'proj_id': ticket_status.id,
-             'slug': ticket_status.slug}), content_type="application/json")
+            {'error': False, 'color': ticket_status.color, 'name': ticket_status.name, 'id': ticket_status.id,
+             'slug': ticket_status.slug,'is_final':is_final}), content_type="application/json")
     else:
         return HttpResponse(json.dumps({'error': True, 'errors': form.errors}), content_type="application/json")
 
 
 @active_user_required
 @check_project_admin
-def ticket_status_edit(request, slug, ticket_slug):
+def ticket_status_edit(request, slug):
+    print request.POST
     project = Project.objects.get(slug=slug, organization=request.user.organization)
-    instance = TicketStatus.objects.get(slug=ticket_slug, project=project)
+    instance = TicketStatus.objects.get(id=request.POST['id'], project=project)
     form = TicketStatusForm(request.POST, instance=instance, project=project)
+    is_final = request.POST.get('is_final',False)
     if (form.is_valid()):
         ticket_status = form.save()
+        if is_final:
+            ticket = project.task_statuses.get(is_final=True)
+            if ticket:
+                ticket.is_final = False
+                ticket.save()
+            ticket_status.is_final = True
+            ticket_status.save()
         return HttpResponse(json.dumps(
             {'error': False, 'color': ticket_status.color, 'name': ticket_status.name, 'proj_id': ticket_status.id,
              'slug': ticket_status.slug}), content_type="application/json")
@@ -382,18 +410,51 @@ def ticket_status_edit(request, slug, ticket_slug):
 @active_user_required
 @check_project_admin
 def ticket_status_delete(request, slug, ticket_slug):
-    ticket = TicketStatus.objects.get(
-        slug=ticket_slug, project=Project.objects.get(slug=slug, organization=request.user.organization))
+    project = Project.objects.get(slug=slug, organization=request.user.organization)
+    ticket = TicketStatus.objects.get(slug=ticket_slug, project=project)
+    is_final = ticket.is_final
     ticket.delete()
+    if is_final:
+        ticket_statuses = project.task_statuses.all()
+        if ticket_statuses:
+            ticket_assign = ticket_statuses[len(ticket_statuses)-1]
+            ticket_assign.is_final = True
+            ticket_assign.save()
+
     return HttpResponse(json.dumps({'error': False}), content_type="application/json")
 
 
 @active_user_required
 @check_project_admin
-def ticket_status_order(request, slug, ticket_slug):
-    ticket = TicketStatus.objects.get(id=ticket_slug, project=Project.objects.get(slug=slug, organization=request.user.organization))
-    json_data = {'ticket': ticket.id}
-    return HttpResponse(json.dumps(json_data))
+def ticket_status_order(request, slug):
+    prev = request.GET.get('prev',False)
+    current = request.GET.get('current',False)
+    print current,prev
+    if prev and current:
+        prev = int(prev)
+        current = int(current)
+        project=Project.objects.get(slug=slug, organization=request.user.organization)
+        ticket_statuses = project.task_statuses.all().order_by('order')
+        if prev > current:
+            print ticket_statuses[current:prev+1]
+            for ticket_status in ticket_statuses[current:prev+1]:
+                if ticket_status.order-1 == prev :
+                    ticket_status.order-=current
+                else:
+                    ticket_status.order-=1
+                ticket_status.save()
+                print ticket_status.order
+        else:
+            print ticket_statuses[prev:current+1]
+            for ticket_status in ticket_statuses[prev:current+1]:
+                if ticket_status.order-1 == prev :
+                    ticket_status.order+=current
+                else:
+                    ticket_status.order+=1
+                ticket_status.save()
+                print ticket_status.order
+
+    return HttpResponse("ok")
 
 
 def password_reset(request, to_email):

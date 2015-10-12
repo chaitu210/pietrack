@@ -229,6 +229,7 @@ class TicketStatus(models.Model):
     is_final = models.BooleanField(default=False)
     class Meta:
         unique_together = (("project", "name"), ("project", "slug"))
+        ordering = ['order']
 
     def __str__(self):
         return self.name
