@@ -255,7 +255,7 @@
         setInterval(function() {
             $.get("{% url 'user:get_notifications' %}",function(response){
 
-                $notification.find(".count").text(response['count'])
+                $notification.find(".count").text(response['count']);
                 $notification.find('div.scroll').html(response['notification_list'])
             });
         }, 60000);

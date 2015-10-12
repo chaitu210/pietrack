@@ -74,7 +74,8 @@ urlpatterns = [
         requirement_tasks_more, name="requirement_tasks_more"),
     url(r'^(?P<slug>[-\w]+)/(?P<milestone_slug>[-\w]+)/task/(?P<task_id>[0-9]+)/$', task_details, name="task_details"),
     url(r'^(?P<slug>[-\w]+)/(?P<milestone_slug>[-\w]+)/task/(?P<task_id>[0-9]+)/edit/$', task_edit, name="task_edit"),
-    url(r'^(?P<slug>[-\w]+)/(?P<milestone_slug>[-\w]+)/task/(?P<task_id>[0-9]+)/delete/$', task_delete, name="task_delete"),
+    url(r'^(?P<slug>[-\w]+)/(?P<milestone_slug>[-\w]+)/task/(?P<task_id>[0-9]+)/delete/$', task_delete,
+        name="task_delete"),
     # attachment
     url(r'^(?P<slug>[-\w]+)/task/(?P<task_id>[0-9]+)/attachment/delete/(?P<attachment_id>[0-9]+)/$',
         delete_attachment, name="delete_attachment"),

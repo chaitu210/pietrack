@@ -227,6 +227,7 @@ class TicketStatus(models.Model):
         Project, related_name="task_statuses", verbose_name=_("project"))
     order = models.IntegerField(default=1, blank=True)
     is_final = models.BooleanField(default=False)
+
     class Meta:
         unique_together = (("project", "name"), ("project", "slug"))
 
@@ -322,9 +323,9 @@ class Comment(models.Model):
     def __str__(self):
         return self.comment
 
-    # def delete(self, *args, **kwargs):
-    #     super(Comment, self).delete(*args, **kwargs)
-    #     self.attachments.all().delete()
+        # def delete(self, *args, **kwargs):
+        #     super(Comment, self).delete(*args, **kwargs)
+        #     self.attachments.all().delete()
 
 
 class Timeline(models.Model):
@@ -344,7 +345,9 @@ class Timeline(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User)
     is_read = models.BooleanField(default=False)
+
     class Meta:
         index_together = [('content_type', 'object_id', 'namespace'), ]
+
     def __str__(self):
         return self.namespace

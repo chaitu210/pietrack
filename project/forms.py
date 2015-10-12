@@ -67,7 +67,7 @@ class PriorityForm(forms.ModelForm):
         existing_slug = ""
         if self.instance:
             existing_slug = self.instance.slug
-        if (Priority.objects.filter(slug=name_slug, project=self.project) and name_slug != existing_slug):
+        if Priority.objects.filter(slug=name_slug, project=self.project) and name_slug != existing_slug:
             raise forms.ValidationError(
                 'Priority with this name already exists')
         elif len(name_slug) == 0:
@@ -99,9 +99,8 @@ class SeverityForm(forms.ModelForm):
         existing_slug = ""
         if self.instance:
             existing_slug = self.instance.slug
-        if (Severity.objects.filter(slug=name_slug, project=self.project) and name_slug != existing_slug):
-            raise forms.ValidationError(
-                'Severity with this name already exists')
+        if Severity.objects.filter(slug=name_slug, project=self.project) and name_slug != existing_slug:
+            raise forms.ValidationError('Severity with this name already exists')
         elif len(name_slug) == 0:
             raise forms.ValidationError("Severity name must contain a letter.")
         return self.cleaned_data.get('name')
@@ -131,7 +130,7 @@ class TicketStatusForm(forms.ModelForm):
         existing_slug = ""
         if self.instance:
             existing_slug = self.instance.slug
-        if (TicketStatus.objects.filter(slug=name_slug, project=self.project) and name_slug != existing_slug):
+        if TicketStatus.objects.filter(slug=name_slug, project=self.project) and name_slug != existing_slug:
             raise forms.ValidationError(
                 'Ticket Status with this name already exists')
         elif len(name_slug) == 0:
