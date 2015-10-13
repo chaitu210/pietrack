@@ -1,14 +1,10 @@
 {% extends 'settings/base.html' %}
-
 {% load static %}
 {% load staticfiles %}
-
 {% block settings_content %}
-
     <div class="right-container">
         <div class="panel panel-default content-panel">
             <div class="panel-body">
-                <!-- content box starts here -->
                 <div class="content_box">
                     <div class="title">
                         <h4><span class="status"> TICKET STATUS</span></h4>
@@ -17,7 +13,6 @@
                         </div>
                         <span class="new"><a href="#" id="add_new">Add New Status</a></span>
                     </div>
-                    <!-- status table starts here -->
                     <div class="table-responsive color-box">
 
                             <table class="table table-striped" id="ticket_status">
@@ -45,16 +40,12 @@
                                                 </div>
                                             </td>
                                             <td>
-                                                <!--{{ticket_status.name}}-->
                                                 <input name="name" value="{{ ticket_status.name }}" type="text" class="form-control" readonly>
                                             </td>
                                             <td class="actions">
                                                 <input type="radio" name="is_final" {% if ticket_status.is_final %}checked="checked"{% endif %}>
                                             </td>
                                             <td class="actions">
-                                                <!--<a href="#" class="edit" onclick="edit_ticket_status('{{ticket_status.color}}','{{ticket_status.name}}','{{ticket_status.slug}}')">
-                                                    <i class="fa fa-edit"></i>
-                                                </a>-->
                                                 <a href="#" class="edit" >
                                                     <i class="fa fa-edit"></i>
                                                 </a>
@@ -62,29 +53,20 @@
                                                     <i class="fa fa-trash"></i>
                                                 </a>
                                             </td>
-
                                         </tr>
                                     {% endfor%}
                                 {% endif %}
                                 </tbody>
                             </table>
                        {% if not ticket_status_list %}
-                            <div>
-                                <hr />
-                                <center>
+                            <div style="text-align: center;">
                                 Please create a new status or use
-                                    <span class="badge" id="create_default">
-                                        <a href="{% url 'project:ticket_status_default' slug %}">default</a>
-                                    </span> status list !
-                                </center>
+                                <span class="badge" id="create_default">
+                                    <a href="{% url 'project:ticket_status_default' slug %}">default</a>
+                                </span> status list !
                             </div>
-                        {% endif %}
-
-                            <!-- form start -->
-                        <form action="" method="post" style="display:none;" id="add_form">
-                            {% csrf_token %}
-                            <input id="status" name="status" value="true" style="display:none;">
-                            <input id="slug" name="slug" value="" style="display:none;">
+                       {% endif %}
+                       <form action="" method="post" style="display:none;" id="add_form">
                             <table class="table table-striped">
                                 <thead>
                                     <tr>
@@ -97,24 +79,23 @@
                                 <tbody>
                                     <tr>
                                         <td> <span class="glyphicon glyphicon-move"></span>
-                                            <input type='hidden' name='csrfmiddlewaretoken' value='bPv9oPoryCHTEBkgEWm1WAaogWN34AKK' />
-                                            <input name="id" value="31" type="hidden"/>
+                                            {% csrf_token %}
                                         </td>
                                         <td scope="row">
                                             <div class="input-group colorpicker-component demo demo-auto">
-                                                <input name="color" type="text"  value="#8b7ebf" class="form-control" />
+                                                <input name="color" type="text"  value="#8b7ebf" class="form-control" placeholder="color"/>
                                                 <span class="input-group-addon"><i style="cursor: default;"></i></span>
                                             </div>
                                         </td>
                                         <td>
-                                            <input name="name" value="" type="text" class="form-control" style="background:#fff;border:1px solid #000">
+                                            <input name="name" value="" type="text" class="form-control" placeholder="ticket status" style="background:#fff;border:1px solid #000" autofocus >
                                         </td>
                                         <td class="actions">
                                             <input type="radio" name="is_final">
                                         </td>
                                         <td class="actions" clear="clearfixall">
                                             <button type="submit" class="edit"  style=" border:0px solid transparent;"><i class="glyphicon glyphicon-floppy-saved" ></i></button>
-                                            <a class="delete" id="id_reset"><span class="glyphicon glyphicon-remove"></span></a>
+                                            <a class="delete" id="id_reset" onclick="clear_form();"><span class="glyphicon glyphicon-remove"></span></a>
                                         </td>
                                     </tr>
                                     <tr>
@@ -126,15 +107,11 @@
                                 </tbody>
                             </table>
                         </form>
-                        <!-- form ends here -->
                     </div>
-                    <!-- status table ends here -->
-                    <!-- content box starts here -->
                 </div>
             </div>
         </div>
     </div>
-
 {% endblock settings_content %}
 {%block extra_js %}
 <script type="text/javascript" src="http://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
@@ -144,8 +121,6 @@
             form.css('display', 'none');
             form.find('input[name="name"]').val('');
             $('form span[name="error"]').text('');
-            $('#slug').val("");
-            $('#status').val("true");
         }
 
         function delete_ticket_status(slug, id) {
@@ -160,40 +135,35 @@
             clear_form();
             $('form').css('display', 'block');
         });
-        $('#id_reset').click(function(e){
-             clear_form();
-        });
+
         $('#add_form').on('submit', function(e) {
+            $instance = $(this)
             e.preventDefault();
-            if ($('#status').val() == "true") {
-                $.post('{% url "project:ticket_status_create" slug %}', $('#add_form').serialize(), function(response) {
-                    if (response.error) {
-                        $("span[name='color']").text("")
-                        $("span[name='name']").text("")
-                        for(key in response.errors){
-                             $("span[name='"+key+"']").text(' * '+response.errors[key]);
-                        }
-                    } else {
-                        $("span[name='color']").text("")
-                        $("span[name='name']").text("")
-                        var name = response['name'];
-                        var color = response['color'];
-                        var row_id = response['id'];
-                        var slug = response['slug'];
-                        data_row = '<tr id="'+ row_id+'"><td><span class="glyphicon glyphicon-move"></span>'+"{% csrf_token %}"+'<input name="id" value="'+row_id+'" type="hidden"></td><td scope="row"><div class="input-group colorpicker-component demo demo-auto colorpicker-element"><input name="color" type="text" value="'+color+'" class="form-control"><span class="input-group-addon"><i style="cursor: default; background-color: rgb(139, 126, 191);"></i></span></div></td><td><input name="name" value="'+name+'" type="text" class="form-control" style="background:#fff"></td><td class="actions"><input type="radio" name="is_final"> </td> <td class="actions"><a  class="edit" style=" border:0px solid transparent;"><i class="fa fa-edit"></i></a>&nbsp;<a class="delete"  onclick="delete_ticket_status(\''+slug+'\',\''+row_id+'\')"><i class="fa fa-trash"></i></a></td></tr>'
-                        $('#ticket_status tbody').append(data_row);
-                        var is_final = response['is_final'];
-                        var is_final = response['is_final'];
-                        if (is_final!=false){
-                            $('#'+row_id).find('input[name="is_final"]').attr('checked',true)
-                            }
-                        clear_form();
+            $.post('{% url "project:ticket_status_create" slug %}', $('#add_form').serialize(), function(response) {
+                if (response.error) {
+                    $instance.find('input').css({border:'none'});
+                    for (var key in response['errors']) {
+                        $input = $instance.find('input[name="'+key+'"]');
+                        $input.css({border:'solid 1px #FF0000'});
                     }
+                }
+                else {
+                    var name = response['name'];
+                    var color = response['color'];
+                    var row_id = response['id'];
+                    var slug = response['slug'];
+                    data_row = '<tr id="'+ row_id+'"><td><span class="glyphicon glyphicon-move"></span>'+"{% csrf_token %}"+'<input name="id" value="'+row_id+'" type="hidden"></td><td scope="row"><div class="input-group colorpicker-component demo demo-auto colorpicker-element"><input name="color" type="text" value="'+color+'" class="form-control"><span class="input-group-addon"><i style="cursor: default; background-color: rgb(139, 126, 191);"></i></span></div></td><td><input name="name" value="'+name+'" type="text" class="form-control" style="background:#fff"></td><td class="actions"><input type="radio" name="is_final"> </td> <td class="actions"><a  class="edit" style=" border:0px solid transparent;"><i class="fa fa-edit"></i></a>&nbsp;<a class="delete"  onclick="delete_ticket_status(\''+slug+'\',\''+row_id+'\')"><i class="fa fa-trash"></i></a></td></tr>'
+                    $('#ticket_status tbody').append(data_row);
+                    var is_final = response['is_final'];
+                    if (is_final!=false){
+                        $('#'+row_id).find('input[name="is_final"]').attr('checked',true)
+                        }
+                    clear_form();
+                }
 
-                });
-            }
+            });
         });
-
+    {% if not ticket_status_list %}
         $('#create_default').on('click', function(event){
             event.preventDefault();
             $.get("{% url 'project:ticket_status_default' slug %}", function(response){
@@ -202,47 +172,42 @@
                }
             });
         });
+    {% endif %}
 
-    </script>
-    <script type="text/javascript">
-        $('#project_submenu').attr('class', 'arrow-up active');
-        $('#project_submenu ul').show().children('li#project_status').addClass('active');
+    $('#project_submenu').attr('class', 'arrow-up active');
+    $('#project_submenu ul').show().children('li#project_status').addClass('active');
 
-        /* table sorting */
-        var fixHelperModified = function(e, tr) {
-
-            var $originals = tr.children();
-            var $helper = tr.clone();
-            $helper.children().each(function(index) {
-                $(this).width($originals.eq(index).width())
-            });
-            return $helper;
-        },
-        updateIndex = function(e, ui) {
-            $('td.index', ui.item.parent()).each(function (i) {
-                $(this).html(i + 1);
-            });
-            console.log("Start id : " + ui.item.id);
-            console.log("Start position: " + ui.item.startPos);
-            console.log("New position: " + ui.item.index());
-            var prev = ui.item.startPos;
-            var current = ui.item.index();
-            if(prev != current){
-                $.get("{% url 'project:ticket_status_order' slug %}"+"?prev="+prev+"&current="+current);
-            }
+    /* table sorting */
+    var fixHelperModified = function(e, tr) {
+        var $originals = tr.children();
+        var $helper = tr.clone();
+        $helper.children().each(function(index) {
+            $(this).width($originals.eq(index).width())
+        });
+        return $helper;
+    },
+    updateIndex = function(e, ui) {
+        $('td.index', ui.item.parent()).each(function (i) {
+            $(this).html(i + 1);
+        });
+        var prev = ui.item.startPos;
+        var current = ui.item.index();
+        if(prev != current){
+            $.get("{% url 'project:ticket_status_order' slug %}"+"?prev="+prev+"&current="+current);
         }
+    };
 
-        $("#ticket_status tbody").sortable({
-            helper: fixHelperModified,
-            stop: updateIndex,
-            start: function(event, ui) {
-                ui.item.startPos = ui.item.index();
-                ui.item.id = ui.item.id
-            },
-             update: function( event, ui ) {
-                ui.item.id = ui.item.attr("id");
-              }
-        }).disableSelection();
+    $("#ticket_status tbody").sortable({
+        helper: fixHelperModified,
+        stop: updateIndex,
+        start: function(event, ui) {
+                        ui.item.startPos = ui.item.index();
+                        ui.item.id = ui.item.id
+                    },
+        update: function( event, ui ) {
+                       ui.item.id = ui.item.attr("id");
+                    }
+    }).disableSelection();
 
     /*inline edit*/
     $('body').on('click','a > .fa-edit',function(e){
@@ -265,9 +230,7 @@
                 for (var key in response['errors']) {
                     $input = $row.find('input[name="'+key+'"]');
                     $input.css({border:'solid 1px #FF0000'});
-                    console.log($input.parent())
                 }
-
             }
             else{
                 $row.find('input').css({border:'none'});
@@ -277,5 +240,4 @@
         });
     });
 </script>
-
 {%endblock%}
