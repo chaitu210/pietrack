@@ -43,10 +43,12 @@ urlpatterns = [
     url(r'^(?P<slug>[-\w]+)/settings/severities/$', severities, name='severities'),
     url(r'^(?P<slug>[-\w]+)/settings/severity/default/$', severity_default, name='severity_default'),
     url(r'^(?P<slug>[-\w]+)/settings/severity/create/$', severity_create, name='severity_create'),
-    url(r'^(?P<slug>[-\w]+)/settings/severity/(?P<severity_slug>[a-zA-Z0-9-]+)/edit/$',
+    url(r'^(?P<slug>[-\w]+)/settings/severity/edit/$',
         severity_edit, name='severity_edit'),
     url(r'^(?P<slug>[-\w]+)/settings/severity/(?P<severity_slug>[a-zA-Z0-9-]+)/delete/$',
         severity_delete, name='severity_delete'),
+    url(r'^(?P<slug>[-\w]+)/settings/severity/update/order/$',
+        severity_order, name='severity_order'),
 
     # member roles
     url(r'^(?P<slug>[-\w]+)/settings/member_roles/$', member_roles, name='member_roles'),
