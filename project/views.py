@@ -403,17 +403,19 @@ def ticket_status(request, slug):
 @check_project_admin
 def ticket_status_default(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
-    TicketStatus.objects.bulk_create(
-        [TicketStatus(name='New', slug=slugify('New'), color='#999999', project=project, order=1),
-         TicketStatus(name='In progress', slug=slugify('In progress'), color='#729fcf',
-                      project=project, order=2),
-         TicketStatus(name='Ready for test', slug=slugify('Ready for test'),
-                      color='#4e9a06', project=project, order=3),
-         TicketStatus(name='Done', slug=slugify('Done'), color='#cc0000', project=project, order=4)]
-         )
+    default = (
+                ('New','new','#999999'),
+                ('In progress','in-progress','#729fcf'),
+                ('Ready for test','ready-for-test','#4e9a06'),
+                ('Done','done','#cc0000')
+               )
+    for name, slug, color in default:
+        order = project.task_statuses.count()+1
+        TicketStatus.objects.create(name=name, slug=slug, color=color, project=project, order=order)
     if not project.task_statuses.filter(is_final=True):
+        order = project.task_statuses.count()+1
         TicketStatus.objects.create(name='Archived', slug=slugify('Archived'), color='#5c3566',
-                      project=project, is_final=True, order=5)
+                      project=project, is_final=True, order=order)
     messages.success(request, 'Default status are added to the ticket status page !')
     return HttpResponse(json.dumps({'error': False}), content_type="application/json")
 
@@ -426,6 +428,8 @@ def ticket_status_create(request, slug):
     is_final = request.POST.get('is_final',False)
     if form.is_valid():
         ticket_status = form.save()
+        ticket_status.order = project.task_statuses.count()
+        ticket_status.save()
         if is_final:
             if not project.task_statuses.filter(is_final=True):
                 ticket_status.is_final = True
