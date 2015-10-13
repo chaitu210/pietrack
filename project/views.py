@@ -243,7 +243,7 @@ def priority_create(request, slug):
     if form.is_valid():
         priority = form.save()
         return HttpResponse(json.dumps(
-            {'error': False, 'color': priority.color, 'name': priority.name, 'proj_id': priority.id,
+            {'error': False, 'color': priority.color, 'name': priority.name, 'id': priority.id,
              'slug': priority.slug}), content_type="application/json")
     else:
         return HttpResponse(json.dumps({'error': True, 'errors': form.errors}), content_type="application/json")
@@ -502,6 +502,7 @@ def ticket_status_order(request, slug):
                     ticket_status.order-=1
                 ticket_status.save()
     return HttpResponse("200 OK")
+
 
 def password_reset(request, to_email):
     from_email = request.user.organization.slug + "@pietrack.com"
