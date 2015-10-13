@@ -302,7 +302,7 @@ def priority_delete(request, slug, priority_slug):
 @check_project_admin
 def severities(request, slug):
     severity_list = Severity.objects.filter(
-        project=Project.objects.get(slug=slug, organization=request.user.organization)).order_by('id')
+        project=Project.objects.get(slug=slug, organization=request.user.organization)).order_by('order')
     return render(request, 'settings/severities.html', {'slug': slug, 'severity_list': severity_list,
                                                         'notification_list': get_notification_list(request.user)})
 
@@ -311,9 +311,14 @@ def severities(request, slug):
 @check_project_admin
 def severity_default(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
-    Severity.objects.bulk_create([Severity(name='Low', slug=slugify('Low'), color='#999999', project=project),
-                                  Severity(name='Normal', slug=slugify('Normal'), color='#4e9a06', project=project),
-                                  Severity(name='High', slug=slugify('High'), color='#cc0000', project=project)])
+    default = (
+                ('Low', 'low', '#999999'),
+                ('Normal', 'normal', '#4e9a06'),
+                ('High', 'high', '#cc0000'),
+               )
+    for name, slug, color in default:
+        order = project.severities.count()+1
+        Severity.objects.create(name=name, slug=slug, color=color, project=project,order=order)
     messages.success(request, 'Default severities are added to the Severity page !')
     return HttpResponse(json.dumps({'error': False}), content_type="application/json")
 
@@ -325,6 +330,8 @@ def severity_create(request, slug):
     form = SeverityForm(request.POST, project=project)
     if form.is_valid():
         severity = form.save()
+        severity.order = project.severities.count()
+        severity.save()
         return HttpResponse(json.dumps(
             {'error': False, 'color': severity.color, 'name': severity.name, 'proj_id': severity.id,
              'slug': severity.slug}), content_type="application/json")
