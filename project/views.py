@@ -224,13 +224,17 @@ def priorities(request, slug):
 @check_project_admin
 def priority_default(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
-    Priority.objects.bulk_create([Priority(name='Wishlist', slug=slugify('Wishlist'), color='#999999', project=project),
-                                  Priority(name='Minor', slug=slugify('Minor'), color='#729fcf', project=project),
-                                  Priority(name='Normal', slug=slugify('Normal'), color='#4e9a06', project=project),
-                                  Priority(name='Important', slug=slugify('Important'), color='#f57900',
-                                           project=project),
-                                  Priority(name='Critical', slug=slugify('Critical'), color='#CC0000',
-                                           project=project)])
+    default = (
+                ('Wishlist', 'wishlist', '#999999' ),
+                ('Minor', 'minor', '#729fcf' ),
+                ('Normal', 'normal', '#4e9a06' ),
+                ('Important', 'important', '#f57900' ),
+                ('Critical', 'critical', '#CC0000' ),
+              )
+    for name, slug, color in default:
+        order = project.priorities.count()+1
+        Priority.objects.create(name=name, slug=slug, color=color, project=project,order=order)
+
     messages.success(request, 'Default priorities are added to the Priority page !')
     return HttpResponse(json.dumps({'error': False}), content_type="application/json")
 
@@ -242,6 +246,8 @@ def priority_create(request, slug):
     form = PriorityForm(request.POST, project=project)
     if form.is_valid():
         priority = form.save()
+        priority.order = project.priorities.count()
+        priority.save()
         return HttpResponse(json.dumps(
             {'error': False, 'color': priority.color, 'name': priority.name, 'id': priority.id,
              'slug': priority.slug}), content_type="application/json")
