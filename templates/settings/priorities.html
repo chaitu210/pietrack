@@ -1,10 +1,7 @@
 {% extends 'settings/base.html' %}
-
 {% load static %}
 {% load staticfiles %}
-
 {% block settings_content %}
-
     <div class="right-container">
         <div class="panel panel-default content-panel">
             <div class="panel-body">
@@ -19,7 +16,6 @@
                     </div>
                     <!-- status table starts here -->
                     <div class="table-responsive color-box">
-
                             <table class="table table-striped" id="priority">
                                 <thead>
                                     <tr>
@@ -47,11 +43,9 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <!--{{priority.name}}-->
                                             <input name="name" value="{{ priority.name }}" type="text" class="form-control" readonly>
                                         </td>
                                         <td class="actions">
-                                            <!--<a href="#" class="edit" onclick="edit_priority('{{priority.color}}','{{priority.name}}','{{priority.slug}}')">-->
                                                 <a href="#" class="edit" >
                                                     <i class="fa fa-edit"></i>
                                                 </a>
@@ -62,16 +56,12 @@
                                 {% endif %}
                                 </tbody>
                             </table>
-
                        {% if not priority_list %}
-                            <div>
-                                <hr />
-                                <center>
+                            <div style="text-align: center">
                                 Please create a new priority or use
                                     <span class="badge" id="create_default">
                                         <a href="{% url 'project:priority_default' slug %}">default</a>
                                     </span> priorities list !
-                                </center>
                             </div>
                         {% endif %}
                         <!-- form start -->
@@ -119,12 +109,9 @@
             </div>
         </div>
     </div>
-
 {% endblock settings_content %}
-
 {%block extra_js%}
 <script type="text/javascript" src="http://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
-
 <script>
     function clear_form() {
         var form = $('form');
@@ -133,6 +120,9 @@
         form.find('input[name="color"]').val('#666666');
         form.find('input[name="name"]').css({border:'1px solid #000'});
         form.find('input[name="color"]').css({border:'none'});
+        form.find('input[name="name"]').attr('placeholder','Priority Name');
+        form.find('input[name="color"]').attr('placeholder','Choose Color');
+
     }
 
     function delete_priority(slug, id) {
@@ -146,6 +136,7 @@
     $('#add_new').on('click', function() {
         clear_form();
         $('form').css('display', 'block');
+
     });
 
     $('#id_reset').on('click', function() {clear_form();});
@@ -155,23 +146,18 @@
         e.preventDefault();
             $.post('{% url "project:priority_create" slug %}', $('#add_form').serialize(), function(response) {
                 if (response.error) {
-                    /*if (response.errors['name']) {
-
-                        $("span[name='error']").text(' * '+response.errors['name']);
-                    }*/
-                    alert("errors")
                     $instance.find('input').css({border:'none'});
                     for (var key in response['errors']) {
                         $input = $instance.find('input[name="'+key+'"]');
-                        console.log(key)
+                        $input.val("")
+                        $input.attr('placeholder',response['errors'][key])
                         $input.css({border:'solid 1px #FF0000'});
                     }
                 } else {
                     var name = response['name'];
                     var color = response['color'];
-                    var row_id = response['proj_id']
+                    var row_id = response['id']
                     var slug = response['slug']
-
                     data_row = "<tr id=\"" + row_id + "\"><td><input name='id' value='"+row_id+"' type='hidden'><span class=\"glyphicon glyphicon-move\"></span>"+"{% csrf_token %}"+"</td><td scope=\"row\"><div class=\"input-group colorpicker-component demo demo-auto\"><input name='color' type=\"text\" value=\"" + color + "\" class=\"form-control\"/><span class=\"input-group-addon\"><i></i></span></div></td><td><input name=\"name\" value=\""+name+"\" type=\"text\" class=\"form-control\" style=\"background:#fff\"></td><td class=\"actions\"><a href=\"#\" class=\"edit\"><i class=\"fa fa-edit\"></i></a>&nbsp;<a href=\"#\" class=\"delete\" onclick=\"delete_priority('" + slug + "','" + row_id + "')\"><i class=\"fa fa-trash\"></i></a></td></tr>"
                     $('#priority tbody').append(data_row);
                     $('.demo').colorpicker();
@@ -180,7 +166,7 @@
 
             });
     });
-
+{% if not priority_list %}
     $('#create_default').on('click', function(event){
         event.preventDefault();
         $.get("{% url 'project:priority_default' slug %}", function(response){
@@ -189,7 +175,7 @@
            }
         });
     });
-
+{% endif %}
     $('#project_submenu').attr('class', 'arrow-up active');
     $('#project_submenu ul').show().children('li#project_priorities').addClass('active');
 
@@ -207,9 +193,6 @@
             $('td.index', ui.item.parent()).each(function (i) {
                 $(this).html(i + 1);
             });
-            console.log("Start id : " + ui.item.id);
-            console.log("Start position: " + ui.item.startPos);
-            console.log("New position: " + ui.item.index());
             var prev = ui.item.startPos;
             var current = ui.item.index();
             if(prev != current){
@@ -247,17 +230,16 @@
         var data = $row.find('input').serialize();
         $.post('{% url 'project:priority_edit' slug %}',data, function(response){
             if(response['error']){
-                alert("errors")
                 $row.find('input').css({border:'none'});
                 for (var key in response['errors']) {
                     $input = $row.find('input[name="'+key+'"]');
-                    console.log(key)
+                    $input.val("")
+                    $input.attr('placeholder',response['errors'][key])
                     $input.css({border:'solid 1px #FF0000'});
                 }
 
             }
             else{
-                alert("no errors")
                 $row.find('input').css({border:'none'});
                 $row.find('td:nth-child(3) input').attr('readonly',true);
                 $instatnce.attr('class','fa fa-edit');
