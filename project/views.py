@@ -214,8 +214,8 @@ def delete_project(request, slug, id):
 @active_user_required
 @check_project_admin
 def priorities(request, slug):
-    priority_list = Priority.objects.filter(
-        project=Project.objects.get(slug=slug, organization=request.user.organization)).order_by('id')
+    project=Project.objects.get(slug=slug, organization=request.user.organization)
+    priority_list = Priority.objects.filter(project=project).order_by('order')
     return render(request, 'settings/priorities.html', {'slug': slug, 'priority_list': priority_list,
                                                         'notification_list': get_notification_list(request.user)})
 
@@ -251,9 +251,10 @@ def priority_create(request, slug):
 
 @active_user_required
 @check_project_admin
-def priority_edit(request, slug, priority_slug):
+def priority_edit(request, slug):
+    print request.POST
     project = Project.objects.get(slug=slug, organization=request.user.organization)
-    instance = Priority.objects.get(slug=priority_slug, project=project)
+    instance = Priority.objects.get(id=request.POST.get('id'), project=project)
     form = PriorityForm(request.POST, instance=instance, project=project)
     if form.is_valid():
         priority = form.save()
@@ -263,6 +264,31 @@ def priority_edit(request, slug, priority_slug):
     else:
         return HttpResponse(json.dumps({'error': True, 'errors': form.errors}), content_type="application/json")
 
+@active_user_required
+@check_project_admin
+def priority_order(request, slug):
+    prev = request.GET.get('prev',False)
+    current = request.GET.get('current',False)
+    if prev and current:
+        prev = int(prev)
+        current = int(current)
+        project=Project.objects.get(slug=slug, organization=request.user.organization)
+        priorities = project.priorities.all().order_by('order')
+        if prev > current:
+            for priority in priorities[current:prev+1]:
+                if priority.order-1 == prev :
+                    priority.order = current+1
+                else:
+                    priority.order+=1
+                priority.save()
+        else:
+            for priority in priorities[prev:current+1]:
+                if priority.order-1 == prev :
+                    priority.order=current+1
+                else:
+                    priority.order-=1
+                priority.save()
+    return HttpResponse("200 OK")
 
 @active_user_required
 @check_project_admin
@@ -308,9 +334,9 @@ def severity_create(request, slug):
 
 @active_user_required
 @check_project_admin
-def severity_edit(request, slug, severity_slug):
+def severity_edit(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
-    instance = Severity.objects.get(slug=severity_slug, project=project)
+    instance = Severity.objects.get(id=request.POST.get('id'), project=project)
     form = SeverityForm(request.POST, instance=instance, project=project)
     if form.is_valid():
         severity = form.save()
@@ -321,6 +347,29 @@ def severity_edit(request, slug, severity_slug):
         return HttpResponse(json.dumps({'error': True, 'errors': form.errors}), content_type="application/json")
 
 
+def severity_order(request, slug):
+    prev = request.GET.get('prev',False)
+    current = request.GET.get('current',False)
+    if prev and current:
+        prev = int(prev)
+        current = int(current)
+        project=Project.objects.get(slug=slug, organization=request.user.organization)
+        severities = project.severities.all().order_by('order')
+        if prev > current:
+            for severity in severities[current:prev+1]:
+                if severity.order-1 == prev :
+                    severity.order = current+1
+                else:
+                    severity.order+=1
+                severity.save()
+        else:
+            for severity in severities[prev:current+1]:
+                if severity.order-1 == prev :
+                    severity.order=current+1
+                else:
+                    severity.order-=1
+                severity.save()
+    return HttpResponse("200 severity OK")
 @active_user_required
 @check_project_admin
 def severity_delete(request, slug, severity_slug):
@@ -452,7 +501,8 @@ def ticket_status_order(request, slug):
                 else:
                     ticket_status.order-=1
                 ticket_status.save()
-    return HttpResponse("200 ok")
+    return HttpResponse("200 OK")
+
 
 def password_reset(request, to_email):
     from_email = request.user.organization.slug + "@pietrack.com"
@@ -504,10 +554,8 @@ def create_member(request, slug):
                 if create_member_form.is_valid():
                     random_password = ''.join(
                         random.choice(string.digits) for _ in xrange(8))
-                    new_user_obj = User(
-                        email=post_dict['email'], username=post_dict['email'], password=random_password,
-                        organization=request.user.organization,
-                        pietrack_role='user')
+                    new_user_obj = User(email=post_dict['email'], username=post_dict['email'], password=random_password,
+                                        organization=request.user.organization, pietrack_role='user')
                     team_members.append((new_user_obj, post_dict['designation']))
                     json_post_index += 1
                 else:
@@ -835,7 +883,7 @@ def task_comment(request, slug, task_id):
 
 @active_user_required
 @is_project_member
-def task_comment_edit(request):
+def task_comment_edit(request, slug):
     project = Project.objects.get(slug=request.POST.get('slug'), organization=request.user.organization)
     task = Ticket.objects.get(id=request.POST.get('task_id'), project=project)
     comment = Comment.objects.get(id=request.POST.get('comment_id'))
@@ -928,7 +976,7 @@ def delete_attachment(request, slug, task_id, attachment_id):
 
 @active_user_required
 @is_project_member
-def delete_task_comment(request, comment_id):
+def delete_task_comment(request, slug, comment_id):
     comment = Comment.objects.get(id=comment_id)
     if comment.commented_by == request.user:
         task = comment.ticket

@@ -18,7 +18,7 @@
   <div class="comment_text">
     <p class="your_comment">{{comment.comment|safe}}</p>
          <div class="edit_comment_text">
-               <form action="{% url 'project:task_comment_edit' %}" method="post">
+               <form action="{% url 'project:task_comment_edit' slug %}" method="post">
                    {% csrf_token %}
                    <input type="hidden" name="slug" value="{{ slug }}">
                    <input type="hidden" name="task_id" value="{{ task.id }}">
@@ -61,7 +61,7 @@
               <a href="#">
                   <button class="edit"><i class="fa fa-edit"></i>Edit</button>
               </a>
-              <a href="{% url 'project:delete_task_comment' comment.id %}">
+              <a href="{% url 'project:delete_task_comment' slug comment.id %}">
                   <button class="delete"><i class="fa fa-trash"></i>Delete</button>
               </a>
           {% endif %}

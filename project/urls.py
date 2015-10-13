@@ -32,8 +32,10 @@ urlpatterns = [
     url(r'^(?P<slug>[-\w]+)/settings/priorities/$', priorities, name='priorities'),
     url(r'^(?P<slug>[-\w]+)/settings/priority/default/$', priority_default, name='priority_default'),
     url(r'^(?P<slug>[-\w]+)/settings/priority/create/$', priority_create, name='priority_create'),
-    url(r'^(?P<slug>[-\w]+)/settings/priority/(?P<priority_slug>[a-zA-Z0-9-]+)/edit/$',
+    url(r'^(?P<slug>[-\w]+)/settings/priority/edit/$',
         priority_edit, name='priority_edit'),
+    url(r'^(?P<slug>[-\w]+)/settings/priority/update/order/$',
+        priority_order, name='priority_order'),
     url(r'^(?P<slug>[-\w]+)/settings/priority/(?P<priority_slug>[a-zA-Z0-9-]+)/delete/$',
         priority_delete, name='priority_delete'),
 
@@ -41,10 +43,12 @@ urlpatterns = [
     url(r'^(?P<slug>[-\w]+)/settings/severities/$', severities, name='severities'),
     url(r'^(?P<slug>[-\w]+)/settings/severity/default/$', severity_default, name='severity_default'),
     url(r'^(?P<slug>[-\w]+)/settings/severity/create/$', severity_create, name='severity_create'),
-    url(r'^(?P<slug>[-\w]+)/settings/severity/(?P<severity_slug>[a-zA-Z0-9-]+)/edit/$',
+    url(r'^(?P<slug>[-\w]+)/settings/severity/edit/$',
         severity_edit, name='severity_edit'),
     url(r'^(?P<slug>[-\w]+)/settings/severity/(?P<severity_slug>[a-zA-Z0-9-]+)/delete/$',
         severity_delete, name='severity_delete'),
+    url(r'^(?P<slug>[-\w]+)/settings/severity/update/order/$',
+        severity_order, name='severity_order'),
 
     # member roles
     url(r'^(?P<slug>[-\w]+)/settings/member_roles/$', member_roles, name='member_roles'),
@@ -56,9 +60,9 @@ urlpatterns = [
         member_role_delete, name='member_role_delete'),
 
     # comments
-    url(r'^comment/comment_edit/$', task_comment_edit, name="task_comment_edit"),
+    url(r'^(?P<slug>[-\w]+)/comment/comment_edit/$', task_comment_edit, name="task_comment_edit"),
 
-    url(r'^task/comment/delete/(?P<comment_id>[0-9]+)/$', delete_task_comment, name="delete_task_comment"),
+    url(r'^(?P<slug>[-\w]+)/task/comment/delete/(?P<comment_id>[0-9]+)/$', delete_task_comment, name="delete_task_comment"),
     url(r'^(?P<slug>[-\w]+)/task/(?P<task_id>[0-9]+)/comment/$', task_comment, name="task_comment"),
 
     # taskboard
