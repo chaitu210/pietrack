@@ -334,9 +334,9 @@ def severity_create(request, slug):
 
 @active_user_required
 @check_project_admin
-def severity_edit(request, slug, severity_slug):
+def severity_edit(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
-    instance = Severity.objects.get(slug=severity_slug, project=project)
+    instance = Severity.objects.get(id=request.POST.get('id'), project=project)
     form = SeverityForm(request.POST, instance=instance, project=project)
     if form.is_valid():
         severity = form.save()
@@ -347,6 +347,29 @@ def severity_edit(request, slug, severity_slug):
         return HttpResponse(json.dumps({'error': True, 'errors': form.errors}), content_type="application/json")
 
 
+def severity_order(request, slug):
+    prev = request.GET.get('prev',False)
+    current = request.GET.get('current',False)
+    if prev and current:
+        prev = int(prev)
+        current = int(current)
+        project=Project.objects.get(slug=slug, organization=request.user.organization)
+        severities = project.severities.all().order_by('order')
+        if prev > current:
+            for severity in severities[current:prev+1]:
+                if severity.order-1 == prev :
+                    severity.order = current+1
+                else:
+                    severity.order+=1
+                severity.save()
+        else:
+            for severity in severities[prev:current+1]:
+                if severity.order-1 == prev :
+                    severity.order=current+1
+                else:
+                    severity.order-=1
+                severity.save()
+    return HttpResponse("200 severity OK")
 @active_user_required
 @check_project_admin
 def severity_delete(request, slug, severity_slug):
