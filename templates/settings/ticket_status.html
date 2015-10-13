@@ -19,7 +19,7 @@
                     </div>
                     <!-- status table starts here -->
                     <div class="table-responsive color-box">
-                        {% if ticket_status_list %}
+
                             <table class="table table-striped" id="ticket_status">
                                 <thead>
                                     <tr>
@@ -31,22 +31,31 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-
+                                {% if ticket_status_list %}
                                     {% for ticket_status in ticket_status_list%}
                                         <tr id="{{ticket_status.id}}" order="{{forloop.counter}}">
-                                            <td> <span class="glyphicon glyphicon-move"></span></td>
+                                            <td> <span class="glyphicon glyphicon-move"></span>
+                                                {% csrf_token %}
+                                                <input name="id" value="{{ticket_status.id}}" type="hidden"/>
+                                            </td>
                                             <td scope="row">
                                                 <div class="input-group colorpicker-component demo demo-auto">
                                                     <input name="color" type="text"  value="{{ticket_status.color}}" class="form-control" />
                                                     <span class="input-group-addon"><i style="cursor: default;"></i></span>
                                                 </div>
                                             </td>
-                                            <td>{{ticket_status.name}}</td>
+                                            <td>
+                                                <!--{{ticket_status.name}}-->
+                                                <input name="name" value="{{ ticket_status.name }}" type="text" class="form-control" readonly>
+                                            </td>
                                             <td class="actions">
                                                 <input type="radio" name="is_final" {% if ticket_status.is_final %}checked="checked"{% endif %}>
                                             </td>
                                             <td class="actions">
-                                                <a href="#" class="edit" onclick="edit_ticket_status('{{ticket_status.color}}','{{ticket_status.name}}','{{ticket_status.slug}}')">
+                                                <!--<a href="#" class="edit" onclick="edit_ticket_status('{{ticket_status.color}}','{{ticket_status.name}}','{{ticket_status.slug}}')">
+                                                    <i class="fa fa-edit"></i>
+                                                </a>-->
+                                                <a href="#" class="edit" >
                                                     <i class="fa fa-edit"></i>
                                                 </a>
                                                 <a href="#" class="delete" onclick="delete_ticket_status('{{ticket_status.slug}}','{{ticket_status.id}}')">
@@ -56,9 +65,10 @@
 
                                         </tr>
                                     {% endfor%}
+                                {% endif %}
                                 </tbody>
                             </table>
-                       {% else %}
+                       {% if not ticket_status_list %}
                             <div>
                                 <hr />
                                 <center>
@@ -78,28 +88,40 @@
                             <table class="table table-striped">
                                 <thead>
                                     <tr>
+                                        <th></th>
                                         <th width="40%"></th>
                                         <th></th>
-                                        <th></th>
+                                        <th style="min-width:76px;"></th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr>
+                                        <td> <span class="glyphicon glyphicon-move"></span>
+                                            <input type='hidden' name='csrfmiddlewaretoken' value='bPv9oPoryCHTEBkgEWm1WAaogWN34AKK' />
+                                            <input name="id" value="31" type="hidden"/>
+                                        </td>
                                         <td scope="row">
                                             <div class="input-group colorpicker-component demo demo-auto">
-                                                <input name="color" type="text" value="#666666" class="form-control" />
-                                                <span class="input-group-addon"><i></i></span>
+                                                <input name="color" type="text"  value="#8b7ebf" class="form-control" />
+                                                <span class="input-group-addon"><i style="cursor: default;"></i></span>
                                             </div>
                                         </td>
                                         <td>
-                                            <input name="name" value="" type="text" style="width: 100px; padding: 2px; border:1px solid #929292;" placeholder="Ticket Status" autofocus />
-                                            <span class="input-empty-error" name="error"></span>
-
+                                            <input name="name" value="" type="text" class="form-control" style="background:#fff;border:1px solid #000">
+                                        </td>
+                                        <td class="actions">
+                                            <input type="radio" name="is_final">
                                         </td>
                                         <td class="actions" clear="clearfixall">
-                                            <button type="submit" class="edit" style=" border:0px solid transparent;"><i class="fa fa-plus"></i></button>
+                                            <button type="submit" class="edit"  style=" border:0px solid transparent;"><i class="glyphicon glyphicon-floppy-saved" ></i></button>
                                             <a class="delete" id="id_reset"><span class="glyphicon glyphicon-remove"></span></a>
                                         </td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td><span name="color"></span></td>
+                                        <td><span name="name"></span></td>
+                                        <td></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -117,15 +139,6 @@
 {%block extra_js %}
 <script type="text/javascript" src="http://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
     <script>
-        function hexToRgb(hex) {
-            var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-            return result ? {
-                r: parseInt(result[1], 16),
-                g: parseInt(result[2], 16),
-                b: parseInt(result[3], 16)
-            } : null;
-        }
-
         function clear_form() {
             var form = $('form');
             form.css('display', 'none');
@@ -133,22 +146,6 @@
             $('form span[name="error"]').text('');
             $('#slug').val("");
             $('#status').val("true");
-        }
-
-        function edit_ticket_status(color, name, slug) {
-            var r = hexToRgb(color).r;
-            var g = hexToRgb(color).g;
-            var b = hexToRgb(color).b;
-            var color_box = '<i style="background-color: rgb(' + r + ',' + g + ',' + b + ');"></i>';
-
-            $('#add_form').css('display', 'block');
-            $('#add_form').find("input[name='color']").val(color);
-            $('#add_form').find("input[name='name']").val(name);
-            $('#status').val("false");
-            $('#slug').val(slug);
-            $('#add_form span').html(color_box);
-            $('.demo').colorpicker();
-
         }
 
         function delete_ticket_status(slug, id) {
@@ -163,63 +160,37 @@
             clear_form();
             $('form').css('display', 'block');
         });
-
-        $('#id_reset').on('click', function() {
-            clear_form();
-
+        $('#id_reset').click(function(e){
+             clear_form();
         });
-
         $('#add_form').on('submit', function(e) {
             e.preventDefault();
             if ($('#status').val() == "true") {
                 $.post('{% url "project:ticket_status_create" slug %}', $('#add_form').serialize(), function(response) {
                     if (response.error) {
-                        if (response.errors['name']) {
-                            $("span[name='error']").text(' * '+response.errors['name']);
+                        $("span[name='color']").text("")
+                        $("span[name='name']").text("")
+                        for(key in response.errors){
+                             $("span[name='"+key+"']").text(' * '+response.errors[key]);
                         }
                     } else {
-
+                        $("span[name='color']").text("")
+                        $("span[name='name']").text("")
                         var name = response['name'];
                         var color = response['color'];
-                        var row_id = response['proj_id'];
+                        var row_id = response['id'];
                         var slug = response['slug'];
-
-                        data_row = "<tr id=\"" + row_id + "\"><td scope=\"row\"><div class=\"input-group colorpicker-component demo demo-auto\"><input type=\"text\" value=\"" + color + "\" class=\"form-control\"/><span class=\"input-group-addon\"><i></i></span></div></td><td>" + name + "</td><td class=\"actions\"><a href=\"#\" class=\"edit\" onclick=\"edit_ticket_status('" + color + "','" + name + "','" + slug + "')\"><i class=\"fa fa-edit\"></i></a>&nbsp;<a href=\"#\" class=\"delete\" onclick=\"delete_ticket_status('" + slug + "','" + row_id + "')\"><i class=\"fa fa-trash\"></i></a></td></tr>";
+                        data_row = '<tr id="'+ row_id+'"><td><span class="glyphicon glyphicon-move"></span>'+"{% csrf_token %}"+'<input name="id" value="'+row_id+'" type="hidden"></td><td scope="row"><div class="input-group colorpicker-component demo demo-auto colorpicker-element"><input name="color" type="text" value="'+color+'" class="form-control"><span class="input-group-addon"><i style="cursor: default; background-color: rgb(139, 126, 191);"></i></span></div></td><td><input name="name" value="'+name+'" type="text" class="form-control" style="background:#fff"></td><td class="actions"><input type="radio" name="is_final"> </td> <td class="actions"><a  class="edit" style=" border:0px solid transparent;"><i class="fa fa-edit"></i></a>&nbsp;<a class="delete"  onclick="delete_ticket_status(\''+slug+'\',\''+row_id+'\')"><i class="fa fa-trash"></i></a></td></tr>'
                         $('#ticket_status tbody').append(data_row);
-                        $('.demo').colorpicker();
+                        var is_final = response['is_final'];
+                        var is_final = response['is_final'];
+                        if (is_final!=false){
+                            $('#'+row_id).find('input[name="is_final"]').attr('checked',true)
+                            }
                         clear_form();
                     }
 
                 });
-            } else {
-                var myslug = $('#slug').val();
-                $.post('/project/{{slug}}/settings/ticket_status/' + myslug + '/edit/', $('#add_form').serialize(), function(response) {
-                    if (response.error) {
-                        if (response.errors['name']) {
-                            $("span[name='error']").text(' * '+response.errors['name']);
-                        }
-                    } else {
-
-                        var name = response['name'];
-                        var color = response['color'];
-                        var row_id = response['proj_id'];
-                        var slug = response['slug'];
-
-                        $('#' + row_id + ' a.edit').attr('onclick', "edit_ticket_status('" + color + "','" + name + "','" + slug + "')");
-                        $('#' + row_id + ' a.delete').attr("onclick", "delete_ticket_status('" + slug + "','" + row_id + "')");
-                        $('#' + row_id + ' td:nth-child(2)').text(name);
-                        $('#' + row_id + ' input').val(color);
-                        var r = hexToRgb(color).r;
-                        var g = hexToRgb(color).g;
-                        var b = hexToRgb(color).b;
-                        var color_box = '<i style="background-color: rgb(' + r + ',' + g + ',' + b + ');"></i>';
-                        $('#' + row_id + " span").html(color_box);
-                        $('.demo').colorpicker();
-                        clear_form();
-                    }
-
-                });
-
             }
         });
 
@@ -248,39 +219,63 @@
             return $helper;
         },
         updateIndex = function(e, ui) {
-            $.get("/project/{{slug}}/settings/ticket_status/"+ui.item.attr('id')+"/order/", function (response) {
-                if(response){
-                    console.log(response.ticket);
-                }
-            }, 'json');
-
             $('td.index', ui.item.parent()).each(function (i) {
                 $(this).html(i + 1);
             });
-
-            alert(ui.item.attr('order'));
-           /* $('td.index').attr('order').change(function(e){
-               console.log ($(this).attr('order'))
-            })*/
-        };
+            console.log("Start id : " + ui.item.id);
+            console.log("Start position: " + ui.item.startPos);
+            console.log("New position: " + ui.item.index());
+            var prev = ui.item.startPos;
+            var current = ui.item.index();
+            if(prev != current){
+                $.get("{% url 'project:ticket_status_order' slug %}"+"?prev="+prev+"&current="+current);
+            }
+        }
 
         $("#ticket_status tbody").sortable({
             helper: fixHelperModified,
-            stop: updateIndex
+            stop: updateIndex,
+            start: function(event, ui) {
+                ui.item.startPos = ui.item.index();
+                ui.item.id = ui.item.id
+            },
+             update: function( event, ui ) {
+                ui.item.id = ui.item.attr("id");
+              }
         }).disableSelection();
 
+    /*inline edit*/
+    $('body').on('click','a > .fa-edit',function(e){
+        e.preventDefault();
+        $row = $(this).closest('tr');
+        $(this).attr('class','glyphicon glyphicon-floppy-saved');
+        $row.find('input').css({border:'solid 1px #00CC66'});
+        $row.find('td:nth-child(3) input').attr('readonly',false)
+    });
 
-/*
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                $("#ticket_status tbody").sortable({
-        helper: fixHelperModified,
-        stop: updateIndex
-        update: function(event, ui) {
-        $('table tr').each(function() {
-            $(this).children('td:first-child').html($(this).index())
-            console.log($(this).index())
+    /*inline save */
+    $('body').on('click','a > .glyphicon.glyphicon-floppy-saved',function(e){
+        e.preventDefault();
+        $instatnce = $(this)
+        $row = $(this).closest('tr');
+        var data = $row.find('input').serialize();
+        $.post('{% url 'project:ticket_status_edit' slug %}',data, function(response){
+            if(response['error']){
+                $row.find('input').css({border:'none'});
+                for (var key in response['errors']) {
+                    $input = $row.find('input[name="'+key+'"]');
+                    $input.css({border:'solid 1px #FF0000'});
+                    console.log($input.parent())
+                }
+
+            }
+            else{
+                $row.find('input').css({border:'none'});
+                $row.find('td:nth-child(3) input').attr('readonly',true);
+                $instatnce.attr('class','fa fa-edit');
+            }
         });
-    }).disableSelection();
-*/
+    });
 </script>
 
 {%endblock%}

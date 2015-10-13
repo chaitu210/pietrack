@@ -21,11 +21,11 @@ urlpatterns = [
     url(r'^(?P<slug>[-\w]+)/settings/ticket_status/$', ticket_status, name='ticket_status'),
     url(r'^(?P<slug>[-\w]+)/settings/ticket_status/default/$', ticket_status_default, name='ticket_status_default'),
     url(r'^(?P<slug>[-\w]+)/settings/ticket_status/create/$', ticket_status_create, name='ticket_status_create'),
-    url(r'^(?P<slug>[-\w]+)/settings/ticket_status/(?P<ticket_slug>[a-zA-Z0-9-]+)/edit/$',
+    url(r'^(?P<slug>[-\w]+)/settings/ticket_status/edit/$',
         ticket_status_edit, name='ticket_status_edit'),
     url(r'^(?P<slug>[-\w]+)/settings/ticket_status/(?P<ticket_slug>[a-zA-Z0-9-]+)/delete/$',
         ticket_status_delete, name='ticket_status_delete'),
-    url(r'^(?P<slug>[-\w]+)/settings/ticket_status/(?P<ticket_slug>[a-zA-Z0-9-]+)/order/$',
+    url(r'^(?P<slug>[-\w]+)/settings/ticket_statuses/update/order/$',
         ticket_status_order, name='ticket_status_order'),
 
     # priority
