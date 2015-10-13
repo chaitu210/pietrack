@@ -505,10 +505,8 @@ def create_member(request, slug):
                 if create_member_form.is_valid():
                     random_password = ''.join(
                         random.choice(string.digits) for _ in xrange(8))
-                    new_user_obj = User(
-                        email=post_dict['email'], username=post_dict['email'], password=random_password,
-                        organization=request.user.organization,
-                        pietrack_role='user')
+                    new_user_obj = User(email=post_dict['email'], username=post_dict['email'], password=random_password,
+                                        organization=request.user.organization, pietrack_role='user')
                     team_members.append((new_user_obj, post_dict['designation']))
                     json_post_index += 1
                 else:
@@ -836,7 +834,7 @@ def task_comment(request, slug, task_id):
 
 @active_user_required
 @is_project_member
-def task_comment_edit(request):
+def task_comment_edit(request, slug):
     project = Project.objects.get(slug=request.POST.get('slug'), organization=request.user.organization)
     task = Ticket.objects.get(id=request.POST.get('task_id'), project=project)
     comment = Comment.objects.get(id=request.POST.get('comment_id'))
@@ -929,7 +927,7 @@ def delete_attachment(request, slug, task_id, attachment_id):
 
 @active_user_required
 @is_project_member
-def delete_task_comment(request, comment_id):
+def delete_task_comment(request, slug, comment_id):
     comment = Comment.objects.get(id=comment_id)
     if comment.commented_by == request.user:
         task = comment.ticket
