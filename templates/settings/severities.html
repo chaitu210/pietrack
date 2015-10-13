@@ -19,18 +19,24 @@
                     </div>
                     <!-- status table starts here -->
                     <div class="table-responsive color-box">
-                        {% if severity_list %}
                             <table class="table table-striped" id="priority">
                                 <thead>
                                     <tr>
+                                        <th></th>
                                         <th width="40%">Color</th>
                                         <th>Name</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
+                            {% if severity_list %}
                                 {% for severity in severity_list%}
                                     <tr id="{{severity.id}}">
+                                        <td>
+                                            <span class="glyphicon glyphicon-move"></span>
+                                            {% csrf_token %}
+                                            <input name="id" value="{{severity.id}}" type="hidden"/>
+                                        </td>
                                         <td scope="row">
                                             <div class="input-group colorpicker-component demo demo-auto">
                                                 <input type="text" value="{{severity.color}}" class="form-control" />
@@ -40,10 +46,10 @@
                                             </div>
                                         </td>
                                         <td>
-                                            {{severity.name}}
+                                            <input name="name" value="{{ severity.name }}" type="text" class="form-control" readonly>
                                         </td>
                                         <td class="actions">
-                                            <a href="#" class="edit" onclick="edit_severity('{{severity.color}}','{{severity.name}}','{{severity.slug}}')">
+                                            <a href="#" class="edit" >
                                                 <i class="fa fa-edit"></i>
                                             </a>
                                             <a href="#" class="delete" onclick="delete_severity('{{severity.slug}}','{{severity.id}}')">
@@ -52,10 +58,11 @@
                                         </td>
                                     </tr>
                                     {% endfor%}
+                            {% endif %}
                                 </tbody>
                             </table>
 
-                       {% else %}
+                       {% if not severity_list %}
                             <div>
                                 <hr />
                                 <center>
@@ -227,9 +234,43 @@
         });
     });
 
-    </script>
-    <script type="text/javascript">
-        $('#project_submenu').attr('class', 'arrow-up active');
-        $('#project_submenu ul').show().children('li#project_severities').addClass('active');
-    </script>
+    $('#project_submenu').attr('class', 'arrow-up active');
+    $('#project_submenu ul').show().children('li#project_severities').addClass('active');
+
+    /*inline edit*/
+    $('body').on('click','a > .fa-edit',function(e){
+        e.preventDefault();
+        $row = $(this).closest('tr');
+        $(this).attr('class','glyphicon glyphicon-floppy-saved');
+        $row.find('input').css({border:'solid 1px #00CC66'});
+        $row.find('td:nth-child(3) input').attr('readonly',false)
+    });
+
+    /*inline save */
+    $('body').on('click','a > .glyphicon.glyphicon-floppy-saved',function(e){
+        e.preventDefault();
+        $instatnce = $(this)
+        $row = $(this).closest('tr');
+        var data = $row.find('input').serialize();
+        $.post('{% url 'project:priority_edit' slug %}',data, function(response){
+            if(response['error']){
+                alert("errors")
+                $row.find('input').css({border:'none'});
+                for (var key in response['errors']) {
+                    $input = $row.find('input[name="'+key+'"]');
+                    console.log(key)
+                    $input.css({border:'solid 1px #FF0000'});
+                }
+
+            }
+            else{
+                alert("no errors")
+                $row.find('input').css({border:'none'});
+                $row.find('td:nth-child(3) input').attr('readonly',true);
+                $instatnce.attr('class','fa fa-edit');
+            }
+        });
+    });
+    /* end edit */
+</script>
 {% endblock %}
