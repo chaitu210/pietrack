@@ -80,6 +80,8 @@ class PriorityForm(forms.ModelForm):
         instance.slug = slugify(self.cleaned_data['name'])
         instance.name = self.cleaned_data['name']
         instance.color = self.cleaned_data['color']
+        if not self.instance:
+            instance.order = self.project.priorities.count()+1
         if commit:
             instance.save()
         return instance
@@ -111,6 +113,8 @@ class SeverityForm(forms.ModelForm):
         instance.slug = slugify(self.cleaned_data['name'])
         instance.name = self.cleaned_data['name']
         instance.color = self.cleaned_data['color']
+        if not self.instance:
+            instance.order = self.project.severities.count()+1
         if commit:
             instance.save()
         return instance
@@ -144,7 +148,8 @@ class TicketStatusForm(forms.ModelForm):
         instance.slug = slugify(self.cleaned_data['name'])
         instance.name = self.cleaned_data['name']
         instance.color = self.cleaned_data['color']
-        instance.order = TicketStatus.objects.filter(project=self.project).count()+1
+        if not self.instance:
+            instance.order = TicketStatus.objects.filter(project=self.project).count()+1
         if commit:
             instance.save()
         return instance
