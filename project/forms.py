@@ -149,7 +149,7 @@ class TicketStatusForm(forms.ModelForm):
         instance.name = self.cleaned_data['name']
         instance.color = self.cleaned_data['color']
         if not self.instance:
-            instance.order = TicketStatus.objects.filter(project=self.project).count()+1
+            instance.order =self.project.task_statuses.count()+1
         if commit:
             instance.save()
         return instance

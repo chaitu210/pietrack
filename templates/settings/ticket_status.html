@@ -117,10 +117,15 @@
 <script type="text/javascript" src="http://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
     <script>
         function clear_form() {
-            var form = $('form');
-            form.css('display', 'none');
-            form.find('input[name="name"]').val('');
-            $('form span[name="error"]').text('');
+        var form = $('form');
+        form.css('display', 'none');
+        form.find('input[name="name"]').val('');
+        form.find('input[name="color"]').val('#666666');
+        form.find('input[name="name"]').css({border:'1px solid #000'});
+        form.find('input[name="color"]').css({border:'none'});
+        form.find('input[name="name"]').attr('placeholder','TicketStatus Name');
+        form.find('input[name="color"]').attr('placeholder','Choose Color');
+
         }
 
         function delete_ticket_status(slug, id) {
@@ -145,6 +150,8 @@
                     for (var key in response['errors']) {
                         $input = $instance.find('input[name="'+key+'"]');
                         $input.css({border:'solid 1px #FF0000'});
+                        $input.val("")
+                        $input.attr('placeholder',response['errors'][key])
                     }
                 }
                 else {
@@ -158,6 +165,7 @@
                     if (is_final!=false){
                         $('#'+row_id).find('input[name="is_final"]').attr('checked',true)
                         }
+                    $('.demo').colorpicker();
                     clear_form();
                 }
 
@@ -230,6 +238,8 @@
                 for (var key in response['errors']) {
                     $input = $row.find('input[name="'+key+'"]');
                     $input.css({border:'solid 1px #FF0000'});
+                    $input.val("")
+                    $input.attr('placeholder',response['errors'][key])
                 }
             }
             else{

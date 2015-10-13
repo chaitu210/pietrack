@@ -122,6 +122,8 @@
         form.find('input[name="color"]').val('#666666');
         form.find('input[name="name"]').css({border:'1px solid #000'});
         form.find('input[name="color"]').css({border:'none'});
+        form.find('input[name="name"]').attr('placeholder','Severity Name');
+        form.find('input[name="color"]').attr('placeholder','Choose Color');
     }
 
     function delete_severity(slug, id) {
