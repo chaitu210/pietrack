@@ -386,7 +386,6 @@ def ticket_status_create(request, slug):
 @active_user_required
 @check_project_admin
 def ticket_status_edit(request, slug):
-    print request.POST
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     instance = TicketStatus.objects.get(id=request.POST['id'], project=project)
     form = TicketStatusForm(request.POST, instance=instance, project=project)
@@ -436,24 +435,19 @@ def ticket_status_order(request, slug):
         project=Project.objects.get(slug=slug, organization=request.user.organization)
         ticket_statuses = project.task_statuses.all().order_by('order')
         if prev > current:
-            print ticket_statuses[current:prev+1]
             for ticket_status in ticket_statuses[current:prev+1]:
                 if ticket_status.order-1 == prev :
-                    ticket_status.order-=current
-                else:
-                    ticket_status.order-=1
-                ticket_status.save()
-                print ticket_status.order
-        else:
-            print ticket_statuses[prev:current+1]
-            for ticket_status in ticket_statuses[prev:current+1]:
-                if ticket_status.order-1 == prev :
-                    ticket_status.order+=current
+                    ticket_status.order = current+1
                 else:
                     ticket_status.order+=1
                 ticket_status.save()
-                print ticket_status.order
-
+        else:
+            for ticket_status in ticket_statuses[prev:current+1]:
+                if ticket_status.order-1 == prev :
+                    ticket_status.order=current+1
+                else:
+                    ticket_status.order-=1
+                ticket_status.save()
     return HttpResponse("ok")
 
 

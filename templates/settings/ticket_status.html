@@ -228,9 +228,7 @@
             var prev = ui.item.startPos;
             var current = ui.item.index();
             if(prev != current){
-                $.get("{% url 'project:ticket_status_order' slug %}"+"?prev="+prev+"&current="+current, function (response) {
-                        alert(response);
-                   });
+                $.get("{% url 'project:ticket_status_order' slug %}"+"?prev="+prev+"&current="+current);
             }
         }
 
