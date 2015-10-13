@@ -450,10 +450,8 @@ def create_member(request, slug):
                 if create_member_form.is_valid():
                     random_password = ''.join(
                         random.choice(string.digits) for _ in xrange(8))
-                    new_user_obj = User(
-                        email=post_dict['email'], username=post_dict['email'], password=random_password,
-                        organization=request.user.organization,
-                        pietrack_role='user')
+                    new_user_obj = User(email=post_dict['email'], username=post_dict['email'], password=random_password,
+                                        organization=request.user.organization, pietrack_role='user')
                     team_members.append((new_user_obj, post_dict['designation']))
                     json_post_index += 1
                 else:
