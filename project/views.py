@@ -214,8 +214,8 @@ def delete_project(request, slug, id):
 @active_user_required
 @check_project_admin
 def priorities(request, slug):
-    priority_list = Priority.objects.filter(
-        project=Project.objects.get(slug=slug, organization=request.user.organization)).order_by('id')
+    project=Project.objects.get(slug=slug, organization=request.user.organization)
+    priority_list = Priority.objects.filter(project=project).order_by('order')
     return render(request, 'settings/priorities.html', {'slug': slug, 'priority_list': priority_list,
                                                         'notification_list': get_notification_list(request.user)})
 
@@ -251,9 +251,10 @@ def priority_create(request, slug):
 
 @active_user_required
 @check_project_admin
-def priority_edit(request, slug, priority_slug):
+def priority_edit(request, slug):
+    print request.POST
     project = Project.objects.get(slug=slug, organization=request.user.organization)
-    instance = Priority.objects.get(slug=priority_slug, project=project)
+    instance = Priority.objects.get(id=request.POST.get('id'), project=project)
     form = PriorityForm(request.POST, instance=instance, project=project)
     if form.is_valid():
         priority = form.save()
@@ -263,6 +264,31 @@ def priority_edit(request, slug, priority_slug):
     else:
         return HttpResponse(json.dumps({'error': True, 'errors': form.errors}), content_type="application/json")
 
+@active_user_required
+@check_project_admin
+def priority_order(request, slug):
+    prev = request.GET.get('prev',False)
+    current = request.GET.get('current',False)
+    if prev and current:
+        prev = int(prev)
+        current = int(current)
+        project=Project.objects.get(slug=slug, organization=request.user.organization)
+        priorities = project.priorities.all().order_by('order')
+        if prev > current:
+            for priority in priorities[current:prev+1]:
+                if priority.order-1 == prev :
+                    priority.order = current+1
+                else:
+                    priority.order+=1
+                priority.save()
+        else:
+            for priority in priorities[prev:current+1]:
+                if priority.order-1 == prev :
+                    priority.order=current+1
+                else:
+                    priority.order-=1
+                priority.save()
+    return HttpResponse("200 OK")
 
 @active_user_required
 @check_project_admin
@@ -433,7 +459,6 @@ def ticket_status_delete(request, slug, ticket_slug):
 def ticket_status_order(request, slug):
     prev = request.GET.get('prev',False)
     current = request.GET.get('current',False)
-    print current,prev
     if prev and current:
         prev = int(prev)
         current = int(current)
@@ -453,7 +478,7 @@ def ticket_status_order(request, slug):
                 else:
                     ticket_status.order-=1
                 ticket_status.save()
-    return HttpResponse("ok")
+    return HttpResponse("200 OK")
 
 def password_reset(request, to_email):
     from_email = request.user.organization.slug + "@pietrack.com"

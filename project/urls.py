@@ -32,8 +32,10 @@ urlpatterns = [
     url(r'^(?P<slug>[-\w]+)/settings/priorities/$', priorities, name='priorities'),
     url(r'^(?P<slug>[-\w]+)/settings/priority/default/$', priority_default, name='priority_default'),
     url(r'^(?P<slug>[-\w]+)/settings/priority/create/$', priority_create, name='priority_create'),
-    url(r'^(?P<slug>[-\w]+)/settings/priority/(?P<priority_slug>[a-zA-Z0-9-]+)/edit/$',
+    url(r'^(?P<slug>[-\w]+)/settings/priority/edit/$',
         priority_edit, name='priority_edit'),
+    url(r'^(?P<slug>[-\w]+)/settings/priority/update/order/$',
+        priority_order, name='priority_order'),
     url(r'^(?P<slug>[-\w]+)/settings/priority/(?P<priority_slug>[a-zA-Z0-9-]+)/delete/$',
         priority_delete, name='priority_delete'),
 
