@@ -258,7 +258,6 @@ def priority_create(request, slug):
 @active_user_required
 @check_project_admin
 def priority_edit(request, slug):
-    print request.POST
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     instance = Priority.objects.get(id=request.POST.get('id'), project=project)
     form = PriorityForm(request.POST, instance=instance, project=project)
