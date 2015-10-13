@@ -26,6 +26,7 @@ from .templatetags.project_tags import is_project_admin
 from django.utils.functional import wraps
 from django.db.models import Q
 
+
 def check_project_admin(view):
     wraps(view)
 
@@ -36,9 +37,9 @@ def check_project_admin(view):
                                     project__organization=request.user.organization)
 
             if role.is_project_admin:
-                return wraps(view) (view(request, slug, *args, **kwargs))
+                return wraps(view)(view(request, slug, *args, **kwargs))
             elif request.user.pietrack_role == 'admin':
-                return wraps(view) (view(request, slug, *args, **kwargs))
+                return wraps(view)(view(request, slug, *args, **kwargs))
         except:
             if request.user.pietrack_role == 'admin':
                 return wraps(view)(view(request, slug, *args, **kwargs))
@@ -71,16 +72,19 @@ def active_user_required(view_func):
         user_login_required(view_func), login_url='/')
     return decorated_view_func
 
+
 def is_project_member(view):
-    def inner(request,slug, *args, **kwargs):
+    def inner(request, slug, *args, **kwargs):
         try:
             project = Project.objects.get(slug=slug, organization=request.user.organization)
             if project.members.filter(email=request.user.email):
-                return view(request,slug, *args, **kwargs)
+                return view(request, slug, *args, **kwargs)
         except:
             pass
         return HttpResponseForbidden()
+
     return inner
+
 
 @active_user_required
 @check_organization_admin
@@ -148,7 +152,7 @@ def project_details(request, slug):
     template_name = 'project/project_project_details.html'
     if request.method == 'POST':
         img = False
-        if (request.FILES.get('logo', False)):
+        if request.FILES.get('logo', False):
             img = True
             try:
                 Image.open(request.FILES.get('logo'))
@@ -166,8 +170,8 @@ def project_details(request, slug):
             project.slug = slug
             project.description = request.POST['description']
             project.modified_date = timezone.now()
-            if (request.FILES.get('logo', False)):
-                if (project.logo):
+            if request.FILES.get('logo', False):
+                if project.logo:
                     os.remove(project.logo.path)
                 project.logo = request.FILES.get('logo')
             project.save()
@@ -200,9 +204,10 @@ def delete_project(request, slug, id):
             content_type = ContentType.objects.get_for_model(timeline)
             Timeline.objects.filter(content_type__pk=content_type.id, object_id=timeline.id).delete()
         project.delete()
+        messages.success(request, 'Successfully deleted Project - ' + str(project) + ' !')
     except OSError as e:
         pass
-    messages.success(request, 'Successfully deleted Project - ' + str(project) + ' !')
+
     return redirect("project:list_of_projects")
 
 
@@ -235,7 +240,7 @@ def priority_default(request, slug):
 def priority_create(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     form = PriorityForm(request.POST, project=project)
-    if (form.is_valid()):
+    if form.is_valid():
         priority = form.save()
         return HttpResponse(json.dumps(
             {'error': False, 'color': priority.color, 'name': priority.name, 'proj_id': priority.id,
@@ -250,7 +255,7 @@ def priority_edit(request, slug, priority_slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     instance = Priority.objects.get(slug=priority_slug, project=project)
     form = PriorityForm(request.POST, instance=instance, project=project)
-    if (form.is_valid()):
+    if form.is_valid():
         priority = form.save()
         return HttpResponse(json.dumps(
             {'error': False, 'color': priority.color, 'name': priority.name, 'proj_id': priority.id,
@@ -292,7 +297,7 @@ def severity_default(request, slug):
 def severity_create(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     form = SeverityForm(request.POST, project=project)
-    if (form.is_valid()):
+    if form.is_valid():
         severity = form.save()
         return HttpResponse(json.dumps(
             {'error': False, 'color': severity.color, 'name': severity.name, 'proj_id': severity.id,
@@ -307,7 +312,7 @@ def severity_edit(request, slug, severity_slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     instance = Severity.objects.get(slug=severity_slug, project=project)
     form = SeverityForm(request.POST, instance=instance, project=project)
-    if (form.is_valid()):
+    if form.is_valid():
         severity = form.save()
         return HttpResponse(json.dumps(
             {'error': False, 'color': severity.color, 'name': severity.name, 'proj_id': severity.id,
@@ -357,7 +362,7 @@ def ticket_status_create(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     form = TicketStatusForm(request.POST, project=project)
     is_final = request.POST.get('is_final',False)
-    if (form.is_valid()):
+    if form.is_valid():
         ticket_status = form.save()
         if is_final:
             if not project.task_statuses.filter(is_final=True):
@@ -390,7 +395,7 @@ def ticket_status_edit(request, slug):
     instance = TicketStatus.objects.get(id=request.POST['id'], project=project)
     form = TicketStatusForm(request.POST, instance=instance, project=project)
     is_final = request.POST.get('is_final',False)
-    if (form.is_valid()):
+    if form.is_valid():
         ticket_status = form.save()
         if is_final:
             ticket = project.task_statuses.get(is_final=True)
@@ -449,7 +454,6 @@ def ticket_status_order(request, slug):
                     ticket_status.order-=1
                 ticket_status.save()
     return HttpResponse("ok")
-
 
 def password_reset(request, to_email):
     from_email = request.user.organization.slug + "@pietrack.com"
@@ -725,8 +729,7 @@ def update_taskboard_status(request, slug, status_slug, task_id):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     task = Ticket.objects.get(id=task_id, project=project)
     old_status = task.status.name
-    ticket_status = TicketStatus.objects.get(
-        slug=status_slug, project=project)
+    ticket_status = TicketStatus.objects.get(slug=status_slug, project=project)
     task.status = ticket_status
     task.save()
     msg = "moved " + task.name + " from " + old_status + " to " + task.status.name

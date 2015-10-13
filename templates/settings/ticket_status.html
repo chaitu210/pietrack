@@ -137,7 +137,7 @@
 
 {% endblock settings_content %}
 {%block extra_js %}
-<script src="http://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+<script type="text/javascript" src="http://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
     <script>
         function clear_form() {
             var form = $('form');
@@ -147,6 +147,7 @@
             $('#slug').val("");
             $('#status').val("true");
         }
+
         function delete_ticket_status(slug, id) {
             $.get('/project/{{slug}}/settings/ticket_status/' + slug + '/delete/', function(response) {
                 if (!response.error) {
@@ -187,7 +188,6 @@
                             $('#'+row_id).find('input[name="is_final"]').attr('checked',true)
                             }
                         clear_form();
-
                     }
 
                 });
