@@ -230,6 +230,7 @@ class TicketStatus(models.Model):
 
     class Meta:
         unique_together = (("project", "name"), ("project", "slug"))
+        ordering = ['order']
 
     def __str__(self):
         return self.name
