@@ -381,7 +381,7 @@ def severity_order(request, slug):
                 else:
                     severity.order-=1
                 severity.save()
-    return HttpResponse("200 severity OK")
+    return HttpResponse("200 OK")
 @active_user_required
 @check_project_admin
 def severity_delete(request, slug, severity_slug):
@@ -774,7 +774,7 @@ def tickets(request, slug):
 def taskboard(request, slug, milestone_slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     milestone = Milestone.objects.get(slug=milestone_slug, project=project)
-    ticket_status_list = TicketStatus.objects.filter(project=project).order_by('id')
+    ticket_status_list = TicketStatus.objects.filter(project=project).order_by('order')
     mem_details = []
     for member in project.members.all():
         try:
@@ -793,6 +793,9 @@ def update_taskboard_status(request, slug, status_slug, task_id):
     task = Ticket.objects.get(id=task_id, project=project)
     old_status = task.status.name
     ticket_status = TicketStatus.objects.get(slug=status_slug, project=project)
+    if ticket_status.is_final or task.status.is_final:
+        if not (is_project_admin(request.user,slug) or request.user.pietrack_role=='admin'):
+            return HttpResponse(json.dumps({'only_admin':True}), content_type="application/json")
     task.status = ticket_status
     task.save()
     msg = "moved " + task.name + " from " + old_status + " to " + task.status.name
