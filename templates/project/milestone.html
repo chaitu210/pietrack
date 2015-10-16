@@ -46,9 +46,6 @@
 {% endblock %} 
 {% block extra_js %}
     <script>
-    $(function() {
-        $("#milestone_start_date, #milestone_finished_date").datepicker();
-    });
 
     $('#milestone_save').click(function(event) {
         event.preventDefault()
@@ -65,14 +62,28 @@
         });
     });
 
-    function display_datepicker() {
-        $("#milestone_estimated_start, #milestone_estimated_finish").datepicker({
-            changeMonth: true,
-            changeYear: true,
-            dateFormat: 'yy-mm-dd',
-            minDate: new Date(),
+
+      $(function() {
+        $( "#milestone_estimated_start" ).datepicker({
+          changeMonth: true,
+          changeYear: true,
+          dateFormat: 'yy-mm-dd',
+          numberOfMonths: 1,
+          minDate: new Date(),
+          onClose: function( selectedDate ) {
+            $( "#milestone_estimated_finish" ).datepicker( "option", "minDate", selectedDate );
+          }
         });
-    };
-    display_datepicker();
+        $( "#milestone_estimated_finish" ).datepicker({
+          changeMonth: true,
+          changeYear: true,
+          dateFormat: 'yy-mm-dd',
+          numberOfMonths: 1,
+          onClose: function( selectedDate ) {
+            $( "#milestone_estimated_start" ).datepicker( "option", "maxDate", selectedDate );
+          }
+        });
+      });
+
     </script>
 {% endblock %}
