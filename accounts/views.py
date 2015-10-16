@@ -33,9 +33,10 @@ def active_user_required(view_func):
 
 
 def index(request):
+    organization = Organization.objects.all().count()
     if request.user.id:
         return HttpResponseRedirect(reverse('project:list_of_projects'))
-    return render(request, 'login.html')
+    return render(request, 'login.html', {'organization': organization})
 
 
 @active_user_required
