@@ -39,7 +39,9 @@
       <!-- form div -->
       <div class="form_div">
         <span class='icon-hexagon1 hex1_left'></span>
+      {% if not organization %}
         <span class='icon-hexagon1 hex2_left'></span>
+      {% endif %}
         <span class='icon-hexagon1 hex3_left'></span>
         <span class='icon-hexagon1 hex1_right'></span>
         <span class='icon-hexagon1 hex2_right'></span>
@@ -72,19 +74,6 @@
         </div>
         <!--/ tag -->
         <!-- tag -->
-        <div class="border_div create_acc">
-          <div class="content_wrap">
-            <div class="icon_div">
-              <span class='icon-hexagon1 hex1_dash_left'></span>
-              <i class='fa fa-users icon_upon'></i>
-            </div>
-            <div class="button_div">
-              <button class='login_panel_tab_button' id='create_account_button' panelId='create_account'>Create Account</button>
-            </div>
-          </div>
-        </div>
-        <!--/ tag -->
-        <!-- tag -->
         <div class="border_div pm">
           <div class="content_wrap">
             <div class="icon_div">
@@ -98,6 +87,21 @@
           </div>
         </div>
         <!--/ tag -->
+    {% if not organization %}
+        <!-- tag -->
+        <div class="border_div create_acc">
+          <div class="content_wrap">
+            <div class="icon_div">
+              <span class='icon-hexagon1 hex1_dash_left'></span>
+              <i class='fa fa-users icon_upon'></i>
+            </div>
+            <div class="button_div">
+              <button class='login_panel_tab_button' id='create_account_button' panelId='create_account'>Create Account</button>
+            </div>
+          </div>
+        </div>
+        <!--/ tag -->
+    {% endif %}
         <!-- tag -->
         <div class="border_div tm">
           <div class="content_wrap">

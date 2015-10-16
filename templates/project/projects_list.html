@@ -79,4 +79,9 @@
         window.location = $(this).data('href');
     });
  </script>
+{% if not projects_list %}
+    <script type="text/javascript">
+        window.location = $('.right a').attr('href');
+    </script>
+{% endif %}
 {% endblock %}
