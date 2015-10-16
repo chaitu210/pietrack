@@ -109,6 +109,7 @@
                         <div class="task_category_wrap">
                             <div class="title" style="background:{{ticket_status.color}};">
                                 {{ticket_status.name}}
+                                {% if ticket_status.is_final %} <a style="text-transform:lowercase;">(Only Admin)</a>{% endif %}
                             </div>
                             <div class="scroll all">
                                 <ul class='connectedSortable' id='{{ticket_status.slug}}'>
@@ -197,14 +198,19 @@
     var drag_options = {
         connectWith: ".connectedSortable",
         start: function(event, ui) {
-            $(this).css('z-index',100);
             console.log("200ok 1")
         },
-
+        appendTo: 'body',
+        helper: "clone",
         receive: function(event, ui) {
             var status = this.id;
             var task = ui.item.attr('id');
-            $.get('/project/{{slug}}/update_taskboard/' + status + '/' + task + '/');
+            $.get('/project/{{slug}}/update_taskboard/' + status + '/' + task + '/',function(response){
+                if(response['only_admin']){
+                    alert("Only admin can perform this operation.")
+                    ui.sender.sortable("cancel");
+                }
+            });
         }
     }
 
@@ -213,12 +219,21 @@
             connectWith: ".connectedSortable",
             start: function(event, ui) {
                 $(this).children().css('z-index',2000);
+                $(ui.sender).sortable('refresh');
                 console.log("200ok 2")
-        },
+            },
+            appendTo: 'body',
+            //helper: "clone",
             receive: function(event, ui) {
                 var status = this.id;
                 var task = ui.item.attr('id');
-                $.get('/project/{{slug}}/update_taskboard/' + status + '/' + task + '/');
+
+                $.get('/project/{{slug}}/update_taskboard/' + status + '/' + task + '/',function(response){
+                    if(response['only_admin']){
+                        alert("Only admin can perform this operation.")
+                        ui.sender.sortable("cancel");
+                    }
+                });
             }
         }).disableSelection();
     });
