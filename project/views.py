@@ -772,18 +772,24 @@ def tickets(request, slug):
 @active_user_required
 @is_project_member
 def taskboard(request, slug, milestone_slug):
+    # assigned_to = []
+    # requirements = []
+    # tasks = []
+    # start_date = False
+    # end_date = False
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     milestone = Milestone.objects.get(slug=milestone_slug, project=project)
     ticket_status_list = TicketStatus.objects.filter(project=project).order_by('order')
-    mem_details = []
-    for member in project.members.all():
-        try:
-            mem_details.append(member)
-        except:
-            pass
+    mem_details = project.members.all()
+    assigned_to =  request.GET.getlist('assigned_to')
+    requirements =  request.GET.getlist('requirements')
+    tasks =  request.GET.getlist('tasks')
+    start_date = request.GET.get('start_date','')
+    end_date = request.GET.get('end_date','')
+    search_filter = (milestone,assigned_to,requirements,tasks,start_date,end_date)
     return render(request, 'project/taskboard.html',
-                  {'ticket_status_list': ticket_status_list, 'slug': slug, 'milestone': milestone,
-                   'project_members': mem_details, 'notification_list': get_notification_list(request.user)})
+                  {'ticket_status_list': ticket_status_list, 'slug': slug,
+                   'project_members': mem_details, 'search_filter':search_filter, 'notification_list': get_notification_list(request.user)})
 
 
 @active_user_required

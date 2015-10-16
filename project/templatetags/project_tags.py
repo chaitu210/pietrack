@@ -1,14 +1,38 @@
-import os
 from django import template
-from piebase.models import Ticket, Comment, Requirement, Role, Project
+from piebase.models import Ticket, Comment, Requirement, Role
 from django.core.paginator import Paginator
+from datetime import datetime
 
 register = template.Library()
 
 
 @register.filter
-def Task_list(status, milestone):
+def Task_list(status, search_filter):
+    milestone = search_filter[0]
+    assigned_to = map(int,search_filter[1])
+    requirements = map(int,search_filter[2])
+    task_list = map(int,search_filter[3])
+    start_date = search_filter[4]
+    end_date = search_filter[5]
     tasks = Ticket.objects.filter(status=status, milestone=milestone)
+    if requirements:
+        tasks = tasks.filter(requirement__id__in=requirements)
+    if assigned_to:
+        tasks = tasks.filter(assigned_to__id__in=assigned_to)
+    if task_list:
+        tasks = tasks.filter(id__in=task_list)
+    if start_date!='':
+        try:
+            start_date = datetime.strptime(start_date+u' 00:00:00', '%m/%d/%Y %H:%M:%S')
+            tasks = tasks.filter(created_date__gte=start_date)
+        except:
+            pass
+    if end_date!='':
+        try:
+            end_date = datetime.strptime(end_date+u' 00:00:00', '%m/%d/%Y %H:%M:%S')
+            tasks = tasks.filter(created_date__lte=end_date)
+        except:
+            pass
     p = Paginator(tasks, 10)
     return p.page(1)
 
