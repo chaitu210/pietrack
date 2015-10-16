@@ -170,7 +170,7 @@ COMPRESS_CSS_FILTERS = ['compressor.filters.css_default.CssAbsoluteFilter', 'com
 COMPRESS_JS_FILTERS = ['compressor.filters.jsmin.JSMinFilter']
 
 # EMAIL_HOST = ''
-# EMAIL_HOST_USER = ''
+EMAIL_HOST_USER = 'micropyramid'
 # EMAIL_HOST_PASSWORD = ''
 # EMAIL_PORT = 8080
 # EMAIL_USE_TLS = True

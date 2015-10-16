@@ -215,7 +215,7 @@ header .text .tag {
 .login_content .form_div .forgot_pass {
   border-top: 2px dotted #e2af5c !important;
   left: -166px;
-  top: 165px;
+  top: 279px;
 }
 .login_content .form_div .forgot_pass .icon_div .hex1_dash_left {
   color: #e2af5c;
@@ -228,7 +228,7 @@ header .text .tag {
 .login_content .form_div .create_acc {
   border-top: 2px dotted #e93a27 !important;
   left: -166px;
-  top: 279px;
+  top: 165px;
 }
 .login_content .form_div .create_acc .icon_div .hex1_dash_left {
   color: #e93a27;
