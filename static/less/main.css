@@ -1715,6 +1715,16 @@ header .text .tag {
 .project_description .about_project_wrap .mile_stone_wrap .mile_stone_each .milestone_container .count_wrap .count i {
   padding-right: 10px;
 }
+.project_description .about_project_wrap .mile_stone_wrap .mile_stone_each .milestone_container .count_wrap .status {
+  background: #00c1a4;
+  color: #fff;
+  font-weight: 400;
+  font-size: 12px;
+  padding: 5px 15px;
+  position: absolute;
+  left: 1px;
+  bottom: 0px;
+}
 .project_description .about_project_wrap .profile-pic-count {
   margin-bottom: 20px;
 }
@@ -2105,6 +2115,16 @@ header .text .tag {
 }
 .project_description .team .mile_stone_wrap .mile_stone_each .milestone_container .count_wrap .count i {
   padding-right: 10px;
+}
+.project_description .team .mile_stone_wrap .mile_stone_each .milestone_container .count_wrap .status {
+  background: #00c1a4;
+  color: #fff;
+  font-weight: 400;
+  font-size: 12px;
+  padding: 5px 15px;
+  position: absolute;
+  left: 1px;
+  bottom: 0px;
 }
 .project_description .team .profile-pic-count {
   margin-bottom: 20px;
