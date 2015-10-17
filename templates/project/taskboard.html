@@ -24,7 +24,7 @@
             <!-- filters -->
             <div class="filters_wrap">
                 <h3>Refine your search</h3>
-            <form action="" method="get">
+            <form action="" method="get" id="search">
                 <div class="row filter_row">
                     <div class="col-md-2">
                         <select class='select2 input select2_assigned_to' name="assigned_to" multiple>
@@ -214,35 +214,19 @@
     <!--/ horizontal scroll -->
     <!-- update status -->
     <script type="text/javascript">
-    var drag_options = {
-        connectWith: ".connectedSortable",
-        start: function(event, ui) {
-            console.log("200ok 1")
-        },
-        appendTo: 'body',
-        helper: "clone",
-        receive: function(event, ui) {
-            var status = this.id;
-            var task = ui.item.attr('id');
-            $.get('/project/{{slug}}/update_taskboard/' + status + '/' + task + '/',function(response){
-                if(response['only_admin']){
-                    alert("Only admin can perform this operation.")
-                    ui.sender.sortable("cancel");
-                }
-            });
-        }
-    }
 
     $(function() {
         $(".connectedSortable").sortable({
             connectWith: ".connectedSortable",
             start: function(event, ui) {
-                $(this).children().css('z-index',2000);
-                $(ui.sender).sortable('refresh');
+                $('.connectedSortable').find('li:hidden').show();
+
                 console.log("200ok 2")
             },
-            appendTo: 'body',
-            //helper: "clone",
+            //appendTo: 'body',
+            helper: 'clone',
+            //placeholder: 'ui-state-highlight ui-splitselect-item',
+            //opacity: '.5',
             receive: function(event, ui) {
                 var status = this.id;
                 var task = ui.item.attr('id');
@@ -260,16 +244,15 @@
     /* load tasks all */
     jQuery(function($) {
         $('.scroll.all').on('scroll', function() {
-
+           // console.log($(this).scrollTop() + $(this).innerHeight())
+            //console.log(this.scrollHeight - 2)
             if ($(this).scrollTop() + $(this).innerHeight() >= this.scrollHeight - 2) {
                 page = $(this).find('input[name="page_num"]').val();
                 var status_slug = $(this).children("ul").attr("id")
-
                 if (page) {
                     $(this).find('input[name="page_num"]').remove();
-                    $.get("/project/{{slug}}/{{search_filter.0.slug}}/" + status_slug + "/load_tasks/", {
-                        "page": page
-                    }, function(response) {
+                    var data = $('#search').serialize()+"&page="+page
+                    $.get("/project/{{slug}}/{{search_filter.0.slug}}/" + status_slug + "/load_tasks/",data, function(response) {
                         $('ul#' + status_slug).append(response)
                     });
                 }
@@ -336,22 +319,9 @@
     });
     if($('#tasks_container li[id]').length == 0){
            $('#not_found').show();
+          setTimeout(function(){
+            $('#not_found').hide();
+          },4000);
         }
-    /*$('document').change(function(e){
-        $(document).bind('DOMNodeInserted', function(event) {
-      alert(    ); // paren
-    });
-
-});
-
-
-    $(document).on("change","li",function(){
-       if($('#tasks_container li[id]').length == 0){
-           $('#not_found').show();
-        }
-        else{
-           $('#not_found').hide();
-        }
-    });*/
   </script>
 {% endblock%}
