@@ -1127,16 +1127,14 @@ def project_edit(request, slug):
 @check_project_admin
 def requirement_create(request, slug, milestone_slug):
     project_obj = Project.objects.get(slug=slug, organization=request.user.organization)
-    if request.POST:
+    if request.method == 'POST':
         json_data = {}
-        requirement_form = RequirementForm(request.POST)
+        requirement_dict = request.POST.copy()
+        project_id = project_obj.id
+        requirement_dict['project'] = project_id
+        requirement_form = RequirementForm(request.user, requirement_dict)
         if requirement_form.is_valid():
-            name = request.POST.get('name')
-            milestone_obj = Milestone.objects.get(
-                id=request.POST.get('milestone'))
-            requirement = Requirement.objects.create(name=name, slug=slugify(name), description=request.POST.get(
-                'description'), project=project_obj, milestone=milestone_obj)
-
+            requirement = requirement_form.save()
             msg = " created requirement " + requirement.name
             create_timeline.send(sender=request.user, content_object=requirement, namespace=msg,
                                  event_type="requirement_form", project=project_obj)
@@ -1160,14 +1158,21 @@ def requirement_edit(request, slug, milestone_slug, requirement_slug):
     project_obj = Project.objects.get(slug=slug, organization=request.user.organization)
     milestone = Milestone.objects.get(id=milestone_slug, project=project_obj)
     requirement_obj = Requirement.objects.get(slug=requirement_slug, milestone=milestone)
+    old_name = requirement_obj.name
     if request.POST:
         json_data = {}
-        requirement_form = RequirementForm(request.POST, instance=requirement_obj)
+        requirement_dict = request.POST.copy()
+        project_id = project_obj.id
+        requirement_dict['project'] = project_id
+        requirement_form = RequirementForm(request.user, requirement_dict, instance=requirement_obj)
         if requirement_form.is_valid():
-            requirement_form.save()
-            msg = " requirement " + requirement_obj.name + " was updated "
+            requirement = requirement_form.save()
+            if old_name != requirement.name:
+                msg = "renamed requirement " + old_name + " to " + requirement.name
+            else:
+                msg = " requirement " + requirement_obj.name + " details updated "
             create_timeline.send(sender=request.user, content_object=requirement_obj, namespace=msg,
-                                 event_type="requirement_form", project=project_obj)
+                                     event_type="requirement edited", project=project_obj)
             json_data['error'] = False
             messages.success(request, 'Successfully updated your requirement - ' + str(requirement_obj.name) + ' !')
             return HttpResponse(json.dumps(json_data), content_type='application/json')

@@ -81,7 +81,7 @@ class PriorityForm(forms.ModelForm):
         instance.name = self.cleaned_data['name']
         instance.color = self.cleaned_data['color']
         if not self.instance:
-            instance.order = self.project.priorities.count()+1
+            instance.order = self.project.priorities.count() + 1
         if commit:
             instance.save()
         return instance
@@ -114,7 +114,7 @@ class SeverityForm(forms.ModelForm):
         instance.name = self.cleaned_data['name']
         instance.color = self.cleaned_data['color']
         if not self.instance:
-            instance.order = self.project.severities.count()+1
+            instance.order = self.project.severities.count() + 1
         if commit:
             instance.save()
         return instance
@@ -149,7 +149,7 @@ class TicketStatusForm(forms.ModelForm):
         instance.name = self.cleaned_data['name']
         instance.color = self.cleaned_data['color']
         if not self.instance:
-            instance.order =self.project.task_statuses.count()+1
+            instance.order = self.project.task_statuses.count() + 1
         if commit:
             instance.save()
         return instance
@@ -289,9 +289,24 @@ class MilestoneForm(forms.ModelForm):
 
 
 class RequirementForm(forms.ModelForm):
+    def __init__(self, user, *args, **kwargs):
+        self.user = user
+        super(RequirementForm, self).__init__(*args, **kwargs)
+
     class Meta:
         model = Requirement
-        fields = ['name', 'milestone', 'description']
+        fields = ['name', 'milestone', 'estimated_start',
+                  'estimated_finish', 'description', 'project']
+
+    def save(self, commit=True):
+        print self.cleaned_data
+        requirement = super(RequirementForm, self).save(commit=False)
+        requirement.slug = slugify(self.cleaned_data.get('name'))
+        requirement.modified_date = self.cleaned_data.get('estimated_finish')
+        requirement.created_by = self.user
+        if commit:
+            requirement.save()
+        return requirement
 
 
 class CommentForm(forms.ModelForm):
