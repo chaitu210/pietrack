@@ -25,7 +25,7 @@ from task.forms import TaskForm
 from .templatetags.project_tags import is_project_admin
 from django.utils.functional import wraps
 from django.db.models import Q
-
+from datetime import datetime
 
 def check_project_admin(view):
     wraps(view)
@@ -775,15 +775,16 @@ def taskboard(request, slug, milestone_slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     milestone = Milestone.objects.get(slug=milestone_slug, project=project)
     ticket_status_list = TicketStatus.objects.filter(project=project).order_by('order')
-    mem_details = []
-    for member in project.members.all():
-        try:
-            mem_details.append(member)
-        except:
-            pass
+    mem_details = project.members.all()
+    assigned_to =  request.GET.getlist('assigned_to')
+    requirements =  request.GET.getlist('requirements')
+    tasks =  request.GET.getlist('tasks')
+    start_date = request.GET.get('start_date','')
+    end_date = request.GET.get('end_date','')
+    search_filter = (milestone,assigned_to,requirements,tasks,start_date,end_date)
     return render(request, 'project/taskboard.html',
-                  {'ticket_status_list': ticket_status_list, 'slug': slug, 'milestone': milestone,
-                   'project_members': mem_details, 'notification_list': get_notification_list(request.user)})
+                  {'ticket_status_list': ticket_status_list, 'slug': slug,
+                   'project_members': mem_details, 'search_filter':search_filter, 'notification_list': get_notification_list(request.user)})
 
 
 @active_user_required
@@ -811,8 +812,25 @@ def load_tasks(request, slug, milestone_slug, status_slug):
     status = TicketStatus.objects.get(slug=status_slug, project=project)
     milestone = Milestone.objects.get(slug=milestone_slug, project=project)
     tasks = Ticket.objects.filter(status=status, milestone=milestone)
-
     paginator = Paginator(tasks, 10)
+    if request.GET.getlist('requirements'):
+        tasks = tasks.filter(requirement__id__in=request.GET.getlist('requirements'))
+    if request.GET.getlist('assigned_to'):
+        tasks = tasks.filter(assigned_to__id__in= request.GET.getlist('assigned_to'))
+    if request.GET.getlist('tasks'):
+        tasks = tasks.filter(id__in=request.GET.getlist('tasks'))
+    if request.GET.get('start_date','')!='':
+        try:
+            start_date = datetime.strptime( request.GET.getlist('start_date','')+u' 00:00:00', '%m/%d/%Y %H:%M:%S')
+            tasks = tasks.filter(created_date__gte=start_date)
+        except:
+            pass
+    if request.GET.get('end_date','')!='':
+        try:
+            end_date = datetime.strptime(request.GET.get('end_date','')+u' 00:00:00', '%m/%d/%Y %H:%M:%S')
+            tasks = tasks.filter(created_date__lte=end_date)
+        except:
+            pass
     page = request.GET.get('page')
     try:
         tasks = paginator.page(page)

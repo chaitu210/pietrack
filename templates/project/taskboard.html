@@ -7,14 +7,15 @@
         <!-- about project -->
         <div class="about_project_wrap">
             <div class="title">
-                <span>{{milestone.name}}</span>
+
+                <span>{{search_filter.0.name}}</span>
                 <span class='header_button_wrap'>
-                    <a href="{% url 'task:add_task' slug milestone.slug %}">
+                    <a href="{% url 'task:add_task' slug search_filter.0.slug %}">
                         <span class='header_button'><i class="fa fa-plus-circle"></i> New Task</span>
                     </a>
                 {% if request.user.pietrack_role == 'admin' or request.user|is_project_admin:slug %}
 
-                    <a href="{% url 'project:requirement_create' slug milestone.slug %}">
+                    <a href="{% url 'project:requirement_create' slug search_filter.0.slug %}">
                         <span class='header_button'>New Requirement</span>
                     </a>
                 {% endif %}
@@ -23,24 +24,25 @@
             <!-- filters -->
             <div class="filters_wrap">
                 <h3>Refine your search</h3>
+            <form action="" method="get" id="search">
                 <div class="row filter_row">
                     <div class="col-md-2">
-                        <select class='select2 input select2_assigned_to' multiple>
+                        <select class='select2 input select2_assigned_to' name="assigned_to" multiple>
                             {% for member in project_members %}
                                 <option value="{{ member.id }}">{% if member.first_name %}{{ member.first_name }}{% else %}{{ member.username }}{% endif %}</option>
                             {% endfor %}
                         </select>
                     </div>
                     <div class="col-md-2">
-                        <select class='select2 input select2_requirement' multiple>
-                            {% for requirement in milestone|milestone_requirements %}
+                        <select class='select2 input select2_requirement' name="requirements" multiple>
+                            {% for requirement in search_filter.0|milestone_requirements %}
                                 <option value="{{ requirement.id }}">{{ requirement.name }}</option>
                             {% endfor %}
                         </select>
                     </div>
                     <div class="col-md-3">
-                        <select class='select2 input select2_task' multiple>
-                            {% for requirement in milestone|milestone_requirements %}
+                        <select class='select2 input select2_task' name="tasks" multiple>
+                            {% for requirement in search_filter.0|milestone_requirements %}
                                 {% for task in requirement.tasks.all %}
                                     <option value="{{ task.id }}">{{ task.name }}</option>
                                 {% endfor %}
@@ -49,15 +51,23 @@
 
                     </div>
                     <div class="col-md-2">
-                        <input type="text" class='input' id='sdate' placeholder='Start Date'>
+                        <input name="start_date" type="text" class='input' id='sdate' placeholder='Start Date'>
                     </div>
                     <div class="col-md-2">
-                        <input type="text" class='input' id='edate' placeholder='End Date'>
+                        <input name="end_date" type="text" class='input' id='edate' placeholder='End Date'>
                     </div>
                     <div class="col-md-1">
-                        <button class='submit_btn'><i class='fa fa-search'></i>Go</button>
+                        <button type="submit" class='submit_btn'><i class='fa fa-search'></i>Go</button>
                     </div>
                 </div>
+            </form>
+            <div id="not_found" style="display: none;">
+                <hr>
+                <div style="text-align: center;font-weight: bold;padding:0px;margin: 0px; color: #E88E00">
+                    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                      Sorry, Search query was not found !
+                </div>
+                <hr>
             </div>
             <!--/ filters -->
             <!-- lists div -->
@@ -70,7 +80,7 @@
                         </div>
                         <div class="scroll">
                             <ul>
-                                {%for requirement in milestone|milestone_requirements %}
+                                {%for requirement in search_filter.0|milestone_requirements %}
                                     <li>
                                         <div class='ticket_wrap'>
                                             <a class='name_div_wrap'>
@@ -85,12 +95,12 @@
                                             </a>
                                         {% if request.user.pietrack_role == 'admin' or request.user|is_project_admin:slug %}
                                             <span class='actions_div'>
-                                                <a href="{% url 'project:requirement_edit' slug milestone.id requirement.slug %}">
+                                                <a href="{% url 'project:requirement_edit' slug search_filter.0.id requirement.slug %}">
                                                     <span class='edit'>
                                                         <i class='fa fa-pencil'></i>
                                                         </span>
                                                 </a>
-                                                <a class="delete_req" id='{{ requirement.id }}' href="{% url 'project:requirement_delete' slug milestone.slug requirement.id %}">
+                                                <a class="delete_req" id='{{ requirement.id }}' href="{% url 'project:requirement_delete' slug search_filter.0.slug requirement.id %}">
                                                     <span class='drop'>
                                                     <i class='fa fa-close'></i>
                                                     </span>
@@ -113,7 +123,7 @@
                             </div>
                             <div class="scroll all">
                                 <ul class='connectedSortable' id='{{ticket_status.slug}}'>
-                                    {% include "project/partials/task.html" with milestone=milestone slug=slug tasks=ticket_status|Task_list:milestone %}
+                                    {% include "project/partials/task.html" with milestone=search_filter.0 slug=slug tasks=ticket_status|Task_list:search_filter %}
                                 </ul>
                             </div>
                         </div>
@@ -127,7 +137,7 @@
         <!--/ about project -->
     </div>
     <!-- edit role add modal starts here -->
-    {%for requirement in milestone.project.requirements.all %}
+    {%for requirement in search_filter.0.project.requirements.all %}
         <div class="modal fade" id="myModal{{requirement.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
@@ -171,6 +181,8 @@
     <script type="text/javascript">
     $(function() {
         $("#sdate, #edate").datepicker();
+        $('#sdate').val('{{ search_filter.4 }}')
+        $('#edate').val('{{ search_filter.5 }}')
        /* $('.select2').select2();*/
     });
     </script>
@@ -179,14 +191,21 @@
             tags:"true",
             placeholder: 'Assigned members'
         });
+        var assigned_to = [{% for assign in search_filter.1 %}'{{ assign }}'{% if not forloop.last %},{% endif %}{% endfor %}];
+        $('.select2_assigned_to').select2().select2('val',assigned_to)
+
         $(".select2_requirement").select2({
           tags: "true",
           placeholder: "Requirements"
         });
+        var requirements = [{% for assign in search_filter.2 %}'{{ assign }}'{% if not forloop.last %},{% endif %}{% endfor %}];
+        $('.select2_requirement').select2().select2('val',requirements)
         $(".select2_task").select2({
           tags: "true",
           placeholder: "Task Title"
         });
+        var tasks = [{% for assign in search_filter.3 %}'{{ assign }}'{% if not forloop.last %},{% endif %}{% endfor %}];
+        $('.select2_task').select2().select2('val',tasks)
     </script>
     <!-- horizontal scroll -->
     <script type="text/javascript">
@@ -195,35 +214,19 @@
     <!--/ horizontal scroll -->
     <!-- update status -->
     <script type="text/javascript">
-    var drag_options = {
-        connectWith: ".connectedSortable",
-        start: function(event, ui) {
-            console.log("200ok 1")
-        },
-        appendTo: 'body',
-        helper: "clone",
-        receive: function(event, ui) {
-            var status = this.id;
-            var task = ui.item.attr('id');
-            $.get('/project/{{slug}}/update_taskboard/' + status + '/' + task + '/',function(response){
-                if(response['only_admin']){
-                    alert("Only admin can perform this operation.")
-                    ui.sender.sortable("cancel");
-                }
-            });
-        }
-    }
 
     $(function() {
         $(".connectedSortable").sortable({
             connectWith: ".connectedSortable",
             start: function(event, ui) {
-                $(this).children().css('z-index',2000);
-                $(ui.sender).sortable('refresh');
+                $('.connectedSortable').find('li:hidden').show();
+
                 console.log("200ok 2")
             },
-            appendTo: 'body',
-            //helper: "clone",
+            //appendTo: 'body',
+            helper: 'clone',
+            //placeholder: 'ui-state-highlight ui-splitselect-item',
+            //opacity: '.5',
             receive: function(event, ui) {
                 var status = this.id;
                 var task = ui.item.attr('id');
@@ -241,16 +244,15 @@
     /* load tasks all */
     jQuery(function($) {
         $('.scroll.all').on('scroll', function() {
-
+           // console.log($(this).scrollTop() + $(this).innerHeight())
+            //console.log(this.scrollHeight - 2)
             if ($(this).scrollTop() + $(this).innerHeight() >= this.scrollHeight - 2) {
                 page = $(this).find('input[name="page_num"]').val();
                 var status_slug = $(this).children("ul").attr("id")
-
                 if (page) {
                     $(this).find('input[name="page_num"]').remove();
-                    $.get("/project/{{slug}}/{{milestone.slug}}/" + status_slug + "/load_tasks/", {
-                        "page": page
-                    }, function(response) {
+                    var data = $('#search').serialize()+"&page="+page
+                    $.get("/project/{{slug}}/{{search_filter.0.slug}}/" + status_slug + "/load_tasks/",data, function(response) {
                         $('ul#' + status_slug).append(response)
                     });
                 }
@@ -262,7 +264,7 @@
     $(document).ready(function() {
         $('.name_div').on('click', function() {
             var req_id = $(this).attr('id');
-            $.get("/project/{{slug}}/{{milestone.slug}}/" + req_id + "/", function(response) {
+            $.get("/project/{{slug}}/{{search_filter.0.slug}}/" + req_id + "/", function(response) {
                 $('.task_category_wrap').remove()
                 $('.requirement_list_panel').after(response)
                 $('.scroll').slimscroll({
@@ -279,7 +281,7 @@
                             var requirement_id = $(this).attr('id')
                             if (page) {
                                 $(this).find('input[name="page_num"]').remove();
-                                $.get("/project/{{slug}}/{{milestone.slug}}/" + status_slug + "/" + requirement_id + "/load_tasks/", {
+                                $.get("/project/{{slug}}/{{search_filter.0.slug}}/" + status_slug + "/" + requirement_id + "/load_tasks/", {
                                     "page": page
                                 }, function(response) {
                                     $('ul#' + status_slug).append(response)
@@ -315,5 +317,11 @@
         });
         e.preventDefault();
     });
+    if($('#tasks_container li[id]').length == 0){
+           $('#not_found').show();
+          setTimeout(function(){
+            $('#not_found').hide();
+          },4000);
+        }
   </script>
 {% endblock%}
