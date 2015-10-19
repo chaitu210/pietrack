@@ -21,6 +21,16 @@
                     <span id='requirement_milestone_error'></span>
                 </div>
                 <div class="form_group">
+                    <label for="requirement_estimated_start">Start Date</label>
+                    <input id='requirement_estimated_start' name='estimated_start' value='{{ requirement_obj.estimated_start|date:"Y-m-d"}}' type="text" class='input'>
+                    <span id='requirement_estimated_start_error'></span>
+                </div>
+                <div class="form_group">
+                    <label for="requirement_estimated_finish">Finished Date</label>
+                    <input id='requirement_estimated_finish' name='estimated_finish' value='{{ requirement_obj.estimated_finish|date:"Y-m-d" }}' type="text" class='input'>
+                    <span id='requirement_estimated_finish_error'></span>
+                </div>
+                <div class="form_group">
                     <label for="requirement_desc">Description</label>
                     <textarea id='requirement_desc' name='description' class="form-control textarea">{{ requirement_obj.description }}</textarea>
                     <span id='requirement_description_error'></span>
@@ -31,6 +41,9 @@
         </div>
     </div>
   </section>
+{% endblock %}
+{% block extra_js_links %}
+    <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
 {% endblock %}
 {% block extra_js %}
   <script>
@@ -48,5 +61,30 @@
             }
         });
     });
+
+          // for datepicker
+      $(function() {
+        $( "#requirement_estimated_start" ).datepicker({
+          changeMonth: true,
+          changeYear: true,
+          dateFormat: 'yy-mm-dd',
+          numberOfMonths: 1,
+          minDate: new Date(),
+          onClose: function( selectedDate ) {
+            $( "#requirement_estimated_finish" ).datepicker( "option", "minDate", selectedDate );
+          }
+        });
+        $( "#requirement_estimated_finish" ).datepicker({
+          changeMonth: true,
+          changeYear: true,
+          dateFormat: 'yy-mm-dd',
+          numberOfMonths: 1,
+          minDate: new Date(),
+          onClose: function( selectedDate ) {
+            $( "#requirement_estimated_start" ).datepicker( "option", "maxDate", selectedDate );
+          }
+        });
+      });
+
   </script>
 {% endblock %}
