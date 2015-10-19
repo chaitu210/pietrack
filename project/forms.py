@@ -299,7 +299,6 @@ class RequirementForm(forms.ModelForm):
                   'estimated_finish', 'description', 'project']
 
     def save(self, commit=True):
-        print self.cleaned_data
         requirement = super(RequirementForm, self).save(commit=False)
         requirement.slug = slugify(self.cleaned_data.get('name'))
         requirement.modified_date = self.cleaned_data.get('estimated_finish')
