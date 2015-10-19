@@ -1369,7 +1369,7 @@ header .text .tag {
   line-height: 18px;
 }
 .create_project .content_box .panel_box .user-pic-block .user-picture {
-  margin-bottom: 15px;
+  margin-bottom: 0px;
   border: 1px solid #ccc;
   display: inline-block;
   padding: 10px;
@@ -1379,7 +1379,7 @@ header .text .tag {
   height: auto;
 }
 .create_project .content_box .panel_box .user-pic-block .pic-btn {
-  margin: 15px 0px;
+  margin: 0px 0px 10px 0px;
 }
 .create_project .content_box .panel_box label {
   font-weight: 600;

@@ -159,7 +159,7 @@
   </section>
 {% endblock %}
 {% block extra_js_links%}
-    <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+    <script type="text/javascript" src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 {% endblock %}
 {% block extra_js %}
 
@@ -181,8 +181,8 @@
     <script type="text/javascript">
     $(function() {
         $("#sdate, #edate").datepicker();
-        $('#sdate').val('{{ search_filter.4 }}')
-        $('#edate').val('{{ search_filter.5 }}')
+        $('#sdate').val('{{ search_filter.4 }}');
+        $('#edate').val('{{ search_filter.5 }}');
        /* $('.select2').select2();*/
     });
     </script>
@@ -191,21 +191,21 @@
             tags:"true",
             placeholder: 'Assigned members'
         });
-        var assigned_to = [{% for assign in search_filter.1 %}'{{ assign }}'{% if not forloop.last %},{% endif %}{% endfor %}];
-        $('.select2_assigned_to').select2().select2('val',assigned_to)
+        var assigned_to = [{% for assign in search_filter.1 %}'{{ assign }}'{% if not forloop.last %},{% endif %}{% endfor %}]
+//        $('.select2_assigned_to').select2().select2('val',assigned_to);
 
         $(".select2_requirement").select2({
           tags: "true",
           placeholder: "Requirements"
         });
-        var requirements = [{% for assign in search_filter.2 %}'{{ assign }}'{% if not forloop.last %},{% endif %}{% endfor %}];
-        $('.select2_requirement').select2().select2('val',requirements)
+        var requirements = [{% for assign in search_filter.2 %}'{{ assign }}'{% if not forloop.last %},{% endif %}{% endfor %}]
+//        $('.select2_requirement').select2().select2('val',requirements);
         $(".select2_task").select2({
           tags: "true",
           placeholder: "Task Title"
         });
-        var tasks = [{% for assign in search_filter.3 %}'{{ assign }}'{% if not forloop.last %},{% endif %}{% endfor %}];
-        $('.select2_task').select2().select2('val',tasks)
+        var tasks = [{% for assign in search_filter.3 %}'{{ assign }}'{% if not forloop.last %},{% endif %}{% endfor %}]
+//        $('.select2_task').select2().select2('val',tasks)
     </script>
     <!-- horizontal scroll -->
     <script type="text/javascript">
@@ -233,7 +233,7 @@
 
                 $.get('/project/{{slug}}/update_taskboard/' + status + '/' + task + '/',function(response){
                     if(response['only_admin']){
-                        alert("Only admin can perform this operation.")
+                        alert("Only admin can perform this operation.");
                         ui.sender.sortable("cancel");
                     }
                 });
@@ -248,10 +248,10 @@
             //console.log(this.scrollHeight - 2)
             if ($(this).scrollTop() + $(this).innerHeight() >= this.scrollHeight - 2) {
                 page = $(this).find('input[name="page_num"]').val();
-                var status_slug = $(this).children("ul").attr("id")
+                var status_slug = $(this).children("ul").attr("id");
                 if (page) {
                     $(this).find('input[name="page_num"]').remove();
-                    var data = $('#search').serialize()+"&page="+page
+                    var data = $('#search').serialize()+"&page="+page;
                     $.get("/project/{{slug}}/{{search_filter.0.slug}}/" + status_slug + "/load_tasks/",data, function(response) {
                         $('ul#' + status_slug).append(response)
                     });
@@ -265,8 +265,8 @@
         $('.name_div').on('click', function() {
             var req_id = $(this).attr('id');
             $.get("/project/{{slug}}/{{search_filter.0.slug}}/" + req_id + "/", function(response) {
-                $('.task_category_wrap').remove()
-                $('.requirement_list_panel').after(response)
+                $('.task_category_wrap').remove();
+                $('.requirement_list_panel').after(response);
                 $('.scroll').slimscroll({
                     alwaysVisible: false,
                     height: 350
@@ -277,8 +277,8 @@
                 $('.requirement').on('scroll', function() {
                         if ($(this).scrollTop() + $(this).innerHeight() >= this.scrollHeight - 2) {
                             page = $(this).find('input[name="page_num"]').val();
-                            var status_slug = $(this).children("ul").attr("id")
-                            var requirement_id = $(this).attr('id')
+                            var status_slug = $(this).children("ul").attr("id");
+                            var requirement_id = $(this).attr('id');
                             if (page) {
                                 $(this).find('input[name="page_num"]').remove();
                                 $.get("/project/{{slug}}/{{search_filter.0.slug}}/" + status_slug + "/" + requirement_id + "/load_tasks/", {
@@ -289,7 +289,7 @@
                             }
 
                         }
-                    })
+                    });
                     /*end  requirement tasks update */
             });
 
@@ -308,8 +308,8 @@
     });
   {% endif %}
     $('a.task_delete').click(function(e){
-        var url = $(this).attr('href')
-        var parent = $(this).closest('li')
+        var url = $(this).attr('href');
+        var parent = $(this).closest('li');
         $.get(url,function(response){
             if(response=='True'){
                 $(parent).remove();
