@@ -312,7 +312,7 @@ class Ticket(models.Model):
                                  verbose_name=_("severity"))
     priority = models.ForeignKey(Priority, null=True, blank=True, related_name="priority_tickets",
                                  verbose_name=_("priority"))
-    ticket_type = models.CharField(max_length=50, default='task', blank=True, choices=TICKET_TYPE)
+    ticket_type = models.CharField(blank=True, max_length=50, choices=TICKET_TYPE, default='task')
     target_date = models.DateField(null=True, blank=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, related_name="user_tickets", null=True, blank=True)

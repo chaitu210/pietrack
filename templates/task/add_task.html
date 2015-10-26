@@ -14,9 +14,9 @@
             </div>
         {% endif %}
         <div class="title">
-            <h4>{% if is_bug_enhancement %}Create Issue {% else %}{% if task %}Edit {% else %}Add{% endif %} Task{% endif %}</h4>
+            <h4>{% if is_issue %}Create Issue {% else %}{% if task %}Edit {% else %}Add{% endif %} Task{% endif %}</h4>
             <div class="tag">
-                {% if is_bug_enhancement %}
+                {% if is_issue %}
                     An issue is a problem related to a project that is about to occur or is currently occurring. An issue must be resolved as soon as possible, otherwise it will have detrimental effects on the project.
                 {% else %}
                     a task is an activity that needs to be accomplished within a defined period of time or by a deadline to work towards work-related goals
@@ -52,12 +52,30 @@
                         <span id='task_status_error'></span>
                     </div>
                 {% endif %}
-                {% if is_bug_enhancement %}
+                {% if is_issue %}
                     <div class="form_group">
                         <label>Issue Type</label>
                         <select name='issue_type' class='input'>
                             {% for issue in issue_type %}
                                 <option value='{{ issue }}'>{{ issue }}</option>
+                            {% endfor %}
+                        </select>
+                        <span id='task_status_error'></span>
+                    </div>
+                    <div class="form_group">
+                        <label> Severity </label>
+                        <select name='severity' class='input'>
+                            {% for severity in severity_list %}
+                                <option value='{{ severity.id }}'>{{ severity }}</option>
+                            {% endfor %}
+                        </select>
+                        <span id='task_status_error'></span>
+                    </div>
+                    <div class="form_group">
+                        <label> Priority </label>
+                        <select name='priority' class='input'>
+                            {% for priority in priority_list %}
+                                <option value='{{ priority.id }}'>{{ priority }}</option>
                             {% endfor %}
                         </select>
                         <span id='task_status_error'></span>
@@ -132,11 +150,9 @@ $('#task_save').click(function(event) {
         if (data['error'] === true) {
             for (var key in data['form_errors']) {
                 $('#task_' + key + '_error').text('').append(data['form_errors'][key])
-                console.log(key);
-                console.log(data['form_errors'][key])
             }
         }else {
-            window.location = "{% if milestone %}{% url 'project:taskboard' slug milestone.slug %}{% endif %}"
+            window.location = "{% if milestone %}{% url 'project:taskboard' slug milestone.slug %}{% elif is_issue %}{% url 'project:issues' slug %}{% endif %}"
         }
     });
 });
