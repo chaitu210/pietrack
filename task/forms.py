@@ -24,6 +24,7 @@ class TaskForm(forms.ModelForm):
         task.requirement = self.cleaned_data.get('requirement')
         task.milestone = self.cleaned_data.get('requirement').milestone
         task.created_by = self.user
+        task.ticket_type = 'task'
         if commit:
             task.save()
         return task

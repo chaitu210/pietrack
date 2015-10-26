@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+{% load project_tags %}
+{% load static %}
+{% block content %}
+<section id='base_content'>
+    <div class="project_description">
+        <!-- about project -->
+        <div class="about_project_wrap">
+            <div class="title">
+
+                <span>Project - Issues</span>
+                <span class='header_button_wrap'>
+                    <a href="">
+                        <span class='header_button'><i class="fa fa-plus-circle"></i> New Issue</span>
+                    </a>
+                </span>
+            </div>
+            <!-- filters -->
+            <div class="filters_wrap">
+                <h3>Refine your search</h3>
+            <form action="" method="get" id="search">
+                <div class="row filter_row">
+                    <div class="col-md-2">
+                        <select class='select2 input select2_assigned_to' name="assigned_to" multiple>
+                                <option value="1">abcd</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <select class='select2 input select2_requirement' name="requirements" multiple>
+                            {% for requirement in search_filter.0|milestone_requirements %}
+                                <option value="{{ requirement.id }}">{{ requirement.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select class='select2 input select2_task' name="tasks" multiple>
+                            {% for requirement in search_filter.0|milestone_requirements %}
+                                {% for task in requirement.tasks.all %}
+                                    <option value="{{ task.id }}">{{ task.name }}</option>
+                                {% endfor %}
+                            {% endfor %}
+                        </select>
+
+                    </div>
+                    <div class="col-md-2">
+                        <input name="start_date" type="text" class='input' id='sdate' placeholder='Start Date'>
+                    </div>
+                    <div class="col-md-2">
+                        <input name="end_date" type="text" class='input' id='edate' placeholder='End Date'>
+                    </div>
+                    <div class="col-md-1">
+                        <button type="submit" class='submit_btn'><i class='fa fa-search'></i>Go</button>
+                    </div>
+                </div>
+            </form>
+            <br>
+            <!--/ filters -->
+            <!-- lists div -->
+              <div class="table-responsive color-box">
+
+                            <table class="table table-striped" >
+                                <thead>
+                                    <tr>
+                                        <th width="20%">Subject</th>
+                                        <th width="5%">Type</th>
+                                        <th width="5%"> Severity </th>
+                                        <th width="18%"> Priority</th>
+                                        <th width="18%"> Status </th>
+                                        <th width="18%"> Created </th>
+                                        <th width="18%"> Assigned to </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                  {% for issue in issue_list %}
+                                    <tr>
+                                        <td> {{ issue.name }} </td>
+                                        <td> {{ issue.ticket_type }} </td>
+                                        <!--<td> {{ issue.severity }} </td> -->
+                                        <td scope="row">
+                                                <div class="input-group colorpicker-component demo demo-auto">
+                                                    <input name="color" type="text"  value="{{issue.severity.color}}" class="form-control demo" style="display: none"/>
+                                                    <span class="input-group-addon"><i style="cursor: default;"></i></span>
+                                                </div>
+                                        </td>
+                                        <td> {{ issue.priority }} </td>
+                                        <td> {{ issue.status }} </td>
+                                        <td> {{ issue.created_date }} </td>
+                                        <td> {{ issue.assigned_to }} </td>
+                                    </tr>
+                                  {% endfor %}
+                                </tbody>
+                            </table>
+
+            <!--/ lists div -->
+            <div class="clearfix"></div>
+        </div>
+        <!--/ about project -->
+    </div>
+    <!-- edit role add modal starts here -->
+
+    <!-- edit role add modal ends here -->
+  </section>
+{% endblock %}
+{% block extra_js_links%}
+    <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+{% endblock %}
+{% block extra_js %}
+
+
+  <script type="text/javascript">
+    $('.demo').colorpicker().css({'pointer-events': 'none','background-color':'none !importent'});
+    $('.demo').removeClass('')
+    $(function() {
+        $('.scroll').slimscroll({
+            alwaysVisible: false,
+            height: 350
+        });
+    });
+    $('.sub_list').mouseenter(function(event) {
+        $(this).closest('.parent_list').addClass('active_li_drop')
+    });
+    $('.sub_list').mouseleave(function(event) {
+        $(this).closest('.parent_list').removeClass('active_li_drop')
+    });
+    </script>
+    <script type="text/javascript">
+     $(function() {
+        $("#sdate, #edate").datepicker();
+    });
+    </script>
+    <script type="text/javascript">
+        $('.select2_assigned_to').select2({
+            tags:"true",
+            placeholder: 'Assigned members'
+        });
+
+        $(".select2_requirement").select2({
+          tags: "true",
+          placeholder: "Requirements"
+        });
+
+
+        $(".select2_task").select2({
+          tags: "true",
+          placeholder: "Task Title"
+        });
+
+    </script>
+    <!-- horizontal scroll -->
+    <script type="text/javascript">
+    $('.hscroll').css('min-width', ($('.task_category_wrap').length + 1) * 270 + 'px');
+    </script>
+{% endblock%}
