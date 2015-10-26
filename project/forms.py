@@ -10,11 +10,11 @@ from django.utils.http import urlsafe_base64_encode
 from django.utils.translation import ugettext, ugettext_lazy as _
 from .tasks import celery_send_mail
 from piebase.models import Project, Priority, Severity, Organization, User, TicketStatus, Role, Milestone, Requirement, \
-    Comment, Timeline
+    Comment
 from django.template.defaultfilters import slugify
 from django.utils import timezone
 from django.core.exceptions import ValidationError
-
+import datetime
 
 # def CreateTimeline(content_object, event_type, project, user):
 #     Timeline.objects.create(content_object=content_object, event_type=event_type, project=project)
@@ -313,3 +313,18 @@ class CommentForm(forms.ModelForm):
         if commit:
             instance.save()
         return instance
+
+class CreateIssueForm(forms.Form):
+    name = forms.CharField(max_length=50, required=True)
+    issue_type = forms.CharField(max_length=20, required=True)
+    finished_date = forms.DateField(required=True)
+
+    def __init__(self, *args, **kwargs):
+        self.project = kwargs.pop('project', None)
+        super(CreateIssueForm, self).__init__(*args, **kwargs)
+
+    def clean_finished_date(self):
+        date = self.cleaned_data['finished_date']
+        if date< datetime.date.today():
+            raise ValidationError("The date should not be passed")
+        return date

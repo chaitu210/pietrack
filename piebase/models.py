@@ -29,6 +29,11 @@ PIETRACK_ROLES = (
     ('PIE_User', 'PIE User'),
 )
 
+TICKET_TYPE = (
+    ('bug','bug'),
+    ('enhancement','enhancement'),
+    ('task','task')
+)
 
 def rand_str(number):
     return ''.join(random.sample(string.ascii_lowercase, number))
@@ -301,7 +306,7 @@ class Ticket(models.Model):
                                  verbose_name=_("severity"))
     priority = models.ForeignKey(Priority, null=True, blank=True, related_name="priority_tickets",
                                  verbose_name=_("priority"))
-    ticket_type = models.CharField(max_length=50, default='task', blank=True)
+    ticket_type = models.CharField(max_length=50, default='task', blank=True, choices=TICKET_TYPE)
     target_date = models.DateField(null=True, blank=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, related_name="user_tickets", null=True, blank=True)

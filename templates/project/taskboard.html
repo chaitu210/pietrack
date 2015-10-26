@@ -214,14 +214,19 @@
     <!--/ horizontal scroll -->
     <!-- update status -->
     <script type="text/javascript">
-
+    var drag_options = {
+        connectWith: ".connectedSortable",
+        receive: function(event, ui) {
+            var status = this.id;
+            var task = ui.item.attr('id');
+            $.get('/project/{{slug}}/update_taskboard/' + status + '/' + task + '/');
+        }
+    }
     $(function() {
         $(".connectedSortable").sortable({
             connectWith: ".connectedSortable",
             start: function(event, ui) {
                 $('.connectedSortable').find('li:hidden').show();
-
-                console.log("200ok 2")
             },
             //appendTo: 'body',
             helper: 'clone',

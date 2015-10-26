@@ -8,6 +8,11 @@
         <div class="col-md-9 about_project_wrap">
           <div class="title">
             <span>{{task.name}}</span>
+          {% if task.status.is_final %}
+            <span class="header_button_wrap">
+                <a href="{% url 'project:bug_enhancement' slug task.id %}"><span class="header_button"><i class="fa fa-plus"></i> create Issue</span></a>
+            </span>
+          {% endif %}
           </div>
           <div class="profile-pic-count">
             <div class="col-md-12 content">
