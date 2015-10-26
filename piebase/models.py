@@ -212,6 +212,12 @@ class Requirement(models.Model):
     name = models.CharField(max_length=200, verbose_name=_("name"))
     slug = models.SlugField(
         max_length=250, null=False, blank=True, verbose_name=_("slug"))
+    estimated_start = models.DateField(verbose_name=_("estimated start date"))
+    estimated_finish = models.DateField(
+        verbose_name=_("estimated finish date"))
+    created_date = models.DateTimeField(
+        verbose_name=_("created date"), auto_now_add=True)
+    modified_date = models.DateTimeField(verbose_name=_("modified date"))
     description = models.TextField(verbose_name=_("description"))
     project = models.ForeignKey(
         Project, null=True, blank=False, related_name="requirements", verbose_name=_("project"))
