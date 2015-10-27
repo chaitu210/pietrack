@@ -85,6 +85,9 @@ urlpatterns = [
 
     #issue_board
     url(r'^(?P<slug>[-\w]+)/issues/$', issues, name="issues"),
+    url(r'^(?P<slug>[-\w]+)/issue/update/$', update_issue, name="update_issue"),
+    url(r'^(?P<slug>[-\w]+)/issue/(?P<issue_id>[0-9]+)/details/$', issue_details, name="issue_details"),
+
 
     # attachment
     url(r'^(?P<slug>[-\w]+)/task/(?P<task_id>[0-9]+)/attachment/delete/(?P<attachment_id>[0-9]+)/$',
