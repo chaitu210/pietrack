@@ -80,6 +80,12 @@ urlpatterns = [
     url(r'^(?P<slug>[-\w]+)/(?P<milestone_slug>[-\w]+)/task/(?P<task_id>[0-9]+)/edit/$', task_edit, name="task_edit"),
     url(r'^(?P<slug>[-\w]+)/(?P<milestone_slug>[-\w]+)/task/(?P<task_id>[0-9]+)/delete/$', task_delete,
         name="task_delete"),
+    url(r'^(?P<slug>[-\w]+)/task/(?P<task_id>[0-9]+)/issue/create/$', create_issue,
+        name="create_issue"),
+
+    #issue_board
+    url(r'^(?P<slug>[-\w]+)/issues/$', issues, name="issues"),
+
     # attachment
     url(r'^(?P<slug>[-\w]+)/task/(?P<task_id>[0-9]+)/attachment/delete/(?P<attachment_id>[0-9]+)/$',
         delete_attachment, name="delete_attachment"),

@@ -7,7 +7,7 @@ from django.shortcuts import render, redirect, render_to_response, get_object_or
 from piebase.models import User, Project, Priority, Severity, TicketStatus, Ticket, Requirement, Attachment, Role, \
     Milestone, Timeline, Comment
 from forms import CreateProjectForm, PriorityForm, SeverityForm, TicketStatusForm, RoleForm, CommentForm, \
-    CreateMemberForm, PasswordResetForm, MilestoneForm, RequirementForm
+    CreateMemberForm, PasswordResetForm, MilestoneForm, RequirementForm,CreateIssueForm
 from PIL import Image
 from django.utils import timezone
 from django.template.defaultfilters import slugify
@@ -978,6 +978,38 @@ def task_edit(request, slug, milestone_slug, task_id):
                                                       'task': task, 'milestone': task.milestone}
                       )
 
+@active_user_required
+@check_project_admin
+def create_issue(request,slug,task_id):
+    project = Project.objects.get(slug=slug, organization=request.user.organization)
+    task = Ticket.objects.get(id=task_id)
+    if request.POST:
+        form = CreateIssueForm(request.POST, project=project)
+        error = True
+        if form.is_valid():
+            error=False
+            issue = Ticket.objects.create(
+                name=request.POST.get('name'),
+                slug=slugify(request.POST.get('name')),
+                project=project,
+                assigned_to=project.members.get(id=request.POST.get('assigned_to')),
+                finished_date = request.POST.get('finished_date'),
+                description = request.POST.get('description'),
+                status = project.task_statuses.filter(is_final=False)[0],
+                ticket_type = request.POST.get('issue_type'),
+                severity = project.severities.get(id=request.POST.get('severity')),
+                priority = project.priorities.get(id=request.POST.get('priority')),
+                created_by = request.user
+            )
+            issue.reference.add(task)
+        return HttpResponse(json.dumps({'error':error, 'form_errors':form.errors}), content_type="json/application")
+
+    return render(request, 'task/add_task.html', {'is_issue':True,'issue_type':['bug','enhancement'],
+                                                  'assigned_to_list':project.members.all(),
+                                                  'slug':slug,
+                                                  'severity_list':project.severities.all(),
+                                                  'priority_list':project.priorities.all()
+                                                  })
 
 @active_user_required
 @is_project_member
@@ -1225,3 +1257,10 @@ def requirement_delete(request, slug, milestone_slug, id):
     create_timeline.send(sender=request.user, content_object=milestone, namespace=msg,
                          event_type="requirement_form", project=project_object)
     return HttpResponseRedirect(reverse('project:taskboard', kwargs={'milestone_slug': milestone_slug, 'slug': slug}))
+
+@active_user_required
+@is_project_member
+def issues(request,slug):
+    project = Project.objects.get(slug=slug, organization=request.user.organization)
+    issue_list = project.project_tickets.filter(~Q(ticket_type='task'))
+    return render(request, 'project/issueboard.html',{'slug':slug, 'issue_list':issue_list })

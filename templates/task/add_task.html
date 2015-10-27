@@ -2,7 +2,7 @@
 {% block content %}
 <section id='base_content' class='create_project'>
     <div class="content_box">
-        {% if requirement_list|length == 0 or ticket_status_list|length == 0 %}
+        {% if requirement_list and requirement_list|length == 0 or  ticket_status_list and ticket_status_list|length == 0 %}
             <div class="role-alert member-warning-alert" style="width:23em;">
                 <div class="alert alert-warning alert-dismissible" role="alert">
                     <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -14,9 +14,14 @@
             </div>
         {% endif %}
         <div class="title">
-            <h4>{% if task %}Edit {% else %}Add{% endif %} Task</h4>
+            <h4>{% if is_issue %}Create Issue {% else %}{% if task %}Edit {% else %}Add{% endif %} Task{% endif %}</h4>
             <div class="tag">
-a task is an activity that needs to be accomplished within a defined period of time or by a deadline to work towards work-related goals            </div>
+                {% if is_issue %}
+                    An issue is a problem related to a project that is about to occur or is currently occurring. An issue must be resolved as soon as possible, otherwise it will have detrimental effects on the project.
+                {% else %}
+                    a task is an activity that needs to be accomplished within a defined period of time or by a deadline to work towards work-related goals
+                {% endif %}
+            </div>
         </div>
         <div class="panel_box">
             <form id='task_form'>
@@ -25,6 +30,7 @@ a task is an activity that needs to be accomplished within a defined period of t
                     <input id='task_name' name='name' type="text" class='input' value="{% if task %}{{ task.name }}{% endif %}">
                     <span id='task_name_error' class='task_err'></span>
                 </div>
+                {% if requirement_list %}
                 <div class="form_group">
                     <label>Requirement</label>
                     <select name='requirement' class='input'>
@@ -34,15 +40,47 @@ a task is an activity that needs to be accomplished within a defined period of t
                     </select>
                     <span id='task_requirement_error'></span>
                 </div>
-                <div class="form_group">
-                    <label>Status</label>
-                    <select name='status' class='input'>
-                        {% for ticket_status_iter in ticket_status_list %}
-                            <option value='{{ ticket_status_iter.id }}'>{{ ticket_status_iter.name }}</option>
-                        {% endfor %}
-                    </select>
-                    <span id='task_status_error'></span>
-                </div>
+                {% endif %}
+                {% if ticket_status_list %}
+                    <div class="form_group">
+                        <label>Status</label>
+                        <select name='status' class='input'>
+                            {% for ticket_status_iter in ticket_status_list %}
+                                <option value='{{ ticket_status_iter.id }}'>{{ ticket_status_iter.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <span id='task_status_error'></span>
+                    </div>
+                {% endif %}
+                {% if is_issue %}
+                    <div class="form_group">
+                        <label>Issue Type</label>
+                        <select name='issue_type' class='input'>
+                            {% for issue in issue_type %}
+                                <option value='{{ issue }}'>{{ issue }}</option>
+                            {% endfor %}
+                        </select>
+                        <span id='task_status_error'></span>
+                    </div>
+                    <div class="form_group">
+                        <label> Severity </label>
+                        <select name='severity' class='input'>
+                            {% for severity in severity_list %}
+                                <option value='{{ severity.id }}'>{{ severity }}</option>
+                            {% endfor %}
+                        </select>
+                        <span id='task_status_error'></span>
+                    </div>
+                    <div class="form_group">
+                        <label> Priority </label>
+                        <select name='priority' class='input'>
+                            {% for priority in priority_list %}
+                                <option value='{{ priority.id }}'>{{ priority }}</option>
+                            {% endfor %}
+                        </select>
+                        <span id='task_status_error'></span>
+                    </div>
+                {% endif %}
                 <div class="form_group">
                     <label>Finished Date</label>
                     <input id='task_finished_date' name='finished_date' type="text" class='input' value="{{ task.finished_date|date:"Y-m-d" }}">
@@ -75,10 +113,12 @@ a task is an activity that needs to be accomplished within a defined period of t
 {% endblock %}
 {% block extra_js %}
 <script>
-    {% if requirement_list|length == 0 %}
-        setTimeout(function(){ window.location = "{% url 'project:requirement_create' slug milestone.slug %}"; }, 2500);
-    {% elif ticket_status_list|length == 0 %}
-        setTimeout(function(){ window.location = "{% url 'project:ticket_status' slug  %}"; }, 2500);
+    {% if requirement_list or  ticket_status_list %}
+        {% if requirement_list|length == 0 %}
+            setTimeout(function(){ window.location = "{% url 'project:requirement_create' slug milestone.slug %}"; }, 2500);
+        {% elif ticket_status_list|length == 0 %}
+            setTimeout(function(){ window.location = "{% url 'project:ticket_status' slug  %}"; }, 2500);
+        {% endif %}
     {% endif %}
 
 $(function() {
@@ -111,17 +151,17 @@ $('#task_save').click(function(event) {
             for (var key in data['form_errors']) {
                 $('#task_' + key + '_error').text('').append(data['form_errors'][key])
             }
-        } else {
-            window.location = "{% url 'project:taskboard' slug milestone.slug %}"
+        }else {
+            window.location = "{% if milestone %}{% url 'project:taskboard' slug milestone.slug %}{% elif is_issue %}{% url 'project:issues' slug %}{% endif %}"
         }
     });
 });
-
+{% if requirement_list %}
     {% if requirement_list|length == 0 %}
         window.setTimeout(function(){
             window.location.href = "{% url 'project:requirement_create' slug milestone.slug %}";
         }, 3000);
     {% endif %}
-
+{% endif %}
 </script>
 {% endblock %}
