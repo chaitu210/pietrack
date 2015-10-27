@@ -1263,4 +1263,39 @@ def requirement_delete(request, slug, milestone_slug, id):
 def issues(request,slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     issue_list = project.project_tickets.filter(~Q(ticket_type='task'))
-    return render(request, 'project/issueboard.html',{'slug':slug, 'issue_list':issue_list })
+
+    assigned_to_list = request.GET.getlist('assigned_to')
+    issue_type_list = request.GET.getlist('issue_type')
+    issues = request.GET.getlist('issue_list')
+    start_date = request.GET.getlist('start_date')
+    end_date = request.GET.getlist('end_date')
+
+
+    return render(request, 'project/issueboard.html',
+                  {'project':project,'slug':slug, 'issue_list':issue_list,
+                   'status_list':project.task_statuses.all(),
+                   'member_list':project.members.all(),
+                   'issue_type_list':['bug','enhancement']
+                   })
+
+@active_user_required
+@is_project_member
+def update_issue(request, slug):
+    project = Project.objects.get(slug=slug, organization=request.user.organization)
+    issue = Ticket.objects.get(id=request.GET.get('issue_id'));
+    status_id = request.GET.get('status',False)
+    assigned_to_id = request.GET.get('assigned_to',False)
+    if status_id:
+        issue.status = project.task_statuses.get(id=status_id)
+    if assigned_to_id:
+        issue.assigned_to = project.members.get(id=assigned_to_id)
+    issue.save()
+    return HttpResponse("200 ok ")
+
+@active_user_required
+@is_project_member
+def issue_details(request, slug, issue_id):
+    project = Project.objects.get(slug=slug, organization=request.user.organization)
+    task = project.project_tickets.get(id=issue_id)
+    return render(request, 'task/Task_detail.html', {'task': task, 'slug': slug, 'project': project,
+                                                     'notification_list': get_notification_list(request.user)})
