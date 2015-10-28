@@ -103,8 +103,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         t = loader.get_template('emails/resetpwd_email.html')
         c = Context({'uidb64': uidb64, 'token': token})
         rendered = t.render(c)
-        Memail(settings.DEFAULT_FROM_EMAIL,
-               "Reset your password", rendered, self.email)
+        Memail(settings.DEFAULT_FROM_EMAIL, "Reset your password", rendered, self.email)
 
     def send_activate_mail(self):
         uidb64 = urlsafe_base64_encode(str(self.pk))
@@ -119,18 +118,14 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 class Project(models.Model):
     name = models.CharField(max_length=250, verbose_name=_("name"))
-    slug = models.SlugField(
-        max_length=250, null=False, blank=True, verbose_name=_("slug"))
+    slug = models.SlugField(max_length=250, null=False, blank=True, verbose_name=_("slug"))
     description = models.TextField(verbose_name=_("description"))
-    created_date = models.DateTimeField(
-        verbose_name=_("created date"), auto_now_add=True)
+    created_date = models.DateTimeField(verbose_name=_("created date"), auto_now_add=True)
     modified_date = models.DateTimeField(verbose_name=_("modified date"))
-    members = models.ManyToManyField(
-        settings.AUTH_USER_MODEL, related_name="projects")
+    members = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="projects")
     organization = models.ForeignKey(Organization)
     logo = models.FileField(upload_to=logo, blank=True, null=True)
-    created_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL, null=True, blank=True)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -146,8 +141,7 @@ class Project(models.Model):
 class Attachment(models.Model):
     uploaded_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, null=True, blank=True)
-    created_date = models.DateTimeField(
-        verbose_name=_("created date"), auto_now_add=True)
+    created_date = models.DateTimeField(verbose_name=_("created date"), auto_now_add=True)
     attached_file = models.FileField(max_length=500, null=True, blank=True, upload_to=url,
                                      verbose_name=_("attached file"))
     order = models.IntegerField(default=0, verbose_name=_("order"))
@@ -166,12 +160,9 @@ class Attachment(models.Model):
 
 class Role(models.Model):
     name = models.CharField(max_length=200, verbose_name=_("name"))
-    slug = models.SlugField(
-        max_length=250, null=False, blank=True, verbose_name=_("slug"))
-    project = models.ForeignKey(
-        Project, null=True, blank=False, related_name="roles", verbose_name=_("project"))
-    users = models.ManyToManyField(
-        settings.AUTH_USER_MODEL, related_name="user_roles")
+    slug = models.SlugField(max_length=250, null=False, blank=True, verbose_name=_("slug"))
+    project = models.ForeignKey(Project, null=True, blank=False, related_name="roles", verbose_name=_("project"))
+    users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="user_roles")
     is_project_admin = models.BooleanField(default=False)
 
     class Meta:
@@ -186,20 +177,14 @@ class Milestone(models.Model):
         max_length=200, db_index=True, verbose_name=_("name"))
     # TODO: Change the unique restriction to a unique together with the
     # project id
-    slug = models.SlugField(
-        max_length=250, db_index=True, null=False, blank=True, verbose_name=_("slug"))
-    project = models.ForeignKey(
-        Project, related_name="milestones", verbose_name=_("project"))
+    slug = models.SlugField(max_length=250, db_index=True, null=False, blank=True, verbose_name=_("slug"))
+    project = models.ForeignKey(Project, related_name="milestones", verbose_name=_("project"))
     estimated_start = models.DateField(verbose_name=_("estimated start date"))
-    estimated_finish = models.DateField(
-        verbose_name=_("estimated finish date"))
-    created_date = models.DateTimeField(
-        verbose_name=_("created date"), auto_now_add=True)
+    estimated_finish = models.DateField(verbose_name=_("estimated finish date"))
+    created_date = models.DateTimeField(verbose_name=_("created date"), auto_now_add=True)
     modified_date = models.DateTimeField(verbose_name=_("modified date"))
-    status = models.CharField(
-        max_length=200, choices=MILESTONE_STATUS, default="planned")
-    created_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL, blank=True, null=True)
+    status = models.CharField(max_length=200, choices=MILESTONE_STATUS, default="planned")
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True)
 
     class Meta:
         ordering = ["created_date"]
@@ -211,19 +196,14 @@ class Milestone(models.Model):
 
 class Requirement(models.Model):
     name = models.CharField(max_length=200, verbose_name=_("name"))
-    slug = models.SlugField(
-        max_length=250, null=False, blank=True, verbose_name=_("slug"))
+    slug = models.SlugField(max_length=250, null=False, blank=True, verbose_name=_("slug"))
     estimated_start = models.DateField(verbose_name=_("estimated start date"))
-    estimated_finish = models.DateField(
-        verbose_name=_("estimated finish date"))
-    created_date = models.DateTimeField(
-        verbose_name=_("created date"), auto_now_add=True)
+    estimated_finish = models.DateField(verbose_name=_("estimated finish date"))
+    created_date = models.DateTimeField(verbose_name=_("created date"), auto_now_add=True)
     modified_date = models.DateTimeField(verbose_name=_("modified date"))
     description = models.TextField(verbose_name=_("description"))
-    project = models.ForeignKey(
-        Project, null=True, blank=False, related_name="requirements", verbose_name=_("project"))
-    milestone = models.ForeignKey(
-        Milestone, null=True, blank=False, related_name="requirements")
+    project = models.ForeignKey(Project, null=True, blank=False, related_name="requirements", verbose_name=_("project"))
+    milestone = models.ForeignKey(Milestone, null=True, blank=False, related_name="requirements")
 
     def __str__(self):
         return self.name
@@ -231,12 +211,9 @@ class Requirement(models.Model):
 
 class TicketStatus(models.Model):
     name = models.CharField(max_length=255, verbose_name=_("name"))
-    slug = models.SlugField(
-        max_length=255, null=False, blank=True, verbose_name=_("slug"))
-    color = models.CharField(
-        max_length=20, default="#999999", verbose_name=_("color"))
-    project = models.ForeignKey(
-        Project, related_name="task_statuses", verbose_name=_("project"))
+    slug = models.SlugField(max_length=255, null=False, blank=True, verbose_name=_("slug"))
+    color = models.CharField(max_length=20, default="#999999", verbose_name=_("color"))
+    project = models.ForeignKey(Project, related_name="task_statuses", verbose_name=_("project"))
     order = models.IntegerField(default=1, blank=True)
     is_final = models.BooleanField(default=False)
 
@@ -250,12 +227,9 @@ class TicketStatus(models.Model):
 
 class Priority(models.Model):
     name = models.CharField(max_length=255, verbose_name=_("name"))
-    slug = models.SlugField(
-        max_length=255, null=False, blank=True, verbose_name=_("slug"))
-    color = models.CharField(
-        max_length=20, default="#999999", verbose_name=_("color"))
-    project = models.ForeignKey(
-        Project, related_name="priorities", verbose_name=_("project"))
+    slug = models.SlugField(max_length=255, null=False, blank=True, verbose_name=_("slug"))
+    color = models.CharField(max_length=20, default="#999999", verbose_name=_("color"))
+    project = models.ForeignKey(Project, related_name="priorities", verbose_name=_("project"))
     order = models.IntegerField(default=1, blank=True)
 
     class Meta:
@@ -268,12 +242,9 @@ class Priority(models.Model):
 
 class Severity(models.Model):
     name = models.CharField(max_length=255, verbose_name=_("name"))
-    slug = models.SlugField(
-        max_length=255, null=False, blank=True, verbose_name=_("slug"))
-    color = models.CharField(
-        max_length=20, default="#999999", verbose_name=_("color"))
-    project = models.ForeignKey(
-        Project, related_name="severities", verbose_name=_("project"))
+    slug = models.SlugField(max_length=255, null=False, blank=True, verbose_name=_("slug"))
+    color = models.CharField(max_length=20, default="#999999", verbose_name=_("color"))
+    project = models.ForeignKey(Project, related_name="severities", verbose_name=_("project"))
     order = models.IntegerField(default=1, blank=True)
 
     class Meta:
@@ -285,38 +256,28 @@ class Severity(models.Model):
 
 class Ticket(models.Model):
     name = models.CharField(max_length=200, verbose_name=_("name"))
-    slug = models.SlugField(
-        max_length=250, null=False, blank=True, verbose_name=_("slug"))
-    project = models.ForeignKey(
-        Project, related_name="project_tickets", verbose_name=_("project"))
-    assigned_to = models.ForeignKey(
-        settings.AUTH_USER_MODEL, null=True, blank=True)
+    slug = models.SlugField(max_length=250, null=False, blank=True, verbose_name=_("slug"))
+    project = models.ForeignKey(Project, related_name="project_tickets", verbose_name=_("project"))
+    assigned_to = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True)
     milestone = models.ForeignKey(Milestone, null=True, blank=True, default=None, related_name="tasks",
                                   verbose_name=_("milestone"))
     requirement = models.ForeignKey(Requirement, null=True, blank=True, default=None, related_name="tasks",
                                     verbose_name=_("milestone"))
-    created_date = models.DateTimeField(
-        verbose_name=_("created date"), auto_now_add=True)
-    modified_date = models.DateTimeField(
-        verbose_name=_("modified date"), auto_now_add=True)
-    finished_date = models.DateTimeField(
-        verbose_name=_("finished date"))
+    created_date = models.DateTimeField(verbose_name=_("created date"), auto_now_add=True)
+    modified_date = models.DateTimeField(verbose_name=_("modified date"), auto_now_add=True)
+    finished_date = models.DateTimeField(verbose_name=_("finished date"))
     order = models.IntegerField(default=1)
-    description = models.TextField(
-        null=False, blank=True, verbose_name=_("description"))
+    description = models.TextField(null=False, blank=True, verbose_name=_("description"))
     attachments = models.ManyToManyField(Attachment, blank=True)
-    reference = models.ManyToManyField(
-        'self', related_name='references', blank=True)
-    status = models.ForeignKey(
-        TicketStatus, null=True, blank=True, related_name="tickets", verbose_name=_("status"))
+    reference = models.ManyToManyField('self', related_name='references', blank=True)
+    status = models.ForeignKey(TicketStatus, null=True, blank=True, related_name="tickets", verbose_name=_("status"))
     severity = models.ForeignKey(Severity, null=True, blank=True, related_name="severity_tickets",
                                  verbose_name=_("severity"))
     priority = models.ForeignKey(Priority, null=True, blank=True, related_name="priority_tickets",
                                  verbose_name=_("priority"))
     ticket_type = models.CharField(blank=True, max_length=50, choices=TICKET_TYPE, default='task')
     target_date = models.DateField(null=True, blank=True, verbose_name=_("target date"))
-    created_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL, related_name="user_tickets", null=True, blank=True)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="user_tickets", null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -324,13 +285,11 @@ class Ticket(models.Model):
 
 class Comment(models.Model):
     comment = models.TextField(null=False)
-    commented_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL, related_name="comments")
+    commented_by = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="comments")
     ticket = models.ForeignKey(Ticket, related_name="ticket_comments")
     attachments = models.ManyToManyField(Attachment, blank=True)
     created = models.DateTimeField(auto_now_add=True)
-    parent = models.ForeignKey(
-        'self', blank=True, null=True, related_name="comment_parent")
+    parent = models.ForeignKey('self', blank=True, null=True, related_name="comment_parent")
     # class Meta:
     #    index_together = [('content_type', 'object_id', 'namespace'), ]
 
@@ -343,19 +302,15 @@ class Comment(models.Model):
 
 
 class Timeline(models.Model):
-    content_type = models.ForeignKey(
-        ContentType, related_name="content_type_timelines")
+    content_type = models.ForeignKey(ContentType, related_name="content_type_timelines")
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
-    namespace = models.CharField(
-        max_length=250, default="default", db_index=True)
+    namespace = models.CharField(max_length=250, default="default", db_index=True)
     # explination
     event_type = models.CharField(max_length=250, db_index=True)  # created,updated,commented,movedfrom(task),
     project = models.ForeignKey(Project, null=True)
-    data = models.TextField(
-        null=True, blank=True, verbose_name=_("data"))  # left as blank
-    data_content_type = models.ForeignKey(
-        ContentType, related_name="data_timelines", null=True)  # left as blank
+    data = models.TextField(null=True, blank=True, verbose_name=_("data"))  # left as blank
+    data_content_type = models.ForeignKey(ContentType, related_name="data_timelines", null=True)  # left as blank
     created = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User)
     is_read = models.BooleanField(default=False)
