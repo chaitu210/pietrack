@@ -2,6 +2,7 @@ from django import template
 from piebase.models import Ticket, Comment, Requirement, Role
 from django.core.paginator import Paginator
 from datetime import datetime
+from django.db.models import Q
 
 register = template.Library()
 
@@ -9,9 +10,9 @@ register = template.Library()
 @register.filter
 def Task_list(status, search_filter):
     milestone = search_filter[0]
-    assigned_to = map(int,search_filter[1])
-    requirements = map(int,search_filter[2])
-    task_list = map(int,search_filter[3])
+    assigned_to = map(int, search_filter[1])
+    requirements = map(int, search_filter[2])
+    task_list = map(int, search_filter[3])
     start_date = search_filter[4]
     end_date = search_filter[5]
     tasks = Ticket.objects.filter(status=status, milestone=milestone)
@@ -21,20 +22,53 @@ def Task_list(status, search_filter):
         tasks = tasks.filter(assigned_to__id__in=assigned_to)
     if task_list:
         tasks = tasks.filter(id__in=task_list)
-    if start_date!='':
+    if start_date != '':
         try:
-            start_date = datetime.strptime(start_date+u' 00:00:00', '%m/%d/%Y %H:%M:%S')
+            start_date = datetime.strptime(start_date + u' 00:00:00', '%m/%d/%Y %H:%M:%S')
             tasks = tasks.filter(created_date__gte=start_date)
         except:
             pass
-    if end_date!='':
+    if end_date != '':
         try:
-            end_date = datetime.strptime(end_date+u' 00:00:00', '%m/%d/%Y %H:%M:%S')
+            end_date = datetime.strptime(end_date + u' 00:00:00', '%m/%d/%Y %H:%M:%S')
             tasks = tasks.filter(created_date__lte=end_date)
         except:
             pass
     p = Paginator(tasks, 10)
     return p.page(1)
+
+
+@register.filter
+def issue_list(search_filter):
+    assigned_to = map(int, search_filter[0])
+    issue_type = search_filter[1]
+    issue = map(int, search_filter[2])
+    start_date = search_filter[3]
+    end_date = search_filter[4]
+    issues = Ticket.objects.filter(~Q(ticket_type='task'))
+    if assigned_to:
+        issues = issues.filter(assigned_to__id__in=assigned_to)
+
+    if issue_type:
+        issues = issues.filter(ticket_type__in=issue_type)
+
+    if issue:
+        issues = issues.filter(id__in=issue)
+
+    if start_date != '':
+        try:
+            start_date = datetime.strptime(start_date + u' 00:00:00', '%m/%d/%Y %H:%M:%S')
+            issues = issues.filter(created_date__gte=start_date)
+        except:
+            pass
+    if end_date != '':
+        try:
+            end_date = datetime.strptime(end_date + u' 00:00:00', '%m/%d/%Y %H:%M:%S')
+            issues = issues.filter(created_date__lte=end_date)
+        except:
+            pass
+
+    return issues
 
 
 @register.filter

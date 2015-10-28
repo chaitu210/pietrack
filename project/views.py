@@ -7,7 +7,7 @@ from django.shortcuts import render, redirect, render_to_response, get_object_or
 from piebase.models import User, Project, Priority, Severity, TicketStatus, Ticket, Requirement, Attachment, Role, \
     Milestone, Timeline, Comment
 from forms import CreateProjectForm, PriorityForm, SeverityForm, TicketStatusForm, RoleForm, CommentForm, \
-    CreateMemberForm, PasswordResetForm, MilestoneForm, RequirementForm,CreateIssueForm
+    CreateMemberForm, PasswordResetForm, MilestoneForm, RequirementForm, CreateIssueForm
 from PIL import Image
 from django.utils import timezone
 from django.template.defaultfilters import slugify
@@ -26,6 +26,7 @@ from .templatetags.project_tags import is_project_admin
 from django.utils.functional import wraps
 from django.db.models import Q
 from datetime import datetime
+
 
 def check_project_admin(view):
     wraps(view)
@@ -214,7 +215,7 @@ def delete_project(request, slug, id):
 @active_user_required
 @check_project_admin
 def priorities(request, slug):
-    project=Project.objects.get(slug=slug, organization=request.user.organization)
+    project = Project.objects.get(slug=slug, organization=request.user.organization)
     priority_list = Priority.objects.filter(project=project).order_by('order')
     return render(request, 'settings/priorities.html', {'slug': slug, 'priority_list': priority_list,
                                                         'notification_list': get_notification_list(request.user)})
@@ -225,15 +226,15 @@ def priorities(request, slug):
 def priority_default(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     default = (
-                ('Wishlist', 'wishlist', '#999999' ),
-                ('Minor', 'minor', '#729fcf' ),
-                ('Normal', 'normal', '#4e9a06' ),
-                ('Important', 'important', '#f57900' ),
-                ('Critical', 'critical', '#CC0000' ),
-              )
+        ('Wishlist', 'wishlist', '#999999'),
+        ('Minor', 'minor', '#729fcf'),
+        ('Normal', 'normal', '#4e9a06'),
+        ('Important', 'important', '#f57900'),
+        ('Critical', 'critical', '#CC0000'),
+    )
     for name, slug, color in default:
-        order = project.priorities.count()+1
-        Priority.objects.create(name=name, slug=slug, color=color, project=project,order=order)
+        order = project.priorities.count() + 1
+        Priority.objects.create(name=name, slug=slug, color=color, project=project, order=order)
 
     messages.success(request, 'Default priorities are added to the Priority page !')
     return HttpResponse(json.dumps({'error': False}), content_type="application/json")
@@ -269,31 +270,33 @@ def priority_edit(request, slug):
     else:
         return HttpResponse(json.dumps({'error': True, 'errors': form.errors}), content_type="application/json")
 
+
 @active_user_required
 @check_project_admin
 def priority_order(request, slug):
-    prev = request.GET.get('prev',False)
-    current = request.GET.get('current',False)
+    prev = request.GET.get('prev', False)
+    current = request.GET.get('current', False)
     if prev and current:
         prev = int(prev)
         current = int(current)
-        project=Project.objects.get(slug=slug, organization=request.user.organization)
+        project = Project.objects.get(slug=slug, organization=request.user.organization)
         priorities = project.priorities.all().order_by('order')
         if prev > current:
-            for priority in priorities[current:prev+1]:
-                if priority.order-1 == prev :
-                    priority.order = current+1
+            for priority in priorities[current:prev + 1]:
+                if priority.order - 1 == prev:
+                    priority.order = current + 1
                 else:
-                    priority.order+=1
+                    priority.order += 1
                 priority.save()
         else:
-            for priority in priorities[prev:current+1]:
-                if priority.order-1 == prev :
-                    priority.order=current+1
+            for priority in priorities[prev:current + 1]:
+                if priority.order - 1 == prev:
+                    priority.order = current + 1
                 else:
-                    priority.order-=1
+                    priority.order -= 1
                 priority.save()
     return HttpResponse("200 OK")
+
 
 @active_user_required
 @check_project_admin
@@ -317,13 +320,13 @@ def severities(request, slug):
 def severity_default(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     default = (
-                ('Low', 'low', '#999999'),
-                ('Normal', 'normal', '#4e9a06'),
-                ('High', 'high', '#cc0000'),
-               )
+        ('Low', 'low', '#999999'),
+        ('Normal', 'normal', '#4e9a06'),
+        ('High', 'high', '#cc0000'),
+    )
     for name, slug, color in default:
-        order = project.severities.count()+1
-        Severity.objects.create(name=name, slug=slug, color=color, project=project,order=order)
+        order = project.severities.count() + 1
+        Severity.objects.create(name=name, slug=slug, color=color, project=project, order=order)
     messages.success(request, 'Default severities are added to the Severity page !')
     return HttpResponse(json.dumps({'error': False}), content_type="application/json")
 
@@ -360,34 +363,37 @@ def severity_edit(request, slug):
 
 
 def severity_order(request, slug):
-    prev = request.GET.get('prev',False)
-    current = request.GET.get('current',False)
+    prev = request.GET.get('prev', False)
+    current = request.GET.get('current', False)
     if prev and current:
         prev = int(prev)
         current = int(current)
-        project=Project.objects.get(slug=slug, organization=request.user.organization)
+        project = Project.objects.get(slug=slug, organization=request.user.organization)
         severities = project.severities.all().order_by('order')
         if prev > current:
-            for severity in severities[current:prev+1]:
-                if severity.order-1 == prev :
-                    severity.order = current+1
+            for severity in severities[current:prev + 1]:
+                if severity.order - 1 == prev:
+                    severity.order = current + 1
                 else:
-                    severity.order+=1
+                    severity.order += 1
                 severity.save()
         else:
-            for severity in severities[prev:current+1]:
-                if severity.order-1 == prev :
-                    severity.order=current+1
+            for severity in severities[prev:current + 1]:
+                if severity.order - 1 == prev:
+                    severity.order = current + 1
                 else:
-                    severity.order-=1
+                    severity.order -= 1
                 severity.save()
     return HttpResponse("200 OK")
+
+
 @active_user_required
 @check_project_admin
 def severity_delete(request, slug, severity_slug):
     Severity.objects.get(
         slug=severity_slug, project=Project.objects.get(slug=slug, organization=request.user.organization)).delete()
     return HttpResponse(json.dumps({'error': False}), content_type="application/json")
+
 
 @active_user_required
 @check_project_admin
@@ -403,18 +409,18 @@ def ticket_status(request, slug):
 def ticket_status_default(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     default = (
-                ('New','new','#999999'),
-                ('In progress','in-progress','#729fcf'),
-                ('Ready for test','ready-for-test','#4e9a06'),
-                ('Done','done','#cc0000')
-               )
+        ('New', 'new', '#999999'),
+        ('In progress', 'in-progress', '#729fcf'),
+        ('Ready for test', 'ready-for-test', '#4e9a06'),
+        ('Done', 'done', '#cc0000')
+    )
     for name, slug, color in default:
-        order = project.task_statuses.count()+1
+        order = project.task_statuses.count() + 1
         TicketStatus.objects.create(name=name, slug=slug, color=color, project=project, order=order)
     if not project.task_statuses.filter(is_final=True):
-        order = project.task_statuses.count()+1
+        order = project.task_statuses.count() + 1
         TicketStatus.objects.create(name='Archived', slug=slugify('Archived'), color='#5c3566',
-                      project=project, is_final=True, order=order)
+                                    project=project, is_final=True, order=order)
     messages.success(request, 'Default status are added to the ticket status page !')
     return HttpResponse(json.dumps({'error': False}), content_type="application/json")
 
@@ -424,7 +430,7 @@ def ticket_status_default(request, slug):
 def ticket_status_create(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     form = TicketStatusForm(request.POST, project=project)
-    is_final = request.POST.get('is_final',False)
+    is_final = request.POST.get('is_final', False)
     if form.is_valid():
         ticket_status = form.save()
         ticket_status.order = project.task_statuses.count()
@@ -443,12 +449,12 @@ def ticket_status_create(request, slug):
         else:
             ticket_statuses = project.task_statuses.all()
             if ticket_statuses and not ticket_statuses.filter(is_final=True):
-                ticket_assign = ticket_statuses[len(ticket_statuses)-1]
+                ticket_assign = ticket_statuses[len(ticket_statuses) - 1]
                 ticket_assign.is_final = True
                 ticket_assign.save()
         return HttpResponse(json.dumps(
             {'error': False, 'color': ticket_status.color, 'name': ticket_status.name, 'id': ticket_status.id,
-             'slug': ticket_status.slug,'is_final':is_final}), content_type="application/json")
+             'slug': ticket_status.slug, 'is_final': is_final}), content_type="application/json")
     else:
         return HttpResponse(json.dumps({'error': True, 'errors': form.errors}), content_type="application/json")
 
@@ -459,7 +465,7 @@ def ticket_status_edit(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     instance = TicketStatus.objects.get(id=request.POST['id'], project=project)
     form = TicketStatusForm(request.POST, instance=instance, project=project)
-    is_final = request.POST.get('is_final',False)
+    is_final = request.POST.get('is_final', False)
     if form.is_valid():
         ticket_status = form.save()
         if is_final:
@@ -486,7 +492,7 @@ def ticket_status_delete(request, slug, ticket_slug):
     if is_final:
         ticket_statuses = project.task_statuses.all()
         if ticket_statuses:
-            ticket_assign = ticket_statuses[len(ticket_statuses)-1]
+            ticket_assign = ticket_statuses[len(ticket_statuses) - 1]
             ticket_assign.is_final = True
             ticket_assign.save()
 
@@ -496,26 +502,26 @@ def ticket_status_delete(request, slug, ticket_slug):
 @active_user_required
 @check_project_admin
 def ticket_status_order(request, slug):
-    prev = request.GET.get('prev',False)
-    current = request.GET.get('current',False)
+    prev = request.GET.get('prev', False)
+    current = request.GET.get('current', False)
     if prev and current:
         prev = int(prev)
         current = int(current)
-        project=Project.objects.get(slug=slug, organization=request.user.organization)
+        project = Project.objects.get(slug=slug, organization=request.user.organization)
         ticket_statuses = project.task_statuses.all().order_by('order')
         if prev > current:
-            for ticket_status in ticket_statuses[current:prev+1]:
-                if ticket_status.order-1 == prev :
-                    ticket_status.order = current+1
+            for ticket_status in ticket_statuses[current:prev + 1]:
+                if ticket_status.order - 1 == prev:
+                    ticket_status.order = current + 1
                 else:
-                    ticket_status.order+=1
+                    ticket_status.order += 1
                 ticket_status.save()
         else:
-            for ticket_status in ticket_statuses[prev:current+1]:
-                if ticket_status.order-1 == prev :
-                    ticket_status.order=current+1
+            for ticket_status in ticket_statuses[prev:current + 1]:
+                if ticket_status.order - 1 == prev:
+                    ticket_status.order = current + 1
                 else:
-                    ticket_status.order-=1
+                    ticket_status.order -= 1
                 ticket_status.save()
     return HttpResponse("200 OK")
 
@@ -776,15 +782,16 @@ def taskboard(request, slug, milestone_slug):
     milestone = Milestone.objects.get(slug=milestone_slug, project=project)
     ticket_status_list = TicketStatus.objects.filter(project=project).order_by('order')
     mem_details = project.members.all()
-    assigned_to =  request.GET.getlist('assigned_to')
-    requirements =  request.GET.getlist('requirements')
-    tasks =  request.GET.getlist('tasks')
-    start_date = request.GET.get('start_date','')
-    end_date = request.GET.get('end_date','')
-    search_filter = (milestone,assigned_to,requirements,tasks,start_date,end_date)
+    assigned_to = request.GET.getlist('assigned_to')
+    requirements = request.GET.getlist('requirements')
+    tasks = request.GET.getlist('tasks')
+    start_date = request.GET.get('start_date', '')
+    end_date = request.GET.get('end_date', '')
+    search_filter = (milestone, assigned_to, requirements, tasks, start_date, end_date)
     return render(request, 'project/taskboard.html',
                   {'ticket_status_list': ticket_status_list, 'slug': slug,
-                   'project_members': mem_details, 'search_filter':search_filter, 'notification_list': get_notification_list(request.user)})
+                   'project_members': mem_details, 'search_filter': search_filter,
+                   'notification_list': get_notification_list(request.user)})
 
 
 @active_user_required
@@ -795,8 +802,8 @@ def update_taskboard_status(request, slug, status_slug, task_id):
     old_status = task.status.name
     ticket_status = TicketStatus.objects.get(slug=status_slug, project=project)
     if ticket_status.is_final or task.status.is_final:
-        if not (is_project_admin(request.user,slug) or request.user.pietrack_role=='admin'):
-            return HttpResponse(json.dumps({'only_admin':True}), content_type="application/json")
+        if not (is_project_admin(request.user, slug) or request.user.pietrack_role == 'admin'):
+            return HttpResponse(json.dumps({'only_admin': True}), content_type="application/json")
     task.status = ticket_status
     task.save()
     msg = "moved " + task.name + " from " + old_status + " to " + task.status.name
@@ -816,18 +823,18 @@ def load_tasks(request, slug, milestone_slug, status_slug):
     if request.GET.getlist('requirements'):
         tasks = tasks.filter(requirement__id__in=request.GET.getlist('requirements'))
     if request.GET.getlist('assigned_to'):
-        tasks = tasks.filter(assigned_to__id__in= request.GET.getlist('assigned_to'))
+        tasks = tasks.filter(assigned_to__id__in=request.GET.getlist('assigned_to'))
     if request.GET.getlist('tasks'):
         tasks = tasks.filter(id__in=request.GET.getlist('tasks'))
-    if request.GET.get('start_date','')!='':
+    if request.GET.get('start_date', '') != '':
         try:
-            start_date = datetime.strptime( request.GET.getlist('start_date','')+u' 00:00:00', '%m/%d/%Y %H:%M:%S')
+            start_date = datetime.strptime(request.GET.getlist('start_date', '') + u' 00:00:00', '%m/%d/%Y %H:%M:%S')
             tasks = tasks.filter(created_date__gte=start_date)
         except:
             pass
-    if request.GET.get('end_date','')!='':
+    if request.GET.get('end_date', '') != '':
         try:
-            end_date = datetime.strptime(request.GET.get('end_date','')+u' 00:00:00', '%m/%d/%Y %H:%M:%S')
+            end_date = datetime.strptime(request.GET.get('end_date', '') + u' 00:00:00', '%m/%d/%Y %H:%M:%S')
             tasks = tasks.filter(created_date__lte=end_date)
         except:
             pass
@@ -978,38 +985,40 @@ def task_edit(request, slug, milestone_slug, task_id):
                                                       'task': task, 'milestone': task.milestone}
                       )
 
+
 @active_user_required
 @check_project_admin
-def create_issue(request,slug,task_id):
+def create_issue(request, slug, task_id):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     task = Ticket.objects.get(id=task_id)
     if request.POST:
         form = CreateIssueForm(request.POST, project=project)
         error = True
         if form.is_valid():
-            error=False
+            error = False
             issue = Ticket.objects.create(
                 name=request.POST.get('name'),
                 slug=slugify(request.POST.get('name')),
                 project=project,
                 assigned_to=project.members.get(id=request.POST.get('assigned_to')),
-                finished_date = request.POST.get('finished_date'),
-                description = request.POST.get('description'),
-                status = project.task_statuses.filter(is_final=False)[0],
-                ticket_type = request.POST.get('issue_type'),
-                severity = project.severities.get(id=request.POST.get('severity')),
-                priority = project.priorities.get(id=request.POST.get('priority')),
-                created_by = request.user
+                finished_date=request.POST.get('finished_date'),
+                description=request.POST.get('description'),
+                status=project.task_statuses.filter(is_final=False)[0],
+                ticket_type=request.POST.get('issue_type'),
+                severity=project.severities.get(id=request.POST.get('severity')),
+                priority=project.priorities.get(id=request.POST.get('priority')),
+                created_by=request.user
             )
             issue.reference.add(task)
-        return HttpResponse(json.dumps({'error':error, 'form_errors':form.errors}), content_type="json/application")
+        return HttpResponse(json.dumps({'error': error, 'form_errors': form.errors}), content_type="json/application")
 
-    return render(request, 'task/add_task.html', {'is_issue':True,'issue_type':['bug','enhancement'],
-                                                  'assigned_to_list':project.members.all(),
-                                                  'slug':slug,
-                                                  'severity_list':project.severities.all(),
-                                                  'priority_list':project.priorities.all()
+    return render(request, 'task/add_task.html', {'is_issue': True, 'issue_type': ['bug', 'enhancement'],
+                                                  'assigned_to_list': project.members.all(),
+                                                  'slug': slug,
+                                                  'severity_list': project.severities.all(),
+                                                  'priority_list': project.priorities.all()
                                                   })
+
 
 @active_user_required
 @is_project_member
@@ -1222,7 +1231,7 @@ def requirement_edit(request, slug, milestone_slug, requirement_slug):
             else:
                 msg = " requirement " + requirement_obj.name + " details updated "
             create_timeline.send(sender=request.user, content_object=requirement_obj, namespace=msg,
-                                     event_type="requirement edited", project=project_obj)
+                                 event_type="requirement edited", project=project_obj)
             json_data['error'] = False
             messages.success(request, 'Successfully updated your requirement - ' + str(requirement_obj.name) + ' !')
             return HttpResponse(json.dumps(json_data), content_type='application/json')
@@ -1258,39 +1267,44 @@ def requirement_delete(request, slug, milestone_slug, id):
                          event_type="requirement_form", project=project_object)
     return HttpResponseRedirect(reverse('project:taskboard', kwargs={'milestone_slug': milestone_slug, 'slug': slug}))
 
+
 @active_user_required
 @is_project_member
-def issues(request,slug):
+def issues(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     issue_list = project.project_tickets.filter(~Q(ticket_type='task'))
 
     assigned_to_list = request.GET.getlist('assigned_to')
     issue_type_list = request.GET.getlist('issue_type')
+    print issue_type_list
     issues = request.GET.getlist('issue_list')
     start_date = request.GET.getlist('start_date')
     end_date = request.GET.getlist('end_date')
-
-
+    search_filter = (assigned_to_list, issue_type_list, issues, start_date, end_date)
+    print search_filter
     return render(request, 'project/issueboard.html',
-                  {'project':project,'slug':slug, 'issue_list':issue_list,
-                   'status_list':project.task_statuses.all(),
-                   'member_list':project.members.all(),
-                   'issue_type_list':['bug','enhancement']
+                  {'project': project, 'slug': slug, 'issue_list': issue_list,
+                   'status_list': project.task_statuses.all(),
+                   'member_list': project.members.all(),
+                   'search_filter': search_filter,
+                   'issue_type_list': ['bug', 'enhancement']
                    })
+
 
 @active_user_required
 @is_project_member
 def update_issue(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
-    issue = Ticket.objects.get(id=request.GET.get('issue_id'));
-    status_id = request.GET.get('status',False)
-    assigned_to_id = request.GET.get('assigned_to',False)
+    issue = Ticket.objects.get(id=request.GET.get('issue_id'))
+    status_id = request.GET.get('status', False)
+    assigned_to_id = request.GET.get('assigned_to', False)
     if status_id:
         issue.status = project.task_statuses.get(id=status_id)
     if assigned_to_id:
         issue.assigned_to = project.members.get(id=assigned_to_id)
     issue.save()
     return HttpResponse("200 ok ")
+
 
 @active_user_required
 @is_project_member
@@ -1299,3 +1313,24 @@ def issue_details(request, slug, issue_id):
     task = project.project_tickets.get(id=issue_id)
     return render(request, 'task/Task_detail.html', {'task': task, 'slug': slug, 'project': project,
                                                      'notification_list': get_notification_list(request.user)})
+
+
+@active_user_required
+@is_project_member
+def edit_issue(request, slug, issue_id):
+    project = Project.objects.get(slug=slug, organization=request.user.organization)
+    issue = Ticket.objects.get(id=issue_id)
+    print issue
+    if request.POST:
+        form = CreateIssueForm(request.POST, project=project, instance=issue)
+        if form.is_valid():
+            pass
+    return HttpResponseRedirect()
+
+
+@active_user_required
+@is_project_member
+def delete_issue(request, slug, issue_id):
+    issue = Ticket.objects.get(id=issue_id)
+    issue.delete()
+    return HttpResponseRedirect(reverse('project:issues', kwargs={'slug': slug}))

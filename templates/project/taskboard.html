@@ -29,14 +29,18 @@
                     <div class="col-md-2">
                         <select class='select2 input select2_assigned_to' name="assigned_to" multiple>
                             {% for member in project_members %}
-                                <option value="{{ member.id }}">{% if member.first_name %}{{ member.first_name }}{% else %}{{ member.username }}{% endif %}</option>
+                                <option value="{{ member.id }}"  {% for mem in search_filter.1 %}{% ifequal mem|add:'0' member.id %}selected{% endifequal %}{% endfor %} >
+                                    {% if member.first_name %}{{ member.first_name }}{% else %}{{ member.username }}{% endif %}
+                                </option>
                             {% endfor %}
                         </select>
                     </div>
                     <div class="col-md-2">
                         <select class='select2 input select2_requirement' name="requirements" multiple>
                             {% for requirement in search_filter.0|milestone_requirements %}
-                                <option value="{{ requirement.id }}">{{ requirement.name }}</option>
+                                <option value="{{ requirement.id }}" {% for req in search_filter.2 %}{% ifequal req|add:'0' requirement.id %}selected{% endifequal %}{% endfor %}>
+                                    {{ requirement.name }}
+                                </option>
                             {% endfor %}
                         </select>
                     </div>
@@ -44,7 +48,9 @@
                         <select class='select2 input select2_task' name="tasks" multiple>
                             {% for requirement in search_filter.0|milestone_requirements %}
                                 {% for task in requirement.tasks.all %}
-                                    <option value="{{ task.id }}">{{ task.name }}</option>
+                                    <option value="{{ task.id }}"  {% for task_id in search_filter.3 %}{% ifequal task_id|add:'0' task.id %}selected{% endifequal %}{% endfor %}>
+                                        {{ task.name }}
+                                    </option>
                                 {% endfor %}
                             {% endfor %}
                         </select>

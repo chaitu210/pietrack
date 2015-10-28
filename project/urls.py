@@ -62,7 +62,8 @@ urlpatterns = [
     # comments
     url(r'^(?P<slug>[-\w]+)/comment/comment_edit/$', task_comment_edit, name="task_comment_edit"),
 
-    url(r'^(?P<slug>[-\w]+)/task/comment/delete/(?P<comment_id>[0-9]+)/$', delete_task_comment, name="delete_task_comment"),
+    url(r'^(?P<slug>[-\w]+)/task/comment/delete/(?P<comment_id>[0-9]+)/$', delete_task_comment,
+        name="delete_task_comment"),
     url(r'^(?P<slug>[-\w]+)/task/(?P<task_id>[0-9]+)/comment/$', task_comment, name="task_comment"),
 
     # taskboard
@@ -83,11 +84,12 @@ urlpatterns = [
     url(r'^(?P<slug>[-\w]+)/task/(?P<task_id>[0-9]+)/issue/create/$', create_issue,
         name="create_issue"),
 
-    #issue_board
+    # issue_board
     url(r'^(?P<slug>[-\w]+)/issues/$', issues, name="issues"),
     url(r'^(?P<slug>[-\w]+)/issue/update/$', update_issue, name="update_issue"),
     url(r'^(?P<slug>[-\w]+)/issue/(?P<issue_id>[0-9]+)/details/$', issue_details, name="issue_details"),
-
+    url(r'^(?P<slug>[-\w]+)/issue/(?P<issue_id>[0-9]+)/edit/$', edit_issue, name="edit_issue"),
+    url(r'^(?P<slug>[-\w]+)/issue/(?P<issue_id>[0-9]+)/delete/$', delete_issue, name="delete_issue"),
 
     # attachment
     url(r'^(?P<slug>[-\w]+)/task/(?P<task_id>[0-9]+)/attachment/delete/(?P<attachment_id>[0-9]+)/$',
