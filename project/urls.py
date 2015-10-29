@@ -68,6 +68,8 @@ urlpatterns = [
 
     # taskboard
     url(r'^(?P<slug>[-\w]+)/tickets/$', tickets, name="tickets"),
+    url(r'^(?P<slug>[-\w]+)/taskboard/update/order/$', taskboard_order, name="taskboard_order"),
+
     url(r'^(?P<slug>[-\w]+)/(?P<milestone_slug>[-\w]+)/taskboard/$', taskboard, name="taskboard"),
     url(r'^(?P<slug>[-\w]+)/update_taskboard/(?P<status_slug>([a-zA-Z0-9-]+))/(?P<task_id>[0-9]+)/$',
         update_taskboard_status, name="update_taskboard_status"),
@@ -81,11 +83,12 @@ urlpatterns = [
     url(r'^(?P<slug>[-\w]+)/(?P<milestone_slug>[-\w]+)/task/(?P<task_id>[0-9]+)/edit/$', task_edit, name="task_edit"),
     url(r'^(?P<slug>[-\w]+)/(?P<milestone_slug>[-\w]+)/task/(?P<task_id>[0-9]+)/delete/$', task_delete,
         name="task_delete"),
-    url(r'^(?P<slug>[-\w]+)/task/(?P<task_id>[0-9]+)/issue/create/$', create_issue,
-        name="create_issue"),
 
     # issue_board
     url(r'^(?P<slug>[-\w]+)/issues/$', issues, name="issues"),
+    url(r'^(?P<slug>[-\w]+)/issue/create/$', create_issue, name="create_issue"),
+    url(r'^(?P<slug>[-\w]+)/task/(?P<task_id>[0-9]+)/issue/create/$', create_issue_to_ticket,
+        name="create_issue_to_ticket"),
     url(r'^(?P<slug>[-\w]+)/issue/update/$', update_issue, name="update_issue"),
     url(r'^(?P<slug>[-\w]+)/issue/(?P<issue_id>[0-9]+)/details/$', issue_details, name="issue_details"),
     url(r'^(?P<slug>[-\w]+)/issue/(?P<issue_id>[0-9]+)/edit/$', edit_issue, name="edit_issue"),

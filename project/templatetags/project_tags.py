@@ -30,8 +30,8 @@ def Task_list(status, search_filter):
             pass
     if end_date != '':
         try:
-            end_date = datetime.strptime(end_date + u' 00:00:00', '%m/%d/%Y %H:%M:%S')
-            tasks = tasks.filter(created_date__lte=end_date)
+            end_date = datetime.strptime(end_date + u' 23:59:59', '%m/%d/%Y %H:%M:%S')
+            tasks = tasks.filter(finished_date__lte=end_date)
         except:
             pass
     p = Paginator(tasks, 10)
@@ -63,8 +63,8 @@ def issue_list(search_filter):
             pass
     if end_date != '':
         try:
-            end_date = datetime.strptime(end_date + u' 00:00:00', '%m/%d/%Y %H:%M:%S')
-            issues = issues.filter(created_date__lte=end_date)
+            end_date = datetime.strptime(end_date + u' 23:59:59', '%m/%d/%Y %H:%M:%S')
+            issues = issues.filter(finished_date__lte=end_date)
         except:
             pass
 

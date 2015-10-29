@@ -279,8 +279,11 @@ class Ticket(models.Model):
     target_date = models.DateField(null=True, blank=True, verbose_name=_("target date"))
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="user_tickets", null=True, blank=True)
 
+    class Meta:
+        ordering = ['order']
     def __str__(self):
         return self.name
+
 
 
 class Comment(models.Model):
