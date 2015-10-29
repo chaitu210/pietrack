@@ -41,18 +41,19 @@
                     <span id='task_requirement_error'></span>
                 </div>
                 {% endif %}
-                {% if ticket_status_list %}
+
+                {% if is_issue %}
+                  {% if tasks %}
                     <div class="form_group">
-                        <label>Status</label>
-                        <select name='status' class='input'>
-                            {% for ticket_status_iter in ticket_status_list %}
-                                <option value='{{ ticket_status_iter.id }}'>{{ ticket_status_iter.name }}</option>
+                        <label>Reference Task</label>
+                        <select name='refer_task' class='input'>
+                            {% for task in tasks %}
+                                <option value='{{ task.id }}'>{{ task }}</option>
                             {% endfor %}
                         </select>
                         <span id='task_status_error'></span>
                     </div>
-                {% endif %}
-                {% if is_issue %}
+                  {% endif %}
                     <div class="form_group">
                         <label>Issue Type</label>
                         <select name='issue_type' class='input'>
@@ -81,6 +82,17 @@
                         <span id='task_status_error'></span>
                     </div>
                 {% endif %}
+                {% if ticket_status_list %}
+                    <div class="form_group">
+                        <label>Status</label>
+                        <select name='status' class='input'>
+                            {% for ticket_status_iter in ticket_status_list %}
+                                <option value='{{ ticket_status_iter.id }}'>{{ ticket_status_iter.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <span id='task_status_error'></span>
+                    </div>
+                {% endif %}
                 <div class="form_group">
                     <label>Finished Date</label>
                     <input id='task_finished_date' name='finished_date' type="text" class='input' value="{{ task.finished_date|date:"Y-m-d" }}">
@@ -89,8 +101,9 @@
                 <div class="form_group">
                     <label>Assign to</label>
                     <select name='assigned_to' class='select2 input'>
+                        <option value="">None</option>
                         {% for assigned_to_iter in assigned_to_list %}
-                           <option value='{{ assigned_to_iter.id }}'>{{ assigned_to_iter.email }}</option>
+                           <option value='{{ assigned_to_iter.id }}' {% if task.assigned_to.id == assigned_to_iter.id %}selected{% endif %} >{{ assigned_to_iter.email }}</option>
                         {% endfor %}
                     </select>
                     <span id='task_assigned_to_error'></span>
@@ -113,7 +126,7 @@
 {% endblock %}
 {% block extra_js %}
 <script>
-    {% if requirement_list or  ticket_status_list %}
+    {% if requirement_list or  ticket_status_list and milestone%}
         {% if requirement_list|length == 0 %}
             setTimeout(function(){ window.location = "{% url 'project:requirement_create' slug milestone.slug %}"; }, 2500);
         {% elif ticket_status_list|length == 0 %}

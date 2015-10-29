@@ -83,8 +83,8 @@
                                         </td>
                                         <td scope="row">
                                             <div class="input-group colorpicker-component demo demo-auto">
-                                                <input name="color" type="text"  value="#8b7ebf" class="form-control" placeholder="color"/>
-                                                <span class="input-group-addon"><i style="cursor: default;"></i></span>
+                                                <input name="color" type="text"  value="#666666" class="form-control" placeholder="color"/>
+                                                <span class="input-group-addon"><i style="cursor: default;background-color: rgb(102, 102, 102);"></i></span>
                                             </div>
                                         </td>
                                         <td>
@@ -125,6 +125,7 @@
         form.find('input[name="color"]').css({border:'none'});
         form.find('input[name="name"]').attr('placeholder','TicketStatus Name');
         form.find('input[name="color"]').attr('placeholder','Choose Color');
+        $('form div span i').css({'cursor': 'default','background-color': 'rgb(102, 102, 102)'})
 
         }
 
@@ -139,6 +140,10 @@
         $('#add_new').on('click', function() {
             clear_form();
             $('form').css('display', 'block');
+            $('form').find('input[name="name"]').focus();
+            var $target = $('html,body');
+            $target.animate({scrollTop: $target.height()}, 1000);
+
         });
 
         $('#add_form').on('submit', function(e) {
@@ -224,6 +229,7 @@
         $(this).attr('class','glyphicon glyphicon-floppy-saved');
         $row.find('input').css({border:'solid 1px #00CC66'});
         $row.find('td:nth-child(3) input').attr('readonly',false)
+        $row.find("input[name='name']").focus();
     });
 
     /*inline save */
