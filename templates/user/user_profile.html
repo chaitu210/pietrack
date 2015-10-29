@@ -11,15 +11,13 @@
       {% csrf_token %}
       <div class="user-pic-block">
         <span class="user-picture">
-
-        <img id="profile_picture" src="{% if user.profile_pic %}{{ user.profile_pic.url }}{% else %}{% static 'img/user-pic.jpg' %}{% endif %}" width="100px" height="100px"/>
-
-                 </span>
-        <span class="pic-size">The image will be scaled to 80x80px.</span>
+            <img id="profile_picture" src="{% if user.profile_pic %}{{ user.profile_pic.url }}{% else %}{% static 'img/user-pic.jpg' %}{% endif %}" width="100px" height="100px"/>
+        </span>
         <span class="pic-btn">
-                     <button id="change_picture_button"><i class="fa fa-photo"></i> Change Picture</button>
-                    <input id="id_profile_pic" name="profile_pic" type="file" style='display:none;' onchange="loadFile(event)" />
-                 </span>
+            <button id="change_picture_button"><i class="fa fa-photo"></i> Change Picture</button>
+            <input id="id_profile_pic" name="profile_pic" type="file" style='display:none;' onchange="loadFile(event)" />
+        </span>
+        <span class="pic-size">The image will be scaled to 80x80px.</span>
       </div>
       <div class="form_group">
         <label for="username">User Name</label>

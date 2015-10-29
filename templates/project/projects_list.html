@@ -30,9 +30,9 @@
                             <tr data-href="{% url 'project:project_detail' slug=project.slug %}">
                                 <td>
                                 {% if project.logo %}
-                                    <img src='{{project.logo.url}}' width="50%" height="50%">
+                                    <img class="img" src='{{project.logo.url}}' width="50%" height="50%">
                                 {% else %}
-                                    <img src="{% static 'img/Project-logo.jpg' %}">
+                                    <img class="img" src="{% static 'img/Project-logo.jpg' %}">
                                 {% endif %}
                                 </td>
                                 <td>

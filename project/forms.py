@@ -16,6 +16,7 @@ from django.utils import timezone
 from django.core.exceptions import ValidationError
 import datetime
 
+
 # def CreateTimeline(content_object, event_type, project, user):
 #     Timeline.objects.create(content_object=content_object, event_type=event_type, project=project)
 
@@ -328,6 +329,7 @@ class CommentForm(forms.ModelForm):
             instance.save()
         return instance
 
+
 class CreateIssueForm(forms.Form):
     name = forms.CharField(max_length=50, required=True)
     issue_type = forms.CharField(max_length=20, required=True)
@@ -339,6 +341,6 @@ class CreateIssueForm(forms.Form):
 
     def clean_finished_date(self):
         date = self.cleaned_data['finished_date']
-        if date< datetime.date.today():
+        if date < datetime.date.today():
             raise ValidationError("The date should not be passed")
         return date

@@ -142,23 +142,23 @@
     $('#id_reset').on('click', function() {clear_form();});
 
     $('#add_form').on('submit', function(e) {
-        $instance = $(this)
+        $instance = $(this);
         e.preventDefault();
             $.post('{% url "project:priority_create" slug %}', $('#add_form').serialize(), function(response) {
                 if (response.error) {
                     $instance.find('input').css({border:'none'});
                     for (var key in response['errors']) {
                         $input = $instance.find('input[name="'+key+'"]');
-                        $input.val("")
-                        $input.attr('placeholder',response['errors'][key])
+                        $input.val("");
+                        $input.attr('placeholder',response['errors'][key]);
                         $input.css({border:'solid 1px #FF0000'});
                     }
                 } else {
                     var name = response['name'];
                     var color = response['color'];
-                    var row_id = response['id']
-                    var slug = response['slug']
-                    data_row = "<tr id=\"" + row_id + "\"><td><input name='id' value='"+row_id+"' type='hidden'><span class=\"glyphicon glyphicon-move\"></span>"+"{% csrf_token %}"+"</td><td scope=\"row\"><div class=\"input-group colorpicker-component demo demo-auto\"><input name='color' type=\"text\" value=\"" + color + "\" class=\"form-control\"/><span class=\"input-group-addon\"><i></i></span></div></td><td><input name=\"name\" value=\""+name+"\" type=\"text\" class=\"form-control\" style=\"background:#fff\"></td><td class=\"actions\"><a href=\"#\" class=\"edit\"><i class=\"fa fa-edit\"></i></a>&nbsp;<a href=\"#\" class=\"delete\" onclick=\"delete_priority('" + slug + "','" + row_id + "')\"><i class=\"fa fa-trash\"></i></a></td></tr>"
+                    var row_id = response['id'];
+                    var slug = response['slug'];
+                    data_row = "<tr id=\"" + row_id + "\"><td><input name='id' value='"+row_id+"' type='hidden'><span class=\"glyphicon glyphicon-move\"></span>"+"{% csrf_token %}"+"</td><td scope=\"row\"><div class=\"input-group colorpicker-component demo demo-auto\"><input name='color' type=\"text\" value=\"" + color + "\" class=\"form-control\"/><span class=\"input-group-addon\"><i></i></span></div></td><td><input name=\"name\" value=\""+name+"\" type=\"text\" class=\"form-control\" style=\"background:#fff\"></td><td class=\"actions\"><a href=\"#\" class=\"edit\"><i class=\"fa fa-edit\"></i></a>&nbsp;<a href=\"#\" class=\"delete\" onclick=\"delete_priority('" + slug + "','" + row_id + "')\"><i class=\"fa fa-trash\"></i></a></td></tr>";
                     $('#priority tbody').append(data_row);
                     $('.demo').colorpicker();
                     clear_form();
@@ -205,7 +205,7 @@
             stop: updateIndex,
             start: function(event, ui) {
                 ui.item.startPos = ui.item.index();
-                ui.item.id = ui.item.id
+                ui.item.id = ui.item.id;
             },
              update: function( event, ui ) {
                 ui.item.id = ui.item.attr("id");
@@ -225,16 +225,16 @@
     /*inline save */
     $('body').on('click','a > .glyphicon.glyphicon-floppy-saved',function(e){
         e.preventDefault();
-        $instatnce = $(this)
+        $instatnce = $(this);
         $row = $(this).closest('tr');
         var data = $row.find('input').serialize();
-        $.post('{% url 'project:priority_edit' slug %}',data, function(response){
+        $.post("{% url 'project:priority_edit' slug %}",data, function(response){
             if(response['error']){
                 $row.find('input').css({border:'none'});
                 for (var key in response['errors']) {
                     $input = $row.find('input[name="'+key+'"]');
-                    $input.val("")
-                    $input.attr('placeholder',response['errors'][key])
+                    $input.val("");
+                    $input.attr('placeholder',response['errors'][key]);
                     $input.css({border:'solid 1px #FF0000'});
                 }
 
