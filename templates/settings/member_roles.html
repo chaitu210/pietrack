@@ -10,14 +10,14 @@
             <div class="panel-body">
                 <!-- content box starts here -->
                 <div class="content_box ">
-                    {% if list_of_roles|length == 0 %}
+                    <!--{% if list_of_roles|length == 0 %}
                         <div class="role-alert pull-right member-warning-alert">
                             <div class="alert alert-warning alert-dismissible" role="alert">
                                 <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                                 <strong><span class="fa fa-warning"></span></strong> Please create a role to add a member !
                             </div>
                         </div>
-                    {% endif %}
+                    {% endif %}-->
                     <br clear="clearfixall" />
                     <div class="title">
                         <h4><span class="status">{{ project.name }} - MEMBER ROLE'S</span></h4>
@@ -103,10 +103,10 @@
                             <div>
                                 <hr />
                                 <center>
-                                Please create a new status or use
+                                Please create a new role or use
                                     <span class="badge" id="create_default">
                                         <a href="{% url 'project:member_roles_default' slug %}">default</a>
-                                    </span> status list !
+                                    </span> roles !
                                 </center>
                             </div>
                         {% endif %}

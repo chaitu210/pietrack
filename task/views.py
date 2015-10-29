@@ -18,9 +18,12 @@ def add_task(request, slug, milestone_slug):
             msg = "created " + task.name + " in requirement " + task.requirement.name + " of milestone " + task.milestone.name
             create_timeline.send(sender=request.user, content_object=task, namespace=msg,
                          event_type="task created", project=project_obj)
-            msg = "task " + task.name + " is assigned to " + task.assigned_to.username
-            create_timeline.send(sender=request.user, content_object=task.assigned_to, namespace=msg,
+            try:
+                msg = "task " + task.name + " is assigned to " + task.assigned_to.username
+                create_timeline.send(sender=request.user, content_object=task.assigned_to, namespace=msg,
                          event_type="task assigned", project=project_obj)
+            except:
+                pass
             return HttpResponse(json.dumps(json_data), content_type='application/json')
         else:
             json_data['error'] = True
