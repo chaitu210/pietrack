@@ -23,21 +23,21 @@
                     <div class="col-md-2">
                         <select class='select2 input select2_assigned_to' name="assigned_to" multiple>
                             {% for member in member_list %}
-                                <option value="{{ member.id }}">{{ member }}</option>
+                                <option value="{{ member.id }}" {% for mem in search_filter.0 %}{% ifequal mem|add:'0' member.id %}selected{% endifequal %}{% endfor %}>{% if member.first_name %}{{ member.first_name }}{% else %}{{ member.username }}{% endif %}</option>
                             {% endfor %}
                         </select>
                     </div>
                     <div class="col-md-2">
                         <select class='select2 input issue_type' name="issue_type" multiple>
                             {% for issue_type in issue_type_list%}
-                                <option value="{{ issue_type }}">{{ issue_type }}</option>
+                                <option value="{{ issue_type }}" {% for iss_type in search_filter.1 %}{% ifequal iss_type issue_type %}selected{% endifequal %}{% endfor %}>{{ issue_type }}</option>
                             {% endfor %}
                         </select>
                     </div>
                     <div class="col-md-3">
                         <select class='select2 input issue_title' name="issue_list" multiple>
                             {% for issue in issue_list %}
-                                    <option value="{{ issue.id }}">{{ issue.name }}</option>
+                                    <option value="{{ issue.id }}" {% for is_id in search_filter.2 %}{% ifequal is_id|add:'0' issue.id %}selected{% endifequal %}{% endfor %}>{{ issue.name }}</option>
                             {% endfor %}
                         </select>
 
@@ -46,35 +46,45 @@
                         <input name="start_date" type="text" class='input' id='sdate' placeholder='Created Date'>
                     </div>
                     <div class="col-md-2">
-                        <input name="end_date" type="text" class='input' id='edate' placeholder='Finished Date'>
+                        <input name="end_date"   type="text" class='input' id='edate' placeholder='Finished Date'>
                     </div>
                     <div class="col-md-1">
                         <button type="submit" class='submit_btn'><i class='fa fa-search'></i>Go</button>
                     </div>
                 </div>
             </form>
+
+            <!--<div id="not_found" style="display: none;">-->
+                <!--<hr>-->
+                <!--<div style="text-align: center;font-weight: bold;padding:0px;margin: 0px; color: #E88E00">-->
+                    <!--<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>-->
+                      <!--Sorry, Search query was not found !-->
+                <!--</div>-->
+                <!--<hr>-->
+            <!--</div>-->
             <br>
             <!--/ filters -->
             <!-- lists div -->
               <div class="table-responsive color-box">
 
-                            <table class="table table-striped" id="issue" >
+                            <table class="table table-striped" id="issue_container" >
                                 <thead>
                                     <tr>
                                         <th width="20%">Subject</th>
                                         <th width="10%">Type</th>
                                         <th width="5%"> Severity </th>
                                         <th width="5%"> Priority</th>
-                                        <th width="18%"> Status </th>
+                                        <th width="14%"> Status </th>
                                         <th width="18%"> Created </th>
                                         <th width="18%"> Assigned to </th>
+                                        <th width="6%">Actions</th>
                                     </tr>
                                 </thead>
+                                {% for issue in search_filter|issue_list %}
                                 <tbody style="cursor: pointer;">
-                                  {% for issue in issue_list %}
-                                    <tr id="{{ issue.id }}">
-                                        <td> {{ issue.name }} </td>
-                                        <td> {{ issue.ticket_type }} </td>
+                                    <tr id="{{ issue.id }}" class="issues_rows">
+                                        <td> <input name="name" value="{{ issue.name }}" type="text" class="form-control" /> </td>
+                                        <td> <input name="ticket_type" value="{{ issue.ticket_type }}" type="text" class="form-control" /></td>
                                         <td scope="row">
                                                 <div class="input-group colorpicker-component demo demo-auto">
                                                     <input name="color" type="text"  value="{{issue.severity.color}}" class="form-control demo" style="display: none"/>
@@ -99,22 +109,48 @@
                                         <td>
                                             <select class="form-control issue" name="assigned_to">
                                               {% for member in member_list %}
-                                                <option value="{{ member.id }}" {% if member == issue.assigned_to %} selected {% endif %}>{{ member }}</option>
+                                                <option value="{{ member.id }}" {% if member == issue.assigned_to %} selected {% endif %}>
+                                                    {% if member.first_name %}{{ member.first_name }}{% else %}{{ member }}{% endif %}
+                                                </option>
                                               {% endfor %}
                                             </select>
                                         </td>
+                                        <td>
+
+                                            <span class='actions_div'>
+                                                <!--<a href="{% url 'project:edit_issue' slug issue.id %}">-->
+                                                <a href="#">
+                                                    <span class='edit'>
+                                                        <i class='fa fa-pencil'></i>
+                                                        </span>
+                                                </a>
+                                                <!--<a href="#" class="delete" onclick="delete_issue('{{slug}}','{{issue.id}}')"><i class="fa fa-trash"></i></a>-->
+                                                <a class="delete_req" id='{{ issue.id }}' href="{% url 'project:delete_issue' slug issue.id %}">
+                                                    <span class='drop'>
+                                                    <i class='fa fa-close'></i>
+                                                    </span>
+                                                </a>
+                                            </span>
+
+                                        </td>
                                     </tr>
-                                  {% endfor %}
+
+                                    {% empty %}
+                                        {% if issue_list %}
+                                        <div id="not_found">
+                                            <hr>
+                                                <div style="text-align: center;font-weight: bold;padding:0px;margin: 0px; color: #E88E00" class="search_warning">
+                                                    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                                                        Sorry, Search query not found !
+                                                </div>
+                                            <hr>
+                                        </div>
+                                        {% endif %}
+                                    {% endfor %}
                                 </tbody>
                             </table>
-                          {% if not issue_list %}
-                            <hr>
-                            <div style="text-align: center;font-weight: bold;padding:0px;margin: 0px; color: #E88E00">
-                                <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-                                  Sorry, Search query not found !
-                            </div>
-                            <hr>
-                          {% endif %}
+
+
             <!--/ lists div -->
             <div class="clearfix"></div>
         </div>
@@ -131,7 +167,7 @@
 {% block extra_js %}
   <script type="text/javascript">
     $('.demo').colorpicker().css({'pointer-events': 'none'});
-    $('.demo').removeClass('')
+    $('.demo').removeClass('');
     $(function() {
         $('.scroll').slimscroll({
             alwaysVisible: false,
@@ -158,7 +194,7 @@
 
         $(".issue_type").select2({
           tags: "true",
-          placeholder: "issue type"
+          placeholder: "Issue Type"
         });
 
         $(".issue_title").select2({
@@ -169,16 +205,38 @@
     /* extra code */
 
         $('tr .issue').change(function(e){
-            $row= $(this).closest('tr')
+            $row= $(this).closest('tr');
             var data = "issue_id="+$row.attr('id');
             $.each($row.find('select[name]'), function(index,value){
                 data += '&'+$(value).serialize()
             });
-            $.get('{% url 'project:update_issue' slug %}'+'?'+data);
+            $.get("{% url 'project:update_issue' slug %}"+'?'+data);
         });
-        $('#issue tbody tr ').click(function(e){
-            var id = $(this).attr('id');
+        $('#issue tbody tr td:first-child').click(function(e){
+            var id = $(this).parent().attr('id');
             window.location.href = "/project/{{ slug }}/issue/"+id+"/details"
         }).children().find('select').on('click', function(){return false;});
+
+        /* delete issue */
+
+        function delete_issue(slug, id) {
+            alert(id);
+            $.get('/project/{{slug}}/issue/'+id+'/delete', function(response) {
+                if (!response.error) {
+                    $('#' + id).remove();
+                }
+            });
+        }
+
+        /* delete issues ends here */
+
+
+
+            if ($('#not_found')){
+                setTimeout(function () {
+                    $('#not_found').hide();
+                }, 3000);
+        }
+
     </script>
 {% endblock%}

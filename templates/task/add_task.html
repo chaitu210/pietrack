@@ -138,16 +138,16 @@ function display_datepicker() {
         changeMonth: true,
         changeYear: true,
         dateFormat: 'yy-mm-dd',
-        minDate: new Date(),
+        minDate: new Date()
     });
 };
 display_datepicker()
 </script>
 <script>
 $('#task_save').click(function(event) {
-    event.preventDefault()
+    event.preventDefault();
     $.post('', $('#task_form').serialize(), function(data) {
-        $('.task_err').text('')
+        $('.task_err').text('');
         if (data['error'] === true) {
             for (var key in data['form_errors']) {
                 $('#task_' + key + '_error').text('').append(data['form_errors'][key])
