@@ -3,7 +3,7 @@ from django.shortcuts import render, HttpResponse
 from task.forms import TaskForm
 from piebase.models import TicketStatus, Project, Role
 from project.signals import create_timeline
-
+from project.views import get_notification_list
 
 def add_task(request, slug, milestone_slug):
     project_obj = Project.objects.get(slug=slug, organization=request.user.organization)
@@ -48,4 +48,6 @@ def add_task(request, slug, milestone_slug):
         milestone = project_obj.milestones.get(slug=milestone_slug)
         return render(request, 'task/add_task.html',
                       {'requirement_list': requirement_list, 'ticket_status_list': ticket_status_list,
-                       'assigned_to_list': assigned_to_list, 'slug': slug, 'milestone': milestone})
+                       'assigned_to_list': assigned_to_list, 'slug': slug, 'milestone': milestone,
+                        'notification_list':get_notification_list(request.user)
+                       })

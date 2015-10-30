@@ -123,6 +123,7 @@ class Project(models.Model):
     created_date = models.DateTimeField(verbose_name=_("created date"), auto_now_add=True)
     modified_date = models.DateTimeField(verbose_name=_("modified date"))
     members = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="projects")
+    admins = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="admin_projects")
     organization = models.ForeignKey(Organization)
     logo = models.FileField(upload_to=logo, blank=True, null=True)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True)
@@ -163,7 +164,7 @@ class Role(models.Model):
     slug = models.SlugField(max_length=250, null=False, blank=True, verbose_name=_("slug"))
     project = models.ForeignKey(Project, null=True, blank=False, related_name="roles", verbose_name=_("project"))
     users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="user_roles")
-    is_project_admin = models.BooleanField(default=False)
+    # is_project_admin = models.BooleanField(default=False)
 
     class Meta:
         unique_together = [("slug", "project")]
