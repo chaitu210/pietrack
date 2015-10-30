@@ -22,7 +22,8 @@ class TaskForm(forms.ModelForm):
         task.project = self.project
         task.slug = slugify(self.cleaned_data.get('name'))
         task.requirement = self.cleaned_data.get('requirement')
-        task.milestone = self.cleaned_data.get('requirement').milestone
+        if self.cleaned_data.get('requirement'):
+            task.milestone = self.cleaned_data.get('requirement').milestone
         task.created_by = self.user
         task.ticket_type = 'task'
         if commit:
