@@ -10,7 +10,7 @@
 
                 <span>{{ project.name }} - Issues</span>
                 <span class='header_button_wrap'>
-                    <a href="">
+                    <a href="{% url 'project:create_issue' slug %}">
                         <span class='header_button'><i class="fa fa-plus-circle"></i> New Issue</span>
                     </a>
                 </span>
@@ -43,10 +43,10 @@
 
                     </div>
                     <div class="col-md-2">
-                        <input name="start_date" type="text" class='input' id='sdate' placeholder='Created Date'>
+                        <input name="start_date" type="text" class='input' value="{{ request.GET.start_date }}" id='sdate' placeholder='Created Date'>
                     </div>
                     <div class="col-md-2">
-                        <input name="end_date"   type="text" class='input' id='edate' placeholder='Finished Date'>
+                        <input name="end_date"   type="text" class='input' value="{{ request.GET.end_date }}" id='edate' placeholder='Finished Date'>
                     </div>
                     <div class="col-md-1">
                         <button type="submit" class='submit_btn'><i class='fa fa-search'></i>Go</button>
@@ -83,13 +83,8 @@
                                 {% for issue in search_filter|issue_list %}
                                 <tbody style="cursor: pointer;">
                                     <tr id="{{ issue.id }}" class="issues_rows">
-                                        <td>
-                                            <input name="name" value="{{ issue.name }}" type="text" class="form-control" />
-                                        </td>
-                                        <td>
-                                            <select class="form-control" name="issue_type">
-                                                    <option value="{{ issue.ticket_type }}" {% for iss_type in search_filter.1 %}{% ifequal iss_type issue.ticket_type %}selected{% endifequal %}{% endfor %}>{{ issue.ticket_type }}</option>
-                                            </select>
+                                        <td> {{ issue.name }} </td>
+                                        <td> {{ issue.ticket_type }} </td>
                                         </td>
                                         <td scope="row">
                                                 <div class="input-group colorpicker-component demo demo-auto">
@@ -114,6 +109,7 @@
                                         <td> {{ issue.created_date }} </td>
                                         <td>
                                             <select class="form-control issue" name="assigned_to">
+                                            <option value="">None</option>
                                               {% for member in member_list %}
                                                 <option value="{{ member.id }}" {% if member == issue.assigned_to %} selected {% endif %}>
                                                     {% if member.first_name %}{{ member.first_name }}{% else %}{{ member }}{% endif %}
@@ -125,7 +121,7 @@
 
                                             <span class='actions_div'>
                                                 <!--<a href="{% url 'project:edit_issue' slug issue.id %}">-->
-                                                <a href="#">
+                                                <a href="{% url 'project:edit_issue' slug issue.id %}">
                                                     <span class='edit'>
                                                         <i class='fa fa-pencil'></i>
                                                         </span>
@@ -218,8 +214,8 @@
             });
             $.get("{% url 'project:update_issue' slug %}"+'?'+data);
         });
-        $('#issue tbody tr td:first-child').click(function(e){
-            var id = $(this).parent().attr('id');
+        $('#issue_container tbody tr').click(function(e){
+            var id = $(this).attr('id');
             window.location.href = "/project/{{ slug }}/issue/"+id+"/details"
         }).children().find('select').on('click', function(){return false;});
 

@@ -233,11 +233,23 @@
             connectWith: ".connectedSortable",
             start: function(event, ui) {
                 $('.connectedSortable').find('li:hidden').show();
+
+                ui.item.startPos = ui.item.index();
+                ui.item.id = ui.item.id;
+                ui.item.slug = ui.item.closest('ul').attr('id')
+            },
+            stop:function(event, ui){
+                previous = ui.item.startPos
+                current = ui.item.index()
+                slug = ui.item.slug
+
+                if(previous!=current){
+                   $.get("{% url 'project:taskboard_order' slug%}"+"?prev="+previous+"&current="+current+"&status_slug="+slug)
+                }
             },
             //appendTo: 'body',
-            helper: 'clone',
             //placeholder: 'ui-state-highlight ui-splitselect-item',
-            //opacity: '.5',
+            opacity: '.5',
             receive: function(event, ui) {
                 var status = this.id;
                 var task = ui.item.attr('id');
@@ -328,13 +340,13 @@
         });
         e.preventDefault();
     });
-    if($('#tasks_container li').length) {
-        if ($('#tasks_container li[id]').length == 0) {
-            $('#not_found').show();
-            setTimeout(function () {
-                $('#not_found').hide();
-            }, 4000);
-        }
+    {% if tasks_pro %}
+    if ($('#tasks_container li[id]').length == 0) {
+        $('#not_found').show();
+        setTimeout(function () {
+            $('#not_found').hide();
+        }, 4000);
     }
+    {% endif %}
   </script>
 {% endblock%}

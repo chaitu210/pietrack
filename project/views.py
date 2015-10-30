@@ -86,6 +86,13 @@ def is_project_member(view):
 
     return inner
 
+def swap_order(tasks):
+    for index in range(len(tasks)-1):
+            temp = tasks[index+1].order
+            tasks[index+1].order = tasks[index].order
+            tasks[index].order = temp
+            tasks[index+1].save()
+            tasks[index].save()
 
 @active_user_required
 @check_organization_admin
@@ -119,7 +126,7 @@ def create_project(request):
         else:
             return HttpResponse(json.dumps({'error': True, 'errors': form.errors, 'logo': img}),
                                 content_type="application/json")
-    return render(request, 'project/create_project.html')
+    return render(request, 'project/create_project.html',{'notification_list': get_notification_list(request.user)})
 
 
 @active_user_required
@@ -284,19 +291,11 @@ def priority_order(request, slug):
         project = Project.objects.get(slug=slug, organization=request.user.organization)
         priorities = project.priorities.all().order_by('order')
         if prev > current:
-            for priority in priorities[current:prev + 1]:
-                if priority.order - 1 == prev:
-                    priority.order = current + 1
-                else:
-                    priority.order += 1
-                priority.save()
+            priorities = priorities[current:prev + 1]
         else:
-            for priority in priorities[prev:current + 1]:
-                if priority.order - 1 == prev:
-                    priority.order = current + 1
-                else:
-                    priority.order -= 1
-                priority.save()
+            priorities = priorities[prev:current + 1]
+            priorities = priorities[::-1]
+        swap_order(priorities)
     return HttpResponse("200 OK")
 
 
@@ -373,19 +372,11 @@ def severity_order(request, slug):
         project = Project.objects.get(slug=slug, organization=request.user.organization)
         severities = project.severities.all().order_by('order')
         if prev > current:
-            for severity in severities[current:prev + 1]:
-                if severity.order - 1 == prev:
-                    severity.order = current + 1
-                else:
-                    severity.order += 1
-                severity.save()
+            severities = severities[current:prev + 1]
         else:
-            for severity in severities[prev:current + 1]:
-                if severity.order - 1 == prev:
-                    severity.order = current + 1
-                else:
-                    severity.order -= 1
-                severity.save()
+            severities = severities[prev:current + 1]
+            severities = severities[::-1]
+        swap_order(severities)
     return HttpResponse("200 OK")
 
 
@@ -512,19 +503,11 @@ def ticket_status_order(request, slug):
         project = Project.objects.get(slug=slug, organization=request.user.organization)
         ticket_statuses = project.task_statuses.all().order_by('order')
         if prev > current:
-            for ticket_status in ticket_statuses[current:prev + 1]:
-                if ticket_status.order - 1 == prev:
-                    ticket_status.order = current + 1
-                else:
-                    ticket_status.order += 1
-                ticket_status.save()
+            ticket_statuses = ticket_statuses[current:prev + 1]
         else:
-            for ticket_status in ticket_statuses[prev:current + 1]:
-                if ticket_status.order - 1 == prev:
-                    ticket_status.order = current + 1
-                else:
-                    ticket_status.order -= 1
-                ticket_status.save()
+            ticket_statuses = ticket_statuses[prev:current + 1]
+            ticket_statuses = ticket_statuses[::-1]
+        swap_order(ticket_statuses)
     return HttpResponse("200 OK")
 
 
@@ -792,9 +775,9 @@ def taskboard(request, slug, milestone_slug):
     search_filter = (milestone, assigned_to, requirements, tasks, start_date, end_date)
     return render(request, 'project/taskboard.html',
                   {'ticket_status_list': ticket_status_list, 'slug': slug,
+                   'tasks_pro':project.project_tickets.filter(ticket_type='task'),
                    'project_members': mem_details, 'search_filter': search_filter,
                    'notification_list': get_notification_list(request.user)})
-
 
 @active_user_required
 @is_project_member
@@ -812,6 +795,26 @@ def update_taskboard_status(request, slug, status_slug, task_id):
     create_timeline.send(sender=request.user, content_object=task, namespace=msg,
                          event_type="task moved", project=project)
     return HttpResponse("")
+
+
+@active_user_required
+@check_project_admin
+def taskboard_order(request, slug):
+    prev = request.GET.get('prev', False)
+    current = request.GET.get('current', False)
+    status_slug = request.GET.get('status_slug',False)
+    if prev and current and status_slug:
+        prev = int(prev)
+        current = int(current)
+        project = Project.objects.get(slug=slug, organization=request.user.organization)
+        tasks = project.project_tickets.filter(ticket_type='task', status__slug=status_slug).order_by('order')
+        if prev > current:
+            tasks = tasks[current:prev + 1]
+        else:
+            tasks = tasks[prev:current + 1]
+            tasks = tasks[::-1]
+        swap_order(tasks)
+    return HttpResponse("200 OK")
 
 
 @active_user_required
@@ -856,7 +859,7 @@ def load_tasks(request, slug, milestone_slug, status_slug):
 def requirement_tasks(request, slug, milestone_slug, requirement_id):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     milestone = Milestone.objects.get(slug=milestone_slug, project=project)
-    ticket_status_list = TicketStatus.objects.filter(project=project).order_by('id')
+    ticket_status_list = TicketStatus.objects.filter(project=project)
     return render(request, 'project/partials/requirement_tasks.html',
                   {'ticket_status_list': ticket_status_list, 'slug': slug, 'requirement_id': requirement_id,
                    'milestone': milestone, 'notification_list': get_notification_list(request.user)})
@@ -973,7 +976,7 @@ def task_edit(request, slug, milestone_slug, task_id):
         return HttpResponse(json.dumps(json_data), content_type='application/json')
     else:
         requirement_list = project_obj.requirements.filter(milestone__slug=milestone_slug)
-        ticket_status_list = TicketStatus.objects.filter(project=project_obj).order_by('id')
+        ticket_status_list = TicketStatus.objects.filter(project=project_obj)
         assigned_to_list = []
         for member in project_obj.members.all():
             try:
@@ -981,18 +984,23 @@ def task_edit(request, slug, milestone_slug, task_id):
                 assigned_to_list.append(member)
             except:
                 pass
-        return render(request, 'task/add_task.html', {'requirement_list': requirement_list,
-                                                      'ticket_status_list': ticket_status_list,
-                                                      'assigned_to_list': assigned_to_list, 'slug': slug,
-                                                      'task': task, 'milestone': task.milestone}
-                      )
+        return render(request, 'task/add_task.html',
+                      {'requirement_list': requirement_list,
+                      'ticket_status_list': ticket_status_list,
+                      'assigned_to_list': assigned_to_list, 'slug': slug,
+                      'task': task, 'milestone': task.milestone,
+                       'notification_list': get_notification_list(request.user)
+                      })
 
 
 @active_user_required
-@check_project_admin
-def create_issue(request, slug, task_id):
+@is_project_member
+def create_issue_to_ticket(request, slug, task_id):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
-    task = Ticket.objects.get(id=task_id)
+    try:
+        task = Ticket.objects.get(id=task_id)
+    except:
+        task=None
     if request.POST:
         form = CreateIssueForm(request.POST, project=project)
         error = True
@@ -1002,25 +1010,48 @@ def create_issue(request, slug, task_id):
                 name=request.POST.get('name'),
                 slug=slugify(request.POST.get('name')),
                 project=project,
-                assigned_to=project.members.get(id=request.POST.get('assigned_to')),
                 finished_date=request.POST.get('finished_date'),
                 description=request.POST.get('description'),
-                status=project.task_statuses.filter(is_final=False)[0],
+                status=project.task_statuses.get(id=request.POST.get('status')),
                 ticket_type=request.POST.get('issue_type'),
                 severity=project.severities.get(id=request.POST.get('severity')),
                 priority=project.priorities.get(id=request.POST.get('priority')),
                 created_by=request.user
             )
-            issue.reference.add(task)
+            try:
+                assigned_to=project.members.get(id=request.POST.get('assigned_to'))
+                issue.assigned_to = assigned_to
+            except:
+                issue.assigned_to = None
+                pass
+            issue.reference = task
+            issue.order = project.project_tickets.count()+1
+            issue.save()
         return HttpResponse(json.dumps({'error': error, 'form_errors': form.errors}), content_type="json/application")
 
     return render(request, 'task/add_task.html', {'is_issue': True, 'issue_type': ['bug', 'enhancement'],
                                                   'assigned_to_list': project.members.all(),
                                                   'slug': slug,
                                                   'severity_list': project.severities.all(),
-                                                  'priority_list': project.priorities.all()
+                                                  'priority_list': project.priorities.all(),
+                                                  'ticket_status_list':project.task_statuses.all(),
+                                                  'notification_list': get_notification_list(request.user)
                                                   })
-
+@active_user_required
+@is_project_member
+def create_issue(request, slug):
+    project = Project.objects.get(slug=slug, organization=request.user.organization)
+    if request.POST:
+        return create_issue_to_ticket(request, slug, request.POST.get('refer_task') )
+    return render(request, 'task/add_task.html', {'is_issue': True, 'issue_type': ['bug', 'enhancement'],
+                                                  'assigned_to_list': project.members.all(),
+                                                  'slug': slug,
+                                                  'severity_list': project.severities.all(),
+                                                  'priority_list': project.priorities.all(),
+                                                  'tasks' : project.project_tickets.filter(ticket_type='task'),
+                                                  'ticket_status_list':project.task_statuses.all(),
+                                                  'notification_list': get_notification_list(request.user)
+                                                  })
 
 @active_user_required
 @is_project_member
@@ -1181,7 +1212,7 @@ def project_edit(request, slug):
                          event_type="milestone deleted", project=project_obj)
     messages.success(request, 'Successfully updated project - ' + str(project_obj.name) + ' !')
     return render(request, 'project/project_edit.html',
-                  {'milestone_list': milestone_list, 'member_dict': member_dict, 'project_slug': slug})
+                  {'milestone_list': milestone_list, 'member_dict': member_dict, 'project_slug': slug,'notification_list': get_notification_list(request.user)})
 
 
 @active_user_required
@@ -1278,18 +1309,17 @@ def issues(request, slug):
 
     assigned_to_list = request.GET.getlist('assigned_to')
     issue_type_list = request.GET.getlist('issue_type')
-    print issue_type_list
     issues = request.GET.getlist('issue_list')
-    start_date = request.GET.getlist('start_date')
-    end_date = request.GET.getlist('end_date')
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
     search_filter = (assigned_to_list, issue_type_list, issues, start_date, end_date)
-    print search_filter
     return render(request, 'project/issueboard.html',
                   {'project': project, 'slug': slug, 'issue_list': issue_list,
                    'status_list': project.task_statuses.all(),
                    'member_list': project.members.all(),
                    'search_filter': search_filter,
-                   'issue_type_list': ['bug', 'enhancement']
+                   'issue_type_list': ['bug', 'enhancement'],
+                   'notification_list': get_notification_list(request.user)
                    })
 
 
@@ -1308,6 +1338,8 @@ def update_issue(request, slug):
         issue.status = project.task_statuses.get(id=status_id)
     if assigned_to_id:
         issue.assigned_to = project.members.get(id=assigned_to_id)
+    else:
+        issue.assigned_to = None
     issue.save()
     return HttpResponse("200 ok ")
 
@@ -1326,13 +1358,41 @@ def issue_details(request, slug, issue_id):
 def edit_issue(request, slug, issue_id):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     issue = Ticket.objects.get(id=issue_id)
-    print issue
     if request.POST:
         form = CreateIssueForm(request.POST, project=project, instance=issue)
+        error = True
+        task = Ticket.objects.get(id=request.POST.get('refer_task'))
         if form.is_valid():
-            pass
-    return HttpResponseRedirect()
+            error = False
+            issue.name=request.POST.get('name')
+            issue.slug=slugify(request.POST.get('name'))
+            issue.finished_date=request.POST.get('finished_date')
+            issue.description=request.POST.get('description')
+            issue.status=project.task_statuses.get(id=request.POST.get('status'))
+            issue.ticket_type=request.POST.get('issue_type')
+            issue.severity=project.severities.get(id=request.POST.get('severity'))
+            issue.priority=project.priorities.get(id=request.POST.get('priority'))
+            issue.reference=task
+            try:
+                assigned_to=project.members.get(id=request.POST.get('assigned_to'))
+                issue.assigned_to = assigned_to
+            except:
+                issue.assigned_to = None
+                issue.save()
+                pass
+            issue.save()
+        return HttpResponse(json.dumps({'error': error, 'form_errors': form.errors}), content_type="json/application")
 
+    return render(request, 'task/add_task.html', {'is_issue': True, 'issue_type': ['bug', 'enhancement'],
+                                                  'assigned_to_list': project.members.all(),
+                                                  'slug': slug,
+                                                  'severity_list': project.severities.all(),
+                                                  'priority_list': project.priorities.all(),
+                                                  'ticket_status_list':project.task_statuses.all(),
+                                                  'tasks' : project.project_tickets.filter(ticket_type='task'),
+                                                  'issue_old': issue,
+                                                  'notification_list': get_notification_list(request.user)
+                                                  })
 
 @active_user_required
 @is_project_member
