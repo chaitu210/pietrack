@@ -95,7 +95,8 @@ a {
 /* header */
 header {
   padding-bottom: 20px;
-  z-index: 10000;
+  z-index: 9995;
+  /*changed the value from 10000 to 9995*/
   /*border-bottom:2px solid #eee;*/
 }
 header .logo {
@@ -306,7 +307,7 @@ header .text .tag {
   font-size: 18px;
   font-weight: bold;
   margin-top: 0px;
-  text-transform: uppercase;
+  text-transform: capitalize;
   margin-bottom: 13px;
 }
 .login_content .form_div .border_div .content_wrap .ticket .tag_description {
@@ -326,7 +327,7 @@ header .text .tag {
   border-radius: 0px;
   padding: 3px 13px;
   font-size: 11px;
-  text-transform: uppercase;
+  text-transform: capitalize;
   font-weight: bold;
 }
 .login_content .form_div .border_div .content_wrap .icon_div {
@@ -432,7 +433,7 @@ header .text .tag {
   color: #63ADBA;
   font-size: 11px;
   font-weight: bold;
-  text-transform: uppercase;
+  text-transform: capitalize;
 }
 .login_content .form_div .forgot_flap {
   top: -80px;
@@ -441,7 +442,7 @@ header .text .tag {
   width: 100%;
 }
 .login_content .form_div .form-group label {
-  text-transform: uppercase;
+  text-transform: capitalize;
   text-align: left;
 }
 .login_content .form_div .form-group .form-control {
@@ -458,14 +459,14 @@ header .text .tag {
   letter-spacing: 1px;
   display: inherit;
   background-color: #3c7c88;
-  text-transform: uppercase;
+  text-transform: capitalize;
   font-weight: bold;
   border: none;
   box-shadow: none;
   border-radius: 3px;
 }
 .login_content .form_div .form-group .tag_text {
-  text-transform: uppercase;
+  text-transform: capitalize;
   color: #3c7c88;
   font-weight: bold;
   display: block;
@@ -473,7 +474,7 @@ header .text .tag {
 }
 .login_content .form_div .form-group .tag_text a {
   color: #fff;
-  text-transform: uppercase;
+  text-transform: capitalize;
 }
 /* login content */
 /* login */
@@ -1291,6 +1292,7 @@ header .text .tag {
   clear: both;
   font-size: 10px;
   text-transform: capitalize;
+  /*capitalize*/
 }
 #base_content_vertical {
   margin-top: 45px;
@@ -1326,7 +1328,7 @@ header .text .tag {
   font-weight: bold;
   margin-top: 0px;
   margin-bottom: 10px;
-  text-transform: uppercase;
+  text-transform: capitalize;
 }
 .create_project .content_box .title .tag {
   line-height: 19px;
@@ -1383,7 +1385,7 @@ header .text .tag {
 }
 .create_project .content_box .panel_box label {
   font-weight: 600;
-  text-transform: uppercase;
+  text-transform: capitalize;
   color: #333436;
   margin-bottom: 5px;
   font-size: 13px;
@@ -1415,7 +1417,7 @@ header .text .tag {
 .create_project .content_box .panel_box button {
   padding: 7px;
   font-size: 13px;
-  text-transform: uppercase;
+  text-transform: capitalize;
   font-weight: bold;
   width: 100%;
   box-shadow: none;
@@ -1441,7 +1443,7 @@ header .text .tag {
   color: #00c1a4;
   font-weight: bold;
   padding: 10px 30px;
-  text-transform: uppercase;
+  text-transform: capitalize;
 }
 .list_of_projects .title .center .right {
   float: right;
@@ -1449,7 +1451,7 @@ header .text .tag {
 .list_of_projects .title .center .right button {
   background: #00c1a4;
   color: #fff;
-  text-transform: uppercase;
+  text-transform: capitalize;
   font-size: 11px;
   font-weight: bold;
   padding: 10.5px 30px;
@@ -1510,6 +1512,7 @@ header .text .tag {
   color: #0099e8;
   line-height: 15px;
   text-transform: capitalize;
+  /*capitalize*/
   font-weight: 400;
   font-size: 13px;
 }
@@ -1524,7 +1527,7 @@ header .text .tag {
 .project_description .about_project_wrap .title span {
   font-size: 15x;
   font-weight: 600;
-  text-transform: uppercase;
+  text-transform: capitalize;
   color: #00c1a4;
   background: #000;
   padding: 14px 28px;
@@ -1638,7 +1641,7 @@ header .text .tag {
 }
 .project_description .about_project_wrap .mile_stone_wrap .mile_stone_each .milestone_container .title {
   display: block;
-  /*text-transform: uppercase;*/
+  /*text-transform: capitalize;*/
   margin-top: 5px;
   text-align: center;
   font-size: 18px;
@@ -1697,6 +1700,7 @@ header .text .tag {
 }
 .project_description .about_project_wrap .mile_stone_wrap .mile_stone_each .milestone_container .author .name {
   text-transform: capitalize;
+  /*capitalize*/
 }
 .project_description .about_project_wrap .mile_stone_wrap .mile_stone_each .milestone_container .count_wrap {
   display: block;
@@ -1885,6 +1889,7 @@ header .text .tag {
 }
 .project_description .about_project_wrap .ticket .description .name {
   text-transform: capitalize;
+  /*capitalize*/
   color: #333436;
   font-weight: 600;
   font-size: 12px;
@@ -1925,7 +1930,7 @@ header .text .tag {
 .project_description .team .title span {
   font-size: 15x;
   font-weight: 600;
-  text-transform: uppercase;
+  text-transform: capitalize;
   color: #00c1a4;
   background: #000;
   padding: 14px 28px;
@@ -2039,7 +2044,7 @@ header .text .tag {
 }
 .project_description .team .mile_stone_wrap .mile_stone_each .milestone_container .title {
   display: block;
-  /*text-transform: uppercase;*/
+  /*text-transform: capitalize;*/
   margin-top: 5px;
   text-align: center;
   font-size: 18px;
@@ -2098,6 +2103,7 @@ header .text .tag {
 }
 .project_description .team .mile_stone_wrap .mile_stone_each .milestone_container .author .name {
   text-transform: capitalize;
+  /*capitalize*/
 }
 .project_description .team .mile_stone_wrap .mile_stone_each .milestone_container .count_wrap {
   display: block;
@@ -2286,6 +2292,7 @@ header .text .tag {
 }
 .project_description .team .ticket .description .name {
   text-transform: capitalize;
+  /*capitalize*/
   color: #333436;
   font-weight: 600;
   font-size: 12px;
@@ -2426,7 +2433,7 @@ header .text .tag {
 }
 #box-content .right-container .content-panel .content_box .panel_box label {
   font-weight: 600;
-  text-transform: uppercase;
+  text-transform: capitalize;
   color: #333436;
   margin-bottom: 5px;
   font-size: 13px;
@@ -2459,7 +2466,7 @@ header .text .tag {
 }
 #box-content .right-container .content-panel .content_box .panel_box .special-button {
   padding: 7px;
-  text-transform: uppercase;
+  text-transform: capitalize;
   font-size: 13px;
   font-weight: bold;
   width: 15%;
@@ -2588,7 +2595,7 @@ header .text .tag {
 }
 .modal .modal-content .modal-body label {
   font-weight: 600;
-  text-transform: uppercase;
+  text-transform: capitalize;
   color: #fff;
   margin-bottom: 5px;
   font-size: 13px;
@@ -2623,7 +2630,7 @@ header .text .tag {
   border: none;
   font-size: 12px;
   font-weight: bold;
-  text-transform: uppercase;
+  text-transform: capitalize;
   border-radius: 0px;
 }
 /* modal styles ends here */
@@ -2684,7 +2691,7 @@ header .text .tag {
   color: #fff;
   font-size: 15px;
   font-weight: 500;
-  text-transform: uppercase;
+  text-transform: capitalize;
   margin-bottom: 8px;
 }
 .lists_div .task_category_wrap ul {
@@ -2772,7 +2779,7 @@ header .text .tag {
   color: #fff;
   font-size: 14px;
   font-weight: 500;
-  text-transform: uppercase;
+  text-transform: capitalize;
   margin-bottom: 8px;
 }
 .lists_div .requirement_list_panel ul {
@@ -3031,7 +3038,7 @@ header .text .tag {
   border: 1px solid #00a88e;
   background: #00c1a4;
   border-radius: 2px;
-  text-transform: uppercase;
+  text-transform: capitalize;
 }
 .comments_wrap_div .comment_each .comment_text .reply_button .reply i {
   padding-right: 8px;
@@ -3047,7 +3054,7 @@ header .text .tag {
   border: 1px solid #0088cf;
   background: #0099e8;
   border-radius: 2px;
-  text-transform: uppercase;
+  text-transform: capitalize;
 }
 .comments_wrap_div .comment_each .comment_text .reply_button .edit i {
   padding-right: 8px;
@@ -3063,7 +3070,7 @@ header .text .tag {
   border: 1px solid #ff484b;
   background: #ff6264;
   border-radius: 2px;
-  text-transform: uppercase;
+  text-transform: capitalize;
 }
 .comments_wrap_div .comment_each .comment_text .reply_button .delete i {
   padding-right: 8px;
@@ -3370,7 +3377,7 @@ input[readonly] {
   border: 1px solid #00a88e;
   background: #00c1a4;
   border-radius: 2px;
-  text-transform: uppercase;
+  text-transform: capitalize;
 }
 .edit_comment_text .save_comment i {
   padding-right: 8px;
@@ -3387,7 +3394,7 @@ input[readonly] {
   border: 1px solid #00a88e;
   background: #00c1a4;
   border-radius: 2px;
-  text-transform: uppercase;
+  text-transform: capitalize;
 }
 .edit_comment_text .cancel_comment i {
   padding-right: 8px;

@@ -133,6 +133,8 @@ def create_project(request):
 def list_of_projects(request):
     template_name = 'project/projects_list.html'
     projects_list = Project.objects.filter(members__email=request.user.email, organization=request.user.organization)
+    if not projects_list:
+        return HttpResponseRedirect(reverse('project:create_project'))
     dict_items = {'projects_list': projects_list, 'notification_list': get_notification_list(request.user)}
     return render(request, template_name, dict_items)
 
@@ -1326,8 +1328,12 @@ def issues(request, slug):
 def update_issue(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     issue = Ticket.objects.get(id=request.GET.get('issue_id'))
+    ticket_type = request.GET.get('ticket_type', False)
     status_id = request.GET.get('status', False)
     assigned_to_id = request.GET.get('assigned_to', False)
+    print ticket_type
+    if ticket_type:
+        pass
     if status_id:
         issue.status = project.task_statuses.get(id=status_id)
     if assigned_to_id:

@@ -20,7 +20,7 @@ btn,button,a{
 /* header */
 header{
 	padding-bottom: 20px;
-	z-index: 10000;
+	z-index: 9995; /*changed the value from 10000 to 9995*/
 	/*border-bottom:2px solid #eee;*/
 	.logo{
 		margin: 0px auto;
@@ -249,7 +249,7 @@ header{
 						font-size: 18px;
 						font-weight: bold;
 						margin-top: 0px;
-						text-transform: uppercase;
+						text-transform: capitalize;
 						margin-bottom: 13px;
 					}
 					.tag_description{
@@ -269,7 +269,7 @@ header{
 						border-radius: 0px;
 						padding: 3px 13px;
 						font-size: 11px;
-						text-transform: uppercase;
+						text-transform: capitalize;
 						font-weight: bold;
 					}
 				}
@@ -343,7 +343,7 @@ header{
 			color: #63ADBA;
 			font-size: 11px;
 			font-weight: bold;
-			text-transform: uppercase;
+			text-transform: capitalize;
 		}
 		.forgot_flap{
 			top: -80px;
@@ -351,7 +351,7 @@ header{
 		.form-group{
 			width: 100%;
 			label{
-				text-transform: uppercase;
+				text-transform: capitalize;
 				text-align: left;
 			}
 			.form-control{
@@ -368,21 +368,21 @@ header{
 				letter-spacing: 1px;
 				display: inherit;
 				background-color: @login_button_bg;
-				text-transform: uppercase;
+				text-transform: capitalize;
 				font-weight: bold;
 				border:none;
 				box-shadow: none;
 				border-radius: 3px;
 			}
 			.tag_text{
-				text-transform: uppercase;
+				text-transform: capitalize;
 				color: @login_button_bg;
 				font-weight: bold;
 				display: block;
 				text-align: center;
 				a{
 				color: #fff;
-				text-transform: uppercase;
+				text-transform: capitalize;
 				}
 			}
 		}
@@ -857,7 +857,7 @@ header{
 					display: block;
 					clear: both;
 					font-size: 10px;
-					text-transform: capitalize;
+					text-transform: capitalize; /*capitalize*/
 				}
 			}
 		}
@@ -894,7 +894,7 @@ header{
 				font-weight: bold;
 				margin-top: 0px;
 				margin-bottom: 10px;
-				text-transform: uppercase;
+				text-transform: capitalize;
 			}
 			.tag{
 				line-height: 19px;
@@ -951,7 +951,7 @@ header{
 			}
 			label{
 				font-weight: 600;
-				text-transform: uppercase;
+				text-transform: capitalize;
 				color: @heading_color;
 				margin-bottom: 5px;
 				font-size:13px;
@@ -979,7 +979,7 @@ header{
 			button{
 				padding: 7px;
 				font-size: 13px;
-				text-transform: uppercase;
+				text-transform: capitalize;
 				font-weight: bold;
 				width: 100%;
 				box-shadow: none;
@@ -1003,14 +1003,14 @@ header{
 				color: @green;
 				font-weight: bold;
 				padding: 10px 30px;
-				text-transform: uppercase;
+				text-transform: capitalize;
 			}
 			.right{
 				float: right;
 				button{
 					background: @green;
 					color: #fff;
-					text-transform: uppercase;
+					text-transform: capitalize;
 					font-size: 11px;
 					font-weight: bold;
 					padding: 10.5px 30px;
@@ -1074,7 +1074,7 @@ header{
 								text-align: right;
 								color: @blue;
 								line-height: 15px;
-								text-transform: capitalize;
+								text-transform: capitalize; /*capitalize*/
 								font-weight: 400;
 								font-size:13px;
 
@@ -1096,7 +1096,7 @@ header{
 			span{
 				font-size: 15x;
 				font-weight: 600;
-				text-transform: uppercase;
+				text-transform: capitalize;
 				color: @green;
 				background: #000;
 				padding: 14px 28px;
@@ -1209,7 +1209,7 @@ header{
 					}
 					.title{
 						display: block;
-						/*text-transform: uppercase;*/
+						/*text-transform: capitalize;*/
 						margin-top: 5px;
 						text-align: center;
 						font-size: 18px;
@@ -1250,7 +1250,7 @@ header{
 						padding-bottom: 15px;
 						font-size: 13px;
 						.name{
-							text-transform: capitalize;
+							text-transform: capitalize; /*capitalize*/
 						}
 					}
 					.count_wrap{
@@ -1442,7 +1442,7 @@ header{
 				color: @font_color;
 				font-size:13px;
 				.name{
-					text-transform: capitalize;
+					text-transform: capitalize; /*capitalize*/
 					color: @heading_color;
 					font-weight: 600;
 					font-size: 12px;
@@ -1516,7 +1516,7 @@ header{
 			padding-top: 10px; /* added this line for left nav-menu */
 		}
 	/*nav-left ends here */
-	
+
 	/* right container starts hetre */
 		.right-container{
 			margin-left:250px;
@@ -1573,7 +1573,7 @@ header{
 						  	a{
 							  color: #fff;
 							  border: 1px solid #7bb344;
-							  background: #7bb344;	
+							  background: #7bb344;
 							  display:inline-block;
 							  font-size: 13px;
 						 	  font-weight: bold;
@@ -1595,13 +1595,13 @@ header{
 							  font-weight:normal;
 							  text-transform:none;
 							  text-align:center;
-						  }	
+						  }
 					}
 					.panel_box{
 						position:relative;
 						label{
 							  font-weight: 600;
-							  text-transform: uppercase;
+							  text-transform: capitalize;
 							  color: #333436;
 							  margin-bottom: 5px;
 							  font-size: 13px;
@@ -1629,7 +1629,7 @@ header{
 						}
 						.special-button {
 						  padding: 7px;
-						  text-transform: uppercase;
+						  text-transform: capitalize;
 						  font-size: 13px;
 						  font-weight: bold;
 						  width: 15%; /* changed value from 100 to 15 */
@@ -1766,7 +1766,7 @@ header{
 				padding:0px 15px 10px 15px;
 				label{
 					  font-weight: 600;
-					  text-transform: uppercase;
+					  text-transform: capitalize;
 					  color: #fff;
 					  margin-bottom: 5px;
 					  font-size: 13px;
@@ -1801,7 +1801,7 @@ header{
 					  border: none;
 					  font-size: 12px;
 					  font-weight: bold;
-					  text-transform: uppercase;
+					  text-transform: capitalize;
 					  border-radius: 0px;
 				}
 			}
@@ -1864,7 +1864,7 @@ header{
 			color: #fff;
 			font-size: 15px;
 			font-weight: 500;
-			text-transform: uppercase;
+			text-transform: capitalize;
 			margin-bottom: 8px;
 		}
 		ul{
@@ -1956,7 +1956,7 @@ header{
 			color: #fff;
 			font-size: 14px;
 			font-weight: 500;
-			text-transform: uppercase;
+			text-transform: capitalize;
 			margin-bottom: 8px;
 		}
 		ul{
@@ -2175,7 +2175,7 @@ header{
 				  border: 1px solid darken(@green, 5%);
 				  background: @green;
 				  border-radius: 2px;
-				  text-transform: uppercase;
+				  text-transform: capitalize;
 				  i {
 					padding-right: 8px;
 				  }
@@ -2193,7 +2193,7 @@ header{
 					border:1px solid darken(@blue,5%);
 					background: @blue;
 					border-radius: 2px;
-					text-transform: uppercase;
+					text-transform: capitalize;
 					i{
 						padding-right: 8px;
 					}
@@ -2211,7 +2211,7 @@ header{
 					border:1px solid darken(@red,5%);
 					background: @red;
 					border-radius: 2px;
-					text-transform: uppercase;
+					text-transform: capitalize;
 					i{
 						padding-right: 8px;
 					}
