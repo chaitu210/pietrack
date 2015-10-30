@@ -249,6 +249,8 @@ class Severity(models.Model):
 
     class Meta:
         unique_together = ("project", "name")
+        ordering = ['order']
+
 
     def __str__(self):
         return self.name
@@ -269,7 +271,7 @@ class Ticket(models.Model):
     order = models.IntegerField(default=1)
     description = models.TextField(null=False, blank=True, verbose_name=_("description"))
     attachments = models.ManyToManyField(Attachment, blank=True)
-    reference = models.ManyToManyField('self', related_name='references', blank=True)
+    reference = models.ForeignKey('self', related_name='references', null=True, blank=True)
     status = models.ForeignKey(TicketStatus, null=True, blank=True, related_name="tickets", verbose_name=_("status"))
     severity = models.ForeignKey(Severity, null=True, blank=True, related_name="severity_tickets",
                                  verbose_name=_("severity"))

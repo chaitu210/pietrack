@@ -340,12 +340,13 @@
         });
         e.preventDefault();
     });
-
+    {% if tasks_pro %}
     if ($('#tasks_container li[id]').length == 0) {
         $('#not_found').show();
         setTimeout(function () {
             $('#not_found').hide();
         }, 4000);
     }
+    {% endif %}
   </script>
 {% endblock%}
