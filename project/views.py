@@ -33,11 +33,7 @@ def check_project_admin(view):
 
     def inner(request, slug, *args, **kwargs):
         try:
-
-            role = Role.objects.get(users=request.user, project__slug=slug,
-                                    project__organization=request.user.organization)
-
-            if role.is_project_admin:
+            if request.user.projects.get(slug=slug).admins.filter(id=request.user.id):
                 return wraps(view)(view(request, slug, *args, **kwargs))
             elif request.user.pietrack_role == 'admin':
                 return wraps(view)(view(request, slug, *args, **kwargs))
@@ -530,6 +526,17 @@ def password_reset(request, to_email):
 @is_project_member
 def project_team(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
+    user = request.user
+    if request.POST:
+        member = project.members.get(id=request.POST.get('user_id'))
+        if project.admins.filter(id=request.POST.get('user_id')):
+            project.admins.remove(member)
+        else:
+            project.admins.add(member)
+        text = True
+        if member.pietrack_role == 'admin':
+            text = False
+        return HttpResponse(json.dumps({'result':text}),content_type="application/json")
     dictionary = {'project': project, 'slug': slug, 'notification_list': get_notification_list(request.user)}
     return render(request, 'settings/team.html', dictionary)
 
@@ -663,7 +670,6 @@ def member_roles(request, slug):
     list_of_roles = Role.objects.filter(project=project)
     dictionary = {'list_of_roles': list_of_roles, 'slug': slug,
                   'notification_list': get_notification_list(request.user), 'project': project}
-
     return render(request, 'settings/member_roles.html', dictionary)
 
 
@@ -672,15 +678,12 @@ def member_roles(request, slug):
 def member_roles_default(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     Role.objects.bulk_create(
-        [Role(name='Project Admin', slug=slugify('Project Admin'), project=project, is_project_admin=True),
-         Role(name='UX Developer', slug=slugify('UX Developer'), project=project),
+        [Role(name='UX Developer', slug=slugify('UX Developer'), project=project),
          Role(name='Web Designer', slug=slugify('Web Designer'), project=project),
          Role(name='Front-end Developer', slug=slugify('Front-end Developer'), project=project),
-         Role(name='Back-end Developer', slug=slugify('Back-end Developer'), project=project)])
-    roles = Role.objects.filter(is_project_admin=True)
-    for role in roles:
-        role.users.add(request.user)
-        role.save()
+         Role(name='Back-end Developer', slug=slugify('Back-end Developer'), project=project)]
+    )
+
     messages.success(request, 'Default user roles are added to the User roles page !')
     return HttpResponse(json.dumps({'error': False}), content_type="application/json")
 

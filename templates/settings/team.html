@@ -70,9 +70,9 @@
                                         <div class="toggle_user_admin">
                                             <a href="#">
                                             {% if member.pietrack_role == 'admin' or member|is_project_admin:slug %}
-                                                <i class="fa fa-toggle-on"></i> Yes
+                                                <i class="fa fa-toggle-on"></i><span name="state"> Yes </span>
                                                 {% else %}
-                                                <i class="fa fa-toggle-off"></i> No
+                                                <i class="fa fa-toggle-off"></i><span name="state"> No </span>
                                                 {% endif %}
                                             </a>
 
@@ -125,7 +125,7 @@
 
 {% block extra_js %}
 
-    <script>
+<script>
         function delete_member(id){
             $.get("{% url 'project:delete_member' slug%}"+"?id="+id, function(response){
                 if(response['result'])
@@ -134,9 +134,30 @@
                 }
             });
         }
-    </script>
-    <script type="text/javascript">
-        $('#project_members').addClass('active');
-    </script>
+</script>
+<script type="text/javascript">
+    $('#project_members').addClass('active');
+{% if request.user|is_project_admin:slug %}
+    $('.toggle_user_admin').on('click',function(e){
+        $text = $(this).find('a > span[name="state"]')
+        $icon = $(this).find('a > i')
+        var user_id = $(this).closest('tr').attr('id')
+        data = "csrfmiddlewaretoken={{ csrf_token }}&user_id="+user_id
+
+        $.post('',data,function(response){
+            if(response['result']){
+                if($text.text().trim() == 'Yes' &&  $icon.hasClass('fa-toggle-on') ){
+                    $text.text(" No ");
+                    $icon.attr('class', 'fa fa-toggle-off')
+                }
+                else{
+                    $text.text(" Yes ");
+                    $icon.attr('class', 'fa fa-toggle-on')
+                }
+            }
+        });
+    });
+{% endif %}
+</script>
 
 {% endblock %}

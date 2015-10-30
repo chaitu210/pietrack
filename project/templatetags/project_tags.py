@@ -92,6 +92,8 @@ def Team_mem(task):
 @register.filter
 def get_user_Role(user, project):
     try:
+        if user.pietrack_role=='admin':
+            return "Organization Admin"
         return Role.objects.get(users=user, project=project)
     except Exception, e:
         return user.pietrack_role
@@ -100,8 +102,11 @@ def get_user_Role(user, project):
 @register.filter
 def is_project_admin(user, slug):
     try:
-        return Role.objects.get(users=user, project__slug=slug,
-                                project__organization=user.organization).is_project_admin
+        if user.pietrack_role == 'admin':
+            return True
+        elif user.projects.get(slug=slug).admins.filter(id=user.id):
+            return True
+        return False
     except:
         return False
 
