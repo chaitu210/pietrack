@@ -73,7 +73,9 @@
 {%block extra_js %}
 
     <script type="text/javascript">
-        CKEDITOR.replace('description');
+        CKEDITOR.replace('description', {
+            customConfig: "{% static 'js/custom/ckeditor_config.js' %}"
+        });
     </script>
 
   <script type="text/javascript">
