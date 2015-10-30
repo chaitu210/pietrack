@@ -15,7 +15,10 @@ def add_task(request, slug, milestone_slug):
         if add_task_form.is_valid():
             json_data['error'] = False
             task = add_task_form.save()
-            msg = "created " + task.name + " in requirement " + task.requirement.name + " of milestone " + task.milestone.name
+            if task.requirement:
+                msg = "created " + task.name + " in requirement " + task.requirement.name + " of milestone " + task.milestone.name
+            else:
+                msg = "created " + task.name
             create_timeline.send(sender=request.user, content_object=task, namespace=msg,
                          event_type="task created", project=project_obj)
             msg = "task " + task.name + " is assigned to " + task.assigned_to.username
