@@ -10,7 +10,8 @@ from django.utils.http import urlsafe_base64_encode
 from django.utils.translation import ugettext, ugettext_lazy as _
 from .tasks import celery_send_mail
 from piebase.models import Project, Priority, Severity, Organization, User, TicketStatus, Role, Milestone, Requirement, \
-    Comment
+    Comment, Ticket
+from django.db.models import Q
 from django.template.defaultfilters import slugify
 from django.utils import timezone
 from django.core.exceptions import ValidationError
@@ -337,6 +338,7 @@ class CreateIssueForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         self.project = kwargs.pop('project', None)
+        self.instance = kwargs.pop('instance', None)
         super(CreateIssueForm, self).__init__(*args, **kwargs)
 
     def clean_finished_date(self):
@@ -344,3 +346,12 @@ class CreateIssueForm(forms.Form):
         if date < datetime.date.today():
             raise ValidationError("The date should not be passed")
         return date
+
+    def clean_name(self):
+        name = self.cleaned_data['name']
+        if self.instance:
+           if  Ticket.objects.filter(~Q(ticket_type='task')).exclude(slug=self.instance.slug).filter(slug=slugify(name)):
+               raise ValidationError("Issue with this name already exists.")
+        elif Ticket.objects.filter(~Q(ticket_type='task')).filter(slug=slugify(name)):
+            raise ValidationError("Issue with this name already exists.")
+        return name
