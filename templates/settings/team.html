@@ -34,7 +34,7 @@
                     </div>
                     <!-- status table starts here -->
                     <div class="table-responsive member-box">
-                        <table class="table table-hover">
+                        <table class="table table-hover" id="member_roles">
                             <thead>
                                 <tr>
                                     <th>Member</th>
@@ -79,7 +79,17 @@
                                         </div>
                                     </td>
                                     <td>
-                                        <p>{{ member|get_user_Role:project|title }}</p>
+                                        {% if member.pietrack_role == 'admin' %}
+                                            <select class="form-control" name="" disabled>
+                                                <option value="">{{ member|get_user_Role:project|title }}</option>
+                                            </select>
+                                        {% else %}
+                                            <select class="form-control" name="designation" disabled>
+                                            {% for role in project.roles.all %}
+                                                <option value="{{ role.id }}" {%if role == member|get_user_Role:project %}selected{% endif %}>{{role}}</option>
+                                            {% endfor %}
+                                            </select>
+                                        {% endif %}
                                     </td>
                                     <td>
                                         <span class="active-1 status">
@@ -89,7 +99,7 @@
                                     </td>
                                 {% if request.user.pietrack_role == 'admin' or request.user|is_project_admin:slug %}
                                     {% if request.user.pietrack_role == 'admin' %}
-                                        {% if request.user != member or member|get_user_Role:project != request.user.pietrack_role  %}
+                                        {% if request.user != member %}
                                         <td class="actions">
                                         <a href="{% url 'project:edit_member' slug %}?id={{member.id}}" class="edit"><i class="fa fa-edit"></i></a>
                                         <a href="#" class="delete" onclick="delete_member('{{member.id}}')">
@@ -158,6 +168,37 @@
         });
     });
 {% endif %}
+
+/*$('#member_roles i.fa.fa-edit').click(
+  function(e){
+      $(this).closest('tr').find('select').attr('disabled',false)
+      $(this).attr('class','glyphicon glyphicon-floppy-saved')
+      e.preventDefault();
+  }
+);
+*/
+$('.edit').on('click',function(e) {
+    if($(this).find('i').attr('class') == 'fa fa-edit')
+    {
+         $(this).closest('tr').find('select').attr('disabled',false)
+         $(this).find('i').attr('class','glyphicon glyphicon-floppy-saved')
+    }
+    else{
+        role_id = $(this).closest('tr').find('select').val()
+        url = $(this).closest('a').attr('href')
+        url = url+'&role_id='+role_id
+        $instance = $(this)
+        $.get(url,function(response){
+          if(response['result']){
+            $instance.closest('tr').find('select').attr('disabled',true)
+            $instance.find('i').attr('class','fa fa-edit')
+          }
+        });
+
+    }
+    e.preventDefault();
+});
+
 </script>
 
 {% endblock %}
