@@ -301,3 +301,17 @@ class Timeline(models.Model):
 
     def __str__(self):
         return self.namespace
+
+
+class Labels(models.Model):
+    name = models.CharField(max_length=255, verbose_name=_("name"))
+    slug = models.SlugField(max_length=255, null=False, blank=True, verbose_name=_("slug"))
+    color = models.CharField(max_length=20, default="#999999", verbose_name=_("color"))
+    project = models.ForeignKey(Project, related_name="labels", verbose_name=_("project"))
+    order = models.IntegerField(default=1, blank=True)
+
+    class Meta:
+        ordering = ['order']
+
+    def __str__(self):
+        return self.name

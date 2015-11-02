@@ -1,0 +1,260 @@
+{% extends 'settings/base.html' %}
+{% load static %}
+{% load staticfiles %}
+{% block settings_content %}
+    <div class="right-container">
+        <div class="panel panel-default content-panel">
+            <div class="panel-body">
+                <!-- content box starts here -->
+                <div class="content_box">
+                    <div class="title">
+                        <h4><span class="status">{{ slug}} - LABELS </span></h4>
+                        <div class="tag">
+                            Specify the Labels here.
+                        </div>
+                        <span class="new"><a href="#" id="add_new">Add New Label</a></span>
+                    </div>
+                    <!-- status table starts here -->
+                    <div class="table-responsive color-box">
+                            <table class="table table-striped" id="labels">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th width="40%">Color</th>
+                                        <th>Name</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                            {% if labels_list %}
+                                {% for label in labels_list%}
+                                    <tr id="{{label.id}}">
+                                        <td>
+                                            <span class="glyphicon glyphicon-move"></span>
+                                            {% csrf_token %}
+                                            <input name="id" value="{{label.id}}" type="hidden"/>
+                                        </td>
+                                        <td scope="row">
+                                            <div class="input-group colorpicker-component demo demo-auto">
+                                                <input name="color" type="text" value="{{label.color}}" class="form-control" />
+                                                <span class="input-group-addon">
+                                                    <i style="cursor: default;"></i>
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <input name="name" value="{{ label.name }}" type="text" class="form-control" readonly>
+                                        </td>
+                                        <td class="actions">
+                                            <a href="#" class="edit" >
+                                                <i class="fa fa-edit"></i>
+                                            </a>
+                                            <a href="#" class="delete" onclick="delete_label('{{label.slug}}','{{label.id}}')">
+                                                <i class="fa fa-trash"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor%}
+                            {% endif %}
+                                </tbody>
+                            </table>
+
+                       {% if not labels_list %}
+                            <div style="text-align: center">
+                                Please create a new label or use
+                                    <span class="badge" id="create_default">
+                                        <a href="{% url 'project:labels_default' slug %}">default</a>
+                                    </span> labels list !
+                            </div>
+                        {% endif %}
+                        <!-- add form start -->
+                        <form action="" method="post" style="display:none;" id="add_form">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <td></td>
+                                        <th width="40%"></th>
+                                        <th></th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            {% csrf_token %}
+                                            <span class="glyphicon glyphicon-move"></span>
+                                        </td>
+                                        <td scope="row">
+                                            <div class="input-group colorpicker-component demo demo-auto">
+                                                <input name="color" type="text" value="#666666" class="form-control" />
+                                                <span class="input-group-addon"><i style="cursor: default;background-color: rgb(102, 102, 102);"></i></span>
+                                                <span class="input-empty-error" name="color"></span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <input name="name" value="" type="text" class="form-control" style="border:1px solid #000;" placeholder="Label name" autofocus/>
+                                            <span class="input-empty-error" name="name"></span>
+                                        </td>
+                                        <td class="actions">
+                                            <button type="submit" class="edit" style="border:none;"><i class="glyphicon glyphicon-floppy-saved"></i></button>
+                                            <a class="delete" id="id_reset"><span class="glyphicon glyphicon-remove"></span></a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </form>
+                        <!-- edit form ends here -->
+                    </div>
+                    <!-- status table ends here -->
+                    <!-- content box starts here -->
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock settings_content %}
+{% block extra_js%}
+<script type="text/javascript" src="http://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+<script>
+    $('#labels').addClass('active');
+
+    function clear_form() {
+        var form = $('form');
+        form.css('display', 'none');
+        form.find('input[name="name"]').val('');
+        form.find('input[name="color"]').val('#666666');
+        form.find('input[name="name"]').css({border:'1px solid #000'});
+        form.find('input[name="color"]').css({border:'none'});
+        form.find('input[name="name"]').attr('placeholder','Label Name');
+        form.find('input[name="color"]').attr('placeholder','Choose Color');
+        $('form div span i').css({'cursor': 'default','background-color': 'rgb(102, 102, 102)'})
+
+    }
+
+    function delete_label(slug, id) {
+        $.get('/project/{{slug}}/settings/labels/' + slug + '/delete/', function(response) {
+            if (!response.error) {
+                $('#' + id).remove();
+            }
+        });
+    }
+
+    $('#add_new').on('click', function() {
+        clear_form();
+        $('form').css('display', 'block');
+        $('form').find('input[name="name"]').focus();
+        var $target = $('html,body');
+        $target.animate({scrollTop: $target.height()}, 1000);
+
+    });
+
+    $('#id_reset').on('click', function() {
+        clear_form();
+    });
+
+    $('#add_form').on('submit', function(e) {
+        e.preventDefault();
+        $instance = $(this);
+        $.post('{% url "project:labels_create" slug %}', $('#add_form').serialize(), function(response) {
+           if (response.error) {
+               $instance.find('input').css({border: 'none'});
+               for (var key in response['errors']) {
+                   $input = $instance.find('input[name="' + key + '"]');
+                   $input.val("");
+                   $input.attr('placeholder',response['errors'][key]);
+                   $input.css({border: 'solid 1px #FF0000'});
+               }
+           }
+           else {
+                var name = response['name'];
+                var color = response['color'];
+                var row_id = response['proj_id'];
+                var slug = response['slug'];
+
+                data_row = "<tr id=\"" + row_id + "\"><td><input name='id' value='"+row_id+"' type='hidden'><span class=\"glyphicon glyphicon-move\"></span>"+"{% csrf_token %}"+"</td><td scope=\"row\"><div class=\"input-group colorpicker-component demo demo-auto\"><input name=\"color\" type=\"text\" value=\"" + color + "\" class=\"form-control\"/><span class=\"input-group-addon\"><i></i></span></div></td><td><input name=\"name\" value=\""+name+"\" type=\"text\" class=\"form-control\" style=\"background:#fff\"></td><td class=\"actions\"><a href=\"#\" class=\"edit\"><i class=\"fa fa-edit\"></i></a>&nbsp;<a href=\"#\" class=\"delete\" onclick=\"delete_label('" + slug + "','" + row_id + "')\"><i class=\"fa fa-trash\"></i></a></td></tr>"
+                $('#labels tbody').append(data_row);
+                $('.demo').colorpicker();
+                clear_form();
+            }
+        });
+    });
+
+    $('#create_default').on('click', function(event){
+        event.preventDefault();
+        $.get("{% url 'project:labels_default' slug %}", function(response){
+           if(response){
+               window.location="/project/{{slug}}/settings/labels/";
+           }
+        });
+    });
+
+        /* table sortables */
+    var fixHelperModified = function(e, tr) {
+        var $originals = tr.children();
+        var $helper = tr.clone();
+        $helper.children().each(function(index) {
+            $(this).width($originals.eq(index).width())
+        });
+        return $helper;
+    },
+    updateIndex = function(e, ui) {
+        $('td.index', ui.item.parent()).each(function (i) {
+            $(this).html(i + 1);
+        });
+        var prev = ui.item.startPos;
+        var current = ui.item.index();
+        console.log(prev, current);
+        if(prev != current){
+            $.get("{% url 'project:labels_order' slug %}"+"?prev="+prev+"&current="+current);
+        }
+    };
+
+    $("#labels tbody").sortable({
+        helper: fixHelperModified,
+        stop: updateIndex,
+        start: function(event, ui) {
+            ui.item.startPos = ui.item.index();
+            ui.item.id = ui.item.id
+        },
+         update: function( event, ui ) {
+            ui.item.id = ui.item.attr("id");
+          }
+    }).disableSelection();
+    /* end sotbales */
+
+    /*inline edit*/
+    $('body').on('click','a > .fa-edit',function(e){
+        e.preventDefault();
+        $row = $(this).closest('tr');
+        $(this).attr('class','glyphicon glyphicon-floppy-saved');
+        $row.find('input').css({border:'solid 1px #00CC66'});
+        $row.find('td:nth-child(3) input').attr('readonly',false);
+        $row.find("input[name='name']").focus();
+
+    });
+
+    /*inline save */
+    $('body').on('click','a > .glyphicon.glyphicon-floppy-saved',function(e){
+        e.preventDefault();
+        $instatnce = $(this);
+        $row = $(this).closest('tr');
+        var data = $row.find('input').serialize();
+        $.post("{% url 'project:labels_edit' slug %}",data, function(response){
+            if(response['error']){
+                $row.find('input').css({border:'none'});
+                for (var key in response['errors']) {
+                    $input = $row.find('input[name="'+key+'"]');
+                    $input.val("");
+                    $input.attr('placeholder',response['errors'][key]);
+                    $input.css({border:'solid 1px #FF0000'});
+                }
+            }
+            else{
+                $row.find('input').css({border:'none'});
+                $row.find('td:nth-child(3) input').attr('readonly',true);
+                $instatnce.attr('class','fa fa-edit');
+            }
+        });
+    });
+    /* end edit */
+</script>
+{% endblock %}
