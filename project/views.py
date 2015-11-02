@@ -1006,14 +1006,23 @@ def create_issue_to_ticket(request, slug, task_id):
                 name=request.POST.get('name'),
                 slug=slugify(request.POST.get('name')),
                 project=project,
-                finished_date=request.POST.get('finished_date'),
                 description=request.POST.get('description'),
-                status=project.task_statuses.get(id=request.POST.get('status')),
                 ticket_type=request.POST.get('issue_type'),
-                severity=project.severities.get(id=request.POST.get('severity')),
-                priority=project.priorities.get(id=request.POST.get('priority')),
                 created_by=request.user
             )
+
+            try:
+                issue.status=project.task_statuses.get(id=request.POST.get('status'))
+            except:
+                pass
+            try:
+                issue.severity=project.severities.get(id=request.POST.get('severity'))
+            except:
+                pass
+            try:
+                issue.priority=project.priorities.get(id=request.POST.get('priority'))
+            except:
+                pass
             try:
                 assigned_to=project.members.get(id=request.POST.get('assigned_to'))
                 issue.assigned_to = assigned_to
@@ -1030,7 +1039,6 @@ def create_issue_to_ticket(request, slug, task_id):
                                                   'slug': slug,
                                                   'severity_list': project.severities.all(),
                                                   'priority_list': project.priorities.all(),
-                                                  'ticket_status_list':project.task_statuses.all(),
                                                   'notification_list': get_notification_list(request.user)
                                                   })
 @active_user_required
@@ -1045,7 +1053,6 @@ def create_issue(request, slug):
                                                   'severity_list': project.severities.all(),
                                                   'priority_list': project.priorities.all(),
                                                   'tasks' : project.project_tickets.filter(ticket_type='task'),
-                                                  'ticket_status_list':project.task_statuses.all(),
                                                   'notification_list': get_notification_list(request.user)
                                                   })
 
@@ -1357,24 +1364,32 @@ def edit_issue(request, slug, issue_id):
     if request.POST:
         form = CreateIssueForm(request.POST, project=project, instance=issue)
         error = True
-        task = Ticket.objects.get(id=request.POST.get('refer_task'))
         if form.is_valid():
             error = False
             issue.name=request.POST.get('name')
             issue.slug=slugify(request.POST.get('name'))
             issue.finished_date=request.POST.get('finished_date')
             issue.description=request.POST.get('description')
-            issue.status=project.task_statuses.get(id=request.POST.get('status'))
             issue.ticket_type=request.POST.get('issue_type')
-            issue.severity=project.severities.get(id=request.POST.get('severity'))
-            issue.priority=project.priorities.get(id=request.POST.get('priority'))
-            issue.reference=task
+            # issue.reference=task
             try:
                 assigned_to=project.members.get(id=request.POST.get('assigned_to'))
                 issue.assigned_to = assigned_to
             except:
                 issue.assigned_to = None
                 issue.save()
+                pass
+            try:
+                issue.status=project.task_statuses.get(id=request.POST.get('status'))
+            except:
+                pass
+            try:
+                issue.severity=project.severities.get(id=request.POST.get('severity'))
+            except:
+                pass
+            try:
+                issue.priority=project.priorities.get(id=request.POST.get('priority'))
+            except:
                 pass
             issue.save()
         return HttpResponse(json.dumps({'error': error, 'form_errors': form.errors}), content_type="json/application")

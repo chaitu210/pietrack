@@ -335,7 +335,7 @@ class CommentForm(forms.ModelForm):
 class CreateIssueForm(forms.Form):
     name = forms.CharField(max_length=50, required=True)
     issue_type = forms.CharField(max_length=20, required=True)
-    finished_date = forms.DateField(required=True)
+    # finished_date = forms.DateField(required=True)
 
     def __init__(self, *args, **kwargs):
         self.project = kwargs.pop('project', None)

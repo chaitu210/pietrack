@@ -1,0 +1,170 @@
+[1mdiff --git a/piebase/models.py b/piebase/models.py[m
+[1mindex 532412c..f6ea2ab 100644[m
+[1m--- a/piebase/models.py[m
+[1m+++ b/piebase/models.py[m
+[36m@@ -268,7 +268,7 @@[m [mclass Ticket(models.Model):[m
+                                     verbose_name=_("milestone"))[m
+     created_date = models.DateTimeField(verbose_name=_("created date"), auto_now_add=True)[m
+     modified_date = models.DateTimeField(verbose_name=_("modified date"), auto_now_add=True)[m
+[31m-    finished_date = models.DateTimeField(verbose_name=_("finished date"))[m
+[32m+[m[32m    finished_date = models.DateTimeField(verbose_name=_("finished date"),null=True, blank=True)[m
+     order = models.IntegerField(default=1)[m
+     description = models.TextField(null=False, blank=True, verbose_name=_("description"))[m
+     attachments = models.ManyToManyField(Attachment, blank=True)[m
+[1mdiff --git a/project/forms.py b/project/forms.py[m
+[1mindex ab0bd9e..0b97667 100644[m
+[1m--- a/project/forms.py[m
+[1m+++ b/project/forms.py[m
+[36m@@ -335,7 +335,7 @@[m [mclass CommentForm(forms.ModelForm):[m
+ class CreateIssueForm(forms.Form):[m
+     name = forms.CharField(max_length=50, required=True)[m
+     issue_type = forms.CharField(max_length=20, required=True)[m
+[31m-    finished_date = forms.DateField(required=True)[m
+[32m+[m[32m    # finished_date = forms.DateField(required=True)[m
+ [m
+     def __init__(self, *args, **kwargs):[m
+         self.project = kwargs.pop('project', None)[m
+[1mdiff --git a/project/views.py b/project/views.py[m
+[1mindex 98adff6..53892e2 100644[m
+[1m--- a/project/views.py[m
+[1m+++ b/project/views.py[m
+[36m@@ -1006,14 +1006,23 @@[m [mdef create_issue_to_ticket(request, slug, task_id):[m
+                 name=request.POST.get('name'),[m
+                 slug=slugify(request.POST.get('name')),[m
+                 project=project,[m
+[31m-                finished_date=request.POST.get('finished_date'),[m
+                 description=request.POST.get('description'),[m
+[31m-                status=project.task_statuses.get(id=request.POST.get('status')),[m
+                 ticket_type=request.POST.get('issue_type'),[m
+[31m-                severity=project.severities.get(id=request.POST.get('severity')),[m
+[31m-                priority=project.priorities.get(id=request.POST.get('priority')),[m
+                 created_by=request.user[m
+             )[m
+[32m+[m
+[32m+[m[32m            try:[m
+[32m+[m[32m                issue.status=project.task_statuses.get(id=request.POST.get('status'))[m
+[32m+[m[32m            except:[m
+[32m+[m[32m                pass[m
+[32m+[m[32m            try:[m
+[32m+[m[32m                issue.severity=project.severities.get(id=request.POST.get('severity'))[m
+[32m+[m[32m            except:[m
+[32m+[m[32m                pass[m
+[32m+[m[32m            try:[m
+[32m+[m[32m                issue.priority=project.priorities.get(id=request.POST.get('priority'))[m
+[32m+[m[32m            except:[m
+[32m+[m[32m                pass[m
+             try:[m
+                 assigned_to=project.members.get(id=request.POST.get('assigned_to'))[m
+                 issue.assigned_to = assigned_to[m
+[36m@@ -1030,7 +1039,6 @@[m [mdef create_issue_to_ticket(request, slug, task_id):[m
+                                                   'slug': slug,[m
+                                                   'severity_list': project.severities.all(),[m
+                                                   'priority_list': project.priorities.all(),[m
+[31m-                                                  'ticket_status_list':project.task_statuses.all(),[m
+                                                   'notification_list': get_notification_list(request.user)[m
+                                                   })[m
+ @active_user_required[m
+[36m@@ -1045,7 +1053,6 @@[m [mdef create_issue(request, slug):[m
+                                                   'severity_list': project.severities.all(),[m
+                                                   'priority_list': project.priorities.all(),[m
+                                                   'tasks' : project.project_tickets.filter(ticket_type='task'),[m
+[31m-                                                  'ticket_status_list':project.task_statuses.all(),[m
+                                                   'notification_list': get_notification_list(request.user)[m
+                                                   })[m
+ [m
+[36m@@ -1349,26 +1356,23 @@[m [mdef issue_details(request, slug, issue_id):[m
+                                                      'notification_list': get_notification_list(request.user)})[m
+ [m
+ [m
+[31m-@active_user_required[m
+[31m-@is_project_member[m
+[32m+[m[32m# @active_user_required[m
+[32m+[m[32m# @is_project_member[m
+ def edit_issue(request, slug, issue_id):[m
+     project = Project.objects.get(slug=slug, organization=request.user.organization)[m
+     issue = Ticket.objects.get(id=issue_id)[m
+     if request.POST:[m
+         form = CreateIssueForm(request.POST, project=project, instance=issue)[m
+         error = True[m
+[31m-        task = Ticket.objects.get(id=request.POST.get('refer_task'))[m
+[32m+[m[32m        # task = Ticket.objects.get(id=request.POST.get('refer_task')) except: None[m
+         if form.is_valid():[m
+             error = False[m
+             issue.name=request.POST.get('name')[m
+             issue.slug=slugify(request.POST.get('name'))[m
+             issue.finished_date=request.POST.get('finished_date')[m
+             issue.description=request.POST.get('description')[m
+[31m-            issue.status=project.task_statuses.get(id=request.POST.get('status'))[m
+             issue.ticket_type=request.POST.get('issue_type')[m
+[31m-            issue.severity=project.severities.get(id=request.POST.get('severity'))[m
+[31m-            issue.priority=project.priorities.get(id=request.POST.get('priority'))[m
+[31m-            issue.reference=task[m
+[32m+[m[32m            # issue.reference=task[m
+             try:[m
+                 assigned_to=project.members.get(id=request.POST.get('assigned_to'))[m
+                 issue.assigned_to = assigned_to[m
+[36m@@ -1376,6 +1380,18 @@[m [mdef edit_issue(request, slug, issue_id):[m
+                 issue.assigned_to = None[m
+                 issue.save()[m
+                 pass[m
+[32m+[m[32m            try:[m
+[32m+[m[32m                issue.status=project.task_statuses.get(id=request.POST.get('status'))[m
+[32m+[m[32m            except:[m
+[32m+[m[32m                pass[m
+[32m+[m[32m            try:[m
+[32m+[m[32m                issue.severity=project.severities.get(id=request.POST.get('severity'))[m
+[32m+[m[32m            except:[m
+[32m+[m[32m                pass[m
+[32m+[m[32m            try:[m
+[32m+[m[32m                issue.priority=project.priorities.get(id=request.POST.get('priority'))[m
+[32m+[m[32m            except:[m
+[32m+[m[32m                pass[m
+             issue.save()[m
+         return HttpResponse(json.dumps({'error': error, 'form_errors': form.errors}), content_type="json/application")[m
+ [m
+[1mdiff --git a/templates/project/issueboard.html b/templates/project/issueboard.html[m
+[1mindex e72fd87..9cda6bf 100644[m
+[1m--- a/templates/project/issueboard.html[m
+[1m+++ b/templates/project/issueboard.html[m
+[36m@@ -101,6 +101,7 @@[m
+                                         <td>[m
+ [m
+                                             <select class="form-control issue" name="status">[m
+[32m+[m[32m                                                <option value="">None</option>[m
+                                               {% for status_iter in status_list %}[m
+                                                 <option value="{{ status_iter.id }}" {% if status_iter == issue.status %} selected {% endif %}>{{ status_iter }}</option>[m
+                                               {% endfor %}[m
+[1mdiff --git a/templates/task/add_task.html b/templates/task/add_task.html[m
+[1mindex 54e11aa..df02a5b 100644[m
+[1m--- a/templates/task/add_task.html[m
+[1m+++ b/templates/task/add_task.html[m
+[36m@@ -67,6 +67,7 @@[m
+                     <div class="form_group">[m
+                         <label> Severity </label>[m
+                         <select name='severity' class='input'>[m
+[32m+[m[32m                            <option value=''>None</option>[m
+                             {% for severity in severity_list %}[m
+                                 <option value='{{ severity.id }}' {% if issue_old.severity == severity %}selected{% endif %}>{{ severity }}</option>[m
+                             {% endfor %}[m
+[36m@@ -76,6 +77,7 @@[m
+                     <div class="form_group">[m
+                         <label> Priority </label>[m
+                         <select name='priority' class='input'>[m
+[32m+[m[32m                            <option value=''>None</option>[m
+                             {% for priority in priority_list %}[m
+                                 <option value='{{ priority.id }}' {% if issue_old.priority == priority %}selected{% endif %}>{{ priority }}</option>[m
+                             {% endfor %}[m
+[36m@@ -94,11 +96,13 @@[m
+                         <span id='task_status_error'></span>[m
+                     </div>[m
+                 {% endif %}[m
+[32m+[m[32m            {% if not is_issue %}[m
+                 <div class="form_group">[m
+                     <label>Finished Date</label>[m
+                     <input id='task_finished_date' name='finished_date' type="text" class='input' value="{% if issue_old %}{{ issue_old.finished_date|date:"Y-m-d" }}{% endif %}{{ task.finished_date|date:"Y-m-d" }}">[m
+                     <span id='task_finished_date_error' class='task_err'></span>[m
+                 </div>[m
+[32m+[m[32m            {% endif %}[m
+                 <div class="form_group">[m
+                     <label>Assign to</label>[m
+                     <select name='assigned_to' class='select2 input'>[m

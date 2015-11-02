@@ -101,6 +101,7 @@
                                         <td>
 
                                             <select class="form-control issue" name="status">
+                                                <option value="">None</option>
                                               {% for status_iter in status_list %}
                                                 <option value="{{ status_iter.id }}" {% if status_iter == issue.status %} selected {% endif %}>{{ status_iter }}</option>
                                               {% endfor %}
