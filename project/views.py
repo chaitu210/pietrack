@@ -1295,8 +1295,10 @@ def delete_issue(request, slug, issue_id):
 def labels(request, slug):
     labels_list = Labels.objects.filter(
         project=Project.objects.get(slug=slug, organization=request.user.organization)).order_by('order')
-    return render(request, 'settings/labels.html', {'slug': slug, 'labels_list': labels_list,
-                                                    'notification_list': get_notification_list(request.user)})
+    return render(request, 'settings/labels.html',
+                  {'project': Project.objects.get(slug=slug, organization=request.user.organization), 'slug': slug,
+                   'labels_list': labels_list,
+                   'notification_list': get_notification_list(request.user)})
 
 
 @active_user_required
@@ -1352,7 +1354,6 @@ def labels_edit(request, slug):
 
 
 def labels_order(request, slug):
-    print 'labels order'*10
     prev = request.GET.get('prev', False)
     current = request.GET.get('current', False)
     if prev and current:
