@@ -820,8 +820,6 @@ def load_tasks(request, slug, milestone_slug, status_slug):
     milestone = Milestone.objects.get(slug=milestone_slug, project=project)
     tasks = Ticket.objects.filter(status=status, milestone=milestone)
     paginator = Paginator(tasks, 10)
-    # if request.GET.getlist('requirements'):
-    #     tasks = tasks.filter(requirement__id__in=request.GET.getlist('requirements'))
     if request.GET.getlist('assigned_to'):
         tasks = tasks.filter(assigned_to__id__in=request.GET.getlist('assigned_to'))
     if request.GET.getlist('tasks'):
