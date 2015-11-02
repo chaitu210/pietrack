@@ -120,7 +120,7 @@
       <div class='right_header'>
         <div class="menu">
           <ul>
-            <li class='parent_list'>
+            <!--<li class='parent_list'>
               <span class='each_wrap extras'>
               <i class='fa fa-arrow-down'></i>
               <span class='name'>Extras</span>
@@ -143,7 +143,7 @@
                   </a>
                 </li>
               </ul>
-            </li>
+            </li>-->
             <li class='parent_list'>
               {% block project_notifications %}
                   <span class='each_wrap notification'>
@@ -160,6 +160,7 @@
                     </ul>
              {% endblock %}
             </li>
+<!--
             <li>
               <a href="{% url 'user:logout' %}">
               <span class='each_wrap logout'>
@@ -168,22 +169,59 @@
               </span>
               </a>
             </li>
+-->
+
+
+            <li class='parent_list'>
+
+                <span class="name_img_wrap">
+                <img src="{% if user.profile_pic %}{{ user.profile_pic.url }}{% else %}{% static 'img/user-pic.jpg' %}{% endif %}" alt="{% if user.profile_pic %}{{ user.profile_pic.url }}{% endif %}">
+                </span>
+
+              <ul class="sub_list_user_menu">
+                <li>
+                  <a href="#">
+                  <span class='extras_drop_child extras_one'>
+                      <img src="{% if user.profile_pic %}{{ user.profile_pic.url }}{% else %}{% static 'img/user-pic.jpg' %}{% endif %}" alt="{% if user.profile_pic %}{{ user.profile_pic.url }}{% endif %}">
+                    <span class='name'>
+                                  {% if user.first_name %}
+                                    {{ user.first_name|title }}
+                                  {% else %}
+                                    {{ user.email }}
+                                  {% endif %}
+                    </span>
+
+                  </span>
+                  </a>
+                </li>
+                <li>
+                  <a href="{% url 'user:user_profile' %}">
+                  <span class='extras_drop_child extras_one'>
+                  <i class='fa fa-user'></i>
+                  <span class='name'>Profile</span>
+                  </span>
+                  </a>
+                </li>
+                <li>
+                  <a href="{% url 'user:change_password' %}">
+                  <span class='extras_drop_child extras_two'>
+                  <i class='fa fa-expeditedssl'></i>
+                  <span class='name'>Change Password</span>
+                  </span>
+                  </a>
+                </li>
+                <li>
+                  <a href="{% url 'user:logout' %}">
+                  <span class='extras_drop_child extras_two'>
+                  <i class="fa fa-power-off"></i>
+                  <span class='name'>Logout</span>
+                  </span>
+                  </a>
+                </li>
+              </ul>
+            </li>
           </ul>
         </div>
-        <span class="name_img_wrap">
-        <span class='name'>
-        Hello, <span>
-                      {% if user.first_name %}
-                        {{ user.first_name|title }}
-                      {% else %}
-                        {{ user.email }}
-                      {% endif %}
-              </span>
-        </span>
-        {% if user.profile_pic %}
-        <img src='{{ user.profile_pic.url }}' alt="{{ user.profile_pic.url }}"> {% else %}
-        <img src="{% static 'img/user-pic.jpg' %}" alt="No profile pic :("> {% endif %}
-        </span>
       </div>
     </header>
 

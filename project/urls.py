@@ -75,10 +75,6 @@ urlpatterns = [
         update_taskboard_status, name="update_taskboard_status"),
     url(r'^(?P<slug>[-\w]+)/(?P<milestone_slug>[-\w]+)/(?P<status_slug>[-\w]+)/load_tasks/$',
         load_tasks, name="load_tasks"),
-    url(r'^(?P<slug>[-\w]+)/(?P<milestone_slug>[-\w]+)/(?P<requirement_id>[0-9]+)/$',
-        requirement_tasks, name="requirement_tasks"),
-    url(r'^(?P<slug>[-\w]+)/(?P<milestone_slug>[-\w]+)/(?P<status_slug>[-\w]+)/(?P<requirement_id>[0-9]+)/load_tasks/$',
-        requirement_tasks_more, name="requirement_tasks_more"),
     url(r'^(?P<slug>[-\w]+)/(?P<milestone_slug>[-\w]+)/task/(?P<task_id>[0-9]+)/$', task_details, name="task_details"),
     url(r'^(?P<slug>[-\w]+)/(?P<milestone_slug>[-\w]+)/task/(?P<task_id>[0-9]+)/edit/$', task_edit, name="task_edit"),
     url(r'^(?P<slug>[-\w]+)/(?P<milestone_slug>[-\w]+)/task/(?P<task_id>[0-9]+)/delete/$', task_delete,
@@ -105,15 +101,5 @@ urlpatterns = [
         name='milestone_edit'),
     url(r'^(?P<slug>[a-zA-Z0-9-]+)/milestone/(?P<milestone_slug>[a-zA-Z0-9-]+)/delete/$', milestone_delete,
         name='milestone_delete'),
-
-    # requirement
-    url(r'^(?P<slug>[a-zA-Z0-9-]+)/(?P<milestone_slug>[a-zA-Z0-9-]+)/requirement/create/$', requirement_create,
-        name='requirement_create'),
-    url(
-        r'^(?P<slug>[a-zA-Z0-9-]+)/(?P<milestone_slug>[a-zA-Z0-9-]+)/(?P<requirement_slug>[a-zA-Z0-9-]+)/requirement/edit/$',
-        requirement_edit, name='requirement_edit'),
-    url(
-        r'^(?P<slug>[a-zA-Z0-9-]+)/(?P<milestone_slug>[a-zA-Z0-9-]+)/(?P<id>[0-9-]+)/requirement/delete/$',
-        requirement_delete, name='requirement_delete'),
 
 ]
