@@ -2,6 +2,8 @@
 {% load project_tags %}
 {% load static %}
 {% block content %}
+
+
   <section id='base_content'>
     <div class="project_description">
         <!-- about project -->
@@ -13,12 +15,6 @@
                     <a href="{% url 'task:add_task' slug search_filter.0.slug %}">
                         <span class='header_button'><i class="fa fa-plus-circle"></i> New Task</span>
                     </a>
-                {% if request.user.pietrack_role == 'admin' or request.user|is_project_admin:slug %}
-
-                    <a href="{% url 'project:requirement_create' slug search_filter.0.slug %}">
-                        <span class='header_button'>New Requirement</span>
-                    </a>
-                {% endif %}
                 </span>
             </div>
             <!-- filters -->
@@ -35,20 +31,12 @@
                             {% endfor %}
                         </select>
                     </div>
-                    <div class="col-md-2">
-                        <select class='select2 input select2_requirement' name="requirements" multiple>
-                            {% for requirement in search_filter.0|milestone_requirements %}
-                                <option value="{{ requirement.id }}" {% for req in search_filter.2 %}{% ifequal req|add:'0' requirement.id %}selected{% endifequal %}{% endfor %}>
-                                    {{ requirement.name }}
-                                </option>
-                            {% endfor %}
-                        </select>
-                    </div>
+
                     <div class="col-md-3">
                         <select class='select2 input select2_task' name="tasks" multiple>
-                            {% for requirement in search_filter.0|milestone_requirements %}
-                                {% for task in requirement.tasks.all %}
-                                    <option value="{{ task.id }}"  {% for task_id in search_filter.3 %}{% ifequal task_id|add:'0' task.id %}selected{% endifequal %}{% endfor %}>
+                            {% for task in search_filter.0|milestone_requirements %}
+                                {% for task in tasks.all %}
+                                    <option value="{{ task.id }}"  {% for task_id in search_filter.2 %}{% ifequal task_id|add:'0' task.id %}selected{% endifequal %}{% endfor %}>
                                         {{ task.name }}
                                     </option>
                                 {% endfor %}
@@ -79,47 +67,7 @@
             <!-- lists div -->
             <div class="lists_div style-1" id="tasks_container">
                 <div class="hscroll">
-                    <!-- requirement list -->
-                    <div class="requirement_list_panel">
-                        <div class="title">
-                            Requirement list
-                        </div>
-                        <div class="scroll">
-                            <ul>
-                                {%for requirement in search_filter.0|milestone_requirements %}
-                                    <li>
-                                        <div class='ticket_wrap'>
-                                            <a class='name_div_wrap'>
-                                                <span class='name_div' id="{{requirement.id}}">
-                                                {{requirement.name}}
-                                                    <span class='tag'>
-                                                        <span  data-toggle="modal" data-target="#myModal{{requirement.id}}">
-                                                            View Description
-                                                        </span>
-                                                    </span>
-                                                </span>
-                                            </a>
-                                        {% if request.user.pietrack_role == 'admin' or request.user|is_project_admin:slug %}
-                                            <span class='actions_div'>
-                                                <a href="{% url 'project:requirement_edit' slug search_filter.0.id requirement.slug %}">
-                                                    <span class='edit'>
-                                                        <i class='fa fa-pencil'></i>
-                                                        </span>
-                                                </a>
-                                                <a class="delete_req" id='{{ requirement.id }}' href="{% url 'project:requirement_delete' slug search_filter.0.slug requirement.id %}">
-                                                    <span class='drop'>
-                                                    <i class='fa fa-close'></i>
-                                                    </span>
-                                                </a>
-                                            </span>
-                                        {% endif %}
-                                        </div>
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    </div>
-                    <!--/ requirement list -->
+
                     <!-- task  category each -->
                     {% for ticket_status in ticket_status_list %}
                         <div class="task_category_wrap">
@@ -142,26 +90,7 @@
         </div>
         <!--/ about project -->
     </div>
-    <!-- edit role add modal starts here -->
-    {%for requirement in search_filter.0.project.requirements.all %}
-        <div class="modal fade" id="myModal{{requirement.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title" id="myModalLabel">{{requirement.name}}</h4>
-                    </div>
-                    <div class="modal-body">
-                        {{ requirement.description }}
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" data-dismiss="modal">Ok</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    {% endfor %}
-    <!-- edit role add modal ends here -->
+
   </section>
 {% endblock %}
 {% block extra_js_links%}
@@ -187,8 +116,8 @@
     <script type="text/javascript">
     $(function() {
         $("#sdate, #edate").datepicker();
-        $('#sdate').val('{{ search_filter.4 }}');
-        $('#edate').val('{{ search_filter.5 }}');
+        $('#sdate').val('{{ search_filter.3 }}');
+        $('#edate').val('{{ search_filter.4 }}');
        /* $('.select2').select2();*/
     });
     </script>
@@ -200,17 +129,11 @@
         var assigned_to = [{% for assign in search_filter.1 %}'{{ assign }}'{% if not forloop.last %},{% endif %}{% endfor %}]
 //        $('.select2_assigned_to').select2().select2('val',assigned_to);
 
-        $(".select2_requirement").select2({
-          tags: "true",
-          placeholder: "Requirements"
-        });
-        var requirements = [{% for assign in search_filter.2 %}'{{ assign }}'{% if not forloop.last %},{% endif %}{% endfor %}]
-//        $('.select2_requirement').select2().select2('val',requirements);
         $(".select2_task").select2({
           tags: "true",
           placeholder: "Task Title"
         });
-        var tasks = [{% for assign in search_filter.3 %}'{{ assign }}'{% if not forloop.last %},{% endif %}{% endfor %}]
+        var tasks = [{% for assign in search_filter.2 %}'{{ assign }}'{% if not forloop.last %},{% endif %}{% endfor %}]
 //        $('.select2_task').select2().select2('val',tasks)
     </script>
     <!-- horizontal scroll -->
@@ -227,7 +150,7 @@
             var task = ui.item.attr('id');
             $.get('/project/{{slug}}/update_taskboard/' + status + '/' + task + '/');
         }
-    }
+    };
     $(function() {
         $(".connectedSortable").sortable({
             connectWith: ".connectedSortable",
@@ -239,12 +162,12 @@
                 ui.item.slug = ui.item.closest('ul').attr('id')
             },
             stop:function(event, ui){
-                previous = ui.item.startPos
-                current = ui.item.index()
-                slug = ui.item.slug
+                previous = ui.item.startPos;
+                current = ui.item.index();
+                slug = ui.item.slug;
 
                 if(previous!=current){
-                   $.get("{% url 'project:taskboard_order' slug%}"+"?prev="+previous+"&current="+current+"&status_slug="+slug)
+                   $.get("{% url 'project:taskboard_order' slug %}"+"?prev="+previous+"&current="+current+"&status_slug="+slug)
                 }
             },
             //appendTo: 'body',
@@ -284,7 +207,7 @@
     });
     /* end load all tasks */
 
-    $(document).ready(function() {
+/*    $(document).ready(function() {
         $('.name_div').on('click', function() {
             var req_id = $(this).attr('id');
             $.get("/project/{{slug}}/{{search_filter.0.slug}}/" + req_id + "/", function(response) {
@@ -296,7 +219,7 @@
                 });
                 $('ul.connectedSortable').sortable(drag_options);
 
-                /* start requirement tasks update */
+                /!* start requirement tasks update *!/
                 $('.requirement').on('scroll', function() {
                         if ($(this).scrollTop() + $(this).innerHeight() >= this.scrollHeight - 2) {
                             page = $(this).find('input[name="page_num"]').val();
@@ -313,14 +236,14 @@
 
                         }
                     });
-                    /*end  requirement tasks update */
+                    /!*end  requirement tasks update *!/
             });
 
         });
 
-    });
+    });*/
   {% if request.user.pietrack_role == 'admin' or request.user|is_project_admin:slug %}
-    $('.delete_req').click(function (event) {
+    /*$('.delete_req').click(function (event) {
         event.preventDefault();
         if(confirm("Are you sure you want to delete this?")){
             window.location = $(this).attr("href");
@@ -329,7 +252,7 @@
             return false;
         }
     });
-  {% endif %}
+  {% endif %}*/
     $('a.task_delete').click(function(e){
         var url = $(this).attr('href');
         var parent = $(this).closest('li');

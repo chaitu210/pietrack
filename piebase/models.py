@@ -164,7 +164,6 @@ class Role(models.Model):
     slug = models.SlugField(max_length=250, null=False, blank=True, verbose_name=_("slug"))
     project = models.ForeignKey(Project, null=True, blank=False, related_name="roles", verbose_name=_("project"))
     users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="user_roles")
-    # is_project_admin = models.BooleanField(default=False)
 
     class Meta:
         unique_together = [("slug", "project")]
@@ -190,21 +189,6 @@ class Milestone(models.Model):
     class Meta:
         ordering = ["created_date"]
         unique_together = [("name", "project"), ("slug", "project")]
-
-    def __str__(self):
-        return self.name
-
-
-class Requirement(models.Model):
-    name = models.CharField(max_length=200, verbose_name=_("name"))
-    slug = models.SlugField(max_length=250, null=False, blank=True, verbose_name=_("slug"))
-    estimated_start = models.DateField(verbose_name=_("estimated start date"))
-    estimated_finish = models.DateField(verbose_name=_("estimated finish date"))
-    created_date = models.DateTimeField(verbose_name=_("created date"), auto_now_add=True)
-    modified_date = models.DateTimeField(verbose_name=_("modified date"))
-    description = models.TextField(verbose_name=_("description"))
-    project = models.ForeignKey(Project, null=True, blank=False, related_name="requirements", verbose_name=_("project"))
-    milestone = models.ForeignKey(Milestone, null=True, blank=False, related_name="requirements")
 
     def __str__(self):
         return self.name
@@ -252,7 +236,6 @@ class Severity(models.Model):
         unique_together = ("project", "name")
         ordering = ['order']
 
-
     def __str__(self):
         return self.name
 
@@ -264,8 +247,6 @@ class Ticket(models.Model):
     assigned_to = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True)
     milestone = models.ForeignKey(Milestone, null=True, blank=True, default=None, related_name="tasks",
                                   verbose_name=_("milestone"))
-    requirement = models.ForeignKey(Requirement, null=True, blank=True, default=None, related_name="tasks",
-                                    verbose_name=_("milestone"))
     created_date = models.DateTimeField(verbose_name=_("created date"), auto_now_add=True)
     modified_date = models.DateTimeField(verbose_name=_("modified date"), auto_now_add=True)
     finished_date = models.DateTimeField(verbose_name=_("finished date"))
@@ -284,9 +265,9 @@ class Ticket(models.Model):
 
     class Meta:
         ordering = ['order']
+
     def __str__(self):
         return self.name
-
 
 
 class Comment(models.Model):
@@ -296,15 +277,9 @@ class Comment(models.Model):
     attachments = models.ManyToManyField(Attachment, blank=True)
     created = models.DateTimeField(auto_now_add=True)
     parent = models.ForeignKey('self', blank=True, null=True, related_name="comment_parent")
-    # class Meta:
-    #    index_together = [('content_type', 'object_id', 'namespace'), ]
 
     def __str__(self):
         return self.comment
-
-        # def delete(self, *args, **kwargs):
-        #     super(Comment, self).delete(*args, **kwargs)
-        #     self.attachments.all().delete()
 
 
 class Timeline(models.Model):
