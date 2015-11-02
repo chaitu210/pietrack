@@ -168,8 +168,8 @@ class CreateMemberForm(forms.Form):
         if Role.objects.filter(users__email=email, project__slug=self.slug, project__organization=self.organization):
             raise ValidationError("This user is assigned to the project.")
 
-        if self.organization.user_set.get(email=email).pietrack_role == 'admin':
-            raise ValidationError("organization admin is already a member")
+        # if self.organization.user_set.get(email=email).pietrack_role == 'admin':
+        #     raise ValidationError("organization admin is already a member")
 
         return email
 
