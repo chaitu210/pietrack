@@ -10,7 +10,7 @@ from django.utils.http import urlsafe_base64_encode
 from django.utils.translation import ugettext, ugettext_lazy as _
 from .tasks import celery_send_mail
 from piebase.models import Project, Priority, Severity, Organization, User, TicketStatus, Role, Milestone, Comment, \
-    Ticket
+    Ticket, Labels
 from django.db.models import Q
 from django.template.defaultfilters import slugify
 from django.utils import timezone
@@ -335,3 +335,36 @@ class CreateIssueForm(forms.Form):
         elif Ticket.objects.filter(~Q(ticket_type='task')).filter(slug=slugify(name)):
             raise ValidationError("Issue with this name already exists.")
         return name
+
+
+class LabelsForm(forms.ModelForm):
+    class Meta:
+        model = Labels
+        fields = ['name', 'color']
+
+    def __init__(self, *args, **kwargs):
+        self.project = kwargs.pop('project', None)
+        super(LabelsForm, self).__init__(*args, **kwargs)
+
+    def clean_name(self):
+        name_slug = slugify(self.cleaned_data.get('name'))
+        existing_slug = ""
+        if self.instance:
+            existing_slug = self.instance.slug
+        if Labels.objects.filter(slug=name_slug, project=self.project) and name_slug != existing_slug:
+            raise forms.ValidationError('Label with this name already exists')
+        elif len(name_slug) == 0:
+            raise forms.ValidationError("Label name must contain a letter.")
+        return self.cleaned_data.get('name')
+
+    def save(self, commit=True):
+        instance = super(LabelsForm, self).save(commit=False)
+        instance.project = self.project
+        instance.slug = slugify(self.cleaned_data['name'])
+        instance.name = self.cleaned_data['name']
+        instance.color = self.cleaned_data['color']
+        if not self.instance:
+            instance.order = self.project.labels.count() + 1
+        if commit:
+            instance.save()
+        return instance

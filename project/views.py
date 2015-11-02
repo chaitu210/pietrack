@@ -5,9 +5,9 @@ import shutil
 import os
 from django.shortcuts import render, redirect, render_to_response, get_object_or_404
 from piebase.models import User, Project, Priority, Severity, TicketStatus, Ticket, Attachment, Role, \
-    Milestone, Timeline, Comment
+    Milestone, Timeline, Comment, Labels
 from forms import CreateProjectForm, PriorityForm, SeverityForm, TicketStatusForm, RoleForm, CommentForm, \
-    CreateMemberForm, PasswordResetForm, MilestoneForm, CreateIssueForm
+    CreateMemberForm, PasswordResetForm, MilestoneForm, CreateIssueForm, LabelsForm
 from PIL import Image
 from django.utils import timezone
 from django.template.defaultfilters import slugify
@@ -242,7 +242,7 @@ def priority_default(request, slug):
         order = project.priorities.count() + 1
         Priority.objects.create(name=name, slug=slug, color=color, project=project, order=order)
 
-    messages.success(request, 'Default priorities are added to the Priority page !')
+    messages.success(request, 'Default priorities were added to the Priority page !')
     return HttpResponse(json.dumps({'error': False}), content_type="application/json")
 
 
@@ -325,7 +325,7 @@ def severity_default(request, slug):
     for name, slug, color in default:
         order = project.severities.count() + 1
         Severity.objects.create(name=name, slug=slug, color=color, project=project, order=order)
-    messages.success(request, 'Default severities are added to the Severity page !')
+    messages.success(request, 'Default severities were added to the Severity page !')
     return HttpResponse(json.dumps({'error': False}), content_type="application/json")
 
 
@@ -411,7 +411,7 @@ def ticket_status_default(request, slug):
         order = project.task_statuses.count() + 1
         TicketStatus.objects.create(name='Archived', slug=slugify('Archived'), color='#5c3566',
                                     project=project, is_final=True, order=order)
-    messages.success(request, 'Default status are added to the ticket status page !')
+    messages.success(request, 'Default status were added to the ticket status page !')
     return HttpResponse(json.dumps({'error': False}), content_type="application/json")
 
 
@@ -618,10 +618,10 @@ def create_member(request, slug):
 @check_project_admin
 def edit_member(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
-    result= False
-    user_id = request.GET.get('id',None)
+    result = False
+    user_id = request.GET.get('id', None)
     role_id = request.GET.get('role_id', None)
-    if user_id and role_id :
+    if user_id and role_id:
         user = project.members.get(id=user_id)
         role = project.roles.get(users=user)
         old_role = role.name
@@ -629,10 +629,11 @@ def edit_member(request, slug):
         new_role = role = project.roles.get(id=role_id)
         new_role.users.add(user)
         if (role != new_role):
-           msg = " changed role of " + user.username + "'s  from " + old_role + " to " + str(new_role)
-           create_timeline.send(sender=request.user, content_object=user, namespace=msg,event_type="member edited", project=project)
+            msg = " changed role of " + user.username + "'s  from " + old_role + " to " + str(new_role)
+            create_timeline.send(sender=request.user, content_object=user, namespace=msg, event_type="member edited",
+                                 project=project)
         result = True
-    return HttpResponse(json.dumps({'result':result}), content_type="json/application")
+    return HttpResponse(json.dumps({'result': result}), content_type="json/application")
 
 
 @active_user_required
@@ -679,7 +680,7 @@ def member_roles_default(request, slug):
          Role(name='Back-end Developer', slug=slugify('Back-end Developer'), project=project)]
     )
 
-    messages.success(request, 'Default user roles are added to the User roles page !')
+    messages.success(request, 'Default user roles were added to the User roles page !')
     return HttpResponse(json.dumps({'error': False}), content_type="application/json")
 
 
@@ -1287,3 +1288,90 @@ def delete_issue(request, slug, issue_id):
     issue = Ticket.objects.get(id=issue_id)
     issue.delete()
     return HttpResponseRedirect(reverse('project:issues', kwargs={'slug': slug}))
+
+
+@active_user_required
+@check_project_admin
+def labels(request, slug):
+    labels_list = Labels.objects.filter(
+        project=Project.objects.get(slug=slug, organization=request.user.organization)).order_by('order')
+    return render(request, 'settings/labels.html', {'slug': slug, 'labels_list': labels_list,
+                                                    'notification_list': get_notification_list(request.user)})
+
+
+@active_user_required
+@check_project_admin
+def labels_default(request, slug):
+    project = Project.objects.get(slug=slug, organization=request.user.organization)
+    default = (
+        ('Bug', 'bug', '#d9534f'),
+        ('Confirmed', 'confirmed', '#d9534f'),
+        ('Critical', 'critical', '#d9534f'),
+        ('Discussion', 'discussion', '#428bca'),
+        ('Documentation', 'documentation', '#f0ad4e'),
+        ('Enhancement', 'enhancement', '#5cb85c'),
+        ('Suggestion', 'suggestion', '#428bca'),
+        ('Support', 'support', '#f0ad4e')
+    )
+    for name, slug, color in default:
+        order = project.labels.count() + 1
+        Labels.objects.create(name=name, slug=slug, color=color, project=project, order=order)
+    messages.success(request, 'Default labels were added to the Labels page !')
+    return HttpResponse(json.dumps({'error': False}), content_type="application/json")
+
+
+@active_user_required
+@check_project_admin
+def labels_create(request, slug):
+    project = Project.objects.get(slug=slug, organization=request.user.organization)
+    form = LabelsForm(request.POST, project=project)
+    if form.is_valid():
+        labels = form.save()
+        labels.order = project.labels.count()
+        labels.save()
+        return HttpResponse(json.dumps(
+            {'error': False, 'color': labels.color, 'name': labels.name, 'proj_id': labels.id,
+             'slug': labels.slug}), content_type="application/json")
+    else:
+        return HttpResponse(json.dumps({'error': True, 'errors': form.errors}), content_type="application/json")
+
+
+@active_user_required
+@check_project_admin
+def labels_edit(request, slug):
+    project = Project.objects.get(slug=slug, organization=request.user.organization)
+    instance = Labels.objects.get(id=request.POST.get('id'), project=project)
+    form = LabelsForm(request.POST, instance=instance, project=project)
+    if form.is_valid():
+        labels = form.save()
+        return HttpResponse(json.dumps(
+            {'error': False, 'color': labels.color, 'name': labels.name, 'proj_id': labels.id,
+             'slug': labels.slug}), content_type="application/json")
+    else:
+        return HttpResponse(json.dumps({'error': True, 'errors': form.errors}), content_type="application/json")
+
+
+def labels_order(request, slug):
+    print 'labels order'*10
+    prev = request.GET.get('prev', False)
+    current = request.GET.get('current', False)
+    if prev and current:
+        prev = int(prev)
+        current = int(current)
+        project = Project.objects.get(slug=slug, organization=request.user.organization)
+        labels = project.labels.all().order_by('order')
+        if prev > current:
+            labels = labels[current:prev + 1]
+        else:
+            labels = labels[prev:current + 1]
+            labels = labels[::-1]
+        swap_order(labels)
+    return HttpResponse("200 OK")
+
+
+@active_user_required
+@check_project_admin
+def labels_delete(request, slug, label_slug):
+    Labels.objects.get(
+        slug=label_slug, project=Project.objects.get(slug=slug, organization=request.user.organization)).delete()
+    return HttpResponse(json.dumps({'error': False}), content_type="application/json")
