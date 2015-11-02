@@ -20,6 +20,9 @@
                 </ul>
             </li>
             {% endif %}
+            <li id="labels">
+                <a href="{% url 'project:labels' slug %}"> <span class="gw-menu-text"><i class="fa fa-tags"></i> Labels</span> </a>
+            </li>
             <li id="project_members">
                 <a href="{% url 'project:project_team' slug %}"> <span class="gw-menu-text"><i class="fa fa-users"></i> Members</span> </a>
             </li>
