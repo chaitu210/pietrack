@@ -616,29 +616,22 @@ def create_member(request, slug):
 @active_user_required
 @check_project_admin
 def edit_member(request, slug):
-    if request.POST:
-        email = request.POST.get('email', False)
-        role_slug = request.POST.get('designation', False)
-        project = Project.objects.get(slug=slug, organization=request.user.organization)
-        role = Role.objects.get(project=project, users__email=email)
+    project = Project.objects.get(slug=slug, organization=request.user.organization)
+    result= False
+    user_id = request.GET.get('id',None)
+    role_id = request.GET.get('role_id', None)
+    if user_id and role_id :
+        user = project.members.get(id=user_id)
+        role = project.roles.get(users=user)
         old_role = role.name
-        member = role.users.get(email=email)
-        role.users.remove(member)
-        new_role = Role.objects.get(slug=role_slug, project=project)
-        new_role.users.add(member)
+        role.users.remove(user)
+        new_role = role = project.roles.get(id=role_id)
+        new_role.users.add(user)
         if (role != new_role):
-            msg = " changed role of " + member.username + "'s  from " + old_role + " to " + str(new_role)
-            create_timeline.send(sender=request.user, content_object=member, namespace=msg,
-                                 event_type="member edited", project=project)
-        return HttpResponse(True)
-    elif request.GET.get('id', False):
-        project_roles = Role.objects.filter(project__slug=slug, project__organization=request.user.organization)
-        role = project_roles.get(users__id=request.GET.get('id'))
-        member = role.users.get(id=request.GET.get('id'))
-        return render(request, 'settings/create_member.html',
-                      {'slug': slug, 'edit_project': True, 'project_roles': project_roles, 'mrole': role,
-                       'member': member, 'notification_list': get_notification_list(request.user)})
-    return HttpResponse("Invalid Request")
+           msg = " changed role of " + user.username + "'s  from " + old_role + " to " + str(new_role)
+           create_timeline.send(sender=request.user, content_object=user, namespace=msg,event_type="member edited", project=project)
+        result = True
+    return HttpResponse(json.dumps({'result':result}), content_type="json/application")
 
 
 @active_user_required
