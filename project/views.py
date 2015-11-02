@@ -551,8 +551,7 @@ def create_member(request, slug):
         json_post_index = 0
         email_list = request.POST.getlist('email')
         designation_list = request.POST.getlist('designation')
-        description = request.POST.get('description')
-        post_dict = {'description': description}
+        post_dict = {}
         post_tuple = zip(email_list, designation_list)
         team_members = []
         project_obj = Project.objects.get(slug=slug, organization=request.user.organization)
