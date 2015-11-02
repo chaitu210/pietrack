@@ -89,6 +89,10 @@ urlpatterns = [
     url(r'^(?P<slug>[-\w]+)/issue/(?P<issue_id>[0-9]+)/details/$', issue_details, name="issue_details"),
     url(r'^(?P<slug>[-\w]+)/issue/(?P<issue_id>[0-9]+)/edit/$', edit_issue, name="edit_issue"),
     url(r'^(?P<slug>[-\w]+)/issue/(?P<issue_id>[0-9]+)/delete/$', delete_issue, name="delete_issue"),
+    url(r'^(?P<slug>[-\w]+)/issue/(?P<issue_id>[0-9]+)/approve/$', issue_approve, name="issue_approve"),
+
+
+
 
     # attachment
     url(r'^(?P<slug>[-\w]+)/task/(?P<task_id>[0-9]+)/attachment/delete/(?P<attachment_id>[0-9]+)/$',

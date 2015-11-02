@@ -25,19 +25,17 @@
                     <span id='task_name_error' class='task_err'></span>
                 </div>
 
+                <div class="form_group">
+                    <label>Milestone</label>
+                    <select name='milestone' class='input'>
+                        {% for milestone_task in milestone_list %}
+                            <option value='{{ milestone_task.id }}' {% if milestone == milestone_task %}selected{% endif %}>{{ milestone_task.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <span id='milestone_error'></span>
+                </div>
+
                 {% if is_issue %}
-                  {% if tasks %}
-                    <div class="form_group">
-                        <label>Reference Task</label>
-                        <select name='refer_task' class='input'>
-                            <option value="" {% if not  issue_old.reference %} selected{% endif %}>None</option>
-                            {% for task in tasks %}
-                                <option value='{{ task.id }}' {% if issue_old.reference == task %}selected{% endif %}>{{ task }}</option>
-                            {% endfor %}
-                        </select>
-                        <span id='task_status_error'></span>
-                    </div>
-                  {% endif %}
                     <div class="form_group">
                         <label>Issue Type</label>
                         <select name='issue_type' class='input'>
@@ -86,7 +84,7 @@
                     <input id='task_finished_date' name='finished_date' type="text" class='input' value="{% if issue_old %}{{ issue_old.finished_date|date:"Y-m-d" }}{% endif %}{{ task.finished_date|date:"Y-m-d" }}">
                     <span id='task_finished_date_error' class='task_err'></span>
                 </div>
-                {% endif %}
+
                 <div class="form_group">
                     <label>Assign to</label>
                     <select name='assigned_to' class='select2 input'>
@@ -97,6 +95,9 @@
                     </select>
                     <span id='task_assigned_to_error'></span>
                 </div>
+
+                {% endif %}
+                
                 <div class="form_group">
                     <label>Description</label>
                     <textarea id='task_description' name='description' class="form-control textarea">{% if issue_old %}{{ issue_old.description }}{% endif %}{{ task.description }}</textarea>
