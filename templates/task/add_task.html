@@ -36,18 +36,6 @@
                 </div>
 
                 {% if is_issue %}
-                  {% if tasks %}
-                    <div class="form_group">
-                        <label>Reference Task</label>
-                        <select name='refer_task' class='input'>
-                            <option value="" {% if not  issue_old.reference %} selected{% endif %}>None</option>
-                            {% for task in tasks %}
-                                <option value='{{ task.id }}' {% if issue_old.reference == task %}selected{% endif %}>{{ task }}</option>
-                            {% endfor %}
-                        </select>
-                        <span id='task_status_error'></span>
-                    </div>
-                  {% endif %}
                     <div class="form_group">
                         <label>Issue Type</label>
                         <select name='issue_type' class='input'>
@@ -60,6 +48,7 @@
                     <div class="form_group">
                         <label> Severity </label>
                         <select name='severity' class='input'>
+                            <option value=''>None</option>
                             {% for severity in severity_list %}
                                 <option value='{{ severity.id }}' {% if issue_old.severity == severity %}selected{% endif %}>{{ severity }}</option>
                             {% endfor %}
@@ -69,6 +58,7 @@
                     <div class="form_group">
                         <label> Priority </label>
                         <select name='priority' class='input'>
+                            <option value=''>None</option>
                             {% for priority in priority_list %}
                                 <option value='{{ priority.id }}' {% if issue_old.priority == priority %}selected{% endif %}>{{ priority }}</option>
                             {% endfor %}
@@ -87,6 +77,7 @@
                         <span id='task_status_error'></span>
                     </div>
                 {% endif %}
+
                 {% if not is_issue %}
                 <div class="form_group">
                     <label>Finished Date</label>

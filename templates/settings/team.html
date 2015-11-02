@@ -80,9 +80,7 @@
                                     </td>
                                     <td>
                                         {% if member.pietrack_role == 'admin' %}
-                                            <select class="form-control" name="" disabled>
-                                                <option value="">{{ member|get_user_Role:project|title }}</option>
-                                            </select>
+                                                {{ member|get_user_Role:project|title }}
                                         {% else %}
                                             <select class="form-control" name="designation" disabled>
                                             {% for role in project.roles.all %}

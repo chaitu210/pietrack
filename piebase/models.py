@@ -249,7 +249,7 @@ class Ticket(models.Model):
                                   verbose_name=_("milestone"))
     created_date = models.DateTimeField(verbose_name=_("created date"), auto_now_add=True)
     modified_date = models.DateTimeField(verbose_name=_("modified date"), auto_now_add=True)
-    finished_date = models.DateTimeField(verbose_name=_("finished date"))
+    finished_date = models.DateTimeField(verbose_name=_("finished date"),null=True, blank=True)
     order = models.IntegerField(default=1)
     description = models.TextField(null=False, blank=True, verbose_name=_("description"))
     attachments = models.ManyToManyField(Attachment, blank=True)
