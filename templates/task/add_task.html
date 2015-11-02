@@ -76,7 +76,17 @@
                         <span id='task_status_error'></span>
                     </div>
                 {% endif %}
-
+                {% if ticket_status_list %}
+                    <div class="form_group">
+                        <label>Status</label>
+                        <select name='status' class='input'>
+                            {% for ticket_status_iter in ticket_status_list %}
+                                <option value='{{ ticket_status_iter.id }}' {% if issue_old.status == ticket_status_iter %}selected{% endif %}>{{ ticket_status_iter.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <span id='task_status_error'></span>
+                    </div>
+                {% endif %}
                 {% if not is_issue %}
                 <div class="form_group">
                     <label>Finished Date</label>
@@ -94,7 +104,9 @@
                     </select>
                     <span id='task_assigned_to_error'></span>
                 </div>
+
                 {% endif %}
+                
                 <div class="form_group">
                     <label>Description</label>
                     <textarea id='task_description' name='description' class="form-control textarea">{% if issue_old %}{{ issue_old.description }}{% endif %}{{ task.description }}</textarea>
