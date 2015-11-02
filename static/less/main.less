@@ -456,11 +456,11 @@ header{
 							display: block;
 						}
 					}
-					&:first-child{
+					/*&:first-child{
 						.each_wrap{
 							border-left: 0px;
 						}
-					}
+					}*/
 					/*&:last-child{
 						margin-left: 1px;
 						&:hover{
@@ -476,7 +476,7 @@ header{
 						background: #fff;
 						border: 1px solid @aqua;
 						color: @aqua;
-						border-left:0px;
+						//border-left:0px;
 						.count{
 							font-size: 8px;
 							width: 14px;
@@ -610,13 +610,135 @@ header{
 							border-bottom: 8px solid #fff;
 						}
 					}
-					.sub_list{
+
+				  /* mine styling starts here */
+
+				  .sub_list_user_menu{
+						z-index: 100000;
+						position: absolute;
+						display: none;
+						top: 42px;
+						z-index: 1000;
+						right: 10%;
+						width: 200px;
+						/*background: rgba(0,0,0,0.01);*/
+						/*padding-top: 5px;*/
+						box-shadow: @panel_shadow;
+						li{
+							display: block;
+							width: 100%;
+							background: #fff;
+							border-top: 2px solid @bg_base;
+							.extras_drop_child{
+								cursor: pointer;
+								width: 100%;
+								display: block;
+								transition:0.5s;
+								color:@aqua;
+								border:1px solid @aqua;
+								&:hover{
+									background: @aqua;
+									color: #fff;
+								}
+							  	img{
+								  	border: 2px solid @bg_base;
+								  -webkit-border-radius: 5px;
+								  -moz-border-radius: 5px;
+								  border-radius: 5px;
+									width: auto;
+									vertical-align: top;
+									height:42px; /* changed the value from 45 to 42 */
+								}
+								i{
+									width: 40px;
+									height: 40px;
+									text-align: center;
+									font-size: 18px;
+									padding-top: 9px;
+									background: #fff;
+									color: @aqua;
+								}
+								.name{
+									text-transform: uppercase;
+									font-size: 11px;
+									padding-left: 8px;
+									font-weight: 600;
+									display: inline-block;
+								/*	width: 155px;*/
+								}
+							}
+							/*.extras_one{
+								i{
+									background: #fff;
+									color: @extras_one;
+								}
+								transition:0.5s;
+								color:@extras_one;
+								border:1px solid @extras_one;
+								&:hover{
+									background: @extras_one;
+									color: #fff;
+								}
+							}
+							.extras_two{
+								i{
+									background: @extras_two;
+									color: #fff;
+								}
+								color: @extras_two;
+								border:1px solid @extras_two;
+
+								&:hover{
+									background: @extras_two;
+									color: #fff;
+								}
+							}*/
+						}
+						&:before{
+							content:'';
+							width: 0;
+							height: 0;
+							position: absolute;
+							top: -8px;
+							z-index: 30;
+							left: 57%;
+							border-left: 7px solid transparent;
+							border-right: 7px solid transparent;
+							border-bottom: 8px solid #fff;
+						}
+					}
+				  .name_img_wrap{
+					  margin: 4px;
+					  .name{
+						  font-size: 12px;
+						  margin: 0px 10px 0px 20px;
+						  color: @heading_color;
+						  position: relative;
+						  top: 10px;
+						  span{
+							  font-weight: 500;
+						  }
+					  }
+					  img{
+						  border: 2px solid @bg_base;
+						  -webkit-border-radius: 15px;
+						  -moz-border-radius: 15px;
+						  border-radius: 15px;
+						  width: auto;
+						  vertical-align: top;
+						  height:42px; /* changed the value from 45 to 42 */
+					  }
+				  }
+
+				  /* mine styling ends here  */
+
+					  .sub_list{
 						display: none;
 						margin: 0px;
 						padding: 0px;
 						position: absolute;
 						top: 42px;
-						right: -70%;
+						right: -25%;
 						border:@stroke_color;
 						height: 400px;
 						width: 300px;
@@ -799,23 +921,7 @@ header{
 				}
 			}
 		}
-		.name_img_wrap{
-			.name{
-				font-size: 12px;
-				margin: 0px 10px 0px 20px;
-				color: @heading_color;
-				position: relative;
-				top: -18px;
-				span{
-					font-weight: 500;
-				}
-			}
-			img{
-				width: auto;
-				vertical-align: top;
-				height:42px; /* changed the value from 45 to 42 */
-			}
-		}
+
 	}
 }
 .active_li_drop{

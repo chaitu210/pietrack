@@ -1,5 +1,6 @@
 from django import template
-from piebase.models import Ticket, Comment, Requirement, Role
+from piebase.models import Ticket, Comment, Role
+ # Requirement,
 from django.core.paginator import Paginator
 from datetime import datetime
 from django.db.models import Q
@@ -11,13 +12,10 @@ register = template.Library()
 def Task_list(status, search_filter):
     milestone = search_filter[0]
     assigned_to = map(int, search_filter[1])
-    requirements = map(int, search_filter[2])
-    task_list = map(int, search_filter[3])
-    start_date = search_filter[4]
-    end_date = search_filter[5]
+    task_list = map(int, search_filter[2])
+    start_date = search_filter[3]
+    end_date = search_filter[4]
     tasks = Ticket.objects.filter(status=status, milestone=milestone)
-    if requirements:
-        tasks = tasks.filter(requirement__id__in=requirements)
     if assigned_to:
         tasks = tasks.filter(assigned_to__id__in=assigned_to)
     if task_list:
@@ -72,14 +70,6 @@ def issue_list(search_filter):
 
 
 @register.filter
-def Requirement_Task_list(status, requirement_id):
-    requirement = Requirement.objects.get(id=requirement_id)
-    tasks = requirement.tasks.filter(status=status)
-    p = Paginator(tasks, 10)
-    return p.page(1)
-
-
-@register.filter
 def count_comments(ticket):
     return Comment.objects.filter(ticket=ticket).count()
 
@@ -115,7 +105,7 @@ def is_project_admin(user, slug):
 def sub_comments(sub_comment):
     l = []
     reply = sub_comment.comment_parent.all()
-    if (reply):
+    if reply:
         l.append(sub_comment)
         for sc in reply:
             l.extend(sub_comments(sc))
@@ -130,4 +120,4 @@ def level1comments(task):
 
 @register.filter
 def milestone_requirements(milestone):
-    return Requirement.objects.filter(milestone=milestone)
+    return Ticket.objects.filter(milestone=milestone)

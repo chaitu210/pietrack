@@ -9,17 +9,13 @@ from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.utils.translation import ugettext, ugettext_lazy as _
 from .tasks import celery_send_mail
-from piebase.models import Project, Priority, Severity, Organization, User, TicketStatus, Role, Milestone, Requirement, \
-    Comment, Ticket
+from piebase.models import Project, Priority, Severity, Organization, User, TicketStatus, Role, Milestone, Comment, \
+    Ticket
 from django.db.models import Q
 from django.template.defaultfilters import slugify
 from django.utils import timezone
 from django.core.exceptions import ValidationError
 import datetime
-
-
-# def CreateTimeline(content_object, event_type, project, user):
-#     Timeline.objects.create(content_object=content_object, event_type=event_type, project=project)
 
 
 class CreateProjectForm(forms.ModelForm):
@@ -171,8 +167,10 @@ class CreateMemberForm(forms.Form):
         email = self.cleaned_data['email']
         if Role.objects.filter(users__email=email, project__slug=self.slug, project__organization=self.organization):
             raise ValidationError("This user is assigned to the project.")
+
         if self.organization.user_set.get(email=email).pietrack_role == 'admin':
             raise ValidationError("organization admin is already a member")
+
         return email
 
 
@@ -291,26 +289,6 @@ class MilestoneForm(forms.ModelForm):
         return milestone
 
 
-class RequirementForm(forms.ModelForm):
-    def __init__(self, user, *args, **kwargs):
-        self.user = user
-        super(RequirementForm, self).__init__(*args, **kwargs)
-
-    class Meta:
-        model = Requirement
-        fields = ['name', 'milestone', 'estimated_start',
-                  'estimated_finish', 'description', 'project']
-
-    def save(self, commit=True):
-        requirement = super(RequirementForm, self).save(commit=False)
-        requirement.slug = slugify(self.cleaned_data.get('name'))
-        requirement.modified_date = self.cleaned_data.get('estimated_finish')
-        requirement.created_by = self.user
-        if commit:
-            requirement.save()
-        return requirement
-
-
 class CommentForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.task = kwargs.pop('task', None)
@@ -351,8 +329,9 @@ class CreateIssueForm(forms.Form):
     def clean_name(self):
         name = self.cleaned_data['name']
         if self.instance:
-           if  Ticket.objects.filter(~Q(ticket_type='task')).exclude(slug=self.instance.slug).filter(slug=slugify(name)):
-               raise ValidationError("Issue with this name already exists.")
+            if Ticket.objects.filter(~Q(ticket_type='task')).exclude(slug=self.instance.slug).filter(
+                    slug=slugify(name)):
+                raise ValidationError("Issue with this name already exists.")
         elif Ticket.objects.filter(~Q(ticket_type='task')).filter(slug=slugify(name)):
             raise ValidationError("Issue with this name already exists.")
         return name
