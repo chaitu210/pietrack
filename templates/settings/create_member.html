@@ -76,24 +76,11 @@
             </div>
             {% csrf_token %}
         </form>
-        <form id='id_form_description' action="#">
-
-            <div class="panel_box">
-                <div class="form_group">
-                    <label>Description</label>
-                    <textarea id='id_textarea_description' name='description' class="textarea"></textarea>
-                    <span id='id_span_description_error'></span>
-                </div>
-            </div>
-            {% csrf_token %}
-        </form>
+        
         <div id='id_div_create_member' class="panel_box">
             <button id='id_button_create_member'><i class="fa fa-save"></i> create memeber</button>
             <div id="dup_email" class="alert alert-warning" role="alert" style="padding:0px;margin-top:5px;">
               <div class="container"> Duplicate e-mails were found.</div>
-            </div>
-            <div class="help">
-                The user will get an invite soon.
             </div>
         </div>
     {% endif %}
