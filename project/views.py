@@ -195,6 +195,8 @@ def project_details(request, slug):
 @active_user_required
 @check_project_admin
 def delete_project(request, slug, id):
+    if not request.user.pietrack_role == 'admin':
+        return HttpResponseForbidden('')
     try:
         project = Project.objects.get(id=id, organization=request.user.organization)
         timeline_list = [project]
@@ -912,7 +914,7 @@ def task_edit(request, slug, milestone_slug, task_id):
     old_name = task.name
     old_assigned_to = task.assigned_to
     if request.POST:
-        form = TaskForm(request.POST, user=request.user, project=task.project, milestone=project_obj.milestones.get(slug=milestone_slug), instance=task)
+        form = TaskForm(request.POST, user=request.user, project=task.project, instance=task)
         json_data = {}
         if form.is_valid():
             json_data['error'] = False
@@ -937,6 +939,7 @@ def task_edit(request, slug, milestone_slug, task_id):
             json_data['form_errors'] = form.errors
         return HttpResponse(json.dumps(json_data), content_type='application/json')
     else:
+        milestone_list = project_obj.milestones.all()
         ticket_status_list = TicketStatus.objects.filter(project=project_obj)
         assigned_to_list = []
         for member in project_obj.members.all():
@@ -947,6 +950,7 @@ def task_edit(request, slug, milestone_slug, task_id):
                 pass
         return render(request, 'task/add_task.html',
                       {
+                          'milestone_list': milestone_list,
                           'ticket_status_list': ticket_status_list,
                           'assigned_to_list': assigned_to_list, 'slug': slug,
                           'task': task, 'milestone': task.milestone,
@@ -1007,12 +1011,11 @@ def create_issue(request, slug):
     if request.POST:
         return create_issue_to_ticket(request, slug, request.POST.get('refer_task'))
     return render(request, 'task/add_task.html', {'is_issue': True, 'issue_type': ['bug', 'enhancement'],
-                                                  'assigned_to_list': project.members.all(),
+                                                  'milestone_list': project.milestones.all(),
                                                   'slug': slug,
                                                   'severity_list': project.severities.all(),
                                                   'priority_list': project.priorities.all(),
                                                   'tasks': project.project_tickets.filter(ticket_type='task'),
-                                                  'ticket_status_list': project.task_statuses.all(),
                                                   'notification_list': get_notification_list(request.user)
                                                   })
 

@@ -74,9 +74,7 @@
                                         <th width="13%">Type</th>
                                         <th width="5%"> Severity </th>
                                         <th width="5%"> Priority</th>
-                                        <th width="13%"> Status </th>
                                         <th width="16%"> Created </th>
-                                        <th width="18%"> Assigned to </th>
                                         <th width="8%">Actions</th>
                                     </tr>
                                 </thead>
@@ -98,25 +96,9 @@
                                                     <span class="input-group-addon" style="background: none; border:none; "><i style="cursor: default;"></i></span>
                                                 </div>
                                         </td>
-                                        <td>
 
-                                            <select class="form-control issue" name="status">
-                                              {% for status_iter in status_list %}
-                                                <option value="{{ status_iter.id }}" {% if status_iter == issue.status %} selected {% endif %}>{{ status_iter }}</option>
-                                              {% endfor %}
-                                            </select>
-                                        </td>
                                         <td> {{ issue.created_date }} </td>
-                                        <td>
-                                            <select class="form-control issue" name="assigned_to">
-                                            <option value="">None</option>
-                                              {% for member in member_list %}
-                                                <option value="{{ member.id }}" {% if member == issue.assigned_to %} selected {% endif %}>
-                                                    {% if member.first_name %}{{ member.first_name }}{% else %}{{ member }}{% endif %}
-                                                </option>
-                                              {% endfor %}
-                                            </select>
-                                        </td>
+
                                         <td>
 
                                             <span class='actions_div'>

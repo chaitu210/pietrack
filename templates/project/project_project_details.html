@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% load project_tags %}
 
 {% load compress %}
 {% load static %}
@@ -52,9 +52,11 @@
 
                             </div>
                             <button class="special-button"><span class="fa fa-save"></span> Save</button>
+                             {% if request.user.pietrack_role == 'admin' %}
                             <span class="del-project">
                                 <a href="{%url 'project:delete_project' slug=slug id=project.id %}"><input type="button" class="special-button" value="Delete"/></a>
                             </span>
+                            {% endif %}
                       </div>
                     </form>
               <!-- content box starts here -->
