@@ -566,15 +566,17 @@ def project_team(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     user = request.user
     if request.POST:
-        member = project.members.get(id=request.POST.get('user_id'))
-        if project.admins.filter(id=request.POST.get('user_id')):
-            project.admins.remove(member)
-        else:
-            project.admins.add(member)
-        text = True
-        if member.pietrack_role == 'admin':
-            text = False
-        return HttpResponse(json.dumps({'result': text}), content_type="application/json")
+        if project.members.filter(id=user.id) or user.pietrack_role == 'admin':
+            member = project.members.get(id=request.POST.get('user_id'))
+            if user.id != member.id and member.pietrack_role != 'admin':
+                if project.admins.filter(id=request.POST.get('user_id')):
+                    project.admins.remove(member)
+                else:
+                    project.admins.add(member)
+                text = True
+            else:
+                text = False
+            return HttpResponse(json.dumps({'result': text}), content_type="application/json")
     dictionary = {'project': project, 'slug': slug, 'notification_list': get_notification_list(request.user)}
     return render(request, 'settings/team.html', dictionary)
 
@@ -582,6 +584,9 @@ def project_team(request, slug):
 @active_user_required
 @check_project_admin
 def create_member(request, slug):
+    project_obj = Project.objects.get(slug=slug, organization=request.user.organization)
+    if not project_obj.roles.all():
+        return HttpResponseRedirect(reverse("project:member_roles", kwargs={'slug':slug}))
     if request.method == 'POST':
         error_count = 0
         json_data = {}
@@ -591,7 +596,6 @@ def create_member(request, slug):
         post_dict = {}
         post_tuple = zip(email_list, designation_list)
         team_members = []
-        project_obj = Project.objects.get(slug=slug, organization=request.user.organization)
         for email_iter, designation_iter in post_tuple:
             if email_iter != '':
                 email_iter += '@' + request.user.organization.domain
