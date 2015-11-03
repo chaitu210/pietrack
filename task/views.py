@@ -4,6 +4,8 @@ from task.forms import TaskForm
 from piebase.models import TicketStatus, Project, Role
 from project.signals import create_timeline
 from project.views import get_notification_list
+from django.http import HttpResponseRedirect
+from django.core.urlresolvers import reverse
 
 
 def add_task(request, slug, milestone_slug):
@@ -12,7 +14,6 @@ def add_task(request, slug, milestone_slug):
         add_task_dict = request.POST.copy()
         add_task_dict['project'] = project_obj.id
         json_data = {}
-        print milestone_slug
         add_task_form = TaskForm(add_task_dict, project=project_obj, user=request.user)
         if add_task_form.is_valid():
             json_data['error'] = False
@@ -39,6 +40,8 @@ def add_task(request, slug, milestone_slug):
     else:
         milestone_list = project_obj.milestones.all()
         ticket_status_list = TicketStatus.objects.filter(project=project_obj).order_by('order')
+        if not ticket_status_list:
+            return HttpResponseRedirect(reverse("project:ticket_status",kwargs={'slug':slug}))
         assigned_to_list = []
         for member in project_obj.members.all():
             try:
