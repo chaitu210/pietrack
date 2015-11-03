@@ -27,7 +27,6 @@ from django.utils.functional import wraps
 from django.db.models import Q
 from datetime import datetime
 
-
 def check_project_admin(view):
     wraps(view)
 
@@ -91,6 +90,42 @@ def swap_order(tasks):
         tasks[index + 1].save()
         tasks[index].save()
 
+
+def filter_tickets(List,request):
+    assigned_to_list = request.GET.getlist('assigned_to')
+    issue_type_list = request.GET.getlist('issue_type')
+    issues_list = request.GET.getlist('issue_list')
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+    to_date = request.GET.get('to_date')
+    if assigned_to_list:
+        List = List.filter(assigned_to__id__in=assigned_to_list)
+
+    if issue_type_list:
+        List = List.filter(ticket_type__in=issue_type_list)
+
+    if issues_list:
+        List = List.filter(id__in=issues_list)
+
+    if start_date != '':
+        try:
+            start_date = datetime.strptime(start_date + u' 00:00:00', '%m/%d/%Y %H:%M:%S')
+            List = List.filter(created_date__gte=start_date)
+        except:
+            pass
+    if end_date != '':
+        try:
+            end_date = datetime.strptime(end_date + u' 23:59:59', '%m/%d/%Y %H:%M:%S')
+            List = List.filter(finished_date__lte=end_date)
+        except:
+            pass
+    if to_date !='':
+        try:
+            start_date = datetime.strptime(to_date + u' 23:59:59', '%m/%d/%Y %H:%M:%S')
+            List = List.filter(created_date__lte=start_date)
+        except:
+            pass
+    return List
 
 @active_user_required
 @check_organization_admin
@@ -531,15 +566,17 @@ def project_team(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     user = request.user
     if request.POST:
-        member = project.members.get(id=request.POST.get('user_id'))
-        if project.admins.filter(id=request.POST.get('user_id')):
-            project.admins.remove(member)
-        else:
-            project.admins.add(member)
-        text = True
-        if member.pietrack_role == 'admin':
-            text = False
-        return HttpResponse(json.dumps({'result': text}), content_type="application/json")
+        if project.members.filter(id=user.id) or user.pietrack_role == 'admin':
+            member = project.members.get(id=request.POST.get('user_id'))
+            if user.id != member.id and member.pietrack_role != 'admin':
+                if project.admins.filter(id=request.POST.get('user_id')):
+                    project.admins.remove(member)
+                else:
+                    project.admins.add(member)
+                text = True
+            else:
+                text = False
+            return HttpResponse(json.dumps({'result': text}), content_type="application/json")
     dictionary = {'project': project, 'slug': slug, 'notification_list': get_notification_list(request.user)}
     return render(request, 'settings/team.html', dictionary)
 
@@ -547,6 +584,9 @@ def project_team(request, slug):
 @active_user_required
 @check_project_admin
 def create_member(request, slug):
+    project_obj = Project.objects.get(slug=slug, organization=request.user.organization)
+    if not project_obj.roles.all():
+        return HttpResponseRedirect(reverse("project:member_roles", kwargs={'slug':slug}))
     if request.method == 'POST':
         error_count = 0
         json_data = {}
@@ -556,7 +596,6 @@ def create_member(request, slug):
         post_dict = {}
         post_tuple = zip(email_list, designation_list)
         team_members = []
-        project_obj = Project.objects.get(slug=slug, organization=request.user.organization)
         for email_iter, designation_iter in post_tuple:
             if email_iter != '':
                 email_iter += '@' + request.user.organization.domain
@@ -1124,19 +1163,13 @@ def project_edit(request, slug):
 @is_project_member
 def issues(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
-    issue_list = project.project_tickets.filter(~Q(ticket_type='task'))
-
-    assigned_to_list = request.GET.getlist('assigned_to')
-    issue_type_list = request.GET.getlist('issue_type')
-    issues = request.GET.getlist('issue_list')
-    start_date = request.GET.get('start_date')
-    end_date = request.GET.get('end_date')
-    search_filter = (assigned_to_list, issue_type_list, issues, start_date, end_date)
+    issue_list = project.project_tickets.filter(~Q(ticket_type='task')).filter(is_approved=False)
+    issue_list = filter_tickets(issue_list, request)
     return render(request, 'project/issueboard.html',
                   {'project': project, 'slug': slug, 'issue_list': issue_list,
                    'status_list': project.task_statuses.all(),
-                   'member_list': project.members.all(),
-                   'search_filter': search_filter,
+                   # 'member_list': project.members.all(),
+                   # 'search_filter': search_filter,
                    'issue_type_list': ['bug', 'enhancement'],
                    'notification_list': get_notification_list(request.user)
                    })
@@ -1181,12 +1214,14 @@ def create_issue_to_ticket(request, slug, task_id):
                 slug=slugify(request.POST.get('name')),
                 project=project,
                 description=request.POST.get('description'),
-                ticket_type=request.POST.get('issue_type'),
                 created_by=request.user,
             )
-
             try:
                 issue.status=project.task_statuses.get(id=request.POST.get('status'))
+            except:
+                pass
+            try:
+                issue.ticket_type=request.POST.get('issue_type')
             except:
                 pass
             try:
@@ -1310,14 +1345,90 @@ def delete_issue(request, slug, issue_id):
 
 def issue_approve(request,slug, issue_id):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
-    if not project.milestones.all():
+    milestones = project.milestones.all()
+    issue_old = project.project_tickets.get(id=issue_id)
+
+    if not milestones:
         return HttpResponseRedirect(reverse('project:milestone_create', kwargs={'slug': slug}))
 
-    issue_old = project.project_tickets.get(id=issue_id)
+    if request.POST:
+        json_data={}
+        add_task_form = TaskForm(request.POST, project=project, user=request.user)
+        if add_task_form.is_valid():
+            json_data['error'] = False
+            task = add_task_form.save()
+            task.order = project.project_tickets.count() + 1
+            task.reference = issue_old
+            task.save()
+            issue_old.is_approved=True
+            issue_old.save()
+            url = reverse('project:taskboard', kwargs={'slug': slug, 'milestone_slug':task.milestone.slug})
+            json_data['url'] = url
+            return HttpResponse(json.dumps(json_data), content_type='application/json')
+        else:
+            json_data['error'] = True
+            json_data['form_errors'] = add_task_form.errors
+            return HttpResponse(json.dumps(json_data), content_type='application/json')
+
     return render(request, 'task/add_task.html',{
-        'milestone_list': project.milestones.all(),
-        'issue_old':issue_old
+        'slug':slug,
+        'assigned_to_list': project.members.all(),
+        'milestone_list': milestones,
+        'issue_old':issue_old,
+        'ticket_status_list':project.task_statuses.all(),
+        'is_issue_approved':True
     })
+
+def issues_approved(request, slug):
+    project = Project.objects.get(slug=slug, organization=request.user.organization)
+    issue_list = project.project_tickets.filter(~Q(ticket_type='task')).filter(is_approved=True)
+    closed_list=[]
+    for issue in issue_list:
+        if issue.references.filter(ticket_type='task', status__is_final=False):
+            closed_list.append(issue.pk)
+    issue_list = Ticket.objects.filter(pk__in = closed_list)
+    issue_list = filter_tickets(issue_list, request)
+    return render(request, 'project/issueboard.html',
+                  {'project': project, 'slug': slug,
+                   'issue_list': issue_list,
+                   'status_list': project.task_statuses.all(),
+                   'member_list': project.members.all(),
+                   # 'search_filter': search_filter,
+                   'issue_type_list': ['bug', 'enhancement'],
+                   'notification_list': get_notification_list(request.user),
+                   'change_active': "approved"
+                   })
+
+
+def issues_closed(request, slug):
+    project = Project.objects.get(slug=slug, organization=request.user.organization)
+    issue_list = project.project_tickets.filter(~Q(ticket_type='task')).filter(is_approved=True)
+    closed_list=[]
+    for issue in issue_list:
+        if issue.references.filter(ticket_type='task', status__is_final=True).count() == issue.references.all().count():
+            closed_list.append(issue.pk)
+    issue_list = Ticket.objects.filter(pk__in = closed_list)
+    issue_list = filter_tickets(issue_list, request)
+    return render(request, 'project/issueboard.html',
+                  {'project': project, 'slug': slug,
+                   'issue_list': issue_list,
+                   'status_list': project.task_statuses.all(),
+                   'member_list': project.members.all(),
+                   # 'search_filter': search_filter,
+                   'issue_type_list': ['bug', 'enhancement'],
+                   'notification_list': get_notification_list(request.user),
+                   'change_active': "closed"
+                   })
+
+
+def issue_reopen(request, slug, issue_id):
+    project = Project.objects.get(slug=slug, organization=request.user.organization)
+    issue = project.project_tickets.filter(id=issue_id)
+    for task in project.project_tickets.filter(reference=issue):
+        task.status = project.task_statuses.filter(is_final=False)[0]
+        task.save()
+    return HttpResponse(json.dumps({'result':True}),content_type="json/application")
+
 
 @active_user_required
 @check_project_admin

@@ -4,6 +4,8 @@ from django.template.defaultfilters import slugify
 
 
 class TaskForm(forms.ModelForm):
+
+    finished_date = forms.DateField(required=True)
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)
         self.project = kwargs.pop('project', None)
@@ -13,6 +15,14 @@ class TaskForm(forms.ModelForm):
         model = Ticket
         fields = ['name', 'milestone', 'status', 'finished_date',
                   'assigned_to', 'description', 'ticket_type']
+
+    def clean_name(self):
+        name = self.cleaned_data['name']
+        if self.instance:
+            existing_slug = self.instance.slug
+        if self.project.project_tickets.filter(slug=slugify(name), ticket_type="task") and existing_slug!=slugify(name):
+            raise forms.ValidationError("Task with this name already exists.")
+        return name
 
     def save(self, commit=True):
         task = super(TaskForm, self).save(commit=False)
