@@ -85,6 +85,8 @@ urlpatterns = [
 
     # issue_board
     url(r'^(?P<slug>[-\w]+)/issues/$', issues, name="issues"),
+    url(r'^(?P<slug>[-\w]+)/issues/approved/$', issues_approved, name="issues_approved"),
+    url(r'^(?P<slug>[-\w]+)/issues/closed/$', issues_closed, name="issues_closed"),
     url(r'^(?P<slug>[-\w]+)/issue/create/$', create_issue, name="create_issue"),
     url(r'^(?P<slug>[-\w]+)/task/(?P<task_id>[0-9]+)/issue/create/$', create_issue_to_ticket,
         name="create_issue_to_ticket"),
@@ -93,6 +95,7 @@ urlpatterns = [
     url(r'^(?P<slug>[-\w]+)/issue/(?P<issue_id>[0-9]+)/edit/$', edit_issue, name="edit_issue"),
     url(r'^(?P<slug>[-\w]+)/issue/(?P<issue_id>[0-9]+)/delete/$', delete_issue, name="delete_issue"),
     url(r'^(?P<slug>[-\w]+)/issue/(?P<issue_id>[0-9]+)/approve/$', issue_approve, name="issue_approve"),
+    url(r'^(?P<slug>[-\w]+)/issue/(?P<issue_id>[0-9]+)/reopen/$', issue_reopen, name="issue_reopen"),
 
 
 

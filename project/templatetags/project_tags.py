@@ -119,4 +119,4 @@ def level1comments(task):
 
 @register.filter
 def milestone_requirements(milestone):
-    return Ticket.objects.filter(milestone=milestone)
+    return Ticket.objects.filter(milestone=milestone,ticket_type="task")

@@ -15,18 +15,19 @@
                     </a>
                 </span>
             </div>
+        <nav class="navbar navbar-default">
+            <ul class="nav nav-tabs">
+                <li {% if not change_active %}class="active"{% endif %}><a href="{% url "project:issues" slug %}">Issues</a></li>
+                <li {% if change_active == "approved" %}class="active"{% endif %}><a href="{% url "project:issues_approved" slug %}">Approved</a></li>
+                <li {% if change_active == "closed" %}class="active"{% endif %}><a href="{% url "project:issues_closed" slug %}">Closed</a></li>
+            </ul>
+        </nav>
             <!-- filters -->
             <div class="filters_wrap">
                 <h3>Refine your search</h3>
             <form action="" method="get" id="search">
                 <div class="row filter_row">
-                    <div class="col-md-2">
-                        <select class='select2 input select2_assigned_to' name="assigned_to" multiple>
-                            {% for member in member_list %}
-                                <option value="{{ member.id }}" {% for mem in search_filter.0 %}{% ifequal mem|add:'0' member.id %}selected{% endifequal %}{% endfor %}>{% if member.first_name %}{{ member.first_name }}{% else %}{{ member.username }}{% endif %}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
+
                     <div class="col-md-2">
                         <select class='select2 input issue_type' name="issue_type" multiple>
                             {% for issue_type in issue_type_list%}
@@ -43,10 +44,10 @@
 
                     </div>
                     <div class="col-md-2">
-                        <input name="start_date" type="text" class='input' value="{{ request.GET.start_date }}" id='sdate' placeholder='Created Date'>
+                        <input name="start_date" type="text" class='input' value="{{ request.GET.start_date }}" id='sdate' placeholder='From Date'>
                     </div>
                     <div class="col-md-2">
-                        <input name="end_date"   type="text" class='input' value="{{ request.GET.end_date }}" id='edate' placeholder='Finished Date'>
+                        <input name="to_date"   type="text" class='input' value="{{ request.GET.to_date  }}" id='edate' placeholder='To Date'>
                     </div>
                     <div class="col-md-1">
                         <button type="submit" class='submit_btn'><i class='fa fa-search'></i>Go</button>
@@ -78,7 +79,7 @@
                                         <th width="8%">Actions</th>
                                     </tr>
                                 </thead>
-                                {% for issue in search_filter|issue_list %}
+                                {% for issue in issue_list %}
                                 <tbody style="cursor: pointer;">
                                     <tr id="{{ issue.id }}" class="issues_rows">
                                         <td> {{ issue.name }} </td>
@@ -114,16 +115,26 @@
                                                     <i class='fa fa-close'></i>
                                                     </span>
                                                 </a>
+                                            {% if not change_active %}
                                                 <a href="{% url 'project:issue_approve' slug issue.id %}">
                                                     <i class="fa fa-thumbs-up"></i>
                                                 </a>
+                                            {% endif %}
+
+                                            {% if change_active == "closed" %}
+                                                <a href="{% url 'project:issue_reopen' slug issue.id %}" class="reopen">
+                                                    <button>re-open</button>
+                                                </a>
+                                            {% endif %}
+
                                             </span>
 
                                         </td>
                                     </tr>
 
                                     {% empty %}
-                                        {% if issue_list %}
+                                        {% if not issue_list %}
+                                        <!---
                                         <div id="not_found">
                                             <hr>
                                                 <div style="text-align: center;font-weight: bold;padding:0px;margin: 0px; color: #E88E00" class="search_warning">
@@ -131,8 +142,9 @@
                                                         Sorry, Search query not found !
                                                 </div>
                                             <hr>
-                                        </div>
+                                        </div>-->
                                         {% endif %}
+
                                     {% endfor %}
                                 </tbody>
                             </table>
@@ -174,10 +186,6 @@
     });
     </script>
     <script type="text/javascript">
-        $('.select2_assigned_to').select2({
-            tags:"true",
-            placeholder: 'Assigned members'
-        });
 
         $(".issue_type").select2({
           tags: "true",
@@ -189,6 +197,10 @@
           placeholder: "Issue Title"
         });
 
+        $(".select2_task").select2({
+          tags: "true",
+          placeholder: "Task Title"
+        });
     /* extra code */
 
         $('tr .issue').change(function(e){
@@ -225,5 +237,18 @@
                 }, 3000);
         }
 
+        {% if change_active == "closed" %}
+            $("a.reopen").click(function (e) {
+                $instance = $(this)
+                $.get($(this).attr('href'), function (response) {
+                    if (response['result']){
+                        $("#"+$instance.closest('tr').attr('id')).remove()
+                    }
+                })
+
+                e.preventDefault()
+                e.stopPropagation();
+            })
+        {% endif %}
     </script>
 {% endblock%}

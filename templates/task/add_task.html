@@ -21,7 +21,7 @@
             <form id='task_form'>
                 <div class="form_group">
                     <label>Title</label>
-                    <input id='task_name' name='name' type="text" class='input' value="{% if issue_old %}{{ issue_old.name }}{% endif %}{% if task %}{{ task.name }}{% endif %}">
+                    <input id='task_name' name='name' type="text" class='input' value="{% if issue_old %}{{ issue_old.name }}{% if is_issue_approved %}_bug{% endif %}{% endif %}{% if task %}{{ task.name }}{% endif %}">
                     <span id='task_name_error' class='task_err'></span>
                 </div>
 
@@ -71,7 +71,7 @@
                         <label>Status</label>
                         <select name='status' class='input'>
                             {% for ticket_status_iter in ticket_status_list %}
-                                <option value='{{ ticket_status_iter.id }}' {% if issue_old.status == ticket_status_iter %}selected{% endif %}>{{ ticket_status_iter.name }}</option>
+                                <option value='{{ ticket_status_iter.id }}' {% if issue_old.status  == ticket_status_iter  or task.status == ticket_status_iter%}selected{% endif %}>{{ ticket_status_iter.name }}</option>
                             {% endfor %}
                         </select>
                         <span id='task_status_error'></span>
@@ -152,7 +152,11 @@ $('#task_save').click(function(event) {
             for (var key in data['form_errors']) {
                 $('#task_' + key + '_error').text('').append(data['form_errors'][key])
             }
-        }else {
+        }
+        else if (data['url']){
+            window.location = data['url']
+        }
+        else {
             window.location = "{% if milestone %}{% url 'project:taskboard' slug milestone.slug %}{% elif is_issue %}{% url 'project:issues' slug %}{% endif %}"
         }
     });

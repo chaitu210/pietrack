@@ -262,9 +262,11 @@ class Ticket(models.Model):
     ticket_type = models.CharField(blank=True, max_length=50, choices=TICKET_TYPE, default='task')
     target_date = models.DateField(null=True, blank=True, verbose_name=_("target date"))
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="user_tickets", null=True, blank=True)
+    is_approved = models.BooleanField(default=False)
 
     class Meta:
         ordering = ['order']
+        unique_together = ("project", "slug")
 
     def __str__(self):
         return self.name
