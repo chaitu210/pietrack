@@ -10,6 +10,10 @@ urlpatterns = [
     # project settings
     url(r'^(?P<slug>[-\w]+)/settings/$', project_details, name='project_details'),
     url(r'^(?P<slug>[-\w]+)/edit/$', project_edit, name='project_edit'),
+    url(r'^(?P<slug>[-\w]+)/git_lab/$', git_lab, name='git_lab'),
+    url(r'^(?P<slug>[-\w]+)/git_lab_create/$', git_lab_create, name='git_lab_create'),
+    url(r'^(?P<slug>[-\w]+)/git_lab/(?P<gitlab_id>[0-9]+)/edit/$', git_lab_edit, name='git_lab_edit'),
+    url(r'^(?P<slug>[-\w]+)/git_lab/(?P<gitlab_id>[0-9]+)/git_list/$', git_lab_test_git, name='git_lab_test_git'),
 
     # team
     url(r'^(?P<slug>[-\w]+)/team/$', project_team, name='project_team'),

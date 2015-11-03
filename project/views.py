@@ -1,3 +1,4 @@
+import requests
 import json
 import random
 import string
@@ -5,9 +6,9 @@ import shutil
 import os
 from django.shortcuts import render, redirect, render_to_response, get_object_or_404
 from piebase.models import User, Project, Priority, Severity, TicketStatus, Ticket, Attachment, Role, \
-    Milestone, Timeline, Comment, Labels
+    Milestone, Timeline, Comment, Labels, GitLab
 from forms import CreateProjectForm, PriorityForm, SeverityForm, TicketStatusForm, RoleForm, CommentForm, \
-    CreateMemberForm, PasswordResetForm, MilestoneForm, CreateIssueForm, LabelsForm
+    CreateMemberForm, PasswordResetForm, MilestoneForm, CreateIssueForm, LabelsForm, GitLabForm
 from PIL import Image
 from django.utils import timezone
 from django.template.defaultfilters import slugify
@@ -1213,7 +1214,6 @@ def update_issue(request, slug):
     ticket_type = request.GET.get('ticket_type', False)
     status_id = request.GET.get('status', False)
     assigned_to_id = request.GET.get('assigned_to', False)
-    print ticket_type
     if ticket_type:
         pass
     if status_id:
@@ -1240,7 +1240,6 @@ def issue_details(request, slug, issue_id):
 def edit_issue(request, slug, issue_id):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     issue = Ticket.objects.get(id=issue_id)
-    print request.POST
     if request.POST:
         form = CreateIssueForm(request.POST, project=project, instance=issue)
         error = True
@@ -1376,3 +1375,60 @@ def labels_delete(request, slug, label_slug):
     Labels.objects.get(
         slug=label_slug, project=Project.objects.get(slug=slug, organization=request.user.organization)).delete()
     return HttpResponse(json.dumps({'error': False}), content_type="application/json")
+
+
+@active_user_required
+@check_project_admin
+def git_lab(request, slug):
+    project = Project.objects.get(slug=slug, organization=request.user.organization)
+    data = {'project': project, 'slug': slug}
+    gitlab_list = GitLab.objects.filter(project=project)
+    if gitlab_list:
+        data['gitlab_list'] = gitlab_list[0]
+    else:
+        messages.warning(request, 'Please provide settings for GitLab')
+    return render(request, 'settings/git_lab.html', data)
+
+
+@active_user_required
+@check_project_admin
+def git_lab_create(request, slug):
+    project = Project.objects.get(slug=slug, organization=request.user.organization)
+    form = GitLabForm(request.POST, project=project)
+    if form.is_valid():
+        form.save()
+
+        messages.success(request, 'Successfully added your GitLab settings !')
+        return HttpResponse(json.dumps({'error': False}), content_type='application/json')
+
+    else:
+        return HttpResponse(json.dumps({'error': True, 'errors': form.errors}), content_type="application/json")
+
+
+@active_user_required
+@check_project_admin
+def git_lab_edit(request, slug, gitlab_id):
+    project = Project.objects.get(slug=slug, organization=request.user.organization)
+    instance = GitLab.objects.get(id=gitlab_id, project=project)
+    form = GitLabForm(request.POST, instance=instance, project=project)
+    if form.is_valid():
+        form.save()
+
+        messages.success(request, 'Successfully updated your GitLab settings !')
+        return HttpResponse(json.dumps({'error': False}), content_type="application/json")
+    else:
+        return HttpResponse(json.dumps({'error': True, 'errors': form.errors}), content_type="application/json")
+
+
+@active_user_required
+@check_project_admin
+def git_lab_test_git(request, slug, gitlab_id):
+    project = Project.objects.get(slug=slug, organization=request.user.organization)
+    git_obj = GitLab.objects.get(id=gitlab_id, project=project)
+    resp = requests.request("GET", git_obj.git_url + 'api/v3/projects?private_token=' + git_obj.secret_key)
+
+    for i in resp.json():
+        if i['path']==project.slug:
+            git_obj.git_id = i['id']
+            git_obj.save()
+    return HttpResponse(resp, content_type='application/json')
