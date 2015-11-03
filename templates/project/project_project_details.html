@@ -1,20 +1,9 @@
-{% extends 'base.html' %}
+{% extends 'settings/base.html' %}
 {% load project_tags %}
-
-{% load compress %}
 {% load static %}
 {% load staticfiles %}
+{% block settings_content %}
 
-{% compress css %}
-  {% block extra_css_links %}
-    <link rel="stylesheet" type="text/css" href="{%static 'less/bs_leftnavi1.css' %}">
-  {% endblock %}
-{% endcompress %}
-
-{% block content %} 
- <section id="box-content">
-    <!-- nav left starts here-->
-    {% include "settings/left_menu.html" %}
     <!-- right container starts here-->
     <div class="right-container">
         <div class="panel panel-default content-panel">
@@ -50,7 +39,11 @@
                                     <br>
                                     <span  id="logo-err" class="help" style="margin-left:20px;margin-bottom:10px;"></span>
 
+
+                                <!--<a href="{% url 'project:git_lab' slug %}" class="git_lab"><i class="fa fa-git"></i> Git Lab settings</a>-->
                             </div>
+                            <!--<br />-->
+
                             <button class="special-button"><span class="fa fa-save"></span> Save</button>
                              {% if request.user.pietrack_role == 'admin' %}
                             <span class="del-project">
@@ -65,12 +58,7 @@
            </div>
         </div>
         <!-- right container ends here-->
-  </section>
 {% endblock %}
-
-{%block extra_js_links %}
-    <script type="text/javascript" src="{%static 'js/bs_leftnavi.js' %}"></script>
-{%endblock extra_js_links %}
 
 {%block extra_js %}
 
@@ -98,7 +86,7 @@
           }
         $('#id_form_cproject').on('submit',function(e){
           $('#description').val(CKEDITOR.instances.description.getData());
-          var form = this
+          var form = this;
           var formData = new FormData($(this)[0]);
           $.ajax({
             url: "",
@@ -121,7 +109,7 @@
                     $("span[name='pname_error']").text("");
                     $("span[name='pdescription_error']").text("");
                     /*alert("Project edited");*/
-                    window.location="{%url 'project:list_of_projects'%}"
+                    window.location="{% url 'project:project_detail' slug %}"
                   }
             }
           });
@@ -130,6 +118,7 @@
         });
   </script>
     <script type="text/javascript">
-        $('.edit-project').addClass('active');
+        $('#edit_project_submenu').attr('class', 'arrow-up active');
+        $('#edit_project_submenu ul').show().children('li#edit_project').addClass('active');
     </script>
 {%endblock %}

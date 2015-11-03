@@ -2690,6 +2690,23 @@ header .text .tag {
   height: 120px!important;
   border-radius: 0px;
 }
+#box-content .right-container .content-panel .content_box .panel_box .git_lab {
+  text-align: center;
+  padding: 7px;
+  text-transform: capitalize;
+  font-size: 13px;
+  font-weight: bold;
+  width: 15%;
+  /* changed value from 100 to 15 */
+  box-shadow: none;
+  border-radius: 0px;
+  color: #fff;
+  border: 1px solid #7bb344;
+  background: #7bb344;
+  float: left;
+  margin-left: 10px;
+  text-decoration: none;
+}
 #box-content .right-container .content-panel .content_box .panel_box .special-button {
   padding: 7px;
   text-transform: capitalize;

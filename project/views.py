@@ -1,3 +1,4 @@
+import requests
 import json
 import random
 import string
@@ -5,9 +6,9 @@ import shutil
 import os
 from django.shortcuts import render, redirect, render_to_response, get_object_or_404
 from piebase.models import User, Project, Priority, Severity, TicketStatus, Ticket, Attachment, Role, \
-    Milestone, Timeline, Comment, Labels
+    Milestone, Timeline, Comment, Labels, GitLab
 from forms import CreateProjectForm, PriorityForm, SeverityForm, TicketStatusForm, RoleForm, CommentForm, \
-    CreateMemberForm, PasswordResetForm, MilestoneForm, CreateIssueForm, LabelsForm
+    CreateMemberForm, PasswordResetForm, MilestoneForm, CreateIssueForm, LabelsForm, GitLabForm
 from PIL import Image
 from django.utils import timezone
 from django.template.defaultfilters import slugify
@@ -26,6 +27,7 @@ from .templatetags.project_tags import is_project_admin
 from django.utils.functional import wraps
 from django.db.models import Q
 from datetime import datetime
+
 
 def check_project_admin(view):
     wraps(view)
@@ -91,7 +93,7 @@ def swap_order(tasks):
         tasks[index].save()
 
 
-def filter_tickets(List,request):
+def filter_tickets(List, request):
     assigned_to_list = request.GET.getlist('assigned_to')
     issue_type_list = request.GET.getlist('issue_type')
     issues_list = request.GET.getlist('issue_list')
@@ -119,13 +121,14 @@ def filter_tickets(List,request):
             List = List.filter(finished_date__lte=end_date)
         except:
             pass
-    if to_date !='':
+    if to_date != '':
         try:
             start_date = datetime.strptime(to_date + u' 23:59:59', '%m/%d/%Y %H:%M:%S')
             List = List.filter(created_date__lte=start_date)
         except:
             pass
     return List
+
 
 @active_user_required
 @check_organization_admin
@@ -586,7 +589,7 @@ def project_team(request, slug):
 def create_member(request, slug):
     project_obj = Project.objects.get(slug=slug, organization=request.user.organization)
     if not project_obj.roles.all():
-        return HttpResponseRedirect(reverse("project:member_roles", kwargs={'slug':slug}))
+        return HttpResponseRedirect(reverse("project:member_roles", kwargs={'slug': slug}))
     if request.method == 'POST':
         error_count = 0
         json_data = {}
@@ -997,6 +1000,7 @@ def task_edit(request, slug, milestone_slug, task_id):
                           'notification_list': get_notification_list(request.user)
                       })
 
+
 @active_user_required
 @is_project_member
 def task_delete(request, slug, milestone_slug, task_id):
@@ -1183,7 +1187,6 @@ def update_issue(request, slug):
     ticket_type = request.GET.get('ticket_type', False)
     status_id = request.GET.get('status', False)
     assigned_to_id = request.GET.get('assigned_to', False)
-    print ticket_type
     if ticket_type:
         pass
     if status_id:
@@ -1217,19 +1220,19 @@ def create_issue_to_ticket(request, slug, task_id):
                 created_by=request.user,
             )
             try:
-                issue.status=project.task_statuses.get(id=request.POST.get('status'))
+                issue.status = project.task_statuses.get(id=request.POST.get('status'))
             except:
                 pass
             try:
-                issue.ticket_type=request.POST.get('issue_type')
+                issue.ticket_type = request.POST.get('issue_type')
             except:
                 pass
             try:
-                issue.severity=project.severities.get(id=request.POST.get('severity'))
+                issue.severity = project.severities.get(id=request.POST.get('severity'))
             except:
                 pass
             try:
-                issue.priority=project.priorities.get(id=request.POST.get('priority'))
+                issue.priority = project.priorities.get(id=request.POST.get('priority'))
             except:
                 pass
             try:
@@ -1239,7 +1242,7 @@ def create_issue_to_ticket(request, slug, task_id):
                 issue.assigned_to = None
                 pass
             try:
-                issue.milestone= project.milestones.get(id=request.POST.get('milestone'))
+                issue.milestone = project.milestones.get(id=request.POST.get('milestone'))
             except:
                 pass
             issue.reference = task
@@ -1275,7 +1278,6 @@ def create_issue(request, slug):
                                                   })
 
 
-
 @active_user_required
 @is_project_member
 def issue_details(request, slug, issue_id):
@@ -1290,17 +1292,16 @@ def issue_details(request, slug, issue_id):
 def edit_issue(request, slug, issue_id):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     issue = Ticket.objects.get(id=issue_id)
-    print request.POST
     if request.POST:
         form = CreateIssueForm(request.POST, project=project, instance=issue)
         error = True
         if form.is_valid():
             error = False
-            issue.name=request.POST.get('name')
-            issue.slug=slugify(request.POST.get('name'))
-            issue.finished_date=request.POST.get('finished_date')
-            issue.description=request.POST.get('description')
-            issue.ticket_type=request.POST.get('issue_type')
+            issue.name = request.POST.get('name')
+            issue.slug = slugify(request.POST.get('name'))
+            issue.finished_date = request.POST.get('finished_date')
+            issue.description = request.POST.get('description')
+            issue.ticket_type = request.POST.get('issue_type')
             # issue.reference=task
             try:
                 assigned_to = project.members.get(id=request.POST.get('assigned_to'))
@@ -1310,15 +1311,15 @@ def edit_issue(request, slug, issue_id):
                 issue.save()
                 pass
             try:
-                issue.status=project.task_statuses.get(id=request.POST.get('status'))
+                issue.status = project.task_statuses.get(id=request.POST.get('status'))
             except:
                 pass
             try:
-                issue.severity=project.severities.get(id=request.POST.get('severity'))
+                issue.severity = project.severities.get(id=request.POST.get('severity'))
             except:
                 pass
             try:
-                issue.priority=project.priorities.get(id=request.POST.get('priority'))
+                issue.priority = project.priorities.get(id=request.POST.get('priority'))
             except:
                 pass
             issue.save()
@@ -1343,7 +1344,8 @@ def delete_issue(request, slug, issue_id):
     issue.delete()
     return HttpResponseRedirect(reverse('project:issues', kwargs={'slug': slug}))
 
-def issue_approve(request,slug, issue_id):
+
+def issue_approve(request, slug, issue_id):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     milestones = project.milestones.all()
     issue_old = project.project_tickets.get(id=issue_id)
@@ -1352,7 +1354,7 @@ def issue_approve(request,slug, issue_id):
         return HttpResponseRedirect(reverse('project:milestone_create', kwargs={'slug': slug}))
 
     if request.POST:
-        json_data={}
+        json_data = {}
         add_task_form = TaskForm(request.POST, project=project, user=request.user)
         if add_task_form.is_valid():
             json_data['error'] = False
@@ -1360,9 +1362,9 @@ def issue_approve(request,slug, issue_id):
             task.order = project.project_tickets.count() + 1
             task.reference = issue_old
             task.save()
-            issue_old.is_approved=True
+            issue_old.is_approved = True
             issue_old.save()
-            url = reverse('project:taskboard', kwargs={'slug': slug, 'milestone_slug':task.milestone.slug})
+            url = reverse('project:taskboard', kwargs={'slug': slug, 'milestone_slug': task.milestone.slug})
             json_data['url'] = url
             return HttpResponse(json.dumps(json_data), content_type='application/json')
         else:
@@ -1370,23 +1372,24 @@ def issue_approve(request,slug, issue_id):
             json_data['form_errors'] = add_task_form.errors
             return HttpResponse(json.dumps(json_data), content_type='application/json')
 
-    return render(request, 'task/add_task.html',{
-        'slug':slug,
+    return render(request, 'task/add_task.html', {
+        'slug': slug,
         'assigned_to_list': project.members.all(),
         'milestone_list': milestones,
-        'issue_old':issue_old,
-        'ticket_status_list':project.task_statuses.all(),
-        'is_issue_approved':True
+        'issue_old': issue_old,
+        'ticket_status_list': project.task_statuses.all(),
+        'is_issue_approved': True
     })
+
 
 def issues_approved(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     issue_list = project.project_tickets.filter(~Q(ticket_type='task')).filter(is_approved=True)
-    closed_list=[]
+    closed_list = []
     for issue in issue_list:
         if issue.references.filter(ticket_type='task', status__is_final=False):
             closed_list.append(issue.pk)
-    issue_list = Ticket.objects.filter(pk__in = closed_list)
+    issue_list = Ticket.objects.filter(pk__in=closed_list)
     issue_list = filter_tickets(issue_list, request)
     return render(request, 'project/issueboard.html',
                   {'project': project, 'slug': slug,
@@ -1403,11 +1406,11 @@ def issues_approved(request, slug):
 def issues_closed(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     issue_list = project.project_tickets.filter(~Q(ticket_type='task')).filter(is_approved=True)
-    closed_list=[]
+    closed_list = []
     for issue in issue_list:
         if issue.references.filter(ticket_type='task', status__is_final=True).count() == issue.references.all().count():
             closed_list.append(issue.pk)
-    issue_list = Ticket.objects.filter(pk__in = closed_list)
+    issue_list = Ticket.objects.filter(pk__in=closed_list)
     issue_list = filter_tickets(issue_list, request)
     return render(request, 'project/issueboard.html',
                   {'project': project, 'slug': slug,
@@ -1427,7 +1430,7 @@ def issue_reopen(request, slug, issue_id):
     for task in project.project_tickets.filter(reference=issue):
         task.status = project.task_statuses.filter(is_final=False)[0]
         task.save()
-    return HttpResponse(json.dumps({'result':True}),content_type="json/application")
+    return HttpResponse(json.dumps({'result': True}), content_type="json/application")
 
 
 @active_user_required
@@ -1517,3 +1520,59 @@ def labels_delete(request, slug, label_slug):
         slug=label_slug, project=Project.objects.get(slug=slug, organization=request.user.organization)).delete()
     return HttpResponse(json.dumps({'error': False}), content_type="application/json")
 
+
+@active_user_required
+@check_project_admin
+def git_lab(request, slug):
+    project = Project.objects.get(slug=slug, organization=request.user.organization)
+    data = {'project': project, 'slug': slug}
+    gitlab_list = GitLab.objects.filter(project=project)
+    if gitlab_list:
+        data['gitlab_list'] = gitlab_list[0]
+    else:
+        messages.warning(request, 'Please provide settings for GitLab')
+    return render(request, 'settings/git_lab.html', data)
+
+
+@active_user_required
+@check_project_admin
+def git_lab_create(request, slug):
+    project = Project.objects.get(slug=slug, organization=request.user.organization)
+    form = GitLabForm(request.POST, project=project)
+    if form.is_valid():
+        form.save()
+
+        messages.success(request, 'Successfully added your GitLab settings !')
+        return HttpResponse(json.dumps({'error': False}), content_type='application/json')
+
+    else:
+        return HttpResponse(json.dumps({'error': True, 'errors': form.errors}), content_type="application/json")
+
+
+@active_user_required
+@check_project_admin
+def git_lab_edit(request, slug, gitlab_id):
+    project = Project.objects.get(slug=slug, organization=request.user.organization)
+    instance = GitLab.objects.get(id=gitlab_id, project=project)
+    form = GitLabForm(request.POST, instance=instance, project=project)
+    if form.is_valid():
+        form.save()
+
+        messages.success(request, 'Successfully updated your GitLab settings !')
+        return HttpResponse(json.dumps({'error': False}), content_type="application/json")
+    else:
+        return HttpResponse(json.dumps({'error': True, 'errors': form.errors}), content_type="application/json")
+
+
+@active_user_required
+@check_project_admin
+def git_lab_test_git(request, slug, gitlab_id):
+    project = Project.objects.get(slug=slug, organization=request.user.organization)
+    git_obj = GitLab.objects.get(id=gitlab_id, project=project)
+    resp = requests.request("GET", git_obj.git_url + 'api/v3/projects?private_token=' + git_obj.secret_key)
+
+    for i in resp.json():
+        if i['path'] == project.slug:
+            git_obj.git_id = i['id']
+            git_obj.save()
+    return HttpResponse(resp, content_type='application/json')

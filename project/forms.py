@@ -10,7 +10,7 @@ from django.utils.http import urlsafe_base64_encode
 from django.utils.translation import ugettext, ugettext_lazy as _
 from .tasks import celery_send_mail
 from piebase.models import Project, Priority, Severity, Organization, User, TicketStatus, Role, Milestone, Comment, \
-    Ticket, Labels
+    Ticket, Labels, GitLab
 from django.db.models import Q
 from django.template.defaultfilters import slugify
 from django.utils import timezone
@@ -365,6 +365,25 @@ class LabelsForm(forms.ModelForm):
         instance.color = self.cleaned_data['color']
         if not self.instance:
             instance.order = self.project.labels.count() + 1
+        if commit:
+            instance.save()
+        return instance
+
+
+class GitLabForm(forms.ModelForm):
+    class Meta:
+        model = GitLab
+        fields = ['secret_key', 'git_url']
+
+    def __init__(self, *args, **kwargs):
+        self.project = kwargs.pop('project', None)
+        super(GitLabForm, self).__init__(*args, **kwargs)
+
+    def save(self, commit=True):
+        instance = super(GitLabForm, self).save(commit=False)
+        instance.project = self.project
+        instance.secret_key = self.cleaned_data['secret_key']
+        instance.git_url = self.cleaned_data['git_url']
         if commit:
             instance.save()
         return instance

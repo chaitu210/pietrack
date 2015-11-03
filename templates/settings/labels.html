@@ -202,7 +202,6 @@
         });
         var prev = ui.item.startPos;
         var current = ui.item.index();
-        console.log(prev, current);
         if(prev != current){
             $.get("{% url 'project:labels_order' slug %}"+"?prev="+prev+"&current="+current);
         }

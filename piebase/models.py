@@ -317,3 +317,13 @@ class Labels(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class GitLab(models.Model):
+    secret_key = models.CharField(max_length=255, verbose_name=_("secret_key"))
+    git_id = models.CharField(max_length=100, verbose_name=_("git_id"))
+    git_url = models.URLField(max_length=255, verbose_name=_("git_url"))
+    project = models.ForeignKey(Project, related_name="git_lab", verbose_name=_("project"))
+
+    def __str__(self):
+        return self.project.name
