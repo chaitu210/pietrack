@@ -1,0 +1,71 @@
+{% load project_tags %}
+{%load static %}
+<div class="comment_each">
+  <div class="img_div">
+    <div class="img_wrap">
+      {% if comment.commented_by.profile_pic%}
+        <img src='{{comment.commented_by.profile_pic.url}}'>
+      {% else %}
+        <img src='{% static "img/user-pic.jpg" %}'>
+      {% endif %} 
+    </div>
+    <div class="name" id="{{comment.id}}">
+      {{comment.commented_by}}
+      <div class="designation">( {{ comment.commented_by|get_user_Role:project }} )</div>
+      <div class="posted_details">{{comment.created|date:"d F,Y \a\t P"}}</div>
+    </div>
+  </div>
+  <div class="comment_text">
+    <p class="your_comment">{{comment.comment|safe}}</p>
+         <div class="edit_comment_text">
+               <form action="{% url 'project:task_comment_edit' slug %}" method="post">
+                   {% csrf_token %}
+                   <input type="hidden" name="slug" value="{{ slug }}">
+                   <input type="hidden" name="task_id" value="{{ task.id }}">
+                   <input type="hidden" name="comment_id" value="{{ comment.id }}">
+                   <textarea name="comment">{{comment.comment}}</textarea>
+                   <button class="save_comment"><i class="fa fa-floppy-o"></i>Save</button>
+                   <button class="cancel_comment"><i class="fa fa-close"></i>Cancel</button>
+               </form>
+             <div class="clearfix"></div>
+         </div>
+    {% for attachment in comment.attachments.all %}
+      <div class="attachments_wrap">
+        <div class="attachment_each">
+          <i class='fa fa-paperclip'></i>{{attachment}}
+          <a href="{{attachment.attached_file.url}}" target="_blank">
+            <span class='view_link' data-toggle="modal" >
+              <i class='fa fa-eye'></i>
+              View
+            </span>
+          </a>
+          <a href="{{attachment.attached_file.url}}" download>
+            <span class='download_link'>
+              <i class='fa fa-download'></i>
+              Download
+            </span>
+          </a>
+          <span class='delete_link'>
+            <a href="/project/{{slug}}/task/{{task.id}}/attachment/delete/{{attachment.id}}/">
+              <i class='fa fa-trash'></i>
+              Delete
+            </a>
+          </span>
+        </div>
+      </div>
+    {% endfor %}
+        <div class="reply_button">
+          <button class="reply"><i class='fa fa-reply'></i>Reply</button>
+
+          {% if comment.commented_by == request.user %}
+              <a href="#">
+                  <button class="edit"><i class="fa fa-edit"></i>Edit</button>
+              </a>
+              <a href="{% url 'project:delete_task_comment' slug comment.id %}">
+                  <button class="delete"><i class="fa fa-trash"></i>Delete</button>
+              </a>
+          {% endif %}
+
+        </div>
+  </div>
+</div>

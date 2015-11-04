@@ -1,0 +1,41 @@
+{% load project_tags %}
+
+<div class="nav-left">
+    <!-- left menu starts here -->
+    <div class="nano-content">
+        <ul class="gw-nav gw-nav-list">
+            <li class="init-un-active">
+                <a href="{% url 'project:project_detail' slug %}"> <span class="gw-menu-text"> <i class="fa fa-area-chart"></i> Project Details</span> </a>
+            </li>
+            {% if request.user.pietrack_role == 'admin' or request.user|is_project_admin:slug %}
+
+            <li class="init-arrow-down" id="edit_project_submenu">
+                <a href="javascript:void(0)"> <span class="gw-menu-text"> <i class="fa fa-edit"></i> Edit Project Details</span> <b class="gw-arrow"></b> </a>
+                <ul class="gw-submenu">
+                    <li id="edit_project"> <a href='{% url "project:project_details" slug %}'>Edit Project</a> </li>
+                    <li id="git_lab"> <a href='{% url "project:git_lab" slug %}'>Git Lab</a> </li>
+                </ul>
+            </li>
+
+            <li class="init-arrow-down" id="project_submenu">
+                <a href="javascript:void(0)"> <span class="gw-menu-text"> <i class="fa fa-sort-amount-asc"></i> Attributes</span> <b class="gw-arrow"></b> </a>
+                <ul class="gw-submenu">
+                    <li id="project_status"> <a href='{% url "project:ticket_status" slug %}'>Status</a> </li>
+                    <li id="project_priorities"> <a href='{% url "project:priorities" slug %}'>Priorities</a> </li>
+                    <li id="project_severities"> <a href='{% url "project:severities" slug %}'>Severities</a> </li>
+                </ul>
+            </li>
+            {% endif %}
+            <li id="labels">
+                <a href="{% url 'project:labels' slug %}"> <span class="gw-menu-text"><i class="fa fa-tags"></i> Labels</span> </a>
+            </li>
+            <li id="project_members">
+                <a href="{% url 'project:project_team' slug %}"> <span class="gw-menu-text"><i class="fa fa-users"></i> Members</span> </a>
+            </li>
+            <li id="project_member_roles">
+                <a href="{% url 'project:member_roles' slug %}"> <span class="gw-menu-text"> <i class="fa fa-lock"></i> User Roles</span> </a>
+            </li>
+        </ul>
+    </div>
+    <!-- left menu ends here -->
+</div>

@@ -1,0 +1,124 @@
+{% extends 'settings/base.html' %}
+{% load project_tags %}
+{% load static %}
+{% load staticfiles %}
+{% block settings_content %}
+
+    <!-- right container starts here-->
+    <div class="right-container">
+        <div class="panel panel-default content-panel">
+            <div class="panel-body">
+                <!-- content box starts here -->
+                <div class="content_box">
+                    <div class="title">
+                        <h4>{{ project.name }} DETAILS</h4>
+                        <div class="tag">
+                          The project plan serves as a roadmap for the entire project team 
+                        </div>
+                    </div>
+                    <form action="" method="post" id="id_form_cproject">
+                        {%csrf_token%}
+                        <div class="panel_box">
+                            <div class="form_group">
+                                <label>Project Name</label>
+                                <input name='name' type="text" class="form-control" value="{{project.name}}">
+                                <input name='oldname' type="hidden" class="form-control" value="{{project.slug}}">
+                                <span name="pname_error" class="help"></span>
+                            </div>
+                            <div class="form_group">
+                                <label>Description</label>
+                                <textarea id="description" name='description' class="textarea">{{project.description}}</textarea>
+                                <span name="pdescription_error" class="help"></span>
+                            </div>
+                            <div class="form_group">
+                                <label>Logo</label>
+
+                                   <img id="logo" src="{% if project.logo %}{{project.logo.url}}{% else %}{% static 'img/Project_logo.png' %}{% endif %}" class="img-responsive img-thumbnail" style="width:100px;height:100px;margin-left:20px;margin-bottom:10px;" />
+
+                                    <input id="file" name="logo" type="file" value="" style="display:none;"/>
+                                    <br>
+                                    <span  id="logo-err" class="help" style="margin-left:20px;margin-bottom:10px;"></span>
+
+
+                                <!--<a href="{% url 'project:git_lab' slug %}" class="git_lab"><i class="fa fa-git"></i> Git Lab settings</a>-->
+                            </div>
+                            <!--<br />-->
+
+                            <button class="special-button"><span class="fa fa-save"></span> Save</button>
+                             {% if request.user.pietrack_role == 'admin' %}
+                            <span class="del-project">
+                                <a href="{%url 'project:delete_project' slug=slug id=project.id %}"><input type="button" class="special-button" value="Delete"/></a>
+                            </span>
+                            {% endif %}
+                      </div>
+                    </form>
+              <!-- content box starts here -->
+                </div>
+              </div>
+           </div>
+        </div>
+        <!-- right container ends here-->
+{% endblock %}
+
+{%block extra_js %}
+
+    <script type="text/javascript">
+        CKEDITOR.replace('description', {
+            customConfig: "{% static 'js/custom/ckeditor_config.js' %}"
+        });
+    </script>
+
+  <script type="text/javascript">
+        $("#logo").click(function(e){
+            $("#file").click()
+        });
+        $("#file").change(function(e){
+            var tmppath = URL.createObjectURL(event.target.files[0]);
+            if(tmppath){
+              $("#logo").attr('src',tmppath)  
+            }
+        });
+        function send_error(error)
+          {
+              if(error)
+                  return error;
+              return "";
+          }
+        $('#id_form_cproject').on('submit',function(e){
+          $('#description').val(CKEDITOR.instances.description.getData());
+          var form = this;
+          var formData = new FormData($(this)[0]);
+          $.ajax({
+            url: "",
+            data: formData,
+            enctype: 'multipart/form-data',
+            processData: false,
+            contentType: false,
+            type: 'POST',
+            success: function(response) {
+                if(response['error']){
+                    $("span[name='pname_error']").text(send_error(response['errors'].name));
+                    $("span[name='pdescription_error']").text(send_error(response['errors'].description));
+
+                    if(response['logo'])
+                      {
+                          $("#logo-err").text("Please choose a Image(png/jpg/gif)")
+                      }
+                  }
+                  else{
+                    $("span[name='pname_error']").text("");
+                    $("span[name='pdescription_error']").text("");
+                    /*alert("Project edited");*/
+                    window.location="{% url 'project:project_detail' slug %}"
+                  }
+            }
+          });
+
+          e.preventDefault();
+        });
+  </script>
+    <script type="text/javascript">
+        $('#edit_project_submenu').attr('class', 'arrow-up active');
+        $('#edit_project_submenu ul').show().children('li#edit_project').addClass('active');
+    </script>
+{%endblock %}

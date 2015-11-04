@@ -1,0 +1,273 @@
+{% extends 'base.html' %}
+{% load project_tags %}
+{% load static %}
+{% block content %}
+
+
+  <section id='base_content'>
+    <div class="project_description">
+        <!-- about project -->
+        <div class="about_project_wrap">
+            <div class="title">
+
+                <span>{{search_filter.0.name}}</span>
+                <span class='header_button_wrap'>
+                    <a href="{% url 'task:add_task' slug search_filter.0.slug %}">
+                        <span class='header_button'><i class="fa fa-plus-circle"></i> New Task</span>
+                    </a>
+                </span>
+            </div>
+            <!-- filters -->
+            <div class="filters_wrap">
+                <h3>Refine your search</h3>
+            <form action="" method="get" id="search">
+                <div class="row filter_row">
+                    <div class="col-md-2">
+                        <select class='select2 input select2_assigned_to' name="assigned_to" multiple>
+                            {% for member in project_members %}
+                                <option value="{{ member.id }}"  {% for mem in search_filter.1 %}{% ifequal mem|add:'0' member.id %}selected{% endifequal %}{% endfor %} >
+                                    {% if member.first_name %}{{ member.first_name }}{% else %}{{ member.username }}{% endif %}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <select class='select2 input select2_task' name="tasks" multiple>
+                            {% for task in search_filter.0|milestone_requirements %}
+                                    <option value="{{ task.id }}"  {% for task_id in search_filter.2 %}{% ifequal task_id|add:'0' task.id %}selected{% endifequal %}{% endfor %}>
+                                        {{ task.name }}
+                                    </option>
+                            {% endfor %}
+                        </select>
+
+                    </div>
+                    <div class="col-md-2">
+                        <input name="start_date" type="text" class='input' id='sdate' placeholder='Start Date'>
+                    </div>
+                    <div class="col-md-2">
+                        <input name="end_date" type="text" class='input' id='edate' placeholder='End Date'>
+                    </div>
+                    <div class="col-md-1">
+                        <button type="submit" class='submit_btn'><i class='fa fa-search'></i>Go</button>
+                    </div>
+                </div>
+            </form>
+            <div id="not_found" style="display: none;">
+                <hr>
+                <div style="text-align: center;font-weight: bold;padding:0px;margin: 0px; color: #E88E00">
+                    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                      Sorry, Search query was not found !
+                </div>
+                <hr>
+            </div>
+            <!--/ filters -->
+            <!-- lists div -->
+            <div class="lists_div style-1" id="tasks_container">
+                <div class="hscroll">
+
+                    <!-- task  category each -->
+                    {% for ticket_status in ticket_status_list %}
+                        <div class="task_category_wrap">
+                            <div class="title" style="background:{{ticket_status.color}};">
+                                {{ticket_status.name}}
+                                {% if ticket_status.is_final %} <a style="text-transform:lowercase;">(Only Admin)</a>{% endif %}
+                            </div>
+                            <div class="scroll all">
+                                <ul class='connectedSortable' id='{{ticket_status.slug}}'>
+                                    {% include "project/partials/task.html" with milestone=search_filter.0 slug=slug tasks=ticket_status|Task_list:search_filter %}
+                                </ul>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    <!--/ task category each -->
+                </div>
+            </div>
+            <!--/ lists div -->
+            <div class="clearfix"></div>
+        </div>
+        <!--/ about project -->
+    </div>
+
+  </section>
+{% endblock %}
+{% block extra_js_links%}
+    <script type="text/javascript" src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+{% endblock %}
+{% block extra_js %}
+
+
+  <script type="text/javascript">
+    $(function() {
+        $('.scroll').slimscroll({
+            alwaysVisible: false,
+            height: 350
+        });
+    });
+    $('.sub_list').mouseenter(function(event) {
+        $(this).closest('.parent_list').addClass('active_li_drop')
+    });
+    $('.sub_list').mouseleave(function(event) {
+        $(this).closest('.parent_list').removeClass('active_li_drop')
+    });
+    </script>
+    <script type="text/javascript">
+    $(function() {
+        $("#sdate, #edate").datepicker();
+        $('#sdate').val('{{ search_filter.3 }}');
+        $('#edate').val('{{ search_filter.4 }}');
+       /* $('.select2').select2();*/
+    });
+    </script>
+    <script type="text/javascript">
+        $('.select2_assigned_to').select2({
+            tags:"true",
+            placeholder: 'Assigned members'
+        });
+        var assigned_to = [{% for assign in search_filter.1 %}'{{ assign }}'{% if not forloop.last %},{% endif %}{% endfor %}]
+//        $('.select2_assigned_to').select2().select2('val',assigned_to);
+
+        $(".select2_task").select2({
+          tags: "true",
+          placeholder: "Task Title"
+        });
+        var tasks = [{% for assign in search_filter.2 %}'{{ assign }}'{% if not forloop.last %},{% endif %}{% endfor %}]
+//        $('.select2_task').select2().select2('val',tasks)
+    </script>
+    <!-- horizontal scroll -->
+    <script type="text/javascript">
+    $('.hscroll').css('min-width', ($('.task_category_wrap').length + 1) * 270 + 'px');
+    </script>
+    <!--/ horizontal scroll -->
+    <!-- update status -->
+    <script type="text/javascript">
+    var drag_options = {
+        connectWith: ".connectedSortable",
+        receive: function(event, ui) {
+            var status = this.id;
+            var task = ui.item.attr('id');
+            $.get('/project/{{slug}}/update_taskboard/' + status + '/' + task + '/');
+        }
+    };
+    $(function() {
+        $(".connectedSortable").sortable({
+            connectWith: ".connectedSortable",
+            start: function(event, ui) {
+                $('.connectedSortable').find('li:hidden').show();
+
+                ui.item.startPos = ui.item.index();
+                ui.item.id = ui.item.id;
+                ui.item.slug = ui.item.closest('ul').attr('id')
+            },
+            stop:function(event, ui){
+                previous = ui.item.startPos;
+                current = ui.item.index();
+                slug = ui.item.slug;
+
+                if(previous!=current){
+                   $.get("{% url 'project:taskboard_order' slug %}"+"?prev="+previous+"&current="+current+"&status_slug="+slug)
+                }
+            },
+            //appendTo: 'body',
+            //placeholder: 'ui-state-highlight ui-splitselect-item',
+            opacity: '.5',
+            receive: function(event, ui) {
+                var status = this.id;
+                var task = ui.item.attr('id');
+
+                $.get('/project/{{slug}}/update_taskboard/' + status + '/' + task + '/',function(response){
+                    if(response['only_admin']){
+                        alert("Only admin can perform this operation.");
+                        ui.sender.sortable("cancel");
+                    }
+                });
+            }
+        }).disableSelection();
+    });
+
+    /* load tasks all */
+    jQuery(function($) {
+        $('.scroll.all').on('scroll', function() {
+           // console.log($(this).scrollTop() + $(this).innerHeight())
+            //console.log(this.scrollHeight - 2)
+            if ($(this).scrollTop() + $(this).innerHeight() >= this.scrollHeight - 2) {
+                page = $(this).find('input[name="page_num"]').val();
+                var status_slug = $(this).children("ul").attr("id");
+                if (page) {
+                    $(this).find('input[name="page_num"]').remove();
+                    var data = $('#search').serialize()+"&page="+page;
+                    $.get("/project/{{slug}}/{{search_filter.0.slug}}/" + status_slug + "/load_tasks/",data, function(response) {
+                        $('ul#' + status_slug).append(response)
+                    });
+                }
+            }
+        })
+    });
+    /* end load all tasks */
+
+/*    $(document).ready(function() {
+        $('.name_div').on('click', function() {
+            var req_id = $(this).attr('id');
+            $.get("/project/{{slug}}/{{search_filter.0.slug}}/" + req_id + "/", function(response) {
+                $('.task_category_wrap').remove();
+                $('.requirement_list_panel').after(response);
+                $('.scroll').slimscroll({
+                    alwaysVisible: false,
+                    height: 350
+                });
+                $('ul.connectedSortable').sortable(drag_options);
+
+                /!* start requirement tasks update *!/
+                $('.requirement').on('scroll', function() {
+                        if ($(this).scrollTop() + $(this).innerHeight() >= this.scrollHeight - 2) {
+                            page = $(this).find('input[name="page_num"]').val();
+                            var status_slug = $(this).children("ul").attr("id");
+                            var requirement_id = $(this).attr('id');
+                            if (page) {
+                                $(this).find('input[name="page_num"]').remove();
+                                $.get("/project/{{slug}}/{{search_filter.0.slug}}/" + status_slug + "/" + requirement_id + "/load_tasks/", {
+                                    "page": page
+                                }, function(response) {
+                                    $('ul#' + status_slug).append(response)
+                                });
+                            }
+
+                        }
+                    });
+                    /!*end  requirement tasks update *!/
+            });
+
+        });
+
+    });*/
+//  {% if request.user.pietrack_role == 'admin' or request.user|is_project_admin:slug %}
+    /*$('.delete_req').click(function (event) {
+        event.preventDefault();
+        if(confirm("Are you sure you want to delete this?")){
+            window.location = $(this).attr("href");
+        }
+        else{
+            return false;
+        }
+    });
+  {% endif %}*/
+    $('a.task_delete').click(function(e){
+        var url = $(this).attr('href');
+        var parent = $(this).closest('li');
+        $.get(url,function(response){
+            if(response=='True'){
+                $(parent).remove();
+            }
+        });
+        e.preventDefault();
+    });
+    {% if tasks_pro %}
+    if ($('#tasks_container li[id]').length == 0) {
+        $('#not_found').show();
+        setTimeout(function () {
+            $('#not_found').hide();
+        }, 4000);
+    }
+    {% endif %}
+  </script>
+{% endblock%}

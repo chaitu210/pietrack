@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+{% block content %}
+<section id='base_content' class='create_project'>
+    <div class="content_box">
+        {% if ticket_status_list and ticket_status_list|length == 0 %}
+            <div class="role-alert member-warning-alert" style="width:23em;">
+                <div class="alert alert-warning alert-dismissible" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <strong><span class="fa fa-warning"></span></strong>
+                    Please add Ticket status to create Task !
+                </div>
+            </div>
+        {% endif %}
+        <div class="title">
+            <h4>{% if is_issue %}{% if issue_old %}Edit{% else %}Create{% endif %} Issue {% else %}{% if task %}Edit {% else %}Add{% endif %} Task{% endif %}</h4>
+
+        </div>
+        <div class="panel_box">
+            <form id='task_form'>
+                <div class="form_group">
+                    <label>Title</label>
+                    <input id='task_name' name='name' type="text" class='input' value="{% if issue_old %}{{ issue_old.name }}{% if is_issue_approved %}_bug{% endif %}{% endif %}{% if task %}{{ task.name }}{% endif %}">
+                    <span id='task_name_error' class='task_err'></span>
+                </div>
+
+                <div class="form_group">
+                    <label>Milestone</label>
+                    <select name='milestone' class='input'>
+                        {% for milestone_task in milestone_list %}
+                            <option value='{{ milestone_task.id }}' {% if milestone == milestone_task %}selected{% endif %}>{{ milestone_task.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <span id='milestone_error'></span>
+                </div>
+
+                {% if is_issue %}
+                    <div class="form_group">
+                        <label>Issue Type</label>
+                        <select name='issue_type' class='input'>
+                            {% for issue in issue_type %}
+                                <option value='{{ issue }}' {% if issue_old.ticket_type == issue %}selected{% endif %}>{{ issue }}</option>
+                            {% endfor %}
+                        </select>
+                        <span id='task_status_error'></span>
+                    </div>
+                    <div class="form_group">
+                        <label> Severity </label>
+                        <select name='severity' class='input'>
+                            <option value=''>None</option>
+                            {% for severity in severity_list %}
+                                <option value='{{ severity.id }}' {% if issue_old.severity == severity %}selected{% endif %}>{{ severity }}</option>
+                            {% endfor %}
+                        </select>
+                        <span id='task_status_error'></span>
+                    </div>
+                    <div class="form_group">
+                        <label> Priority </label>
+                        <select name='priority' class='input'>
+                            <option value=''>None</option>
+                            {% for priority in priority_list %}
+                                <option value='{{ priority.id }}' {% if issue_old.priority == priority %}selected{% endif %}>{{ priority }}</option>
+                            {% endfor %}
+                        </select>
+                        <span id='task_status_error'></span>
+                    </div>
+                {% endif %}
+                {% if ticket_status_list %}
+                    <div class="form_group">
+                        <label>Status</label>
+                        <select name='status' class='input'>
+                            {% for ticket_status_iter in ticket_status_list %}
+                                <option value='{{ ticket_status_iter.id }}' {% if issue_old.status  == ticket_status_iter  or task.status == ticket_status_iter%}selected{% endif %}>{{ ticket_status_iter.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <span id='task_status_error'></span>
+                    </div>
+                {% endif %}
+
+                {% if not is_issue %}
+                <div class="form_group">
+                    <label>Finished Date</label>
+                    <input id='task_finished_date' name='finished_date' type="text" class='input' value="{% if issue_old %}{{ issue_old.finished_date|date:"Y-m-d" }}{% endif %}{{ task.finished_date|date:"Y-m-d" }}">
+                    <span id='task_finished_date_error' class='task_err'></span>
+                </div>
+
+                <div class="form_group">
+                    <label>Assign to</label>
+                    <select name='assigned_to' class='select2 input'>
+                        <option value="">None</option>
+                        {% for assigned_to_iter in assigned_to_list %}
+                           <option value='{{ assigned_to_iter.id }}' {% if task.assigned_to == assigned_to_iter or issue_old.assigned_to == assigned_to_iter%}selected{% endif %} >{{ assigned_to_iter.email }}</option>
+                        {% endfor %}
+                    </select>
+                    <span id='task_assigned_to_error'></span>
+                </div>
+
+                {% endif %}
+
+                <div class="form_group">
+                    <label>Description</label>
+                    <textarea id='task_description' name='description' class="form-control textarea">{% if issue_old %}{{ issue_old.description }}{% endif %}{{ task.description }}</textarea>
+                    <span id='task_description_error'></span>
+                </div>
+                <br clear="clearfixall" />
+                <button id='task_save'><i class="fa fa-save"></i> Save</button>
+                {% csrf_token %}
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}
+{% block extra_js_links %}
+  <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+{% endblock %}
+{% block extra_js %}
+<script>
+    {% if ticket_status_list and milestone%}
+        {% if ticket_status_list|length == 0 %}
+            setTimeout(function(){ window.location = "{% url 'project:ticket_status' slug  %}"; }, 2500);
+        {% endif %}
+    {% endif %}
+
+$(function() {
+    $("#task_finished_date").datepicker();
+});
+</script>
+<script>
+$(function() {
+    $("#task_finished_date").datepicker();
+    $('.select2').select2();
+});
+</script>
+<script>
+function display_datepicker() {
+    $("#task_finished_date").datepicker({
+        changeMonth: true,
+        changeYear: true,
+        dateFormat: 'yy-mm-dd',
+        minDate: new Date()
+    });
+};
+display_datepicker()
+</script>
+<script>
+$('#task_save').click(function(event) {
+    event.preventDefault();
+    $.post('', $('#task_form').serialize(), function(data) {
+        $('.task_err').text('');
+        if (data['error'] === true) {
+            for (var key in data['form_errors']) {
+                $('#task_' + key + '_error').text('').append(data['form_errors'][key])
+            }
+        }
+        else if (data['url']){
+            window.location = data['url']
+        }
+        else {
+            window.location = "{% if milestone %}{% url 'project:taskboard' slug milestone.slug %}{% elif is_issue %}{% url 'project:issues' slug %}{% endif %}"
+        }
+    });
+});
+
+</script>
+{% endblock %}

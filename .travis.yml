@@ -1,0 +1,28 @@
+language: python
+
+python:
+  - "3.4"
+
+services:
+  - mysql
+
+env:
+  -DJANGO=1.8.3 DB=mysql
+  -DJANGO=1.8.3 DB=sqlite3
+
+install:
+  - pip install -r requirements.txt
+  - pip install coveralls
+  - pip install python-coveralls
+
+before_script:
+  - sleep 15
+  - mysql -e 'create database test;' -u root
+
+script:
+  - python manage.py makemigrations
+  - python manage.py test
+  - coverage run --source=accounts,dashboard,piebase,project,reports manage.py test
+
+after_success:
+  coveralls

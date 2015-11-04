@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block content %}
+  <section id='base_content' class='create_project'>
+    <div class="content_box">
+        <div class="title">
+            <h4>New Project</h4>
+        </div>
+        <!-- create project form start-->
+        <form action="" method="post" id="id_form_cproject">
+            {%csrf_token%}
+            <div class="panel_box">
+                <div class="form_group">
+                    <label>Project title</label>
+                    <input name='name' type="text" class='input'>
+                    <span name="pname_error" id="name" class="error"></span>
+                    <!--Error here -->
+                </div>
+                <div class="form_group">
+                    <label>Description</label>
+                    <textarea id="description" name='description' class='textarea'></textarea>
+                    <span name="pdescription_error" id="description" class="error"></span>
+                    <!--Error here -->
+                </div>
+                <div class="form_group">
+                    <label>Project Logo</label>
+                    <input class="form-control" name="logo" type="file" value=""/>
+                    <span  id="logo" ></span>
+                </div>
+                <br clear="clearfixall" />
+                <button id="id_submit_cproject">Create project</button>
+            </div>
+        </form>
+        <!-- create project form end -->
+    </div>
+  </section>
+{% endblock content %}
+{% block extra_js %}
+    <script type="text/javascript">
+		CKEDITOR.replace('description', {
+            customConfig: "{% static 'js/custom/ckeditor_config.js' %}"
+        });
+	</script>
+    <script type="text/javascript">
+
+    $('#id_form_cproject').on('submit', function(e) {
+      $('#description').val(CKEDITOR.instances.description.getData());
+      var form = this;
+      var formData = new FormData($(this)[0]);
+      $.ajax({
+          url: "",
+          data: formData,
+          enctype: 'multipart/form-data',
+          processData: false,
+          contentType: false,
+          type: 'POST',
+          success: function(response) {
+              if (response['error']) {
+                $(".error").text("");
+                for (key in response['errors']) {
+                    $(".error#" + key).text(' * '+response['errors'][key]);
+                }
+                if(response['logo'])
+                {
+                    $("#logo").text("Please choose a Image(png/jpg/gif)")
+                }
+                } else {
+                    var slug = response['slug'];
+                    window.location = '/project/' + slug + '/' + 'create_member'
+                }
+          }
+      });
+        e.preventDefault();
+
+    });
+
+    </script>
+{% endblock %}

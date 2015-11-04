@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+{% load compress %}
+{% load staticfiles %}
+{% load project_tags %}
+
+<html>
+  <head>
+    <title>Pie Track</title>
+    <link href='http://fonts.googleapis.com/css?family=Lato:400,100,100italic,300,300italic,400italic,700italic,700,900,900italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Raleway:400,100,200,500,300,600,700,800,900' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Josefin+Sans:400,100,100italic,300,300italic,400italic,600,600italic,700,700italic' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-colorpicker/2.3.0/css/bootstrap-colorpicker.min.css">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/css/select2.min.css" rel="stylesheet" />
+    {% compress css %}
+       <link rel="stylesheet" type="text/less" href="{% static 'less/slim_scroll.less' %}">
+       <link rel="stylesheet" type="text/less" href="{% static 'less/main.less' %}">
+       {%block extra_css_links%}
+       {%endblock%}
+    {% endcompress %}
+  </head>
+  <body>
+
+
+    <header id='header_base'>
+      {% if messages %}
+          {% for message in messages %}
+          <div class="alert alert-{% if message.tags %}{{ message.tags }}{% endif %} alert-dismissible my_alert" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <strong>{% if message.tags %}{{ message.tags|title }} !{% endif %}</strong> {{ message }}.
+          </div>
+          {% endfor %}
+      {% endif %}
+      <!-- left menu -->
+      <div class='left_header'>
+        <div class="menu">
+          <ul>
+            <li>
+              <a href="{%url 'project:list_of_projects'%}">
+                <span class='each_wrap child_one'>
+                  <i class='fa fa-pie-chart'></i>
+                  <span class='name'>Pie Track</span>
+                </span>
+              </a>
+            </li>
+            
+            <li>
+              <a href="{% url 'project:list_of_projects' %}">
+                <span class='each_wrap child_one'>
+                <i class='fa fa-folder-open-o'></i>
+                <span class='name'>Projects</span>
+                </span>
+              </a>
+            </li>
+            {% if slug %}
+            <li>
+              <a href="{% url 'project:project_detail' slug %}">
+              <span class='each_wrap child_one'>
+              <i class='fa fa-clock-o'></i>
+              <span class='name'>TimeLine</span>
+              </span>
+              </a>
+            </li>
+            <li>
+              <a href="{% url 'project:milestone_display' slug %}">
+                <span class='each_wrap child_two'>
+                <i class='fa fa-globe'></i>
+                <span class='name'>Milestones</span>
+                </span>
+              </a>
+            </li>
+            <li>
+                <a href="{% url 'project:tickets' slug %}">
+                  <span class='each_wrap child_three'>
+                  <i class='fa fa-tasks'></i>
+                  <span class='name'>Tickets</span>
+                  </span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'project:issues' slug %}">
+                  <span class='each_wrap child_four'>
+                  <i class='fa fa-bug'></i>
+                  <span class='name'>Issues</span>
+                  </span>
+                </a>
+            </li>
+            <!-- <li>
+              <span class='each_wrap child_four'>
+              <i class='fa fa-language'></i>
+              <span class='name'>Wiki</span>
+              </span>
+            </li> -->
+            <li>
+              <a href="{% url 'project:project_team' slug %}">
+                  <span class='each_wrap child_five'>
+                  <i class='fa fa-users'></i>
+                  <span class='name'>Team</span>
+                  </span>
+              </a>
+            </li>
+            {% if request.user.pietrack_role == 'admin' or request.user|is_project_admin:slug %}
+            <li>
+              <a href="{% url 'project:project_details' slug %}">
+                  <span class='each_wrap child_six'>
+                  <i class='fa fa-gears'></i>
+                  <span class='name'>Settings</span>
+                  </span>
+              </a>
+            </li>
+            {% endif %}
+        {% endif %}
+          </ul>
+        </div>
+      </div>
+      <!--/ left menu -->
+      <!-- right header -->
+      <div class='right_header'>
+        <div class="menu">
+          <ul>
+            <!--<li class='parent_list'>
+              <span class='each_wrap extras'>
+              <i class='fa fa-arrow-down'></i>
+              <span class='name'>Extras</span>
+              </span>
+              <ul class="sub_list_extras">
+                <li>
+                  <a href="{% url 'user:user_profile' %}">
+                  <span class='extras_drop_child extras_one'>
+                  <i class='fa fa-user'></i>
+                  <span class='name'>Profile</span>
+                  </span>
+                  </a>
+                </li>
+                <li>
+                  <a href="{% url 'user:change_password' %}">
+                  <span class='extras_drop_child extras_two'>
+                  <i class='fa fa-expeditedssl'></i>
+                  <span class='name'>Change Password</span>
+                  </span>
+                  </a>
+                </li>
+              </ul>
+            </li>-->
+            <li class='parent_list'>
+              {% block project_notifications %}
+                  <span class='each_wrap notification'>
+                  <i class='fa fa-bell'></i>
+                  <span class='name'>Notifications</span>
+                    <span class='number count'>{% if notification_list %}{{ notification_list.1 }}{% else %}0{% endif %}</span>
+                    </span>
+                    <ul class='sub_list'>
+                      <div class='scroll'>
+                        {% if notification_list %}
+                          {% include "user/partials/notification.html" with notification_list=notification_list.0 %}
+                        {% endif %}
+                      </div>
+                    </ul>
+             {% endblock %}
+            </li>
+<!--
+            <li>
+              <a href="{% url 'user:logout' %}">
+              <span class='each_wrap logout'>
+              <i class='fa fa-power-off'></i>
+              <span class='name'>Logout</span>
+              </span>
+              </a>
+            </li>
+-->
+
+
+            <li class='parent_list'>
+
+                <span class="name_img_wrap">
+                <img src="{% if user.profile_pic %}{{ user.profile_pic.url }}{% else %}{% static 'img/user-pic.jpg' %}{% endif %}" alt="{% if user.profile_pic %}{{ user.profile_pic.url }}{% endif %}">
+                </span>
+
+              <ul class="sub_list_user_menu">
+                <li>
+                  <a href="#">
+                  <span class='extras_drop_child extras_one'>
+                      <img src="{% if user.profile_pic %}{{ user.profile_pic.url }}{% else %}{% static 'img/user-pic.jpg' %}{% endif %}" alt="{% if user.profile_pic %}{{ user.profile_pic.url }}{% endif %}">
+                    <span class='name'>
+                                  {% if user.first_name %}
+                                    {{ user.first_name|title }}
+                                  {% else %}
+                                    {{ user.email }}
+                                  {% endif %}
+                    </span>
+
+                  </span>
+                  </a>
+                </li>
+                <li>
+                  <a href="{% url 'user:user_profile' %}">
+                  <span class='extras_drop_child extras_one'>
+                  <i class='fa fa-user'></i>
+                  <span class='name'>Profile</span>
+                  </span>
+                  </a>
+                </li>
+                <li>
+                  <a href="{% url 'user:change_password' %}">
+                  <span class='extras_drop_child extras_two'>
+                  <i class='fa fa-expeditedssl'></i>
+                  <span class='name'>Change Password</span>
+                  </span>
+                  </a>
+                </li>
+                <li>
+                  <a href="{% url 'user:logout' %}">
+                  <span class='extras_drop_child extras_two'>
+                  <i class="fa fa-power-off"></i>
+                  <span class='name'>Logout</span>
+                  </span>
+                  </a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </header>
+
+    {%block content%}
+    {%endblock content%}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-colorpicker/2.3.0/js/bootstrap-colorpicker.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jQuery-slimScroll/1.3.6/jquery.slimscroll.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.0/js/select2.min.js"></script>
+    <!-- for ckeditor -->
+    <script src="https://cdn.ckeditor.com/4.5.3/standard/ckeditor.js"></script>
+    <script src="http://malsup.github.com/jquery.form.js"></script>
+
+    {%block extra_js_links %}
+    {%endblock extra_js_links %}
+    <script type="text/javascript">
+      $(function() {
+          $('.scroll').slimscroll({
+              alwaysVisible: false,
+              height: 380
+          });
+      });
+      $('.sub_list,.sub_list_extras').mouseenter(function(event) {
+          $(this).closest('.parent_list').addClass('active_li_drop')
+      });
+      $('.sub_list,.sub_list_extras').mouseleave(function(event) {
+          $(this).closest('.parent_list').removeClass('active_li_drop')
+      });
+    </script>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+                setTimeout(function() {
+                      $('.my_alert').fadeOut(2000, function(){
+                    });
+                      }, 3000);
+
+        });
+    </script>
+
+    <script type="text/javascript">
+
+        // for pagination
+
+        $('.pagination li a.active').each(function(){
+            $(this).css('background', '#337AB7');
+            $(this).css('color', '#fff');
+        });
+
+       if($('.pagination li:first').find('a span').text() == '<<'){
+            $('.pagination li:first').find('a span').text('First');
+        }
+
+        if($('.pagination li:nth-child(2)').find('a span').text() == '<'){
+            $('.pagination li:nth-child(2)').find('a span').text('Prev');
+        }
+
+        if($('.pagination li:last').find('a span').text() == '>>'){
+            $('.pagination li:last').find('a span').text('Last');
+        }
+        if($('.pagination li:nth-last-child(2)').find('a span').text() == '>'){
+            $('.pagination li:nth-last-child(2)').find('a span').text('Next');
+        }
+
+        /* notification */
+        $notification = $('.notification').parent();
+        $notification.mouseenter(function(e){
+            $.get("{% url 'user:read_notifications' %}", function(response){
+               if(response=="True"){
+                    $notification.find(".count").text('0')
+               }
+            });
+            e.preventDefault();
+        });
+
+        setInterval(function() {
+            $.get("{% url 'user:get_notifications' %}",function(response){
+
+                $notification.find(".count").text(response['count']);
+                $notification.find('div.scroll').html(response['notification_list'])
+            });
+        }, 60000);
+
+        /*notification end */
+    </script>
+    {% block extra_js %}
+    {% endblock %}
+  </body>
+</html>
