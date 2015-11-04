@@ -32,17 +32,28 @@
                                 <input id="id_git_url" name='git_url' type="url" class="form-control" value="{{ gitlab_list.git_url }}">
                                 <span id="gitlab_settings_git_url_error" class="gitlab_err"></span>
                             </div>
-                            <br />
-                            <button class="special-button"><span class="fa fa-save"></span> {% if not gitlab_list %}Save{% else %}Update{% endif %}</button>
-
                             {% if gitlab_list %}
+                            <div class="form_group" id="git_project">
+                                <label for="sel1">Select Project:</label>
+                                <select class="form-control" name="git_proj" id="sel1">
+                                    {% for key,value in resp.items %}
+                                    <option value="{{key}}" {% ifequal gitlab_list.git_id|add:'0' key %}selected{% endifequal %}>{{value}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            {% endif %}
+
+                            <br />
+                            <button class="special-button" id="git_save"><span class="fa fa-save"></span> {% if not gitlab_list %}Save{% else %}Update{% endif %}</button>
+
+                           <!-- {% if gitlab_list %}
                                 <button class="special-button">
                                     <a href="{% url 'project:git_lab_test_git' slug gitlab_list.id %}" class="git-test">
                                         Set the Project ID
                                     </a>
                                 </button>
                             {% endif %}
-                            <p><span class="git_response"></span></p>
+                            <p><span class="git_response"></span></p>-->
 
                       </div>
                     </form>
@@ -64,8 +75,11 @@
     </script>
 
     <script type="text/javascript">
-        $('#gitlab_settings').on('submit',function(e){
+        $('#git_save').click(function(e){
             event.preventDefault();
+            if (confirm("Are you sure about this?")==false){
+                return
+            }
             $.post("{% if not gitlab_list %}{% url 'project:git_lab_create' slug %}{% else %}{% url 'project:git_lab_edit' slug gitlab_list.id %}{% endif %}", $('#gitlab_settings').serialize(), function(response) {
                 $('.gitlab_err').text('');
                 if (response['error']) {
@@ -74,13 +88,13 @@
                     }
                 }
                 else {
-                    window.location = "{% url 'project:git_lab' slug %}"
+                    window.location = "."
                 }
             })
         });
-        {% if gitlab_list %}
+/*        {% if gitlab_list %}
 
-            $('.git-test').on('click', function(e){
+            $('.git-test').click(function(e){
                event.preventDefault();
                 $.get("{% url 'project:git_lab_test_git' slug gitlab_list.id %}", function(resp){
                     if (resp){
@@ -94,7 +108,7 @@
                 });
             });
 
-        {% endif %}
+        {% endif %}*/
 
     </script>
 

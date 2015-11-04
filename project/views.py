@@ -1529,6 +1529,11 @@ def git_lab(request, slug):
     gitlab_list = GitLab.objects.filter(project=project)
     if gitlab_list:
         data['gitlab_list'] = gitlab_list[0]
+        resp = requests.request("GET", gitlab_list[0].git_url + 'api/v3/projects?private_token=' + gitlab_list[0].secret_key)
+        proj_list = {}
+        for i in resp.json():
+            proj_list[i['id']]= i['path']
+        data['resp'] = proj_list
     else:
         messages.warning(request, 'Please provide settings for GitLab')
     return render(request, 'settings/git_lab.html', data)
@@ -1556,7 +1561,10 @@ def git_lab_edit(request, slug, gitlab_id):
     instance = GitLab.objects.get(id=gitlab_id, project=project)
     form = GitLabForm(request.POST, instance=instance, project=project)
     if form.is_valid():
-        form.save()
+        git_form = form.save()
+        if request.POST.get('git_proj'):
+            git_form.git_id = int(request.POST.get('git_proj'))
+            git_form.save()
 
         messages.success(request, 'Successfully updated your GitLab settings !')
         return HttpResponse(json.dumps({'error': False}), content_type="application/json")
@@ -1570,7 +1578,6 @@ def git_lab_test_git(request, slug, gitlab_id):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     git_obj = GitLab.objects.get(id=gitlab_id, project=project)
     resp = requests.request("GET", git_obj.git_url + 'api/v3/projects?private_token=' + git_obj.secret_key)
-
     for i in resp.json():
         if i['path'] == project.slug:
             git_obj.git_id = i['id']
