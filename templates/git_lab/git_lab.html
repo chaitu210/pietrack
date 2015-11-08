@@ -1,0 +1,80 @@
+{% extends 'git_lab/base.html' %}
+{% load project_tags %}
+{% load static %}
+{% load staticfiles %}
+{% block settings_content %}
+
+<!-- right container starts here-->
+<div class="right-container">
+        <div class="panel panel-default content-panel">
+            <div class="panel-body">
+                <!-- content box starts here -->
+                <div class="content_box">
+                    <div class="title">
+                        <h4>{{ project.name }} GitLab Settings</h4>
+                        <div class="tag">
+                          For project settings of GitLab
+                        </div>
+                    </div>
+                    {% if project.git_url and project.secret_key %}
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <th>Secret Key</th>
+                                    <th>Git URL</th>
+                                    <th>Git Project Id</th>
+                                </thead>
+                                <tbody>
+                                    <td>{{ project.secret_key }}</td>
+                                    <td>{{ project.git_url }}</td>
+                                    <td>{{ project.git_id }}</td>
+                                </tbody>
+                            </table>
+                            <div class="row" align="center">
+                                <button class="btn btn-primary">
+                                    <i class="fa fa-edit"></i>
+                                    <a href="{% url 'project:git_proj_update' slug %}">
+                                        Edit Settings
+                                    </a>
+                                </button>
+                                <button class="btn btn-danger" id="gitlab_delete">
+                                    <i class="fa fa-trash-o"></i>
+                                    <a href="{% url 'project:git_proj_clear' slug %}">
+                                        Delete Settings
+                                    </a>
+                                </button>
+
+                            </div>
+                        </div>
+                    {% else %}
+                    <div class="row">
+                        <blockquote>
+                          <p>Provid GitLab settings to get the projects list.</p>
+                          <footer> Click <cite title="Source Title">below button to add</cite></footer>
+                        </blockquote>
+                        <button class="btn btn-default">
+                            <i class="fa fa-plus"></i>
+                            <a href="{% url 'project:git_proj_add' slug %}">
+                                Add settings
+                            </a>
+                        </button>
+                    </div>
+                    {% endif %}
+              <!-- content box starts here -->
+                </div>
+              </div>
+           </div>
+        </div>
+        <!-- right container ends here-->
+
+
+{% endblock %}
+
+{%block extra_js %}
+
+    <script type="text/javascript">
+        $('#git_submenu').attr('class', 'arrow-up active');
+        $('#git_submenu ul').show().children('li#git_lab').addClass('active');
+    </script>
+
+{% endblock %}

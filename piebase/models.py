@@ -127,6 +127,10 @@ class Project(models.Model):
     organization = models.ForeignKey(Organization)
     logo = models.FileField(upload_to=logo, blank=True, null=True)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True)
+    # for GitLab connections
+    secret_key = models.CharField(max_length=255, verbose_name=_("secret_key"), null=True, blank=True)
+    git_id = models.CharField(max_length=100, verbose_name=_("git_id"), null=True, blank=True)
+    git_url = models.URLField(max_length=255, verbose_name=_("git_url"), null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -249,7 +253,7 @@ class Ticket(models.Model):
                                   verbose_name=_("milestone"))
     created_date = models.DateTimeField(verbose_name=_("created date"), auto_now_add=True)
     modified_date = models.DateTimeField(verbose_name=_("modified date"), auto_now_add=True)
-    finished_date = models.DateTimeField(verbose_name=_("finished date"),null=True, blank=True)
+    finished_date = models.DateTimeField(verbose_name=_("finished date"), null=True, blank=True)
     order = models.IntegerField(default=1)
     description = models.TextField(null=False, blank=True, verbose_name=_("description"))
     attachments = models.ManyToManyField(Attachment, blank=True)
@@ -317,13 +321,3 @@ class Labels(models.Model):
 
     def __str__(self):
         return self.name
-
-
-class GitLab(models.Model):
-    secret_key = models.CharField(max_length=255, verbose_name=_("secret_key"))
-    git_id = models.CharField(max_length=100, verbose_name=_("git_id"))
-    git_url = models.URLField(max_length=255, verbose_name=_("git_url"))
-    project = models.ForeignKey(Project, related_name="git_lab", verbose_name=_("project"))
-
-    def __str__(self):
-        return self.project.name

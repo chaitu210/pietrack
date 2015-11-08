@@ -10,10 +10,19 @@ urlpatterns = [
     # project settings
     url(r'^(?P<slug>[-\w]+)/settings/$', project_details, name='project_details'),
     url(r'^(?P<slug>[-\w]+)/edit/$', project_edit, name='project_edit'),
+
+    #git_lab
     url(r'^(?P<slug>[-\w]+)/git_lab/$', git_lab, name='git_lab'),
-    url(r'^(?P<slug>[-\w]+)/git_lab_create/$', git_lab_create, name='git_lab_create'),
-    url(r'^(?P<slug>[-\w]+)/git_lab/(?P<gitlab_id>[0-9]+)/edit/$', git_lab_edit, name='git_lab_edit'),
-    url(r'^(?P<slug>[-\w]+)/git_lab/(?P<gitlab_id>[0-9]+)/git_list/$', git_lab_test_git, name='git_lab_test_git'),
+    url(r'^(?P<slug>[-\w]+)/git_proj_add/$', git_proj_add, name='git_proj_add'),
+    url(r'^(?P<slug>[-\w]+)/git_proj_update/$', git_proj_update, name='git_proj_update'),
+    url(r'^(?P<slug>[-\w]+)/git_proj_clear/$', git_proj_clear, name='git_proj_clear'),
+    url(r'^(?P<slug>[-\w]+)/git_lab/details/$', git_proj_details, name='git_proj_details'),
+    url(r'^(?P<slug>[-\w]+)/git_lab/members/$', git_project_members, name='git_project_members'),
+    url(r'^(?P<slug>[-\w]+)/git_lab/milestones/$', git_project_milestones, name='git_project_milestones'),
+    url(r'^(?P<slug>[-\w]+)/git_lab/milestones/(?P<milestone_id>[0-9]+)/details/$', git_project_milestone_details, name='git_project_milestone_details'),
+    url(r'^(?P<slug>[-\w]+)/git_lab/labels/$', git_project_labels, name='git_project_labels'),
+    url(r'^(?P<slug>[-\w]+)/git_lab/issues/$', git_project_issues, name='git_project_issues'),
+    url(r'^(?P<slug>[-\w]+)/git_lab/issues/(?P<issue_id>[0-9]+)/comments/$', git_project_issue_comments, name='git_project_issue_comments'),
 
     # team
     url(r'^(?P<slug>[-\w]+)/team/$', project_team, name='project_team'),

@@ -309,9 +309,8 @@
               } else {
                   $(form).find('textarea').val("");
                   $(form).find('input[name="file"]').val("");
-                  $('.your_comment').parent().after(response);
-
-                  $('.attachment_file').text(' ');
+                  $(form).find('.your_comment').parent().after(response);
+                  $(form).find('.attachment_file').text(' ');
               }
 
           }

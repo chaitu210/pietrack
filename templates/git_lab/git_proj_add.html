@@ -1,0 +1,126 @@
+{% extends 'git_lab/base.html' %}
+{% load project_tags %}
+{% load static %}
+{% load staticfiles %}
+{% block settings_content %}
+
+<!-- right container starts here-->
+<div class="right-container" >
+        <div class="panel panel-default content-panel">
+            <div class="panel-body">
+                <!-- content box starts here -->
+                <div class="content_box">
+                    <div class="title">
+                        <h4>{{ project.name }} GitLab Settings</h4>
+                        <div class="tag">
+                          For project settings of GitLab
+                        </div>
+                    </div>
+                    <form method="post" id="gitlab_settings">
+                        {%csrf_token%}
+
+                        <div class="panel_box">
+                            <div class="form_group">
+                                <label for="id_secret_key">Secret_key</label>
+                                <input id="id_secret_key" name='secret_key' type="text" class="form-control" value="{% if gitlab_list %}{{ gitlab_list.secret_key }}{% else %}{{ request.POST.secret_key }}{% endif %}">
+                                <span id="gitlab_settings_secret_key_error" class="gitlab_err"></span>
+                            </div>
+
+                            <div class="form_group">
+                                <label for="id_git_url">Git URL</label>
+                                <input id="id_git_url" name='git_url' type="url" class="form-control" value="{% if gitlab_list %}{{ gitlab_list.git_url }}{% else %}{{ request.POST.git_url }}{% endif %}">
+                                <span id="gitlab_settings_git_url_error" class="gitlab_err"></span>
+                            </div>
+                            {% if project.git_url and project.secret_key %}
+                            <div class="form_group">
+                                <label for="id_git_projects"></label>
+                                <input id="id_git_projects" name='action' type="hidden" class="form-control" value="get_projects">
+                                <span id="gitlab_settings_git_projects_error" class="gitlab_err"></span>
+                            </div>
+                            {% endif %}
+
+                            {% if proj_list %}
+                            <div class="form_group" id="git_project">
+                                <label for="choose_project">Select Project:</label>
+                                <select class="form-control" name="git_proj" id="choose_project">
+                                    {% for key,value in proj_list.items %}
+                                    <option value="{{key}}" {% ifequal gitlab_list.git_id|add:'0' key %}selected{% endifequal %}>{{value}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            {% endif %}
+
+                           <!-- <div class="form_group" id="select_menu_options" style="display: none;">
+                                <br />
+                                <h1>Git Options</h1>
+                                <br />
+                                <label> Project Details
+                                    <input type="checkbox" name="project_details">
+                                </label>
+                                <label> Project Members
+                                    <input type="checkbox" name="project_members">
+                                </label>
+                                <label> Project Milestones
+                                    <input type="checkbox" name="project_milestones">
+                                </label>
+                                <label>
+                                    Project Issues
+                                    <input type="checkbox" name="project_issues">
+                                </label>
+                                <label> Project Labels
+                                    <input type="checkbox" name="project_labels">
+                                </label>
+                            </div>-->
+
+                            <br />
+                            <button class="special-button" id="git_save">{% if not project.git_url %}<span class="fa fa-save"></span> Save{% else %}<span class="fa fa-edit"></span> Update{% endif %}</button>
+
+                      </div>
+                    </form>
+              <!-- content box starts here -->
+                </div>
+              </div>
+           </div>
+        </div>
+        <!-- right container ends here-->
+
+
+{% endblock %}
+
+{%block extra_js %}
+
+    <script type="text/javascript">
+
+        $('#git_submenu').attr('class', 'arrow-up active');
+        $('#git_submenu ul').show().children('li#git_lab').addClass('active');
+
+    </script>
+
+    <script type="text/javascript">
+
+        $('#git_save').click(function(e){
+            e.preventDefault();
+            if (confirm("Are you sure about this?")==false){
+                return
+            }
+            $.post(".", $('#gitlab_settings').serialize(), function(response) {
+                $('.gitlab_err').text('');
+                if (response['error']) {
+                    for (var key in response['errors']) {
+                        $('#gitlab_settings_' + key + '_error').text('').append('* '+response['errors'][key])
+                    }
+                }
+                else {
+                    window.location = "{% url 'project:git_lab' slug %}";
+                }
+            })
+        });
+
+        /*$('#choose_project').on('change', function(){
+            $('#select_menu_options').show();
+        });
+*/
+    </script>
+
+{%endblock %}

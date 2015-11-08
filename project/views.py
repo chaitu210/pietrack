@@ -6,7 +6,7 @@ import shutil
 import os
 from django.shortcuts import render, redirect, render_to_response, get_object_or_404
 from piebase.models import User, Project, Priority, Severity, TicketStatus, Ticket, Attachment, Role, \
-    Milestone, Timeline, Comment, Labels, GitLab
+    Milestone, Timeline, Comment, Labels
 from forms import CreateProjectForm, PriorityForm, SeverityForm, TicketStatusForm, RoleForm, CommentForm, \
     CreateMemberForm, PasswordResetForm, MilestoneForm, CreateIssueForm, LabelsForm, GitLabForm
 from PIL import Image
@@ -1526,60 +1526,192 @@ def labels_delete(request, slug, label_slug):
 def git_lab(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
     data = {'project': project, 'slug': slug}
-    gitlab_list = GitLab.objects.filter(project=project)
-    if gitlab_list:
-        data['gitlab_list'] = gitlab_list[0]
-        resp = requests.request("GET", gitlab_list[0].git_url + 'api/v3/projects?private_token=' + gitlab_list[0].secret_key)
+
+    if project.secret_key and project.git_url:
+        data['gitlab_list'] = {'secret_key': project.secret_key, 'git_url': project.git_url}
+        if not project.git_id:
+            return HttpResponseRedirect(
+                reverse('project:git_proj_update', kwargs={'slug': slug}))
+
+    return render(request, 'git_lab/git_lab.html', data)
+
+
+@active_user_required
+@check_project_admin
+def git_proj_add(request, slug):
+    project = Project.objects.get(slug=slug, organization=request.user.organization)
+    data = {'slug': slug, 'project': project}
+    if project.secret_key and project.git_url:
+        data['gitlab_list'] = {'secret_key': project.secret_key, 'git_url': project.git_url}
+    if request.POST:
+        form = GitLabForm(request.POST, instance=project)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Successfully updated your GitLab settings !')
+            return HttpResponse(json.dumps({'error': False}), content_type="application/json")
+        else :
+            return HttpResponse(json.dumps({'error': True, 'errors': form.errors}), content_type="application/json")
+    return render(request, 'git_lab/git_proj_add.html', data)
+
+
+@active_user_required
+@check_project_admin
+def git_proj_update(request, slug):
+    project = Project.objects.get(slug=slug, organization=request.user.organization)
+    data = {'project': project, 'slug': slug}
+    if project.secret_key and project.git_url:
+        data['gitlab_list'] = {'secret_key': project.secret_key, 'git_url': project.git_url, 'git_id': project.git_id}
         proj_list = {}
+        resp = requests.request("GET", project.git_url + 'api/v3/projects?private_token=' + project.secret_key)
         for i in resp.json():
-            proj_list[i['id']]= i['path']
-        data['resp'] = proj_list
-    else:
-        messages.warning(request, 'Please provide settings for GitLab')
-    return render(request, 'settings/git_lab.html', data)
+            proj_list[i['id']] = i['path']
+        data['proj_list'] = proj_list
+
+        form = GitLabForm(request.POST, instance=project)
+        if form.is_valid():
+            git_form = form.save(commit=False)
+            if request.POST.get('git_proj'):
+                git_form.git_id = int(request.POST.get('git_proj'))
+                git_form.save()
+
+                messages.success(request, 'Successfully updated your GitLab settings !')
+                return HttpResponse(json.dumps({'error': False}), content_type="application/json")
+        else:
+            return HttpResponse(json.dumps({'error': True, 'errors': form.errors}), content_type="application/json")
+    return render(request, 'git_lab/git_proj_add.html', data)
 
 
 @active_user_required
 @check_project_admin
-def git_lab_create(request, slug):
+def git_proj_clear(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
-    form = GitLabForm(request.POST, project=project)
-    if form.is_valid():
-        form.save()
 
-        messages.success(request, 'Successfully added your GitLab settings !')
-        return HttpResponse(json.dumps({'error': False}), content_type='application/json')
-
-    else:
-        return HttpResponse(json.dumps({'error': True, 'errors': form.errors}), content_type="application/json")
+    project.secret_key = ''
+    project.git_url = ''
+    project.git_id = ''
+    project.save()
+    return HttpResponseRedirect(reverse('project:git_lab', kwargs={'slug': slug}))
 
 
 @active_user_required
 @check_project_admin
-def git_lab_edit(request, slug, gitlab_id):
+def git_proj_details(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
-    instance = GitLab.objects.get(id=gitlab_id, project=project)
-    form = GitLabForm(request.POST, instance=instance, project=project)
-    if form.is_valid():
-        git_form = form.save()
-        if request.POST.get('git_proj'):
-            git_form.git_id = int(request.POST.get('git_proj'))
-            git_form.save()
+    data = {'project': project, 'slug': slug}
 
-        messages.success(request, 'Successfully updated your GitLab settings !')
-        return HttpResponse(json.dumps({'error': False}), content_type="application/json")
-    else:
-        return HttpResponse(json.dumps({'error': True, 'errors': form.errors}), content_type="application/json")
+    if project.secret_key and project.git_url:
+        data['gitlab_list'] = {'secret_key': project.secret_key, 'git_url': project.git_url}
+
+        project_details = requests.request("GET", project.git_url + 'api/v3/projects/'+project.git_id+'?private_token=' + project.secret_key)
+        data['resp'] = project_details.json()
+
+    return render(request, 'git_lab/git_project_details.html', data)
 
 
 @active_user_required
 @check_project_admin
-def git_lab_test_git(request, slug, gitlab_id):
+def git_project_members(request, slug):
+    project=Project.objects.get(slug=slug, organization=request.user.organization)
+
+    data = {'slug': slug, 'project':project}
+
+    if project.secret_key and project.git_url:
+        data['gitlab_list'] = {'secret_key': project.secret_key, 'git_url': project.git_url}
+
+        project_details = requests.request("GET", project.git_url + 'api/v3/projects/'+project.git_id+'?private_token=' + project.secret_key)
+        members = requests.request('GET', project.git_url + 'api/v3/projects/'+project.git_id+'/members?private_token=' + project.secret_key)
+        data['resp'] = project_details.json()
+        data['members'] = members.json()
+
+    return render(request, 'git_lab/git_project_members.html', data)
+
+
+@active_user_required
+@check_project_admin
+def git_project_milestones(request, slug):
+    project=Project.objects.get(slug=slug, organization=request.user.organization)
+
+    data = {'slug': slug, 'project':project}
+
+    if project.secret_key and project.git_url:
+        data['gitlab_list'] = {'secret_key': project.secret_key, 'git_url': project.git_url}
+        project_details = requests.request("GET", project.git_url + 'api/v3/projects/'+project.git_id+'?private_token=' + project.secret_key)
+        milestones = requests.request("GET", project.git_url + 'api/v3/projects/'+project.git_id+'/milestones?private_token=' + project.secret_key)
+        data['resp'] = project_details.json()
+        data['milestones'] = milestones.json()
+
+    return render(request, 'git_lab/git_project_milestones.html', data)
+
+
+@active_user_required
+@check_project_admin
+def git_project_issues(request, slug):
     project = Project.objects.get(slug=slug, organization=request.user.organization)
-    git_obj = GitLab.objects.get(id=gitlab_id, project=project)
-    resp = requests.request("GET", git_obj.git_url + 'api/v3/projects?private_token=' + git_obj.secret_key)
-    for i in resp.json():
-        if i['path'] == project.slug:
-            git_obj.git_id = i['id']
-            git_obj.save()
-    return HttpResponse(resp, content_type='application/json')
+
+    data = {'project': project, 'slug': slug}
+
+    if project.secret_key and project.git_url:
+        data['gitlab_list'] = {'secret_key': project.secret_key, 'git_url': project.git_url}
+
+        project_details = requests.request("GET", project.git_url + 'api/v3/projects/'+project.git_id+'?private_token=' + project.secret_key)
+        issues = requests.request("GET", project.git_url + 'api/v3/projects/'+project.git_id+'/issues?private_token=' + project.secret_key)
+        data['resp'] = project_details.json()
+        data['issues'] = issues.json()
+    return render(request, 'git_lab/git_project_issues.html', data)
+
+
+@active_user_required
+@check_project_admin
+def git_project_issue_comments(request, slug, issue_id):
+    project = Project.objects.get(slug=slug, organization=request.user.organization)
+
+    data = {'project': project, 'slug': slug}
+
+    if project.secret_key and project.git_url:
+        data['gitlab_list'] = {'secret_key': project.secret_key, 'git_url': project.git_url}
+
+        project_details = requests.request("GET", project.git_url + 'api/v3/projects/'+project.git_id+'?private_token=' + project.secret_key)
+        issue_comments = requests.request("GET", project.git_url + 'api/v3/projects/'+project.git_id+'/issues/'+issue_id+'/notes?private_token=' + project.secret_key)
+        data['resp'] = project_details.json()
+        data['issue_comments'] = issue_comments.json()
+
+    return render(request, 'git_lab/git_project_issue_comments.html', data)
+
+
+@active_user_required
+@check_project_admin
+def git_project_milestone_details(request, slug, milestone_id):
+    project=Project.objects.get(slug=slug, organization=request.user.organization)
+
+    data = {'slug': slug, 'project':project}
+
+    if project.secret_key and project.git_url:
+        data['gitlab_list'] = {'secret_key': project.secret_key, 'git_url': project.git_url}
+
+        project_details = requests.request("GET", project.git_url + 'api/v3/projects/'+project.git_id+'?private_token=' + project.secret_key)
+        milestone_details = requests.request("GET", project.git_url + 'api/v3/projects/'+project.git_id+'/milestones/'+ milestone_id +'?private_token=' + project.secret_key)
+        milestone_issues = requests.request("GET", project.git_url + 'api/v3/projects/'+project.git_id+'/milestones/'+ milestone_id +'/issues?private_token=' + project.secret_key)
+        data['resp'] = project_details.json()
+        data['milestone_details'] = milestone_details.json()
+        data['milestone_issues'] = milestone_issues.json()
+
+    return render(request, 'git_lab/git_project_milestone_details.html', data)
+
+
+@active_user_required
+@check_project_admin
+def git_project_labels(request, slug):
+    project=Project.objects.get(slug=slug, organization=request.user.organization)
+
+    data = {'slug': slug, 'project':project}
+
+    if project.secret_key and project.git_url:
+        data['gitlab_list'] = {'secret_key': project.secret_key, 'git_url': project.git_url}
+
+        project_details = requests.request("GET", project.git_url + 'api/v3/projects/'+project.git_id+'?private_token=' + project.secret_key)
+        labels = requests.request("GET", project.git_url + 'api/v3/projects/'+project.git_id+'/labels?private_token=' + project.secret_key)
+        data['resp'] = project_details.json()
+        data['labels'] = labels.json()
+
+    return render(request, 'git_lab/git_project_labels.html', data)
+

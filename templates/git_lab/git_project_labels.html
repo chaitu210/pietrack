@@ -1,0 +1,66 @@
+{% extends 'git_lab/base.html' %}
+{% load project_tags %}
+{% load static %}
+{% load staticfiles %}
+{% block settings_content %}
+
+<!-- right container starts here-->
+<div class="right-container">
+        <div class="panel panel-default content-panel">
+            <div class="panel-body">
+                <!-- content box starts here -->
+                <div class="content_box">
+                    <div class="title">
+                        <h4>{{ project.name }} - GIt Project "{{ resp.name }}" Labels</h4>
+                        <div class="tag">
+                          For project settings of GitLab
+                        </div>
+                    </div>
+                    {% if gitlab_list and resp and labels %}
+
+                        <div class="table-responsive">
+
+                            <h1>Project Labels:</h1>
+                            <br />
+
+                            <table class="table table-bordered">
+                                <thead>
+                                    <th>Name</th>
+                                    <th>Color</th>
+                                </thead>
+
+                                <tbody>
+                                {% for label in labels %}
+                                    <tr>
+                                        <td><span class="label color-label" style="background-color: {{label.color}}; color: #fff;">{{ label.name }}</span></td>
+                                        <td>{{ label.color }}</td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+
+                        </div>
+
+                    {% else %}
+                    <div class="row">
+                          <p align="center">No labels created on this project : <b>{{ resp.name }}"</b></p>
+                    </div>
+                    {% endif %}
+              <!-- content box starts here -->
+                </div>
+              </div>
+           </div>
+        </div>
+        <!-- right container ends here-->
+
+
+{% endblock %}
+
+{%block extra_js %}
+
+    <script type="text/javascript">
+        $('#git_submenu').attr('class', 'arrow-up active');
+        $('#git_submenu ul').show().children('li#git_project_labels').addClass('active');
+    </script>
+
+{% endblock %}

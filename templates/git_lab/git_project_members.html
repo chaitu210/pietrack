@@ -1,0 +1,81 @@
+{% extends 'git_lab/base.html' %}
+{% load project_tags %}
+{% load static %}
+{% load staticfiles %}
+{% block settings_content %}
+
+<!-- right container starts here-->
+<div class="right-container">
+        <div class="panel panel-default content-panel">
+            <div class="panel-body">
+                <!-- content box starts here -->
+                <div class="content_box">
+                    <div class="title">
+                        <h4>{{ project.name }} - GIt Project "{{ resp.name }}" Members</h4>
+                        <div class="tag">
+                          For project settings of GitLab
+                        </div>
+                    </div>
+                    {% if gitlab_list and resp and members %}
+
+                        <div class="table-responsive">
+
+                            <h1> Project Members :</h1>
+                            <br />
+
+                            <table class="table table-bordered">
+                                <thead>
+                                    <th>Id</th>
+                                    <th>Name</th>
+                                    <th>Access Level</th>
+                                </thead>
+
+                                <tbody>
+                                {% for member in members %}
+                                    <tr>
+                                        <td>{{ member.id }}</td>
+                                        <td><img src="{{ member.avatar_url }}" class="responsive circle" height="30px"> {{ member.name }}</td>
+                                        <td>
+                                            {% if member.access_level == 10 %}
+                                                Guest
+                                            {% elif member.access_level == 20 %}
+                                                Reporter
+                                            {% elif member.access_level == 30 %}
+                                                Developer
+                                            {% else %}
+                                                Master
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+
+                        </div>
+
+                    {% else %}
+                    <div class="row">
+                        <blockquote>
+                          <p>Provid GitLab settings to get the projects details.</p>
+                          <footer> Click <cite title="Source Title">GitLab button</cite></footer>
+                        </blockquote>
+                    </div>
+                    {% endif %}
+              <!-- content box starts here -->
+                </div>
+              </div>
+           </div>
+        </div>
+        <!-- right container ends here-->
+
+
+{% endblock %}
+
+{%block extra_js %}
+
+    <script type="text/javascript">
+        $('#git_submenu').attr('class', 'arrow-up active');
+        $('#git_submenu ul').show().children('li#git_project_members').addClass('active');
+    </script>
+
+{% endblock %}
