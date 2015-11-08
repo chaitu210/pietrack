@@ -1,78 +1,202 @@
-{% extends 'base.html' %}
-{% load compress %}
-{% block content %}
+{% extends 'settings/base.html' %}
+{% load project_tags %}
+{% load static %}
 {% load staticfiles %}
-{% compress css %}
-   {% block extra_css_links %}
-    <link rel="stylesheet" type="text/css" href="{%static 'less/bs_leftnavi.less' %}">
-{% endblock %}
-{% endcompress %}
-<section id="box-content">
-  <!-- nav left starts here-->
-  {% include "settings/left_menu.html" %}
-  <!-- nav left ends here-->
-  <!-- right container starts here-->
-  <div class="right-container">
-    <div class="panel panel-default content-panel content-panel-extra">
-      <div class="panel-body">
-        <!-- content box starts here -->
-        <div class="content_box ">
-          <div class="title">
-            <h4>SAMPL1 - <span class="status">MANAGE MEMBERS</span></h4>
-            <div class="tag">Specify the statuses your user stories, tasks and issues will go through</div>
-            <span class="new"><a href="{% url 'project:create_member' slug %}">Add New Member</a></span>
-          </div>
-          <!-- status table starts here -->
-          <div class="table-responsive member-box">
-            <table class="table table-hover">
-              <thead>
-                <tr>
-                  <th>Member</th>
-                  <th>Role</th>
-                  <th>Status</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for member,role in mem_details %}
-                <tr>
-                  <th scope="row">
-                    <div class="img-text">
-                      <span class="user-pic">
-                    {% if member.profile_pic %}
-                      <img src="{{member.profile_pic.url}}" />
-                    {% else %}
-                      <img src="{% static 'img/user-pic.jpg' %}" />
-                    {%endif%}
-                  </span>
-                      <span class="title-email">
-                                      <span class="title">Mergu</span>
-                      <span class="email">{{member.email}}</span>
-                      </span>
-                    </div>
-                  </th>
-                  <td>
-                    <select class="form-control">
-                      <option>{{role.name}}</option>
-                    </select>
-                  </td>
-                  <td><span class="active-1 status">Active <i class="fa fa-check"></i></span></td>
-                  <td class="actions"><a href="#" class="delete"><i class="fa fa-trash"></i></a></td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-          <!-- status table ends here -->
-          <!-- content box starts here -->
-        </div>
-      </div>
-    </div>
-  </div>
-  <!-- right container ends here-->
-</section>
 
-  {% endblock %}
+{% block settings_content %}
+
+    <div class="right-container">
+        <div class="panel panel-default content-panel content-panel-extra">
+            <div class="panel-body">
+                <!-- content box starts here -->
+                <div class="content_box ">
+                    {% if project.members.all|length == 0 %}
+                        <div class="role-alert pull-right member-warning-alert">
+                            <div class="alert alert-warning alert-dismissible" role="alert">
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <strong><span class="fa fa-warning"></span></strong> You haven't added members yet !
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <div class="title">
+                        <h4><span class="status">{{ project.name }} - PROJECT MEMBERS</span></h4>
+                    {% if request.user.pietrack_role == 'admin' or request.user|is_project_admin:slug %}
+                        <div class="tag">
+                            You can quickly add members to your team and re-order them at anytime
+                        </div>
+                        <span class="new">
+                            <a href="{% url 'project:create_member' slug %}">
+                                <i class="fa fa-user-plus"></i> Add New Member
+                            </a>
+                        </span>
+                    {% endif %}
+                    </div>
+                    <!-- status table starts here -->
+                    <div class="table-responsive member-box">
+                        <table class="table table-hover" id="member_roles">
+                            <thead>
+                                <tr>
+                                    <th>Member</th>
+                                    <th>Admin</th>
+                                    <th>Role</th>
+                                    <th>Status</th>
+                                {% if request.user.pietrack_role == 'admin' or request.user|is_project_admin:slug %}
+                                    <th>Action</th>
+                                {% endif %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% for member in project.members.all %}
+                                <tr id="{{ member.id }}">
+                                    <th scope="row">
+                                        <div class="img-text">
+                                            <span class="user-pic">
+                                             {% if member.profile_pic %}
+                                                 <img src="{{member.profile_pic.url}}" />
+                                             {% else %}
+                                                 <img src="{% static 'img/user-pic.jpg' %}" />
+                                             {%endif%}
+                                             </span>
+                                            <span class="title-email">
+                                                <span class="title">
+                                                    {% if member.first_name %}{{ member.first_name }}{% else %}{{ member.username }}{% endif %}
+                                                </span>
+                                                <span class="email">{{member.email}}</span>
+                                            </span>
+                                        </div>
+                                    </th>
+                                    <td>
+                                        <div class="toggle_user_admin">
+                                            <a href="#">
+                                            {% if member.pietrack_role == 'admin' or member|is_project_admin:slug %}
+                                                <i class="fa fa-toggle-on"></i><span name="state"> Yes </span>
+                                                {% else %}
+                                                <i class="fa fa-toggle-off"></i><span name="state"> No </span>
+                                                {% endif %}
+                                            </a>
+
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {% if member.pietrack_role == 'admin' %}
+                                                {{ member|get_user_Role:project|title }}
+                                        {% else %}
+                                            <select class="form-control" name="designation" disabled>
+                                            {% for role in project.roles.all %}
+                                                <option value="{{ role.id }}" {%if role == member|get_user_Role:project %}selected{% endif %}>{{role}}</option>
+                                            {% endfor %}
+                                            </select>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="active-1 status">
+                                            Active
+                                            <i class="fa fa-check"></i>
+                                        </span>
+                                    </td>
+                                {% if request.user.pietrack_role == 'admin' or request.user|is_project_admin:slug %}
+                                    {% if request.user.pietrack_role == 'admin' %}
+                                        {% if request.user != member %}
+                                        <td class="actions">
+                                        <a href="{% url 'project:edit_member' slug %}?id={{member.id}}" class="edit"><i class="fa fa-edit"></i></a>
+                                        <a href="#" class="delete" onclick="delete_member('{{member.id}}')">
+                                            <i class="fa fa-trash"></i>
+                                        </a>
+                                        </td>
+                                        {% endif  %}
+                                    {% else %}
+                                        {% if  member != request.user and member.pietrack_role != 'admin' %}
+                                        <td class="actions">
+                                        <a href="{% url 'project:edit_member' slug %}?id={{member.id}}" class="edit"><i class="fa fa-edit"></i></a>
+                                        <a href="#" class="delete" onclick="delete_member('{{member.id}}')">
+                                            <i class="fa fa-trash"></i>
+                                        </a>
+                                        </td>
+                                        {% endif  %}
+                                    {% endif %}
+
+                                {% endif %}
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- status table ends here -->
+                    <!-- content box starts here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock settings_content %}
+
 {% block extra_js %}
-    <script type="text/javascript" src="{%static 'js/bs_leftnavi.js' %}"></script>
+
+<script>
+        function delete_member(id){
+            $.get("{% url 'project:delete_member' slug%}"+"?id="+id, function(response){
+                if(response['result'])
+                {
+                    $("#"+id).remove();
+                }
+            });
+        }
+</script>
+<script type="text/javascript">
+    $('#project_members').addClass('active');
+{% if request.user|is_project_admin:slug %}
+    $('.toggle_user_admin').on('click',function(e){
+        $text = $(this).find('a > span[name="state"]')
+        $icon = $(this).find('a > i')
+        var user_id = $(this).closest('tr').attr('id')
+        data = "csrfmiddlewaretoken={{ csrf_token }}&user_id="+user_id
+
+        $.post('',data,function(response){
+            if(response['result']){
+                if($text.text().trim() == 'Yes' &&  $icon.hasClass('fa-toggle-on') ){
+                    $text.text(" No ");
+                    $icon.attr('class', 'fa fa-toggle-off')
+                }
+                else{
+                    $text.text(" Yes ");
+                    $icon.attr('class', 'fa fa-toggle-on')
+                }
+            }
+        });
+    });
+{% endif %}
+
+/*$('#member_roles i.fa.fa-edit').click(
+  function(e){
+      $(this).closest('tr').find('select').attr('disabled',false)
+      $(this).attr('class','glyphicon glyphicon-floppy-saved')
+      e.preventDefault();
+  }
+);
+*/
+$('.edit').on('click',function(e) {
+    if($(this).find('i').attr('class') == 'fa fa-edit')
+    {
+         $(this).closest('tr').find('select').attr('disabled',false)
+         $(this).find('i').attr('class','glyphicon glyphicon-floppy-saved')
+    }
+    else{
+        role_id = $(this).closest('tr').find('select').val()
+        url = $(this).closest('a').attr('href')
+        url = url+'&role_id='+role_id
+        $instance = $(this)
+        $.get(url,function(response){
+          if(response['result']){
+            $instance.closest('tr').find('select').attr('disabled',true)
+            $instance.find('i').attr('class','fa fa-edit')
+          }
+        });
+
+    }
+    e.preventDefault();
+});
+
+</script>
+
 {% endblock %}

@@ -1,0 +1,76 @@
+{% extends 'git_lab/base.html' %}
+{% load project_tags %}
+{% load static %}
+{% load staticfiles %}
+{% block settings_content %}
+
+<!-- right container starts here-->
+<div class="right-container">
+        <div class="panel panel-default content-panel">
+            <div class="panel-body">
+                <!-- content box starts here -->
+                <div class="content_box">
+                    <div class="title">
+                        <h4>{{ project.name }} - GIt Project "{{ resp.name }}" Milestones</h4>
+                        <div class="tag">
+                          For project settings of GitLab
+                        </div>
+                    </div>
+                    {% if gitlab_list and resp and milestones %}
+
+                        <div class="table-responsive">
+
+                            <h1>Project Milestones:</h1>
+                            <br />
+
+                            <table class="table table-bordered">
+                                <thead>
+                                    <th>Id</th>
+                                    <th>Title</th>
+                                    <th>Description</th>
+                                    <th>State</th>
+                                    <th>Created On</th>
+                                    <th>Due Date</th>
+                                    <th>Project</th>
+                                </thead>
+
+                                <tbody>
+                                {% for milestone in milestones %}
+                                    <tr>
+                                        <td><a href="{% url 'project:git_project_milestone_details' slug milestone.id %}">{{ milestone.id }}</a> </td>
+                                        <td>{{ milestone.title }}</td>
+                                        <td>{{ milestone.description }}</td>
+                                        <td>{{ milestone.state }}</td>
+                                        <td>{{ milestone.created_at }}</td>
+                                        <td>{{ milestone.due_date }}</td>
+                                        <td>{{ milestone.project_id }}</td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+
+                        </div>
+
+                    {% else %}
+                    <div class="row">
+                      <p align="center">No milestones were created on this project : <b>"{{ resp.name }}"</b></p>
+                    </div>
+                    {% endif %}
+              <!-- content box starts here -->
+                </div>
+              </div>
+           </div>
+        </div>
+        <!-- right container ends here-->
+
+
+{% endblock %}
+
+{%block extra_js %}
+
+    <script type="text/javascript">
+        $('#git_submenu').attr('class', 'arrow-up active');
+        $('#git_submenu ul').show().children('li#git_project_milestones').addClass('active');
+    </script>
+
+{% endblock %}

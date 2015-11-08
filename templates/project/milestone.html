@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% block content %}
+  <section id='base_content' class='create_project'>
+    <div class="content_box">
+        <div class="title">
+            <h4>{% if milestone_obj %}Edit{% else %}Add new {% endif %} milestone</h4>
+        </div>
+        <form id='milestone_form'>
+            <div class="panel_box">
+                <div class="form_group">
+                    <label for="milestone_name">Title</label>
+                    <input id='milestone_name' name='name' value='{{ milestone_obj.name }}' type="text" class='input'>
+                    <span id='milestone_name_error'></span>
+                </div>
+                <div class="form_group">
+                    <label for="milestone_estimated_start">Start Date</label>
+                    <input id='milestone_estimated_start' name='estimated_start' value='{{ milestone_obj.estimated_start|date:"Y-m-d"}}' type="text" class='input'>
+                    <span id='milestone_estimated_start_error'></span>
+                </div>
+                <div class="form_group">
+                    <label for="milestone_estimated_finish">Finished Date</label>
+                    <input id='milestone_estimated_finish' name='estimated_finish' value='{{ milestone_obj.estimated_finish|date:"Y-m-d" }}' type="text" class='input'>
+                    <span id='milestone_estimated_finish_error'></span>
+                </div>
+                <div class="form_group">
+                    <label for="milestone_status">Status</label>
+                    <select id='milestone_status' name='status'  class='input'>
+                        <option value='planned' {% if  milestone_obj.status == 'planned' %} selected{% endif %} >Planned</option>
+                        <option value='started' {% if  milestone_obj.status == 'started' %} selected{% endif %} >Started</option>
+                        <option value='finished' {% if  milestone_obj.status == 'finished' %} selected{% endif %} >Finished</option>
+                    </select>
+                </div>
+                <br clear="clearfixall" />
+                <button id='milestone_save'><i class="fa fa-save"></i> Save</button>
+            </div>
+            {% csrf_token %}
+        </form>
+    </div>
+  </section>
+{% endblock %}
+{% block extra_js_links %}
+    <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+{% endblock %} 
+{% block extra_js %}
+    <script>
+
+    $('#milestone_save').click(function(event) {
+        event.preventDefault();
+        $.post('', $('#milestone_form').serialize(), function(data) {
+            if (data['error'] === true) {
+                $('span.span_error').remove();
+                for (var key in data.form_errors) {
+                    $('#milestone_' + key + '_error').after("<span class = 'span_error'> * " + data.form_errors[key] + "</span>")
+                }
+            } else {
+                /*alert('Successfully created your mile-stone !');*/
+                window.location = '/project/{{ slug }}/milestones/';
+            }
+        });
+    });
+
+    // for datepicker
+      $(function() {
+        $( "#milestone_estimated_start" ).datepicker({
+          changeMonth: true,
+          changeYear: true,
+          dateFormat: 'yy-mm-dd',
+          numberOfMonths: 1,
+          minDate: new Date(),
+          onClose: function( selectedDate ) {
+            $( "#milestone_estimated_finish" ).datepicker( "option", "minDate", selectedDate );
+          }
+        });
+        $( "#milestone_estimated_finish" ).datepicker({
+          changeMonth: true,
+          changeYear: true,
+          dateFormat: 'yy-mm-dd',
+          numberOfMonths: 1,
+          minDate: new Date(),
+          onClose: function( selectedDate ) {
+            $( "#milestone_estimated_start" ).datepicker( "option", "maxDate", selectedDate );
+          }
+        });
+      });
+
+    </script>
+{% endblock %}

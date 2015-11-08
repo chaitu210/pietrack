@@ -1,0 +1,49 @@
+{% load project_tags %}
+
+<div class="nav-left">
+    <!-- left menu starts here -->
+    <div class="nano-content">
+        <ul class="gw-nav gw-nav-list">
+            <li class="init-un-active">
+                <a href="{% url 'project:project_detail' slug %}"> <span class="gw-menu-text"> <i class="fa fa-area-chart"></i> Project Details</span> </a>
+            </li>
+            {% if request.user.pietrack_role == 'admin' or request.user|is_project_admin:slug %}
+            <li class="edit-project">
+                <a href="{% url 'project:project_details' slug %}"> <span class="gw-menu-text"> <i class="fa fa-edit"></i> Edit Project Details</span> </a>
+            </li>
+            <li class="init-arrow-down" id="git_submenu">
+                <a href="javascript:void(0)"> <span class="gw-menu-text"> <i class="fa fa-git"></i> Git Lab Settings</span> <b class="gw-arrow"></b> </a>
+                <ul class="gw-submenu">
+                    <li id="git_lab"> <a href='{% url "project:git_lab" slug %}'><i class="fa fa-home fa-fw"></i> Git Lab</a> </li>
+                    {% if project.git_id %}
+                    <li id="git_project_details"> <a href="{% url 'project:git_proj_details' slug %}"><i class="fa fa-dashboard fa-fw"></i> Project Details</a> </li>
+                    <li id="git_project_members"> <a href="{% url 'project:git_project_members' slug  %}"><i class="fa fa-users fa-fw"></i> Project Members</a> </li>
+                    <li id="git_project_milestones"> <a href="{% url 'project:git_project_milestones' slug %}"><i class="fa fa-clock-o fa-fw"></i> Project Milestones</a> </li>
+                    <li id="git_project_issues"> <a href="{% url 'project:git_project_issues' slug %}"><i class="fa fa-exclamation-circle fa-fw"></i> Project Issues</a> </li>
+                    <li id="git_project_labels"> <a href="{% url 'project:git_project_labels' slug %}"><i class="fa fa-tags fa-fw"></i> Project Labels</a> </li>
+                    {% endif %}
+
+                </ul>
+            </li>
+            <li class="init-arrow-down" id="project_submenu">
+                <a href="javascript:void(0)"> <span class="gw-menu-text"> <i class="fa fa-sort-amount-asc"></i> Attributes</span> <b class="gw-arrow"></b> </a>
+                <ul class="gw-submenu">
+                    <li id="project_status"> <a href='{% url "project:ticket_status" slug %}'>Status</a> </li>
+                    <li id="project_priorities"> <a href='{% url "project:priorities" slug %}'>Priorities</a> </li>
+                    <li id="project_severities"> <a href='{% url "project:severities" slug %}'>Severities</a> </li>
+                </ul>
+            </li>
+            {% endif %}
+            <li id="labels">
+                <a href="{% url 'project:labels' slug %}"> <span class="gw-menu-text"><i class="fa fa-tags"></i> Labels</span> </a>
+            </li>
+            <li id="project_members">
+                <a href="{% url 'project:project_team' slug %}"> <span class="gw-menu-text"><i class="fa fa-users"></i> Members</span> </a>
+            </li>
+            <li id="project_member_roles">
+                <a href="{% url 'project:member_roles' slug %}"> <span class="gw-menu-text"> <i class="fa fa-lock"></i> User Roles</span> </a>
+            </li>
+        </ul>
+    </div>
+    <!-- left menu ends here -->
+</div>

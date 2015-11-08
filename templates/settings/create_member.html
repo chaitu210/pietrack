@@ -1,110 +1,192 @@
-{% extends 'base.html' %}
+{% extends 'base.html' %} 
 {% load compress %}
 {% block content %}
-    <section id='base_content' class='create_project'>
-      <div class="content_box">
+  <section id='base_content' class='create_project'>
+    <div class="content_box">
+    {% if edit_project %}
+        <br clear="clearfixall" />
         <div class="title">
-          <h4>New Member</h4>
-          <div class="tag">Compellingly reintermediate premier materials for client-centered markets.for client-centered markets.</div>
+            <h4>Edit Member</h4>
+
         </div>
-        <form id = 'id_form_append'>
-            <div id = 'id_div_append'>
-                <div id = 'id_div_add0' class="panel_box">
-                  <div class="form_group">
-                    <label>Email Address</label>
-                    <input name = 'email' type="text" class='input'>
-                    <span id = 'id_span_error_email0' class = 'class_span0'></span>
-                  </div>
-                  <div class="form_group">
-                    <label>Member Designation</label>
-                    <select name = 'designation' type="text" class='input'>
-                        <option>UX</option>
-                        <option>Front end Developer</option>
-                    </select>
-                    <span></span>
-                  </div>
-                  <a class="action" href="#">
-                      <i id = 'id_i_fa_add' class="fa fa-plus"></i>
-                  </a>
+        <form id='editmember' action="#">
+            <div id='id_div_append'>
+                <div id='id_div_add0' class="panel_box">
+                    <div class="form_group">
+                        <label>Email Address</label>
+                        <input name='email' type="text" class='input' value="{{ member.email }}" readonly="readonly" autofocus>
+                        <span id='email_err' ></span>
+                    </div>
+                    <div class="form_group">
+                        <label>Member Designation</label>
+                        <select name='designation' type="text" class='input' id="edit_desig">
+                            {% for role in project_roles %}
+                            <option value="{{ role.slug }}">{{ role.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div id='id_div_create_member' class="panel_box">
+                    <button id='id_button_create_member'><i class="fa fa-save"></i> Edit memeber</button>
                 </div>
             </div>
             {% csrf_token %}
         </form>
-       
-        <form id = 'id_form_description'>
-            <div class="panel_box">
-                <div class="form_group">
-                <label>Description</label>
-                <textarea id = 'id_textarea_description' name = 'description' class="textarea"></textarea>
-                <span id = 'id_span_description_error'></span>
-              </div>
+    {% else %}
+        {% if project_roles|length == 0 %}
+            <div class="role-alert member-warning-alert">
+                <div class="alert alert-warning alert-dismissible" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <strong><span class="fa fa-warning"></span></strong> Please create a role to add a member !
+                </div>
+            </div>
+        {% endif %}
+        <br clear="clearfixall" />
+        <div class="title">
+            <h4>New Member</h4>
+
+        </div>
+        <form id='id_form_append' action="#">
+            <div id='id_div_append'>
+                <div id='id_div_add0' class="panel_box">
+                    <div class="form_group">
+                        <label>Email Address</label>
+                        <div class="form-group form-inline">
+                            <div class="input-group" style="width: 100%;">
+                              <input name="email" type="text" class="form-control" placeholder="e-mail" autofocus>
+                              <div class="input-group-addon">@{{ request.user.organization.domain }}</div>
+                            </div>
+                         </div>
+                        <span id='id_span_error_email0' class='class_span0'></span>
+                    </div>
+                    <div class="form_group">
+                        <label>Member Designation</label>
+                        <select name='designation' type="text" class='input'>
+                            {% for role in project_roles %}
+                            <option value="{{ role.slug }}">{{ role.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <span></span>
+                    </div>
+                    <a class="action" href="#">
+                        <i id='id_i_fa_add' class="fa fa-plus"></i>
+                    </a>
+
+                </div>
             </div>
             {% csrf_token %}
         </form>
         
-        <div id = 'id_div_create_member' class="panel_box">
-            <button id = 'id_button_create_member'>create memeber</button>
-            <div class="help">If users are already registered on pietrack, they will be added automatically. Otherwise they will receive an invitation.</div>
+        <div id='id_div_create_member' class="panel_box">
+            <button id='id_button_create_member'><i class="fa fa-save"></i> create memeber</button>
+            <div id="dup_email" class="alert alert-warning" role="alert" style="padding:0px;margin-top:5px;">
+              <div class="container"> Duplicate e-mails were found.</div>
+            </div>
         </div>
-        
-      </div>
-    </section>
-    {% endblock %}
-    {% block extra_js %}
+    {% endif %}
+    </div>
+  </section>
+{% endblock %}
+
+{% block extra_js %}
     <script>
-        var id_members_array = ['id_form_add0']
-        var id_form_count = 0
-        var i = 0;
-        $(document).ready(function(){
-            $('#id_i_fa_add').click(function duplicate() {
-                $('#id_i_fa_add').off('click')
-                $('.fa.fa-trash').off('click')
-                var original = document.getElementById('id_div_add' + i);
-                var clone = original.cloneNode(true);
-                $('#' + clone.id + " a i").attr('class', 'fa fa-trash') 
-                $('#' + clone.id + " a i").attr('id', 'id_i_fa_del' + i)
-                clone.id = "id_div_add" + ++i; 
-                clone.querySelectorAll("[id = 'id_span_error_email" + (i - 1) + "']")[0].id = 'id_span_error_email' + i
-                document.getElementById('id_form_append').appendChild(clone);
-                $('#id_i_fa_add').on('click', duplicate);
-                $('.fa.fa-trash').on('click', duplicate_trash)
-            });
-        });
-
-        function duplicate_trash(){
-            var trash_id = this.id
-            var parent_trash_id = $('#' + trash_id).parents().eq(1).attr('id')
-            $('#' + parent_trash_id).remove()
-        }
-
-        function display_error(error){
-            if(error){
-                return error
+{% if edit_project %}
+    $('#edit_desig option[value="{{ mrole.slug }}"]').attr("selected", "selected").trigger("chosen:updated");
+    $('#editmember').submit(function(e){
+        $.post('',$('#editmember').serialize(),function(response){
+            if(response){
+              window.location.href = "{% url 'project:project_team' slug %}"
             }
-            return ''
+
+        });
+        e.preventDefault()
+    });
+{% else %}
+    var id_members_array = ['id_form_add0'];
+    var id_form_count = 0;
+    var i = 0;
+    $(document).ready(function() {
+        $('#id_i_fa_add').click(function duplicate() {
+            $('html, body').animate({ scrollTop: $("#id_i_fa_add").offset().top }, 500);
+            $('#id_i_fa_add').off('click');
+            $('.fa.fa-trash').off('click');
+            var original = document.getElementById('id_div_add' + i);
+            var clone = original.cloneNode(true);
+            $('#' + clone.id + " a i").attr('class', 'fa fa-trash');
+            $('#' + clone.id + " a i").attr('id', 'id_i_fa_del' + i);
+            clone.id = "id_div_add" + ++i;
+            clone.querySelectorAll("[id = 'id_span_error_email" + (i - 1) + "']")[0].id = 'id_span_error_email' + i;
+            $(clone).find('input').val("");
+            $(clone).find('span').text("");
+            document.getElementById('id_form_append').appendChild(clone);
+            $('#id_form_append input').focus();
+
+            $('#id_i_fa_add').on('click', duplicate);
+            $('.fa.fa-trash').on('click', duplicate_trash);
+        });
+    });
+
+    function duplicate_trash() {
+        var trash_id = this.id;
+        var parent_trash_id = $('#' + trash_id).parents().eq(1).attr('id');
+        $('#' + parent_trash_id).remove()
+        $('html, body').animate({ scrollTop: $("#id_i_fa_add").offset().top }, 500);
+    }
+
+    function display_error(error) {
+        if (error) {
+            return error
         }
-        
-        $('#id_button_create_member').click(function(event){
-            var id_span_array = []
-            $("#id_div_append").find("span").each(function(){ id_span_array.push(this.id); });
-            event.preventDefault()
-                var description = $('#id_textarea_description').val()
-                $.post('', $('#id_form_append').serialize()+'&'+$.param({ 'description': description }), function(response){
-                    if(response['error'] === true){
-                        var span_id_array = []
-                        $('#id_form_append').find('span').each(function(){ var span_id = this.id
-                            if(span_id){
-                                span_id_array.push(span_id)
-                            }
-                        });
-                        for(var key in response){
-                            $('#' + span_id_array[key]).text('').append(display_error(response[key].email))
-                        }
-                    }
-                    else{
-                        alert('members added')
+        return ''
+    }
+    $("#dup_email").hide();
+    $('#id_button_create_member').click(function(event) {
+        var id_span_array = [];
+        $("#id_div_append").find("span").each(function() {
+            id_span_array.push(this.id);
+        });
+        event.preventDefault();
+
+        var description = $('#id_textarea_description').val();
+        $.post('', $('#id_form_append').serialize() + '&' + $.param({
+            'description': description
+        }), function(response) {
+            if (response['error'] === true) {
+                $('form span').text('');
+                var span_id_array = [];
+                $('#id_form_append').find('span').each(function() {
+                    var span_id = this.id;
+                    if (span_id) {
+                        span_id_array.push(span_id)
                     }
                 });
+                for (var key in response) {
+                    $('#' + span_id_array[key]).text('').append(display_error(response[key].email))
+                }
+                if(response['emails']){
+                    $("#dup_email").show()
+                }
+                else{
+                    $("#dup_email").hide()
+                }
+            } else {
+                window.location.href = "{% url 'project:project_team' slug %}";
+            }
         });
+    });
+
+
+    {% if project_roles|length == 0 %}
+        window.setTimeout(function(){
+            window.location.href = "{% url 'project:member_roles' slug %}";
+        }, 3000);
+    {% endif %}
+  {% endif %}
+    /* check member type*/
+
+    $('input[type="check"]')
+
+    /* end */
     </script>
-    {% endblock %}
+
+{% endblock %}

@@ -1,0 +1,254 @@
+{% extends 'base.html' %}
+{% load project_tags %}
+{% load static %}
+{% block content %}
+<section id='base_content'>
+    <div class="project_description">
+        <!-- about project -->
+        <div class="about_project_wrap">
+            <div class="title">
+
+                <span>{{ project.name }} - Issues</span>
+                <span class='header_button_wrap'>
+                    <a href="{% url 'project:create_issue' slug %}">
+                        <span class='header_button'><i class="fa fa-plus-circle"></i> New Issue</span>
+                    </a>
+                </span>
+            </div>
+        <nav class="navbar navbar-default">
+            <ul class="nav nav-tabs">
+                <li {% if not change_active %}class="active"{% endif %}><a href="{% url "project:issues" slug %}">Issues</a></li>
+                <li {% if change_active == "approved" %}class="active"{% endif %}><a href="{% url "project:issues_approved" slug %}">Approved</a></li>
+                <li {% if change_active == "closed" %}class="active"{% endif %}><a href="{% url "project:issues_closed" slug %}">Closed</a></li>
+            </ul>
+        </nav>
+            <!-- filters -->
+            <div class="filters_wrap">
+                <h3>Refine your search</h3>
+            <form action="" method="get" id="search">
+                <div class="row filter_row">
+
+                    <div class="col-md-2">
+                        <select class='select2 input issue_type' name="issue_type" multiple>
+                            {% for issue_type in issue_type_list%}
+                                <option value="{{ issue_type }}" {% for iss_type in search_filter.1 %}{% ifequal iss_type issue_type %}selected{% endifequal %}{% endfor %}>{{ issue_type }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select class='select2 input issue_title' name="issue_list" multiple>
+                            {% for issue in issue_list %}
+                                    <option value="{{ issue.id }}" {% for is_id in search_filter.2 %}{% ifequal is_id|add:'0' issue.id %}selected{% endifequal %}{% endfor %}>{{ issue.name }}</option>
+                            {% endfor %}
+                        </select>
+
+                    </div>
+                    <div class="col-md-2">
+                        <input name="start_date" type="text" class='input' value="{{ request.GET.start_date }}" id='sdate' placeholder='From Date'>
+                    </div>
+                    <div class="col-md-2">
+                        <input name="to_date"   type="text" class='input' value="{{ request.GET.to_date  }}" id='edate' placeholder='To Date'>
+                    </div>
+                    <div class="col-md-1">
+                        <button type="submit" class='submit_btn'><i class='fa fa-search'></i>Go</button>
+                    </div>
+                </div>
+            </form>
+
+            <!--<div id="not_found" style="display: none;">-->
+                <!--<hr>-->
+                <!--<div style="text-align: center;font-weight: bold;padding:0px;margin: 0px; color: #E88E00">-->
+                    <!--<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>-->
+                      <!--Sorry, Search query was not found !-->
+                <!--</div>-->
+                <!--<hr>-->
+            <!--</div>-->
+            <br>
+            <!--/ filters -->
+            <!-- lists div -->
+              <div class="table-responsive color-box">
+
+                            <table class="table table-striped" id="issue_container" >
+                                <thead>
+                                    <tr>
+                                        <th width="18%">Subject</th>
+                                        <th width="13%">Type</th>
+                                        <th width="5%"> Severity </th>
+                                        <th width="5%"> Priority</th>
+                                        <th width="16%"> Created </th>
+                                        <th width="8%">Actions</th>
+                                    </tr>
+                                </thead>
+                                {% for issue in issue_list %}
+                                <tbody style="cursor: pointer;">
+                                    <tr id="{{ issue.id }}" class="issues_rows">
+                                        <td> {{ issue.name }} </td>
+                                        <td> {{ issue.ticket_type }} </td>
+                                        </td>
+                                        <td scope="row">
+                                                <div class="input-group colorpicker-component demo demo-auto">
+                                                    <input name="color" type="text"  value="{{issue.severity.color}}" class="form-control demo" style="display: none"/>
+                                                    <span class="input-group-addon" style="background: none; border:none; "><i style="cursor: default;"></i></span>
+                                                </div>
+                                        </td>
+                                        <td scope="row">
+                                                <div class="input-group colorpicker-component demo demo-auto">
+                                                    <input name="color" type="text"  value="{{issue.priority.color}}" class="form-control demo" style="display: none"/>
+                                                    <span class="input-group-addon" style="background: none; border:none; "><i style="cursor: default;"></i></span>
+                                                </div>
+                                        </td>
+
+                                        <td> {{ issue.created_date }} </td>
+
+                                        <td>
+
+                                            <span class='actions_div'>
+                                                <!--<a href="{% url 'project:edit_issue' slug issue.id %}">-->
+                                                <a href="{% url 'project:edit_issue' slug issue.id %}">
+                                                    <span class='edit'>
+                                                        <i class='fa fa-pencil'></i>
+                                                        </span>
+                                                </a>
+                                                <!--<a href="#" class="delete" onclick="delete_issue('{{slug}}','{{issue.id}}')"><i class="fa fa-trash"></i></a>-->
+                                                <a class="delete_req" id='{{ issue.id }}' href="{% url 'project:delete_issue' slug issue.id %}">
+                                                    <span class='drop'>
+                                                    <i class='fa fa-close'></i>
+                                                    </span>
+                                                </a>
+                                            {% if not change_active %}
+                                                <a href="{% url 'project:issue_approve' slug issue.id %}">
+                                                    <i class="fa fa-thumbs-up"></i>
+                                                </a>
+                                            {% endif %}
+
+                                            {% if change_active == "closed" %}
+                                                <a href="{% url 'project:issue_reopen' slug issue.id %}" class="reopen">
+                                                    <button>re-open</button>
+                                                </a>
+                                            {% endif %}
+
+                                            </span>
+
+                                        </td>
+                                    </tr>
+
+                                    {% empty %}
+                                        {% if not issue_list %}
+                                        <!---
+                                        <div id="not_found">
+                                            <hr>
+                                                <div style="text-align: center;font-weight: bold;padding:0px;margin: 0px; color: #E88E00" class="search_warning">
+                                                    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                                                        Sorry, Search query not found !
+                                                </div>
+                                            <hr>
+                                        </div>-->
+                                        {% endif %}
+
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+
+
+            <!--/ lists div -->
+            <div class="clearfix"></div>
+        </div>
+        <!--/ about project -->
+    </div>
+    <!-- edit role add modal starts here -->
+
+    <!-- edit role add modal ends here -->
+  </section>
+{% endblock %}
+{% block extra_js_links%}
+    <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+{% endblock %}
+{% block extra_js %}
+  <script type="text/javascript">
+    $('.demo').colorpicker().css({'pointer-events': 'none'});
+    $('.demo').removeClass('');
+    $(function() {
+        $('.scroll').slimscroll({
+            alwaysVisible: false,
+            height: 350
+        });
+    });
+    $('.sub_list').mouseenter(function(event) {
+        $(this).closest('.parent_list').addClass('active_li_drop')
+    });
+    $('.sub_list').mouseleave(function(event) {
+        $(this).closest('.parent_list').removeClass('active_li_drop')
+    });
+    </script>
+    <script type="text/javascript">
+     $(function() {
+        $("#sdate, #edate").datepicker();
+    });
+    </script>
+    <script type="text/javascript">
+
+        $(".issue_type").select2({
+          tags: "true",
+          placeholder: "Issue Type"
+        });
+
+        $(".issue_title").select2({
+          tags: "true",
+          placeholder: "Issue Title"
+        });
+
+        $(".select2_task").select2({
+          tags: "true",
+          placeholder: "Task Title"
+        });
+    /* extra code */
+
+        $('tr .issue').change(function(e){
+            $row= $(this).closest('tr');
+            var data = "issue_id="+$row.attr('id');
+            $.each($row.find('select[name]'), function(index,value){
+                data += '&'+$(value).serialize()
+            });
+            $.get("{% url 'project:update_issue' slug %}"+'?'+data);
+        });
+        $('#issue_container tbody tr').click(function(e){
+            var id = $(this).attr('id');
+            window.location.href = "/project/{{ slug }}/issue/"+id+"/details"
+        }).children().find('select').on('click', function(){return false;});
+
+        /* delete issue */
+
+        function delete_issue(slug, id) {
+            alert(id);
+            $.get('/project/{{slug}}/issue/'+id+'/delete', function(response) {
+                if (!response.error) {
+                    $('#' + id).remove();
+                }
+            });
+        }
+
+        /* delete issues ends here */
+
+
+
+            if ($('#not_found')){
+                setTimeout(function () {
+                    $('#not_found').hide();
+                }, 3000);
+        }
+
+        {% if change_active == "closed" %}
+            $("a.reopen").click(function (e) {
+                $instance = $(this)
+                $.get($(this).attr('href'), function (response) {
+                    if (response['result']){
+                        $("#"+$instance.closest('tr').attr('id')).remove()
+                    }
+                })
+
+                e.preventDefault()
+                e.stopPropagation();
+            })
+        {% endif %}
+    </script>
+{% endblock%}

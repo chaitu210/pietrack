@@ -1,92 +1,83 @@
-{% extends 'base.html' %}
-{% load compress %}
+{% extends 'settings/base.html' %}
+{% load project_tags %}
 {% load static %}
 {% load staticfiles %}
-{% block content %}
-{% compress css %}
-     {% block extra_css_links %}
-        <link rel="stylesheet" type="text/css" href="{%static 'less/bs_leftnavi.less' %}">
-     {% endblock %}
-{% endcompress %}
+{% block settings_content %}
 
-<section id="box-content">
-  <!-- nav left starts here-->
-  <div class="nav-left">
-    <!-- left menu starts here -->
-    <div class="nano-content">
-      <ul class="gw-nav gw-nav-list">
-        <li class="init-un-active">
-          <a href="{%url 'project:project_details' slug %}"> <span class="gw-menu-text"> <i class="fa fa-area-chart"></i> Project Details</span> </a>
-        </li>
-        <li class="init-arrow-down">
-          <a href="javascript:void(0)"> <span class="gw-menu-text"> <i class="fa fa-sort-amount-asc"></i> Attributes</span> <b class="gw-arrow"></b> </a>
-          <ul class="gw-submenu">
-            <li> <a href='{%url "project:ticket_status" slug %}'>Status</a> </li>
-            <li> <a href='{%url "project:issues_priorities" slug %}'>Priorities</a> </li>
-            <li> <a href='{%url "project:issues_severities" slug %}'>Severities</a> </li>
-          </ul>
-        </li>
-        <li>
-          <a href="{%url 'project:manage_members' slug %}"> <span class="gw-menu-text"><i class="fa fa-users"></i> Members</span> </a>
-        </li>
-        <li>
-          <a href="{%url 'project:manage_role' slug %}"> <span class="gw-menu-text"> <i class="fa fa-lock"></i> Permissions</span> </a>
-        </li>
-      </ul>
-    </div>
-    <!-- left menu ends here -->
-  </div>
-  <!-- nav left ends here-->
-  <!-- nav left ends here-->
-  <!-- right container starts here-->
-  <div class="right-container">
-    <div class="panel panel-default content-panel">
-      <div class="panel-body">
-        <!-- content box starts here -->
-        <div class="content_box">
-          <div class="title">
-            <h4>SAMPL1PROJECT DETAILS</h4>
-            <div class="tag">Compellingly reintermediate premier materials for client-centered markets.for client-centered markets.</div>
-          </div>
-          <form action="" method="post" id="id_form_cproject">
-            {%csrf_token%}
-            <div class="panel_box">
-              <div class="form_group">
-                <label>Project Name</label>
-                <input name='name' type="text" class="form-control" value="{{project.name}}">
-                <input name='oldname' type="hidden" class="form-control" value="{{project.slug}}">
-                <span name="pname_error"></span>
-                <!--Error here -->
-                <div class="help">Dynamically maximize professional models whereas.</div>
-              </div>
-              <div class="form_group">
-                <label>Description</label>
-                <textarea name='description' class="textarea">{{project.description}}</textarea>
-                <span name="pdescription_error"></span>
-                <!--Error here -->
-                <div class="help">Dynamically maximize professional models whereas.</div>
-              </div>
-              <button>Save</button>
-              <span class="del-project"><a href="{%url 'project:delete_project' id=project.id %}">Delete Project</a>
-              </div>
-            </form>
+    <!-- right container starts here-->
+    <div class="right-container">
+        <div class="panel panel-default content-panel">
+            <div class="panel-body">
+                <!-- content box starts here -->
+                <div class="content_box">
+                    <div class="title">
+                        <h4>{{ project.name }} DETAILS</h4>
+                        <div class="tag">
+                          The project plan serves as a roadmap for the entire project team 
+                        </div>
+                    </div>
+                    <form action="" method="post" id="id_form_cproject">
+                        {%csrf_token%}
+                        <div class="panel_box">
+                            <div class="form_group">
+                                <label>Project Name</label>
+                                <input name='name' type="text" class="form-control" value="{{project.name}}">
+                                <input name='oldname' type="hidden" class="form-control" value="{{project.slug}}">
+                                <span name="pname_error" class="help"></span>
+                            </div>
+                            <div class="form_group">
+                                <label>Description</label>
+                                <textarea id="description" name='description' class="textarea">{{project.description}}</textarea>
+                                <span name="pdescription_error" class="help"></span>
+                            </div>
+                            <div class="form_group">
+                                <label>Logo</label>
+
+                                   <img id="logo" src="{% if project.logo %}{{project.logo.url}}{% else %}{% static 'img/Project_logo.png' %}{% endif %}" class="img-responsive img-thumbnail" style="width:100px;height:100px;margin-left:20px;margin-bottom:10px;" />
+
+                                    <input id="file" name="logo" type="file" value="" style="display:none;"/>
+                                    <br>
+                                    <span  id="logo-err" class="help" style="margin-left:20px;margin-bottom:10px;"></span>
+
+
+                                <!--<a href="{% url 'project:git_lab' slug %}" class="git_lab"><i class="fa fa-git"></i> Git Lab settings</a>-->
+                            </div>
+                            <!--<br />-->
+
+                            <button class="special-button"><span class="fa fa-save"></span> Save</button>
+                             {% if request.user.pietrack_role == 'admin' %}
+                            <span class="del-project">
+                                <a href="{%url 'project:delete_project' slug=slug id=project.id %}"><input type="button" class="special-button" value="Delete"/></a>
+                            </span>
+                            {% endif %}
+                      </div>
+                    </form>
               <!-- content box starts here -->
+                </div>
               </div>
-              </div>
-             </div>
+           </div>
         </div>
         <!-- right container ends here-->
-    </section>
-
 {% endblock %}
 
-{%block extra_js_links %}
-    <script type="text/javascript" src="{%static 'js/bs_leftnavi.js' %}"></script>
-{%endblock extra_js_links %}
+{%block extra_js %}
 
-{%block create_project_js%}
+    <script type="text/javascript">
+        CKEDITOR.replace('description', {
+            customConfig: "{% static 'js/custom/ckeditor_config.js' %}"
+        });
+    </script>
 
-      /*Backend code start */
+  <script type="text/javascript">
+        $("#logo").click(function(e){
+            $("#file").click()
+        });
+        $("#file").change(function(e){
+            var tmppath = URL.createObjectURL(event.target.files[0]);
+            if(tmppath){
+              $("#logo").attr('src',tmppath)  
+            }
+        });
         function send_error(error)
           {
               if(error)
@@ -94,22 +85,39 @@
               return "";
           }
         $('#id_form_cproject').on('submit',function(e){
-          $.post('',$('#id_form_cproject').serialize(),function(response){
-            if(response['error']){
-              $("span[name='pname_error']").text(send_error(response['errors'].name));
-              $("span[name='pdescription_error']").text(send_error(response['errors'].description));
-            }
-            else{
-              /*redirect page here */
-              $("span[name='pname_error']").text("");
-              $("span[name='pdescription_error']").text("");
-              alert("Project edited");
-              window.location.href="{%url 'project:list_of_projects'%}"
-              
-              
+          $('#description').val(CKEDITOR.instances.description.getData());
+          var form = this;
+          var formData = new FormData($(this)[0]);
+          $.ajax({
+            url: "",
+            data: formData,
+            enctype: 'multipart/form-data',
+            processData: false,
+            contentType: false,
+            type: 'POST',
+            success: function(response) {
+                if(response['error']){
+                    $("span[name='pname_error']").text(send_error(response['errors'].name));
+                    $("span[name='pdescription_error']").text(send_error(response['errors'].description));
+
+                    if(response['logo'])
+                      {
+                          $("#logo-err").text("Please choose a Image(png/jpg/gif)")
+                      }
+                  }
+                  else{
+                    $("span[name='pname_error']").text("");
+                    $("span[name='pdescription_error']").text("");
+                    /*alert("Project edited");*/
+                    window.location="{% url 'project:project_detail' slug %}"
+                  }
             }
           });
+
           e.preventDefault();
         });
-      /*Backed code end*/
+  </script>
+    <script type="text/javascript">
+       $('.edit-project').addClass('active');
+    </script>
 {%endblock %}

@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+{%load static %}
+{% load project_tags %}
+{%block content %}
+    <section id='base_content'>
+    
+      <div class="project_description">
+        <!-- about project -->
+        <div class="col-md-9 about_project_wrap">
+          <div class="title">
+            <span>{{project.name}}</span>
+          {% if request.user.pietrack_role == 'admin' or request.user|is_project_admin:slug %}
+            <span class='header_button_wrap'>
+            <!-- <span class='header_button'>New Task</span>
+            <span class='header_button'>New Requirement</span> -->
+            <a href="{% url 'project:milestone_create' slug %}"><span class='header_button'><i class="fa fa-plus"></i> New MileStone</span></a>
+            </span>
+          {% endif %}
+          </div>
+          <!-- mile stones -->
+          <div class="mile_stone_wrap">
+          <!-- milestone -->
+            {% if milestones_list %}
+              {% for milestone in milestones_list %}
+
+              <span class="col-md-4 mile_stone_each">
+                <span class="milestone_container">
+              {% if request.user.pietrack_role == 'admin' or request.user|is_project_admin:slug %}
+                <span class='actions_row'>
+                <a href="{% url 'project:milestone_edit' slug milestone.slug %}"><i class='fa fa-pencil'></i></a>
+                <a href="{% url 'project:milestone_delete' slug milestone.slug %}"><i class='fa fa-times'></i></a>
+                </span>
+              {% endif %}
+                <a href="{% url 'project:taskboard' slug milestone.slug %}">
+                  <span class='title'>
+                    {{milestone.name}}
+                  </span>
+                  <span class='col-md-6 start_date'>
+                    <span class='title'>
+                    Start date
+                    </span>
+                    <span class='date'>
+                      {{milestone.estimated_start|date:"d/m/Y"}}
+                    </span>
+                  </span>
+                  <span class='col-md-6 end_date'>
+                    <span class='title'>
+                    End date
+                    </span>
+                    <span class='date'>
+                      {{milestone.estimated_finish|date:"d/m/Y"}}
+                    </span>
+                  </span>
+                  <span class='clearfix'></span>
+                  <span class='author'>
+                    by <span class='name'>{{milestone.created_by.username}}</span>
+                  </span>
+                  <span class='count_wrap'>
+                  <span class="status">Status : {{ milestone.status|title }}</span>
+                  <span class='count'>
+                  <i class='fa fa-trophy'></i>Tasks : {{milestone.tasks.count}}</span>
+                  </span>
+                  </a>
+                </span>
+              </span>
+              {% endfor %}
+              <!--/ milestone -->
+              <div class="clearfix"></div>
+            {% else %}
+
+              <br clear="clearfixall" />
+              <div class="panel panel-primary">
+                  <div class="panel-heading">
+                      <h3 class="panel-title"> Message </h3>
+                  </div>
+                  <div class="panel-body">
+                      No milestones were added yet.
+                      {% if request.user.pietrack_role == 'admin' or request.user|is_project_admin:slug %}
+                            Create a new milestone for this project
+                      {% endif %}
+                  </div>
+              </div>
+            {% endif %}
+          </div>
+          <!--/ mile stones -->
+        </div>
+        <!--/ about project -->
+        <!-- team -->
+        <div class="col-md-3 team">
+          <div class="team-block">
+            <div class="title">
+              <span><i class="fa fa-users"></i> Team Members</span>
+            </div>
+            <!-- ticket -->
+            {% for team_member in project.members.all %}
+            <span class='ticket orange'>
+                {%if team_member.profile_pic %}
+                    <img src="{{ team_member.profile_pic.url }}">
+                {% else %}
+                    <img src="{% static 'img/user-pic.jpg' %}">
+                {% endif%}
+                <span class='description'>
+                    <span class='name'>
+                        {% if team_member.first_name %}{{ team_member.first_name }}{% else %}{{ team_member.username }}{% endif %}
+                    </span>
+                    {% if team_member.pietrack_role == 'admin' %} (<i class="fa fa-user"></i> admin){% endif %}
+                    <span class='designation_time'>{{team_member|get_user_Role:project}}</span>
+                </span>
+                <!-- for active user indication -->
+                {% if team_member.username == request.user.username %}
+                    <span class="active-user"><i class="fa fa-check-circle"></i></span>
+                {% endif %}
+                <!-- // -->
+            </span>
+            {% endfor %}
+            <!--/ ticket -->
+          </div>
+          <!--/ team -->
+        </div>
+        <!--/ main project div-->
+      </div>
+    </section>
+{% endblock %}
+{% block extra_js %}
+{% if request.user.pietrack_role == 'admin' or request.user|is_project_admin:slug %}
+    <script>
+      $('body').on('click','a .fa-times', function(e){
+        var url = $(this).parent().attr('href');
+        var milestone = this;
+        $.get(url,function(response){
+          if(response['result']){
+            $(milestone).closest('.mile_stone_each').remove();
+            window.location = window.location.pathname;
+          }
+        });
+        e.preventDefault();
+      });
+    </script>
+{% endif %}
+{% endblock%}

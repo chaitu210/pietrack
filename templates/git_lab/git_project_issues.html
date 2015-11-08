@@ -1,0 +1,79 @@
+{% extends 'git_lab/base.html' %}
+{% load project_tags %}
+{% load static %}
+{% load staticfiles %}
+{% block settings_content %}
+
+<!-- right container starts here-->
+<div class="right-container">
+        <div class="panel panel-default content-panel">
+            <div class="panel-body">
+                <!-- content box starts here -->
+                <div class="content_box">
+                    <div class="title">
+                        <h4>{{ project.name }} - Git Project "{{ resp.name }}" Issues</h4>
+                        <div class="tag">
+                          For project settings of GitLab
+                        </div>
+                    </div>
+                    {% if project and resp and issues %}
+
+                        <div class="table-responsive">
+
+
+                            <h1>Project Issues :</h1>
+                            <br />
+
+                            <table class="table table-bordered">
+                                <thead>
+                                    <th>Id</th>
+                                    <th>Title</th>
+                                    <th>Description</th>
+                                    <th>State</th>
+                                    <th>Labels</th>
+                                    <th>Created By</th>
+                                    <th>Milestone</th>
+                                    <th>Project</th>
+                                </thead>
+
+                                <tbody>
+                                {% for issue in issues %}
+                                    <tr>
+                                        <td><a href="{% url 'project:git_project_issue_comments' slug issue.id %}">{{ issue.id }}</a></td>
+                                        <td>{{ issue.title }}</td>
+                                        <td>{{ issue.description }}</td>
+                                        <td>{{ issue.state }}</td>
+                                        <td>{% for label in issue.labels %}{{ label }}{% if not forloop.last %}, {% else %}{% endif %}{% endfor %}</td>
+                                        <td><img src="{{ issue.author.avatar_url }}" class="responsive" height="30px"> {{ issue.author.name }}</td>
+                                        <td>{% if issue.milestone.title %}{{ issue.milestone.title }}{% else %}Not assigned{% endif %}</td>
+                                        <td>{{ issue.project_id }}</td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+
+                        </div>
+
+                    {% else %}
+                    <div class="row">
+                          <p align="center">No issues were created on this project : <b>"{{ resp.name }}"</b>.</p>
+                    </div>
+                    {% endif %}
+              <!-- content box starts here -->
+                </div>
+              </div>
+           </div>
+        </div>
+        <!-- right container ends here-->
+
+
+{% endblock %}
+
+{%block extra_js %}
+
+    <script type="text/javascript">
+        $('#git_submenu').attr('class', 'arrow-up active');
+        $('#git_submenu ul').show().children('li#git_project_issues').addClass('active');
+    </script>
+
+{% endblock %}

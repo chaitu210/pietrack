@@ -5,57 +5,60 @@
       <div class="content_box">
   <div class="title">
     <h4>User Profile</h4>
-    <div class="tag">Compellingly reintermediate premier materials for client-centered markets.for client-centered markets.</div>
   </div>
   <div class="panel_box">
     <form class="" action="" method="post" id="post-form" enctype="multipart/form-data">
       {% csrf_token %}
       <div class="user-pic-block">
         <span class="user-picture">
-                     {% if user.profile_pic %}
-                    <img src="{{ user.profile_pic.url }}" width="100px" height="100px"/>
-                     {% else %}
-                     <img src="{% static 'img/user-pic.jpg' %}" />
-                     {% endif %}
-                 </span>
-        <span class="pic-size">The image will be scaled to 80x80px.</span>
+            <img id="profile_picture" src="{% if user.profile_pic %}{{ user.profile_pic.url }}{% else %}{% static 'img/user-pic.jpg' %}{% endif %}" width="100px" height="100px"/>
+        </span>
         <span class="pic-btn">
-                     <button id="change_picture_button">Change Picture</button>
-                    <input id="id_profile_pic" name="profile_pic" type="file" style='display:none;'/>
-                 </span>
+            <button id="change_picture_button"><i class="fa fa-photo"></i> Change Picture</button>
+            <input id="id_profile_pic" name="profile_pic" type="file" style='display:none;' onchange="loadFile(event)" />
+        </span>
+        <span class="pic-size">The image will be scaled to 80x80px.</span>
       </div>
       <div class="form_group">
-        <label for="id_username">User Name</label>
-        <input id="id_username" name="username" type="text" class='input' value="{{ user.username }}">
+        <label for="username">User Name</label>
+        <input id="username" name="username" type="text" class='input' placeholder="Enter your username here" value="{{ user.username }}">
         <span name="username"></span>
-        <div class="help">Type your username here</div>
       </div>
       <div class="form_group">
-        <label for="id_email">Email Address</label>
-        <input type="text" class='input' id="id_email" name="email" value="{{ user.email }}">
+        <label for="email">Email Address</label>
+        <input type="text" class='input' id="email" name="email" placeholder="Enter your email here" value="{{ user.email }}" disabled>
         <span name="email"></span>
-        <div class="help">Type your email address here</div>
       </div>
       <div class="form_group">
-        <label for="id_first_name">Full Name</label>
-        <input type="text" class='input' id="id_first_name" name="first_name" value="{{ user.first_name }}">
+        <label for="first_name">Full Name</label>
+        <input type="text" class='input' id="first_name" name="first_name" placeholder="Enter your full name here" value="{{ user.first_name }}">
         <span name="first_name"></span>
-        <div class="help">Type your Full name here</div>
       </div>
       <div class="form_group">
-        <label for="id_biography">Bio (Max 300 letters)</label>
-        <textarea class="form-control textarea" id="id_biography" name="biography">{{ user.biography }}</textarea>
-        <span name="biography"></span>
-        <div class="help">Type your bio-graphy here</div>
+        <label for="organization">organization</label>
+        <input type="text" class='input' id="organization" name="organization" placeholder="Enter your organization name here" value="{{ user.organization.name }}" {% if not user.pietrack_role == 'admin' %}disabled{% endif %}>
+        {% if not user.pietrack_role == 'admin' %}<input type="hidden" class='input' id="organization" name="organization" value="{{ user.organization.name }}">{% endif %}
+        <span name="organization"></span>
       </div>
-      <button>Save</button>
+      <div class="form_group">
+        <label for="domain">Domain</label>
+        <input type="text" class='input' id="domain" name="domain" placeholder="Enter your domain name here" value="{{ user.organization.domain }}" {% if not user.pietrack_role == 'admin' %}disabled{% endif %}>
+          {% if not user.pietrack_role == 'admin' %}<input type="hidden" class='input' id="domain" name="domain" value="{{ user.organization.domain }}">{% endif %}
+        <span name="domain"></span>
+      </div>
+      <div class="form_group">
+        <label for="biography">About You</label>
+        <textarea class="form-control textarea" id="biography" name="biography" placeholder="Please fill about your self">{{ user.biography }}</textarea>
+        <span name="biography"></span>
+      </div>
+      <button><i class="fa fa-save"></i> Save</button>
     </form>
   </div>
 </div>
 </section>
 
 {% endblock %}
-{% block jscript %}
+{% block extra_js %}
     <script src="http://malsup.github.com/jquery.form.js"></script>
         <script type="text/javascript" >
 
@@ -64,32 +67,27 @@
         $("#id_profile_pic").click()
         });
 
-        function display_error(response){
-            if(response){
-                return response;
-            }
-            else{
-                return '';
-            }
-        };
-
         $('#post-form').ajaxForm(function(){
 
-            $.post("{% url 'accounts:user_profile' %}",$('form').serialize(), function(result){
-                if(result['error']){
-                    $("span[name='profile_pic']").text(display_error(result['response'].profile_pic));
-                    $("span[name='username']").text(display_error(result['response'].username));
-                    $("span[name='email']").text(display_error(result['response'].email));
-                    $("span[name='first_name']").text(display_error(result['response'].first_name));
-                    $("span[name='last_name']").text(display_error(result['response'].last_name));
-                    $("span[name='biography']").text(display_error(result['response'].biography));
+            $.post("{% url 'user:user_profile' %}",$('#post-form').serialize(), function(data){
+                if(data.error){
+                    $('p.error_required').remove();
+                    for (var key in data.response) {
+                        $('#' + key).after('<p class="error_required">' + data.response[key] + '</p>');
+                    }
+                }else{
+                    /*alert(data['response']);*/
+                    window.location=''
                 }
-
-                else{
-                    alert(result['response']);
-                }
-            });
+            }, 'json');
         });
+
+  // for changing the profile-picture on browsing
+        var loadFile = function(event) {
+            var output = document.getElementById('profile_picture');
+            output.src = URL.createObjectURL(event.target.files[0]);
+        };
+
 
     </script>
 

@@ -1,0 +1,75 @@
+{% extends 'git_lab/base.html' %}
+{% load project_tags %}
+{% load static %}
+{% load staticfiles %}
+{% block settings_content %}
+
+<!-- right container starts here-->
+<div class="right-container">
+        <div class="panel panel-default content-panel">
+            <div class="panel-body">
+                <!-- content box starts here -->
+                <div class="content_box">
+                    <div class="title">
+                        <h4>{{ project.name }} - Git Project "{{ resp.name }}" Issue Comments</h4>
+                        <div class="tag">
+                          For project settings of GitLab
+                        </div>
+                    </div>
+                    {% if resp and issue_comments %}
+
+                        <div class="table-responsive">
+
+
+                            <h1>Project Issue Comments :</h1>
+                            <br />
+
+                            <table class="table table-bordered">
+                                <thead>
+                                    <th>Id</th>
+                                    <th>Body</th>
+                                    <th>Attachment</th>
+                                    <th>State</th>
+                                    <th>Created By</th>
+                                    <th>Created On</th>
+                                </thead>
+
+                                <tbody>
+                                {% for comment in issue_comments %}
+                                    <tr>
+                                        <td>{{ comment.id }}</td>
+                                        <td>{{ comment.body }}</td>
+                                        <td>{{ comment.attachment }}</td>
+                                        <td>{{ comment.system }}</td>
+                                        <td><img src="{{ comment.author.avatar_url }}" class="responsive" height="30px"> {{ comment.author.name }}</td>
+                                        <td>{{ comment.created_at }}</td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+
+                        </div>
+
+                    {% else %}
+                    <div class="row">
+                      <p align="center">There are no comments posted on this issue.</p>
+                    </div>
+                    {% endif %}
+              <!-- content box starts here -->
+                </div>
+              </div>
+           </div>
+        </div>
+        <!-- right container ends here-->
+
+
+{% endblock %}
+
+{%block extra_js %}
+
+    <script type="text/javascript">
+        $('#git_submenu').attr('class', 'arrow-up active');
+        $('#git_submenu ul').show().children('li#git_project_issues').addClass('active');
+    </script>
+
+{% endblock %}

@@ -3,6 +3,8 @@ piebase/migrations/*
 *.pyc
 *~
 .idea/
-media/profile
+media
 pietrack/local_settings.py
 .coverage
+*.swp
+pietrack.egg-info/

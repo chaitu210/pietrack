@@ -52,6 +52,8 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # added for simple pagination
+    'simple_pagination',
     'compressor',
     'accounts',
     'dashboard',
@@ -60,6 +62,7 @@ INSTALLED_APPS = (
     'reports',
     'djcelery',
     'kombu.transport.django',
+    'task',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -114,7 +117,7 @@ DATABASES = {
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Kolkata'
 
 USE_I18N = True
 
@@ -166,14 +169,11 @@ COMPRESS_OFFLINE_CONTEXT = {
 COMPRESS_CSS_FILTERS = ['compressor.filters.css_default.CssAbsoluteFilter', 'compressor.filters.cssmin.CSSMinFilter']
 COMPRESS_JS_FILTERS = ['compressor.filters.jsmin.JSMinFilter']
 
-EMAIL_USE_TLS = True
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 25 
-EMAIL_HOST_USER = ''
-EMAIL_HOST_PASSWORD = ''
- 
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
-SERVER_EMAIL = EMAIL_HOST_USER
+# EMAIL_HOST = ''
+EMAIL_HOST_USER = 'micropyramid'
+# EMAIL_HOST_PASSWORD = ''
+# EMAIL_PORT = 8080
+# EMAIL_USE_TLS = True
 
 try:
     from local_settings import *

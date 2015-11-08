@@ -28,7 +28,7 @@ urlpatterns = [
     url(r'^project/', include('project.urls', namespace='project')),
     url(r'^user/', include('accounts.urls', namespace='user')),
     url(r'^dashboard/', include('dashboard.urls', namespace='dashboard')),
-    url(r'^tickets/', include('tickets.urls', namespace='tickets')),
+    url(r'^project/(?P<slug>[-\w]+)/(?P<milestone_slug>[a-zA-Z0-9-]+)/task/', include('task.urls', namespace='task')),
 ] + static(MEDIA_URL, document_root=MEDIA_ROOT)
 
 urlpatterns += patterns('',

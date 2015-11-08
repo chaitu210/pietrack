@@ -1,0 +1,147 @@
+{% extends 'git_lab/base.html' %}
+{% load project_tags %}
+{% load static %}
+{% load staticfiles %}
+{% block settings_content %}
+
+<!-- right container starts here-->
+<div class="right-container">
+        <div class="panel panel-default content-panel">
+            <div class="panel-body">
+                <!-- content box starts here -->
+                <div class="content_box">
+
+                    {% if project.git_id and resp %}
+                        {% if resp.avatar_url %}
+                            <div class="row" align="center">
+                                <img src="{{ resp.avatar_url }}" class="img-thumbnail" width="150px">
+                            </div>
+                        {% else %}
+                            <div class="" align="center">
+                                <div class="row" id="project_name">{{ resp.name }}</div>
+                            </div>
+                        {% endif %}
+                    <div class="title">
+                        <h4>{{ resp.name }}</h4>
+                        <div class="tag">
+                          {% if resp.description %}{{ resp.description }}{% else %}No description provided{% endif %}
+                        </div>
+                    </div>
+                    <div class="row">
+                      <div class="" align="center">
+                        <div class="btn-group" role="group" aria-label="...">
+                            <span class="btn btn-default" type="button">
+                                <i class="fa fa-{% if resp.visibility_level == 0 %}lock{% elif resp.visibility_level == 10 %}globe{% else %}shield{% endif %} fa-fw"></i>
+                                {% if resp.visibility_level == 0 %}
+                                    Private
+                                {% elif resp.visibility_level == 10 %}
+                                    Public
+                                {% else %}
+                                    Internal
+                                {% endif %}
+                            </span>
+                        </div>
+                      </div>
+                    </div>
+
+
+                        <div class="table-responsive">
+
+                            <h1>Project Details :</h1>
+                            <br />
+                            <div class="row">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <th>Id</th>
+                                        <th>Name</th>
+                                        <th>Description</th>
+                                        <th>Owner</th>
+                                    </thead>
+
+                                    <tbody>
+                                        <td>{{ resp.id }}</td>
+                                        <td>{{ resp.name }}</td>
+                                        <td>{% if resp.description %}{{ resp.description }}{% else %}No description provided{% endif %}</td>
+                                        <td><img src="{{ resp.owner.avatar_url }}" class="responsive circle" height="30px"> {{ resp.owner.name }}</td>
+                                    </tbody>
+
+                                </table>
+                            </div>
+
+                        </div>
+                    <!--<div class="row">
+                        <a id="switch_button" href="#">Show/Hide</a>
+                        <div id="item_link">
+                            {{ resp.ssh_url_to_repo }}
+                        </div>
+                    </div>-->
+                    {% else %}
+                        <div class="row">
+                            <blockquote>
+                              <p>Please select the project from the GitLab listed projects.</p>
+                              <footer> Click <cite title="Source Title"><a href="{% url 'project:git_lab' slug %}">Here</a></cite></footer>
+                            </blockquote>
+                        </div>
+                    {% endif %}
+              <!-- content box starts here -->
+                </div>
+              </div>
+           </div>
+        </div>
+        <!-- right container ends here-->
+
+
+{% endblock %}
+
+{%block extra_js %}
+
+    <script type="text/javascript">
+        $('#git_submenu').attr('class', 'arrow-up active');
+        $('#git_submenu ul').show().children('li#git_project_details').addClass('active');
+
+        $( "#switch_button" ).click(function() {
+            $( "#item_link" ).toggle();
+        });
+
+    </script>
+
+    <script type="text/javascript">
+
+        $(document).ready(function(){
+        $('#project_name').nameBadge({border: {
+                width: 0
+            },
+            colors: ['#1abc9c', '#2ecc71', '#e74c3c', '#34495e', '#f1c40f', '#a3a948', '#edb92e', '#f85931', '#ce1836', '#009989'],
+            text: '#fff',
+            margin: 15,
+            size: 120});
+        });
+
+
+        /*$(document).ready(function(){
+          $('#project_name').nameBadge({
+            // boder options
+            border: {
+              color: '#ddd',
+              width: 3
+            },
+            // an array of background colors.
+
+            colors: ['#a3a948', '#edb92e', '#f85931', '#ce1836', '#009989'],
+            // text color
+            text: '#fff',
+            // avatar size
+            size: 72,
+            // avatar margin
+            margin: 5,
+            // disable middle name
+            middlename: true,
+            // force uppercase
+            uppercase: false});
+        });*/
+
+    </script>
+
+
+
+{% endblock %}
