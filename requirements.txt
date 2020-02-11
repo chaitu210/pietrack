@@ -1,4 +1,4 @@
-Django==1.8.4
+Django==1.11.28
 PAM==0.4.2
 Twisted-Core==15.2.1
 Twisted-Web==15.2.1
