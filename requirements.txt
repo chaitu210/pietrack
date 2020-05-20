@@ -32,7 +32,7 @@ fontforge==1.0
 futures==3.0.3
 gyp==0.1
 html5lib==0.999
-httplib2==0.9
+httplib2==0.18.0
 idna==2.0
 ipaddress==1.0.14
 isort==4.0.0
