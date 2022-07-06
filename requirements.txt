@@ -31,7 +31,7 @@ flake8==2.4.1
 fontforge==1.0
 futures==3.0.3
 gyp==0.1
-html5lib==0.999
+html5lib==0.999999999
 httplib2==0.9
 idna==2.0
 ipaddress==1.0.14
